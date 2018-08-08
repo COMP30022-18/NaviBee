@@ -92,4 +92,8 @@
     </string>
     <string name="action_settings">Settings</string>
     <string name="app_version_short">α</string>
+    <string name="landing_navigation">Get somewhere</string>
+    <string name="landing_events">Events</string>
+    <string name="landing_social">Friends</string>
+    <string name="landing_sos">SOS</string>
 </resources>
