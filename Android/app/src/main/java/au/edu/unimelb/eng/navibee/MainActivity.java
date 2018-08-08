@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textView2.setText(email);
 
         findViewById(R.id.sign_out_button).setOnClickListener(this);
+        findViewById(R.id.landing_social_btn).setOnClickListener(this);
     }
 
     @Override
@@ -53,6 +54,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
                 this.finish();
                 break;
+
+            case R.id.landing_social_btn:
+                startActivity(new Intent(this, FriendActivity.class));
+                break;
+
         }
     }
 }
