@@ -21,10 +21,10 @@ public class SosActivity extends AppCompatActivity {
 
         callButton.setOnClickListener(new View.OnClickListener() {
             // Check permission function does not work...
-            @SuppressLint("MissingPermission")
+//            @SuppressLint("MissingPermission")
             @Override
             public void onClick(View view) {
-                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                Intent callIntent = new Intent(Intent.ACTION_DIAL);
                 callIntent.setData(Uri.parse("tel:" + phoneNumber.getText().toString()));
                 callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
