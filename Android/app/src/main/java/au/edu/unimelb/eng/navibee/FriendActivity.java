@@ -19,6 +19,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.FirebaseFunctionsException;
+import com.google.firebase.functions.HttpsCallableResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +33,7 @@ public class FriendActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private String userId;
+    private FirebaseFunctions mFunctions;
 
     ArrayList<String> contactList = new ArrayList<String>();
     ArrayAdapter<String> contactListAdapter;
@@ -66,6 +70,7 @@ public class FriendActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        mFunctions = FirebaseFunctions.getInstance();
 
 
         contactListAdapter = new ArrayAdapter<String>(this,
@@ -79,30 +84,28 @@ public class FriendActivity extends AppCompatActivity {
     }
 
     private void loadContactList() {
-        DocumentReference docRef = db.collection("users").document(userId);
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        mFunctions.getHttpsCallable("getFriendList")
+                .call(new HashMap<>()).addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        ArrayList<String> contacts = (ArrayList<String>)document.get("contacts");
-
-
-                        contactList.clear();
-                        contactList.addAll(contacts);
-                        contactListAdapter.notifyDataSetChanged();
-
-
-
-                        Log.d("Firestore", "test");
-
-
-                    } else {
-                        Log.d("Firestore", "data not exists");
-                    }
+            public void onComplete(@NonNull Task<HttpsCallableResult> task) {
+                if (!task.isSuccessful()) {
+//                    Exception e = task.getException();
+//                    if (e instanceof FirebaseFunctionsException) {
+//                        FirebaseFunctionsException ffe = (FirebaseFunctionsException) e;
+//                        FirebaseFunctionsException.Code code = ffe.getCode();
+//                        Object details = ffe.getDetails();
+//                    }
+//
                 } else {
-                    Log.d("Firestore", "get failed with ", task.getException());
+                    Map<String, Object> data = (Map<String, Object>) task.getResult().getData();
+                    ArrayList<Map<String, String>> list = (ArrayList<Map<String, String>>) data.get("list");
+
+                    contactList.clear();
+                    for (Map<String, String> item: list) {
+                        contactList.add(item.get("name"));
+                    }
+
+                    contactListAdapter.notifyDataSetChanged();
                 }
             }
         });
