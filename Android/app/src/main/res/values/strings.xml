@@ -96,4 +96,6 @@
     <string name="landing_events">Events</string>
     <string name="landing_social">Friends</string>
     <string name="landing_sos">SOS</string>
+    <string name="navigation_search_hint">Where do you want to go?</string>
+    <string name="search_button_text">Search</string>
 </resources>

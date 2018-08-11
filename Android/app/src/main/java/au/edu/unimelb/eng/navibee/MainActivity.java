@@ -11,6 +11,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import au.edu.unimelb.eng.navibee.navigation.DestinationsActivity;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     private FirebaseAuth mAuth;
@@ -54,5 +56,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 this.finish();
                 break;
         }
+    }
+
+    public void startNavigationActivity(View view) {
+        Intent intent = new Intent(this, DestinationsActivity.class);
+        startActivity(intent);
     }
 }
