@@ -1,28 +1,15 @@
 package au.edu.unimelb.eng.navibee;
 
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -45,49 +32,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textView2.setText(email);
 
         findViewById(R.id.sign_out_button).setOnClickListener(this);
-        findViewById(R.id.landing_social_btn).setOnClickListener(this);
-
-        initUserData();
-    }
-
-    private void initUserData() {
-        final FirebaseFirestore db = FirebaseFirestore.getInstance();
-        final String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        DocumentReference docRef = db.collection("users").document(userId);
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d("Firestore", "DocumentSnapshot data: " + document.getData());
-                    } else {
-                        // no user doc, create new one
-                        Map<String, Object> user = new HashMap<>();
-                        user.put("name", FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-                        user.put("contacts", Arrays.asList());
-
-                        db.collection("users").document(userId)
-                                .set(user)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Log.d("Firestore", "DocumentSnapshot successfully written!");
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.w("Firestore", "Error writing document", e);
-                                    }
-                                });
-                    }
-                } else {
-                    Log.d("Firestore", "get failed with ", task.getException());
-                }
-            }
-        });
     }
 
     @Override
@@ -109,10 +53,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
                 this.finish();
                 break;
-
             case R.id.landing_events_btn:
                 startActivity(new Intent(this, EventActivity.class));
                 break;
         }
     }
 }
+
