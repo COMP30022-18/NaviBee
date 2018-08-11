@@ -5,6 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -15,10 +18,31 @@ import au.edu.unimelb.eng.navibee.R
 
 class DestinationsActivity : AppCompatActivity() {
 
+    // Recycler view
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var viewAdapter: RecyclerView.Adapter<*>
+    private lateinit var viewManager: RecyclerView.LayoutManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_destinations)
         handleIntent(intent)
+
+        val destinations = ArrayList<DestinationRVItem>()
+//        destinations.add(DestinationRVButton("Say a place", "icon", "voice_search"))
+        destinations.add(DestinationRVDivider("Recent destinations"))
+        destinations.add(DestinationRVDivider("Recommended place"))
+
+        // setup recycler view
+        viewManager = LinearLayoutManager(this)
+        viewAdapter = DestinationsRVAdaptor(destinations)  // TODO: write adaptor and dataset
+
+        recyclerView = findViewById<RecyclerView>(R.id.nav_dest_recycler_view).apply {
+            setHasFixedSize(true)
+            layoutManager = viewManager
+            adapter = viewAdapter
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {
