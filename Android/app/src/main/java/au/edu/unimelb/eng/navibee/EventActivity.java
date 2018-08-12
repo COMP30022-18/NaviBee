@@ -1,11 +1,14 @@
 package au.edu.unimelb.eng.navibee;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -26,8 +29,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
+import static java.util.stream.IntStream.range;
+
 public class EventActivity extends AppCompatActivity {
 
+    public final static String USER_ID = "au.edu.unimelb.eng.navibee.USERID";
     private FirebaseFirestore db;
     private String userId;
 
@@ -39,18 +46,38 @@ public class EventActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
 
-        db = FirebaseFirestore.getInstance();
-        userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        //db = FirebaseFirestore.getInstance();
+        //userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+        // create Adapter and bind with eventList
         eventListAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1,
                 eventList);
 
-        ListView eventListView = (ListView) findViewById(R.id.event_list_view);
+        // find View and apply Adapter
+        ListView eventListView = findViewById(R.id.event_list_view);
         eventListView.setAdapter(eventListAdapter);
 
+        // load data
+        for (int i=0; i < 100; i++){
+            eventList.add(Integer.toString(i));
+        }
         //loadContactList();
+
+        // set On Click Listener on eventListView and start next activity
+        eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int pos, long l) {
+                //using switch case, to check the condition.
+                Intent intent = new Intent(EventActivity.this, EventDetialActivity.class);
+                intent.putExtra(USER_ID, "userId");
+                startActivity(intent);
+            }
+        });
+
     }
+
+
 
 //    private void loadContactList() {
 //

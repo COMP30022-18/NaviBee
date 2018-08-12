@@ -96,4 +96,5 @@
     <string name="landing_events">Events</string>
     <string name="landing_social">Friends</string>
     <string name="landing_sos">SOS</string>
+    <string name="title_activity_event_detial">EventDetialActivity</string>
 </resources>
