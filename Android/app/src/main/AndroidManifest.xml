@@ -25,6 +25,10 @@
             android:name=".SosActivity"
             android:label="@string/landing_sos">
         </activity>
+        <activity
+            android:name=".FriendActivity"
+            android:label="@string/title_activity_friend">
+        </activity>
     </application>
 
 </manifest>
