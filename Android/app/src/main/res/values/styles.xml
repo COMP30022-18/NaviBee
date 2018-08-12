@@ -6,6 +6,9 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorButtonNormal">@color/white</item>
+        <item name="buttonStyle">@style/AppTheme.Button</item>
+
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -26,4 +29,30 @@
         <item name="android:textColor">@color/colorLightTextSecondary</item>
     </style>
 
+    <style name="AppTheme.List.ItemTitle">
+        <item name="android:textSize">45sp</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/colorLightTextPrimary</item>
+    </style>
+
+    <style name="AppTheme.List.ItemSubtitle">
+        <item name="android:textSize">30sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/colorLightTextSecondary</item>
+    </style>
+
+    <style name="AppTheme.Button" parent="Widget.AppCompat.Button">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">72sp</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="AppTheme.Button.Colored" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:minHeight">72sp</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="AppTheme.Button.ColoredPrimary" parent="AppTheme.Button">
+        <item name="colorButtonNormal">@color/colorPrimary</item>
+    </style>
 </resources>

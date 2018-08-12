@@ -11,10 +11,12 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.SearchView
 import au.edu.unimelb.eng.navibee.R
+import java.net.URL
 
 class DestinationsActivity : AppCompatActivity() {
 
@@ -29,9 +31,15 @@ class DestinationsActivity : AppCompatActivity() {
         handleIntent(intent)
 
         val destinations = ArrayList<DestinationRVItem>()
-//        destinations.add(DestinationRVButton("Say a place", "icon", "voice_search"))
+        destinations.add(DestinationRVButton("Say a place", R.drawable.ic_keyboard_voice_black_24dp, View.OnClickListener {
+            Log.d(javaClass.simpleName, "Clicked say a place.")
+        }))
         destinations.add(DestinationRVDivider("Recent destinations"))
+        destinations.add(DestinationRVEntry("Place 1", "Location 1", "", View.OnClickListener {  }))
+        destinations.add(DestinationRVEntry("Place 2", "Location 2", "", View.OnClickListener {  }))
         destinations.add(DestinationRVDivider("Recommended place"))
+        destinations.add(DestinationRVEntry("Place 3", "Location 3", "", View.OnClickListener {  }))
+        destinations.add(DestinationRVEntry("Place 4", "Location 4", "", View.OnClickListener {  }))
 
         // setup recycler view
         viewManager = LinearLayoutManager(this)
