@@ -21,7 +21,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
-        <activity android:name=".SosActivity"></activity>
+        <activity
+            android:name=".SosActivity"
+            android:label="@string/landing_sos">
+        </activity>
     </application>
 
 </manifest>
