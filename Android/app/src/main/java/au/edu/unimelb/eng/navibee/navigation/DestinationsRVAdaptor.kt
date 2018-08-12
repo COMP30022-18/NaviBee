@@ -60,7 +60,6 @@ class DestinationsRVAdaptor(private val dataset: ArrayList<DestinationRVItem>) :
         }
         // holder.itemView.text = dataset[position]
     }
-
 }
 
 abstract class DestinationRVItem

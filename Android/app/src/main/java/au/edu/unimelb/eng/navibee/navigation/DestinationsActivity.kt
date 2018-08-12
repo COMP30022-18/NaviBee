@@ -10,13 +10,9 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.Menu
-import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.SearchView
 import au.edu.unimelb.eng.navibee.R
-import java.net.URL
 
 class DestinationsActivity : AppCompatActivity() {
 
@@ -105,6 +101,10 @@ class DestinationsActivity : AppCompatActivity() {
             Log.d(javaClass.simpleName, "Handling intent on search query $query.")
             // TODO: handle search query
         }
+    }
+
+    private fun searchForLocation(query: String) {
+
     }
 
 }
