@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="au.edu.unimelb.eng.navibee">
 
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,8 +22,13 @@
         </activity>
         <activity android:name=".MainActivity" />
         <activity
+            android:name=".SosActivity"
+            android:label="@string/landing_sos">
+        </activity>
+        <activity
             android:name=".FriendActivity"
-            android:label="@string/title_activity_friend"></activity>
+            android:label="@string/title_activity_friend">
+        </activity>
     </application>
 
 </manifest>
