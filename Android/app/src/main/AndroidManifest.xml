@@ -19,6 +19,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
+        <activity
+            android:name=".FriendActivity"
+            android:label="@string/title_activity_friend"></activity>
         <activity android:name=".navigation.DestinationsActivity"
             android:label="@string/landing_navigation">
             <meta-data android:name="android.app.searchable"

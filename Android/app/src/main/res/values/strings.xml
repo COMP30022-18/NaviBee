@@ -98,4 +98,8 @@
     <string name="landing_sos">SOS</string>
     <string name="navigation_search_hint">Where do you want to go?</string>
     <string name="search_button_text">Search</string>
+    <string name="title_activity_friend">FriendActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>
