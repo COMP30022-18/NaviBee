@@ -35,8 +35,8 @@ public class FriendActivity extends AppCompatActivity {
     private String userId;
     private FirebaseFunctions mFunctions;
 
-    ArrayList<String> contactList = new ArrayList<String>();
-    ArrayAdapter<String> contactListAdapter;
+    ArrayList<ContactPerson> contactList = new ArrayList<ContactPerson>();
+    FriendAdapter contactListAdapter;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -62,7 +62,7 @@ public class FriendActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_friend);
+        setContentView(R.layout.friend_list);
 
 //        mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
@@ -73,8 +73,7 @@ public class FriendActivity extends AppCompatActivity {
         mFunctions = FirebaseFunctions.getInstance();
 
 
-        contactListAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1,
+        contactListAdapter = new FriendAdapter(this,
                 contactList);
 
         ListView listView = (ListView) findViewById(R.id.contactListView);
@@ -102,19 +101,14 @@ public class FriendActivity extends AppCompatActivity {
 
                     contactList.clear();
                     for (Map<String, String> item: list) {
-                        contactList.add(item.get("name"));
+                        ContactPerson person = new ContactPerson(item.get("name"), item.get("photoURL"));
+                        contactList.add(person);
                     }
 
                     contactListAdapter.notifyDataSetChanged();
                 }
             }
         });
-
-
-
-
     }
-
-
 
 }
