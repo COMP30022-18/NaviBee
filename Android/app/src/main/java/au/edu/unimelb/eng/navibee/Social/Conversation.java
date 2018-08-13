@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -25,6 +26,7 @@ public class Conversation {
         this.uid = uid;
         db = FirebaseFirestore.getInstance();
         listen();
+
     }
 
     private void listen() {
@@ -57,6 +59,13 @@ public class Conversation {
                 });
     }
 
+    private void sendMessage(String type, String data) {
+        Message message = new Message(data, uid, new Date(), type);
+
+        db.collection("conversations")
+                .document(conversationId).collection("messages").add(message);
+    }
+
 
 
     public static class Message{
@@ -64,7 +73,6 @@ public class Conversation {
         private Date time;
 
         public Message() {
-
         }
 
         public Message(String data, String sender, Date time, String type) {
