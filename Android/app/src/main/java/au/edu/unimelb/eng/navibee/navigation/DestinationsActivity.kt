@@ -1,10 +1,16 @@
 package au.edu.unimelb.eng.navibee.navigation
 
+import android.app.Activity
+import android.app.AlertDialog
+import android.app.Dialog
 import android.app.SearchManager
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.speech.RecognizerIntent
+import android.support.v4.app.DialogFragment
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -15,6 +21,7 @@ import android.widget.SearchView
 import au.edu.unimelb.eng.navibee.BuildConfig
 import au.edu.unimelb.eng.navibee.R
 import com.mapbox.api.geocoding.v5.MapboxGeocoding
+import com.mapbox.api.geocoding.v5.models.CarmenFeature
 import com.mapbox.api.geocoding.v5.models.GeocodingResponse
 import com.mapbox.mapboxsdk.Mapbox
 import retrofit2.Callback
@@ -30,6 +37,9 @@ class DestinationsActivity : AppCompatActivity() {
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
 
+    // Voice recognition activity result ID
+    val SPEECH_RECOGNITION_RESULT = 1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_destinations)
@@ -38,9 +48,16 @@ class DestinationsActivity : AppCompatActivity() {
         Timber.tag(javaClass.simpleName)
 
         val destinations = ArrayList<DestinationRVItem>()
-        destinations.add(DestinationRVButton("Say a place", R.drawable.ic_keyboard_voice_black_24dp, View.OnClickListener {
-            Timber.d("Clicked say a place.")
-        }))
+        destinations.add(DestinationRVButton("Say a place",
+                R.drawable.ic_keyboard_voice_black_24dp,
+                View.OnClickListener {
+                    Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).let {
+                        it.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH)
+                        it.putExtra(RecognizerIntent.EXTRA_PROMPT, resources.getString(R.string.navigation_search_hint))
+                        startActivityForResult(it, SPEECH_RECOGNITION_RESULT)
+                    }
+                })
+        )
         destinations.add(DestinationRVDivider("Recent destinations"))
         destinations.add(DestinationRVEntry("Place 1", "Location 1", "", View.OnClickListener {  }))
         destinations.add(DestinationRVEntry("Place 2", "Location 2", "", View.OnClickListener {  }))
@@ -105,6 +122,8 @@ class DestinationsActivity : AppCompatActivity() {
                 }
 
             })
+
+
         }
         return true
     }
@@ -130,6 +149,15 @@ class DestinationsActivity : AppCompatActivity() {
                     // Log the first results Point.
                     val firstResultPoint = results[0].center()
                     Timber.d("onResponse: $firstResultPoint (lat ${firstResultPoint!!.latitude()}, long ${firstResultPoint.longitude()})")
+
+                    val bundle = Bundle()
+                    bundle.putSerializable("location", results[0])
+
+                    // Popup to confirm the location (debug only)
+                    SearchResultFragment().let {
+                        it.arguments = bundle
+                        it.show(supportFragmentManager, "tag")
+                    }
                 } else {
                     // No result for your request were found.
                     Timber.d("onResponse: No result found")
@@ -142,4 +170,37 @@ class DestinationsActivity : AppCompatActivity() {
         })
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when (requestCode) {
+            SPEECH_RECOGNITION_RESULT -> {
+                if (resultCode == RESULT_OK) {
+                    val results = data!!.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                    // TODO: Confirm for location.
+                    searchForLocation(results[0])
+                }
+            }
+        }
+    }
+
+    class SearchResultFragment: DialogFragment() {
+
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+            val builder = AlertDialog.Builder(activity)
+            val location = this.arguments?.getSerializable("location") as CarmenFeature
+            builder.let {
+                it.setTitle(R.string.we_have_found)
+                it.setMessage("${location.placeName()} (${location.address()}) at ${location.center()}")
+                it.setPositiveButton(R.string.button_go) { dialog, id ->
+                    TODO("not implemented")
+                }
+                it.setNegativeButton(R.string.button_retry) { dialog, id ->
+                    this@SearchResultFragment.dialog.cancel()
+                }
+            }
+
+            return builder.create()
+        }
+    }
 }

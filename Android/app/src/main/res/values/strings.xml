@@ -102,4 +102,7 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="we_have_found">We have found…</string>
+    <string name="button_go">Go</string>
+    <string name="button_retry">Try again</string>
 </resources>
