@@ -30,7 +30,7 @@ import retrofit2.Response
 import timber.log.Timber
 
 
-class DestinationsActivity : AppCompatActivity() {
+class DestinationsActivity : AppCompatActivity(), SearchResultRetryListener {
 
     // Recycler view
     private lateinit var recyclerView: RecyclerView
@@ -51,11 +51,7 @@ class DestinationsActivity : AppCompatActivity() {
         destinations.add(DestinationRVButton("Say a place",
                 R.drawable.ic_keyboard_voice_black_24dp,
                 View.OnClickListener {
-                    Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).let {
-                        it.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH)
-                        it.putExtra(RecognizerIntent.EXTRA_PROMPT, resources.getString(R.string.navigation_search_hint))
-                        startActivityForResult(it, SPEECH_RECOGNITION_RESULT)
-                    }
+                    startVoiceSearch()
                 })
         )
         destinations.add(DestinationRVDivider("Recent destinations"))
@@ -132,11 +128,19 @@ class DestinationsActivity : AppCompatActivity() {
         if (intent.action == Intent.ACTION_SEARCH) {
             val query = intent.getStringExtra(SearchManager.QUERY)
             Timber.d("Handling intent on search query $query.")
-            searchForLocation(query)
+            searchForLocation(query, false)
         }
     }
 
-    private fun searchForLocation(query: String) {
+    private fun startVoiceSearch() {
+        Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).let {
+            it.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH)
+            it.putExtra(RecognizerIntent.EXTRA_PROMPT, resources.getString(R.string.navigation_search_hint))
+            startActivityForResult(it, SPEECH_RECOGNITION_RESULT)
+        }
+    }
+
+    private fun searchForLocation(query: String, isVoice: Boolean) {
         val mapboxGeocoding = MapboxGeocoding.builder()
                 .accessToken(Mapbox.getAccessToken()!!)
                 .query(query)
@@ -152,6 +156,7 @@ class DestinationsActivity : AppCompatActivity() {
 
                     val bundle = Bundle()
                     bundle.putSerializable("location", results[0])
+                    bundle.putBoolean("isVoice", isVoice)
 
                     // Popup to confirm the location (debug only)
                     SearchResultFragment().let {
@@ -170,6 +175,13 @@ class DestinationsActivity : AppCompatActivity() {
         })
     }
 
+    override fun onSearchResultRetry(dialog: DialogFragment) {
+        // == true is to avoid getBoolean return null
+        if (dialog.arguments?.getBoolean("isVoice") == true) {
+            startVoiceSearch()
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -178,29 +190,46 @@ class DestinationsActivity : AppCompatActivity() {
                 if (resultCode == RESULT_OK) {
                     val results = data!!.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
                     // TODO: Confirm for location.
-                    searchForLocation(results[0])
+                    searchForLocation(results[0], true)
                 }
             }
         }
     }
+}
 
-    class SearchResultFragment: DialogFragment() {
 
-        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-            val builder = AlertDialog.Builder(activity)
-            val location = this.arguments?.getSerializable("location") as CarmenFeature
-            builder.let {
-                it.setTitle(R.string.we_have_found)
-                it.setMessage("${location.placeName()} (${location.address()}) at ${location.center()}")
-                it.setPositiveButton(R.string.button_go) { dialog, id ->
-                    TODO("not implemented")
-                }
-                it.setNegativeButton(R.string.button_retry) { dialog, id ->
-                    this@SearchResultFragment.dialog.cancel()
-                }
+interface SearchResultRetryListener {
+    fun onSearchResultRetry(dialog: DialogFragment)
+}
+
+class SearchResultFragment: DialogFragment() {
+
+    private lateinit var searchResultRetryListner: SearchResultRetryListener
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val builder = AlertDialog.Builder(activity)
+        val location = this.arguments?.getSerializable("location") as CarmenFeature
+        builder.let {
+            it.setTitle(R.string.we_have_found)
+            it.setMessage("${location.placeName()} (${location.text()}) at ${location.center()}")
+            it.setPositiveButton(R.string.button_go) { dialog, id ->
+                TODO("not implemented")
             }
+            it.setNegativeButton(R.string.button_retry) { dialog, id ->
+                this@SearchResultFragment.dialog.cancel()
+                searchResultRetryListner.onSearchResultRetry(this)
+            }
+        }
 
-            return builder.create()
+        return builder.create()
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        try {
+            searchResultRetryListner = context as SearchResultRetryListener
+        } catch (e: ClassCastException) {
+            throw ClassCastException("$context must implement SearchResultRetryListener")
         }
     }
 }
