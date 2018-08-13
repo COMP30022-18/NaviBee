@@ -39,21 +39,22 @@ public class EventActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String userId;
 
-    private ArrayList<String> eventName = new ArrayList<>();
-    private ArrayList<String> eventSummary = new ArrayList<>();
-    private ArrayList<Integer> eventImageId = new ArrayList<>();
+    private List<Map<String, Object>> eventList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_event);
+        setContentView(R.layout.acitivity_event);
+
+        ArrayList<String> eventName = new ArrayList<>();
+        ArrayList<String> eventSummary = new ArrayList<>();
+        ArrayList<Integer> eventImageId = new ArrayList<>();
 
         // load data
         eventName.add("party");
         eventSummary.add("welcome everyone");
         eventImageId.add(R.mipmap.ic_launcher);
 
-        List<Map<String, Object>> eventList = new ArrayList<>();
         for (int i=0; i<eventName.size(); i++) {
             Map<String, Object> eventItem = new HashMap<>();
             eventItem.put("Name", eventName.get(i));
@@ -63,9 +64,9 @@ public class EventActivity extends AppCompatActivity {
         }
 
         // create Adapter and bind with eventList
+        ListView eventListView = findViewById(R.id.event_list_view);
         SimpleAdapter eventListAdapter = new SimpleAdapter(getApplicationContext(), eventList, R.layout.event_item,
                 new String[]{"Name", "Summary", "ImageId"}, new int[]{R.id.name, R.id.summary, R.id.image});
-        ListView eventListView = findViewById(R.id.event_list_view);
         eventListView.setAdapter(eventListAdapter);
 
         // set On Click Listener on eventListView and start next activity
