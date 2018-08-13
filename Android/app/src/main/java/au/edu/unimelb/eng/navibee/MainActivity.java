@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import au.edu.unimelb.eng.navibee.Social.FriendManager;
-import au.edu.unimelb.eng.navibee.Social.MessageManager;
+//import au.edu.unimelb.eng.navibee.Social.MessageManager;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
