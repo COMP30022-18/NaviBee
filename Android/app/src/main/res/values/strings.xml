@@ -105,4 +105,6 @@
     <string name="we_have_found">We have found…</string>
     <string name="button_go">Go</string>
     <string name="button_retry">Try again</string>
+    <string name="location_required_for_navigation">Location permission is required for navigation.</string>
+    <string name="button_got_it">Got it</string>
 </resources>

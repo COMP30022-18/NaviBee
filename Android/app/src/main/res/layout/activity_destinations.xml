@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/destinations_activity_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".navigation.DestinationsActivity">
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/nav_dest_recycler_view"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_height="0dp"
-        android:layout_width="0dp"
-        style="@style/AppTheme.List.SectionHeader"/>
-</android.support.constraint.ConstraintLayout>
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/nav_dest_recycler_view"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_height="0dp"
+            android:layout_width="0dp"
+            style="@style/AppTheme.List.SectionHeader"/>
+    </android.support.constraint.ConstraintLayout>
+</android.support.design.widget.CoordinatorLayout>

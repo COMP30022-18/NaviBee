@@ -1,25 +1,30 @@
 package au.edu.unimelb.eng.navibee.navigation
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
 import android.app.SearchManager
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.support.v4.app.DialogFragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.SearchView
 import au.edu.unimelb.eng.navibee.BuildConfig
+import android.Manifest
+import android.support.design.widget.Snackbar
+import android.support.v4.app.ActivityCompat
 import au.edu.unimelb.eng.navibee.R
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.mapbox.api.geocoding.v5.MapboxGeocoding
 import com.mapbox.api.geocoding.v5.models.CarmenFeature
 import com.mapbox.api.geocoding.v5.models.GeocodingResponse
@@ -30,23 +35,36 @@ import retrofit2.Response
 import timber.log.Timber
 
 
-class DestinationsActivity : AppCompatActivity(), SearchResultRetryListener {
+class DestinationsActivity : AppCompatActivity(), SearchResultRetryListener,
+        LocationPermissionRationaleConfirmListener{
+    companion object {
+        // Voice recognition activity result ID
+        private const val SPEECH_RECOGNITION_RESULT = 1
+
+        // Callback code for requesting fine location.
+        private const val PERMISSIONS_REQUEST_FINE_LOCATION = 2
+    }
 
     // Recycler view
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
+
     private lateinit var viewManager: RecyclerView.LayoutManager
 
-    // Voice recognition activity result ID
-    val SPEECH_RECOGNITION_RESULT = 1
+    // Location service
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var lastKnownLocation: Location? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_destinations)
         handleIntent(intent)
 
-        Timber.tag(javaClass.simpleName)
+        // Setup location service
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
+        // TODO: Populate the list of destinations with real data
         val destinations = ArrayList<DestinationRVItem>()
         destinations.add(DestinationRVButton("Say a place",
                 R.drawable.ic_keyboard_voice_black_24dp,
@@ -140,7 +158,54 @@ class DestinationsActivity : AppCompatActivity(), SearchResultRetryListener {
         }
     }
 
+    private fun checkLocationPermission(fromRationale: Boolean = false): Boolean {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                            Manifest.permission.ACCESS_FINE_LOCATION) && !fromRationale) {
+                LocationPermissionRationalConfirmFragment().show(supportFragmentManager,
+                        "locationPermissionRationale")
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                        PERMISSIONS_REQUEST_FINE_LOCATION)
+
+            }
+        }
+        return (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED)
+    }
+
+    override fun onAcknowledgedLocationPermissionRationale(dialog: DialogFragment) {
+        checkLocationPermission(fromRationale = true)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSIONS_REQUEST_FINE_LOCATION -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission granted
+                } else {
+                    Snackbar.make(findViewById(R.id.destinations_activity_coordinator_layout),
+                            R.string.location_required_for_navigation,
+                            Snackbar.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
     private fun searchForLocation(query: String, isVoice: Boolean) {
+        if (!checkLocationPermission()) {
+            // TODO: Prompt user to give permission
+            return
+        }
+
+        fusedLocationClient.lastLocation
+                .addOnSuccessListener { location : Location? ->
+                    this.lastKnownLocation = location
+                    Timber.d("$location")
+                }
+
         val mapboxGeocoding = MapboxGeocoding.builder()
                 .accessToken(Mapbox.getAccessToken()!!)
                 .query(query)
@@ -161,7 +226,7 @@ class DestinationsActivity : AppCompatActivity(), SearchResultRetryListener {
                     // Popup to confirm the location (debug only)
                     SearchResultFragment().let {
                         it.arguments = bundle
-                        it.show(supportFragmentManager, "tag")
+                        it.show(supportFragmentManager, "searchResult")
                     }
                 } else {
                     // No result for your request were found.
@@ -204,7 +269,7 @@ interface SearchResultRetryListener {
 
 class SearchResultFragment: DialogFragment() {
 
-    private lateinit var searchResultRetryListner: SearchResultRetryListener
+    private lateinit var searchResultRetryListener: SearchResultRetryListener
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = AlertDialog.Builder(activity)
@@ -217,7 +282,7 @@ class SearchResultFragment: DialogFragment() {
             }
             it.setNegativeButton(R.string.button_retry) { dialog, id ->
                 this@SearchResultFragment.dialog.cancel()
-                searchResultRetryListner.onSearchResultRetry(this)
+                searchResultRetryListener.onSearchResultRetry(this)
             }
         }
 
@@ -227,9 +292,39 @@ class SearchResultFragment: DialogFragment() {
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         try {
-            searchResultRetryListner = context as SearchResultRetryListener
+            searchResultRetryListener = context as SearchResultRetryListener
         } catch (e: ClassCastException) {
             throw ClassCastException("$context must implement SearchResultRetryListener")
+        }
+    }
+}
+
+interface LocationPermissionRationaleConfirmListener {
+    fun onAcknowledgedLocationPermissionRationale(dialog: DialogFragment)
+}
+
+class LocationPermissionRationalConfirmFragment: DialogFragment() {
+
+    private lateinit var listener: LocationPermissionRationaleConfirmListener
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val builder = AlertDialog.Builder(activity)
+        builder.let {
+            it.setMessage(R.string.location_required_for_navigation)
+            it.setPositiveButton(R.string.button_got_it) { dialog, id ->
+                listener.onAcknowledgedLocationPermissionRationale(this)
+            }
+        }
+
+        return builder.create()
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        try {
+            listener = context as LocationPermissionRationaleConfirmListener
+        } catch (e: ClassCastException) {
+            throw ClassCastException("$context must implement LocationPermissionRationaleConfirmListener")
         }
     }
 }
