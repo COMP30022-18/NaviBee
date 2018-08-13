@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -38,31 +39,34 @@ public class EventActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String userId;
 
-    ArrayList<String> eventList = new ArrayList<String>();
-    ArrayAdapter<String> eventListAdapter;
+    private ArrayList<String> eventName = new ArrayList<>();
+    private ArrayList<String> eventSummary = new ArrayList<>();
+    private ArrayList<Integer> eventImageId = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
 
-        //db = FirebaseFirestore.getInstance();
-        //userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        // load data
+        eventName.add("party");
+        eventSummary.add("welcome everyone");
+        eventImageId.add(R.mipmap.ic_launcher);
+
+        List<Map<String, Object>> eventList = new ArrayList<>();
+        for (int i=0; i<eventName.size(); i++) {
+            Map<String, Object> eventItem = new HashMap<>();
+            eventItem.put("Name", eventName.get(i));
+            eventItem.put("Summary", eventSummary.get(i));
+            eventItem.put("ImageId", eventImageId.get(i));
+            eventList.add(eventItem);
+        }
 
         // create Adapter and bind with eventList
-        eventListAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1,
-                eventList);
-
-        // find View and apply Adapter
+        SimpleAdapter eventListAdapter = new SimpleAdapter(getApplicationContext(), eventList, R.layout.event_item,
+                new String[]{"Name", "Summary", "ImageId"}, new int[]{R.id.name, R.id.summary, R.id.image});
         ListView eventListView = findViewById(R.id.event_list_view);
         eventListView.setAdapter(eventListAdapter);
-
-        // load data
-        for (int i=0; i < 100; i++){
-            eventList.add(Integer.toString(i));
-        }
-        //loadContactList();
 
         // set On Click Listener on eventListView and start next activity
         eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
