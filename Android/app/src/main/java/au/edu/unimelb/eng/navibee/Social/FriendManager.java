@@ -1,5 +1,6 @@
 package au.edu.unimelb.eng.navibee.Social;
 
+import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -14,7 +15,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import au.edu.unimelb.eng.navibee.NaviBeeApplication;
+
 public class FriendManager {
+
+    public final static String BROADCAST_FRIEND_UPDATED = "broadcast.friend.updated";
 
     public static class ContactPerson {
         private String url;
@@ -87,6 +92,9 @@ public class FriendManager {
                                     break;
                             }
                         }
+
+                        Intent intent = new Intent(BROADCAST_FRIEND_UPDATED);
+                        NaviBeeApplication.getInstance().sendBroadcast(intent);
                     }
                 });
     }
