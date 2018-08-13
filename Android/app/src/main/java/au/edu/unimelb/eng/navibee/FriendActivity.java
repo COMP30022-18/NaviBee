@@ -1,12 +1,21 @@
 package au.edu.unimelb.eng.navibee;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -23,19 +32,92 @@ import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.FirebaseFunctionsException;
 import com.google.firebase.functions.HttpsCallableResult;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import au.edu.unimelb.eng.navibee.Social.FriendManager;
+
 public class FriendActivity extends AppCompatActivity {
 
-    private FirebaseFirestore db;
-    private String userId;
-    private FirebaseFunctions mFunctions;
+    public static class FriendAdapter extends BaseAdapter {
+        private ArrayList<FriendManager.ContactPerson> contactList;
+        private LayoutInflater l_Inflater;
 
-    ArrayList<ContactPerson> contactList = new ArrayList<ContactPerson>();
+        public FriendAdapter(Context context, ArrayList<FriendManager.ContactPerson> contactList){
+            this.contactList = contactList;
+            l_Inflater = LayoutInflater.from(context);
+        }
+
+        public int getCount(){
+            return contactList.size();
+        }
+        public Object getItem(int position){
+            return contactList.get(position);
+        }
+        public long getItemId(int position){
+            return position;
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent){
+            ViewHolder holder;
+            if (convertView == null) {
+                convertView = l_Inflater.inflate(R.layout.friend_item, null);
+                holder = new ViewHolder();
+                holder.image = (ImageView) convertView.findViewById(R.id.friend_icon);
+                holder.text = (TextView) convertView.findViewById(R.id.friend_name);
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+            if (contactList.size() <= 0){
+                holder.text.setText("No Data");
+            }
+            else{
+                FriendManager.ContactPerson tempPerson = contactList.get(position);
+                holder.text.setText(tempPerson.getName());
+                new DownloadImageTask(holder.image)
+                        .execute(tempPerson.getUrl());
+                //holder.image.setImageResource(R.drawable.ic_navibee_color);
+            }
+
+            return convertView;
+        }
+
+        public static class ViewHolder {
+            public ImageView image;
+            public TextView text;
+        }
+        private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+            ImageView bmImage;
+
+            public DownloadImageTask(ImageView bmImage) {
+                this.bmImage = bmImage;
+            }
+
+            protected Bitmap doInBackground(String... urls) {
+                String urldisplay = urls[0];
+                Bitmap mIcon11 = null;
+                try {
+                    InputStream in = new java.net.URL(urldisplay).openStream();
+                    mIcon11 = BitmapFactory.decodeStream(in);
+                } catch (Exception e) {
+                    Log.e("Error", e.getMessage());
+                    e.printStackTrace();
+                }
+                return mIcon11;
+            }
+
+            protected void onPostExecute(Bitmap result) {
+                bmImage.setImageBitmap(result);
+            }
+        }
+    }
+
+    ArrayList<FriendManager.ContactPerson> contactList = new ArrayList<FriendManager.ContactPerson>();
     FriendAdapter contactListAdapter;
 
 
@@ -68,9 +150,6 @@ public class FriendActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        db = FirebaseFirestore.getInstance();
-        userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        mFunctions = FirebaseFunctions.getInstance();
 
 
         contactListAdapter = new FriendAdapter(this,
@@ -83,32 +162,9 @@ public class FriendActivity extends AppCompatActivity {
     }
 
     private void loadContactList() {
-        mFunctions.getHttpsCallable("getFriendList")
-                .call(new HashMap<>()).addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
-            @Override
-            public void onComplete(@NonNull Task<HttpsCallableResult> task) {
-                if (!task.isSuccessful()) {
-//                    Exception e = task.getException();
-//                    if (e instanceof FirebaseFunctionsException) {
-//                        FirebaseFunctionsException ffe = (FirebaseFunctionsException) e;
-//                        FirebaseFunctionsException.Code code = ffe.getCode();
-//                        Object details = ffe.getDetails();
-//                    }
-//
-                } else {
-                    Map<String, Object> data = (Map<String, Object>) task.getResult().getData();
-                    ArrayList<Map<String, String>> list = (ArrayList<Map<String, String>>) data.get("list");
 
-                    contactList.clear();
-                    for (Map<String, String> item: list) {
-                        ContactPerson person = new ContactPerson(item.get("name"), item.get("photoURL"));
-                        contactList.add(person);
-                    }
-
-                    contactListAdapter.notifyDataSetChanged();
-                }
-            }
-        });
+        FriendManager.getInstance().fetchContactPersonList(contactList);
+        contactListAdapter.notifyDataSetChanged();
     }
 
 }
