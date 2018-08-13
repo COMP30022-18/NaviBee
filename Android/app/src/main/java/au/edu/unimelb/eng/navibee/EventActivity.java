@@ -6,10 +6,14 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -40,34 +44,20 @@ public class EventActivity extends AppCompatActivity {
     private String userId;
 
     private List<Map<String, Object>> eventList = new ArrayList<>();
+    private List<Map<String, Object>> eventTag = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.acitivity_event);
 
-        ArrayList<String> eventName = new ArrayList<>();
-        ArrayList<String> eventSummary = new ArrayList<>();
-        ArrayList<Integer> eventImageId = new ArrayList<>();
-
         // load data
-        eventName.add("party");
-        eventSummary.add("welcome everyone");
-        eventImageId.add(R.mipmap.ic_launcher);
-
-        for (int i=0; i<eventName.size(); i++) {
-            Map<String, Object> eventItem = new HashMap<>();
-            eventItem.put("Name", eventName.get(i));
-            eventItem.put("Summary", eventSummary.get(i));
-            eventItem.put("ImageId", eventImageId.get(i));
-            eventList.add(eventItem);
-        }
+        loadEventList();
 
         // create Adapter and bind with eventList
         ListView eventListView = findViewById(R.id.event_list_view);
-        SimpleAdapter eventListAdapter = new SimpleAdapter(getApplicationContext(), eventList, R.layout.event_item,
-                new String[]{"Name", "Summary", "ImageId"}, new int[]{R.id.name, R.id.summary, R.id.image});
-        eventListView.setAdapter(eventListAdapter);
+        EventListAdapter adapter = new EventListAdapter();
+        eventListView.setAdapter(adapter);
 
         // set On Click Listener on eventListView and start next activity
         eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -81,6 +71,76 @@ public class EventActivity extends AppCompatActivity {
         });
 
     }
+
+    private void loadEventList() {
+        Map<String, Object> eventListItem = new HashMap<>();
+        eventListItem.put("Name", "EventName");
+        eventListItem.put("Summary", "summary");
+        eventListItem.put("ImageId", R.mipmap.ic_launcher);
+
+        Map<String, Object> eventTagItem = new HashMap<>();
+        eventTagItem.put("Name", "Event Tag");
+        eventTag.add(eventTagItem);
+
+        eventList.add(eventTagItem);
+        for(int i = 0;i < 10;i++) {
+            eventList.add(eventListItem);
+        }
+    }
+
+    private class EventListAdapter extends BaseAdapter {
+        @Override
+        public int getCount() {
+            // TODO Auto-generated method stub
+            return eventList.size();
+        }
+        @Override
+        public Object getItem(int position) {
+            // TODO Auto-generated method stub
+            return eventList.get(position);
+        }
+        @Override
+        public long getItemId(int position) {
+            // TODO Auto-generated method stub
+            return position;
+        }
+        @Override
+        public boolean isEnabled(int position) {
+            // TODO Auto-generated method stub
+            if(eventTag.contains(getItem(position))){
+                return false;
+            }
+            return super.isEnabled(position);
+        }
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            // TODO Auto-generated method stub
+            View view=convertView;
+            if(eventTag.contains(getItem(position))){
+                view= LayoutInflater.from(getApplicationContext()).inflate(R.layout.event_tag, null);
+
+                TextView tagView = (TextView) view.findViewById(R.id.event_list_item_tag);
+                tagView.setText((String) eventList.get(position).get("Name"));
+
+            }else{
+                view=LayoutInflater.from(getApplicationContext()).inflate(R.layout.event_item, null);
+
+                TextView name = (TextView) view.findViewById(R.id.event_name);
+                name.setText((String) eventList.get(position).get("Name"));
+
+                TextView summary = (TextView) view.findViewById(R.id.event_summary);
+                summary.setText((String) eventList.get(position).get("Summary"));
+
+                ImageView image = (ImageView) view.findViewById(R.id.event_image);
+                image.setImageResource((Integer) eventList.get(position).get("ImageId"));
+
+            }
+
+            return view;
+        }
+
+    }
+
 
 
 

@@ -5,7 +5,7 @@
     android:orientation="horizontal">
 
     <ImageView
-        android:id="@+id/image"
+        android:id="@+id/event_image"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:baselineAlignBottom="true"
@@ -17,7 +17,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/name"
+            android:id="@+id/event_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="8dp"
@@ -25,7 +25,7 @@
             android:textSize="20sp" />
 
         <TextView
-            android:id="@+id/summary"
+            android:id="@+id/event_summary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="8px"
