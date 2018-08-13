@@ -1,6 +1,9 @@
 package au.edu.unimelb.eng.navibee;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -150,8 +153,6 @@ public class FriendActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-
-
         contactListAdapter = new FriendAdapter(this,
                 contactList);
 
@@ -159,7 +160,17 @@ public class FriendActivity extends AppCompatActivity {
         listView.setAdapter(contactListAdapter);
 
         loadContactList();
+
+        IntentFilter intFilt = new IntentFilter(FriendManager.BROADCAST_FRIEND_UPDATED);
+        registerReceiver(br, intFilt);
     }
+
+    BroadcastReceiver br = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            loadContactList();
+        }
+    };
 
     private void loadContactList() {
 
