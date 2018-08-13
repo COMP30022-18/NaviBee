@@ -28,6 +28,7 @@ import com.google.android.gms.location.LocationServices
 import com.mapbox.api.geocoding.v5.MapboxGeocoding
 import com.mapbox.api.geocoding.v5.models.CarmenFeature
 import com.mapbox.api.geocoding.v5.models.GeocodingResponse
+import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
 import retrofit2.Callback
 import retrofit2.Call
@@ -59,10 +60,11 @@ class DestinationsActivity : AppCompatActivity(), SearchResultRetryListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_destinations)
-        handleIntent(intent)
 
         // Setup location service
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        handleIntent(intent)
 
         // TODO: Populate the list of destinations with real data
         val destinations = ArrayList<DestinationRVItem>()
@@ -108,6 +110,7 @@ class DestinationsActivity : AppCompatActivity(), SearchResultRetryListener,
 
         // Set up the search view
         (menu.findItem(R.id.nav_dest_optmnu_search).actionView as SearchView).apply {
+            // TODO: Isolate searchable intent.
             setSearchableInfo(searchManager.getSearchableInfo(componentName))
 
             // Prevent the search view from collapsing within the subview
@@ -204,40 +207,42 @@ class DestinationsActivity : AppCompatActivity(), SearchResultRetryListener,
                 .addOnSuccessListener { location : Location? ->
                     this.lastKnownLocation = location
                     Timber.d("$location")
-                }
-
-        val mapboxGeocoding = MapboxGeocoding.builder()
-                .accessToken(Mapbox.getAccessToken()!!)
-                .query(query)
-                .build()
-
-        mapboxGeocoding.enqueueCall(object : Callback<GeocodingResponse> {
-            override fun onResponse(call: Call<GeocodingResponse>, response: Response<GeocodingResponse>) {
-                val results = response.body()!!.features()
-                if (results.size > 0) {
-                    // Log the first results Point.
-                    val firstResultPoint = results[0].center()
-                    Timber.d("onResponse: $firstResultPoint (lat ${firstResultPoint!!.latitude()}, long ${firstResultPoint.longitude()})")
-
-                    val bundle = Bundle()
-                    bundle.putSerializable("location", results[0])
-                    bundle.putBoolean("isVoice", isVoice)
-
-                    // Popup to confirm the location (debug only)
-                    SearchResultFragment().let {
-                        it.arguments = bundle
-                        it.show(supportFragmentManager, "searchResult")
+                    val builder = MapboxGeocoding.builder()
+                            .accessToken(Mapbox.getAccessToken()!!)
+                            .query(query)
+                    if (location != null) {
+                        builder.proximity(Point.fromLngLat(location.longitude, location.latitude, location.altitude))
                     }
-                } else {
-                    // No result for your request were found.
-                    Timber.d("onResponse: No result found")
-                }
-            }
+                    val mapboxGeocoding = builder.build()
 
-            override fun onFailure(call: Call<GeocodingResponse>, throwable: Throwable) {
-                throwable.printStackTrace()
-            }
-        })
+                    mapboxGeocoding.enqueueCall(object : Callback<GeocodingResponse> {
+                        override fun onResponse(call: Call<GeocodingResponse>, response: Response<GeocodingResponse>) {
+                            val results = response.body()!!.features()
+                            if (results.size > 0) {
+                                // Log the first results Point.
+                                val firstResultPoint = results[0].center()
+                                Timber.d("onResponse: $firstResultPoint (lat ${firstResultPoint!!.latitude()}, long ${firstResultPoint.longitude()})")
+
+                                val bundle = Bundle()
+                                bundle.putSerializable("location", results[0])
+                                bundle.putBoolean("isVoice", isVoice)
+
+                                // Popup to confirm the location (debug only)
+                                SearchResultFragment().let {
+                                    it.arguments = bundle
+                                    it.show(supportFragmentManager, "searchResult")
+                                }
+                            } else {
+                                // No result for your request were found.
+                                Timber.d("onResponse: No result found")
+                            }
+                        }
+
+                        override fun onFailure(call: Call<GeocodingResponse>, throwable: Throwable) {
+                            throwable.printStackTrace()
+                        }
+                    })
+                }
     }
 
     override fun onSearchResultRetry(dialog: DialogFragment) {
