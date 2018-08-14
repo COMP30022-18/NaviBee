@@ -65,6 +65,7 @@
             android:layout_marginStart="0dp"
             android:layout_marginTop="0dp"
             android:text="@string/landing_events"
+            android:onClick="onClickEvents"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"

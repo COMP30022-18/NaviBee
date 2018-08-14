@@ -17,7 +17,7 @@
     android:layout_marginRight="10dp"
     android:layout_marginBottom="2dp"
     android:layout_marginTop="10dp"
-    android:background="@drawable/chat_background">
+    android:background="@drawable/chat_recipient_background">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -26,8 +26,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Message body here"
-            android:padding="8dp"
+            android:text="Message body here. Message body here. Message body here. Message body here. Message body here. Message body here. Message body here. Message body here. Message body here. "
+            android:padding="24dp"
             android:textStyle="bold"
             android:textSize="24sp"
             android:textColor="#000000"/>
@@ -39,13 +39,6 @@
         android:orientation="vertical"
         android:layout_weight="0.5"
         android:layout_gravity="bottom">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="00:00"
-            android:textSize="18sp"
-            android:padding="4dp"/>
 
     </LinearLayout>
 

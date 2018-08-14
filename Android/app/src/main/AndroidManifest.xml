@@ -21,7 +21,12 @@
         <activity android:name=".MainActivity" />
         <activity
             android:name=".FriendActivity"
-            android:label="@string/title_activity_friend"></activity>
+            android:label="@string/title_activity_friend" />
+
+        <activity
+            android:name=".ChatActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

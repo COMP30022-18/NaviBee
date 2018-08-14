@@ -68,7 +68,7 @@
             android:layout_width="72dp"
             android:layout_height="40dp"
             android:text="Send"
-            android:background="@drawable/send_btn"
+            android:background="@drawable/send_button_background"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true" />
     </RelativeLayout>
