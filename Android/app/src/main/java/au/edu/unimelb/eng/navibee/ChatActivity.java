@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.util.ArrayList;
 
 import au.edu.unimelb.eng.navibee.Social.Conversation;
@@ -98,6 +100,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         private ArrayList<Conversation.Message> mDataset;
 
+        private final String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        private static final int VT_SEND=0;
+        private static final int VT_RECV=1;
+
         // Provide a suitable constructor (depends on the kind of dataset)
         public ChatAdapter(ArrayList<Conversation.Message> myDataset) {
             mDataset = myDataset;
@@ -108,12 +115,21 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             this.notifyItemInserted(mDataset.size()-1);
         }
 
+        @Override
+        public int getItemViewType(int position) {
+            // Just as an example, return 0 or 2 depending on position
+            // Note that unlike in ListView adapters, types don't have to be contiguous
+            return mDataset.get(position).getSender().equals(uid)? VT_SEND: VT_RECV;
+        }
+
+
         // Create new views (invoked by the layout manager)
         @Override
         public MessageViewHolder onCreateViewHolder(ViewGroup parent,
                                                        int viewType) {
 
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_sender_message, parent, false);
+            int resource = (viewType==VT_RECV)? R.layout.layout_recipient_message: R.layout.layout_sender_message;
+            View v = LayoutInflater.from(parent.getContext()).inflate(resource, parent, false);
             MessageViewHolder vh = new MessageViewHolder(v);
             return vh;
         }
