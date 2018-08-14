@@ -21,6 +21,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.AdapterView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -58,7 +59,7 @@ public class FriendActivity extends AppCompatActivity {
         public int getCount(){
             return contactList.size();
         }
-        public Object getItem(int position){
+        public FriendManager.ContactPerson getItem(int position){
             return contactList.get(position);
         }
         public long getItemId(int position){
@@ -84,7 +85,6 @@ public class FriendActivity extends AppCompatActivity {
                 holder.text.setText(tempPerson.getName());
                 new DownloadImageTask(holder.image)
                         .execute(tempPerson.getUrl());
-                //holder.image.setImageResource(R.drawable.ic_navibee_color);
             }
 
             return convertView;
@@ -163,6 +163,16 @@ public class FriendActivity extends AppCompatActivity {
 
         IntentFilter intFilt = new IntentFilter(FriendManager.BROADCAST_FRIEND_UPDATED);
         registerReceiver(br, intFilt);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int pos, long l) {
+                //using switch case, to check the condition.
+                Intent intent = new Intent(FriendActivity.this, ChatActivity.class);
+                intent.putExtra("userID", contactListAdapter.getItem(pos).getUid());
+                startActivity(intent);
+            }
+        });
     }
 
     BroadcastReceiver br = new BroadcastReceiver() {
@@ -177,5 +187,4 @@ public class FriendActivity extends AppCompatActivity {
         FriendManager.getInstance().fetchContactPersonList(contactList);
         contactListAdapter.notifyDataSetChanged();
     }
-
 }

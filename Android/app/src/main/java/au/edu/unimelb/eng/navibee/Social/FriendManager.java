@@ -24,14 +24,19 @@ public class FriendManager {
     public static class ContactPerson {
         private String url;
         private String name;
+        private String uid;
 
-        public ContactPerson(String name, String url) {
+        public ContactPerson(String name, String url, String uid) {
             this.url = url;
             this.name = name;
+            this.uid = uid;
         }
 
         public String getUrl() {
             return this.url;
+        }
+        public String getUid(){
+            return this.uid;
         }
 
         public String getName() {
@@ -103,7 +108,7 @@ public class FriendManager {
         list.clear();
         for (Map.Entry<String, Object> entry: friendInfo.entrySet()) {
             Map <String, Object> value = (Map <String, Object>) entry.getValue();
-            ContactPerson cp = new ContactPerson((String)value.get("name"), (String)value.get("photoURL"));
+            ContactPerson cp = new ContactPerson((String)value.get("name"), (String)value.get("photoURL"), entry.getKey());
             list.add(cp);
         }
     }
