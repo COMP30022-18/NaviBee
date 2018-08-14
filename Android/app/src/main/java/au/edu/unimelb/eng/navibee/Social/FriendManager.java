@@ -1,15 +1,20 @@
 package au.edu.unimelb.eng.navibee.Social;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.HttpsCallableResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -111,6 +116,30 @@ public class FriendManager {
             ContactPerson cp = new ContactPerson((String)value.get("name"), (String)value.get("photoURL"), entry.getKey());
             list.add(cp);
         }
+    }
+
+    public void addFriend(String targetUid) {
+        FirebaseFunctions mFunctions = FirebaseFunctions.getInstance();
+        Map<String, Object> data = new HashMap<>();
+        data.put("targetUid", targetUid);
+
+        mFunctions
+            .getHttpsCallable("addFriend")
+            .call(data)
+            .continueWith(new Continuation<HttpsCallableResult, String>() {
+                @Override
+                public String then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                    // This continuation runs on either success or failure, but if the task
+                    // has failed then getResult() will throw an Exception which will be
+                    // propagated down.
+//                    String result = (String) task.getResult().getData();
+//                    return result;
+                    return "";
+                }
+            });
+
+
+
     }
 
 
