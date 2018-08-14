@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -57,6 +58,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         IntentFilter intFilt = new IntentFilter(Conversation.BROADCAST_NEW_MESSAGE);
         registerReceiver(br, intFilt);
+
+        scrollToBottom();
     }
 
     private void loadNewMsg() {
@@ -64,11 +67,22 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             ((ChatAdapter) chatAdapter).addMessage(conversation.getMessage(currentMsgCount));
             currentMsgCount += 1;
         }
+        scrollToBottom();
     }
 
     @Override
     public void onClick(View view) {
+        EditText editText = (EditText)findViewById(R.id.edit_text_message);
 
+        String text = editText.getText().toString();
+        if (!text.equals("")) {
+            conversation.sendMessage("text", text);
+            editText.setText("");
+        }
+    }
+
+    public void scrollToBottom() {
+            chatRecyclerView.scrollToPosition(chatAdapter.getItemCount() - 1);
     }
 
 
@@ -84,15 +98,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         private ArrayList<Conversation.Message> mDataset;
 
-        public void addMessage(Conversation.Message message) {
-            mDataset.add(message);
-            this.notifyItemInserted(mDataset.size()-1);
-        }
-
-
         // Provide a suitable constructor (depends on the kind of dataset)
         public ChatAdapter(ArrayList<Conversation.Message> myDataset) {
             mDataset = myDataset;
+        }
+
+        public void addMessage(Conversation.Message message) {
+            mDataset.add(message);
+            this.notifyItemInserted(mDataset.size()-1);
         }
 
         // Create new views (invoked by the layout manager)
