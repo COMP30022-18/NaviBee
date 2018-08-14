@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -43,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import au.edu.unimelb.eng.navibee.Social.ConversationManager;
 import au.edu.unimelb.eng.navibee.Social.FriendManager;
 
 public class FriendActivity extends AppCompatActivity {
@@ -153,8 +155,7 @@ public class FriendActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        contactListAdapter = new FriendAdapter(this,
-                contactList);
+        contactListAdapter = new FriendAdapter(this, contactList);
 
         ListView listView = (ListView) findViewById(R.id.contactListView);
         listView.setAdapter(contactListAdapter);
@@ -168,9 +169,19 @@ public class FriendActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int pos, long l) {
                 //using switch case, to check the condition.
-                Intent intent = new Intent(FriendActivity.this, ChatActivity.class);
-                intent.putExtra("userID", contactListAdapter.getItem(pos).getUid());
-                startActivity(intent);
+
+                String targetUID= contactListAdapter.getItem(pos).getUid();
+
+                if (!ConversationManager.getInstance().isConversationExists(targetUID)) {
+                    Toast.makeText(FriendActivity.this, "ERROR: conversation not exists", Toast.LENGTH_LONG).show();
+
+                } else {
+                    Intent intent = new Intent(getBaseContext(), ChatActivity.class);
+                    intent.putExtra("TARGET_USER_ID", targetUID);
+                    startActivity(intent);
+                }
+
+
             }
         });
     }

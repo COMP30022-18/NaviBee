@@ -75,4 +75,12 @@ public class ConversationManager {
                     }
                 });
     }
+
+    public Conversation getConversationByUID(String uid) {
+        return conversationMap.get(uid);
+    }
+
+    public boolean isConversationExists(String uid) {
+        return conversationMap.containsKey(uid);
+    }
 }
