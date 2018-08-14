@@ -11,6 +11,10 @@ export const addFriend = functions.https.onCall(
 
         const targetUid = data.targetUid;
 
+        if (uid==targetUid) {
+            return {code:-1, msg:"can not add yourself as a friend"};
+        }
+
         let doc = await db.collection('users').doc(targetUid).get();
         if (!doc.exists) {
             return {code:-1, msg:"target user not exists"};
