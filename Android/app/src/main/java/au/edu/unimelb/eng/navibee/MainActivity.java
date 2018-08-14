@@ -105,7 +105,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.landing_social_btn:
                 startActivity(new Intent(this, FriendActivity.class));
                 break;
-
         }
+    }
+
+    public void onClickEvents(View view) {
+        startActivity(new Intent(this, ChatActivity.class));
     }
 }
