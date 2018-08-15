@@ -1,7 +1,6 @@
 package au.edu.unimelb.eng.navibee;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -12,6 +11,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 public class SosActivity extends AppCompatActivity {
 
@@ -22,26 +22,34 @@ public class SosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sos);
 
-        Button callButton = (Button) findViewById(R.id.callButton);
-        final EditText phoneNumber = (EditText) findViewById(R.id.phoneNumber);
+        Button callButton = findViewById(R.id.callButton);
+        EditText phoneNumber = findViewById(R.id.phoneNumber);
 
-//        final Context context = this;
+        callButton.setOnClickListener((View view) -> {
 
-        callButton.setOnClickListener(new View.OnClickListener() {
+            Intent callIntent = new Intent(Intent.ACTION_CALL);
 
+            callIntent.setData(Uri.parse("tel:" + phoneNumber.getText().toString()));
+            callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.CALL_PHONE},REQUEST_PHONE_CALL);
+            } else {
+                startActivity(callIntent);
+            }
+        });
+
+        LinearLayout sosSetting = findViewById(R.id.settingLayout);
+        Intent settingIntent = new Intent(this, SosSettingActivity.class);
+
+        sosSetting.setOnClickListener(new LinearLayout.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Intent callIntent = new Intent(Intent.ACTION_DIAL);
-                Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:" + phoneNumber.getText().toString()));
-                callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                if (ContextCompat.checkSelfPermission(SosActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(SosActivity.this, new String[]{Manifest.permission.CALL_PHONE},REQUEST_PHONE_CALL);
-                } else {
-                    startActivity(callIntent);
-                }
+                startActivity(settingIntent);
             }
         });
     }
+
 }
