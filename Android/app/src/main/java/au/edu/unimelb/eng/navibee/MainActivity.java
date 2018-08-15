@@ -63,6 +63,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
                 this.finish();
                 break;
+            
+            case R.id.landing_events_btn:
+                startActivity(new Intent(this, EventActivity.class));
+                break;
 
             case R.id.landing_sos_btn:
                 startActivity(new Intent(getApplicationContext(), SosActivity.class));
@@ -79,7 +83,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startActivity(intent);
     }
 
-    public void onClickEvents(View view) {
-        startActivity(new Intent(this, ChatActivity.class));
-    }
 }
+
