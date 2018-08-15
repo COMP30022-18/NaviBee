@@ -33,7 +33,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".EventActivity" />
         </activity>
-        <activity android:name=".SelectFriendsActivity"></activity>
+        <activity android:name=".SelectFriendsActivity" />
         <activity
             android:name=".SosActivity"
             android:label="@string/landing_sos">
@@ -50,6 +50,10 @@
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
+        <activity android:name=".navigation.DestinationsSearchResultActivity"
+            android:theme="@android:style/Theme.NoDisplay" />
+
+
         <activity
             android:name=".ChatActivity"
             android:theme="@style/AppTheme.NoActionBar">
