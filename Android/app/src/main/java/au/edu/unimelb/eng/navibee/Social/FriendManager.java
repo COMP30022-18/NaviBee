@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import au.edu.unimelb.eng.navibee.NaviBeeApplication;
+
 public class FriendManager {
 
     public final static String BROADCAST_FRIEND_UPDATED = "broadcast.friend.updated";
