@@ -19,15 +19,17 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
-        <activity android:name=".EventActivity"
-                  android:parentActivityName=".MainActivity"/>
-
-        <activity android:name=".EventDetailActivity"
-                  android:parentActivityName=".EventActivity">
+        <activity
+            android:name=".EventActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".EventDetailActivity"
+            android:parentActivityName=".EventActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".EventActivity" />
         </activity>
+        <activity android:name=".SelectFriendsActivity"></activity>
     </application>
 
 </manifest>
