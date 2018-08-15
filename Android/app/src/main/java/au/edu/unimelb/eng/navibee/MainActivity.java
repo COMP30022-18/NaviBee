@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textView2.setText(email);
 
         findViewById(R.id.sign_out_button).setOnClickListener(this);
+        findViewById(R.id.landing_sos_btn).setOnClickListener(this);
         findViewById(R.id.landing_social_btn).setOnClickListener(this);
 
         FriendManager.init();
@@ -59,6 +60,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
                 startActivity(intent);
                 this.finish();
+                break;
+
+            case R.id.landing_sos_btn:
+                startActivity(new Intent(getApplicationContext(), SosActivity.class));
                 break;
 
             case R.id.landing_social_btn:
