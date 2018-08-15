@@ -1,10 +1,10 @@
 package au.edu.unimelb.eng.navibee;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -25,6 +26,7 @@ public class SosActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String uid;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,19 +35,26 @@ public class SosActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        TextView phoneNumber = findViewById(R.id.phoneNumber);
+        TextView phoneText = findViewById(R.id.phoneText);
 
         db.collection("users").document(uid).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
-                String emergency = document.getString("emergency");
-                phoneNumber.setText(emergency);
+
+                // check emergency field exists
+                if (document.contains("emergency")) {
+                    String emergency = document.getString("emergency");
+                    phoneText.setText(emergency);
+                } else {
+                    phoneText.setText("Add contact in setting");
+                }
+
             } else {
-                // TODO if fails
+                Toast.makeText(SosActivity.this, "Load data fails", Toast.LENGTH_LONG).show();
             }
         });
 
-        makePhoneCall(phoneNumber);
+        makePhoneCall(phoneText);
 
         startSosSettingActivity();
 
