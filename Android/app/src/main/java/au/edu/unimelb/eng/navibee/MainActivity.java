@@ -11,6 +11,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import au.edu.unimelb.eng.navibee.Social.FriendManager;
+import au.edu.unimelb.eng.navibee.Social.ConversationManager;
+
+import au.edu.unimelb.eng.navibee.navigation.DestinationsActivity;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     private FirebaseAuth mAuth;
@@ -32,6 +37,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textView2.setText(email);
 
         findViewById(R.id.sign_out_button).setOnClickListener(this);
+        findViewById(R.id.landing_sos_btn).setOnClickListener(this);
+        findViewById(R.id.landing_social_btn).setOnClickListener(this);
+
+        FriendManager.init();
+        ConversationManager.init();
     }
 
     @Override
@@ -53,10 +63,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
                 this.finish();
                 break;
+            
             case R.id.landing_events_btn:
                 startActivity(new Intent(this, EventActivity.class));
+
+            case R.id.landing_sos_btn:
+                startActivity(new Intent(getApplicationContext(), SosActivity.class));
+                break;
+
+            case R.id.landing_social_btn:
+                startActivity(new Intent(this, FriendActivity.class));
                 break;
         }
+    }
+
+    public void startNavigationActivity(View view) {
+        Intent intent = new Intent(this, DestinationsActivity.class);
+        startActivity(intent);
+    }
+
+    public void onClickEvents(View view) {
+        startActivity(new Intent(this, ChatActivity.class));
     }
 }
 
