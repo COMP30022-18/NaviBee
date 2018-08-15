@@ -10,33 +10,33 @@ import android.widget.CheckedTextView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import au.edu.unimelb.eng.navibee.Social.FriendManager;
+
 public class EventSelectFriendsActivity extends AppCompatActivity {
 
-    String[] city= {
-            "Bangalore",
-            "Chennai",
-            "Mumbai",
-            "Pune",
-            "Delhi",
-            "Jabalpur",
-            "Indore",
-            "Ranchi",
-            "Hyderabad",
-            "Ahmedabad",
-            "Kolkata",
-            "Bhopal"
-    };
+    private Map<String, Boolean> selectedFriendMap;
+    private ArrayList<String> friendNameList;
+    private ArrayList<FriendManager.ContactPerson> friendList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.event_select_friends_list);
 
+        friendNameList = new ArrayList<>();
+        selectedFriendMap = new HashMap<>();
+        friendList = new ArrayList<>();
+        loadData();
+
         ListView friendListView = findViewById(R.id.event_select_friends_list);
         friendListView.setChoiceMode(friendListView.CHOICE_MODE_MULTIPLE);
 
         friendListView.setAdapter(new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_checked,city));
+                android.R.layout.simple_list_item_checked, friendNameList));
 
         friendListView.setOnItemClickListener(
                 new AdapterView.OnItemClickListener()
@@ -45,12 +45,23 @@ public class EventSelectFriendsActivity extends AppCompatActivity {
                     public void onItemClick(AdapterView<?> arg0, View v,
                                             int position, long id) {
                         CheckedTextView item = (CheckedTextView) v;
-
-                        Toast.makeText(getApplicationContext(), city[position] + " checked : " +
+                        Toast.makeText(getApplicationContext(), friendList.get(position).getName() + " checked : " +
                                 item.isChecked(), Toast.LENGTH_SHORT).show();
+
+                        selectedFriendMap.put(friendList.get(position).getUid(), item.isChecked());
                     }
                 }
         );
+    }
 
+    private void loadData (){
+        // fetch friend list
+        FriendManager.getInstance().fetchContactPersonList(friendList);
+
+        // add to selectedFriendMap
+        for (FriendManager.ContactPerson p: friendList){
+            selectedFriendMap.put(p.getUid(), false);
+            friendNameList.add(p.getName());
+        }
     }
 }
