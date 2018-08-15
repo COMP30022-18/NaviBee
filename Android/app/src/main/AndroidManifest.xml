@@ -33,7 +33,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".EventActivity" />
         </activity>
-        <activity android:name=".SelectFriendsActivity"></activity>
+        <activity android:name=".EventSelectFriendsActivity"></activity>
         <activity
             android:name=".SosActivity"
             android:label="@string/landing_sos">

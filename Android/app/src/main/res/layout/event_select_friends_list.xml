@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SelectFriendsActivity">
+    tools:context=".EventSelectFriendsActivity">
 
     <ListView
+        android:id="@+id/event_select_friends_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
