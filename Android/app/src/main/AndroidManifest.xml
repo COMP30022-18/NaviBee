@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="au.edu.unimelb.eng.navibee">
-  
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
 
@@ -33,7 +33,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".EventActivity" />
         </activity>
-        <activity android:name=".SelectFriendsActivity"></activity>
+        <activity android:name=".SelectFriendsActivity" />
         <activity
             android:name=".SosActivity"
             android:label="@string/landing_sos">
@@ -41,11 +41,13 @@
         <activity
             android:name=".FriendActivity"
             android:label="@string/title_activity_friend" />
-
-        <activity android:name=".navigation.DestinationsActivity"
+        <activity
+            android:name=".navigation.DestinationsActivity"
             android:label="@string/landing_navigation">
-            <meta-data android:name="android.app.searchable"
+            <meta-data
+                android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
+
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -53,6 +55,10 @@
         <activity
             android:name=".ChatActivity"
             android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".SosSettingActivity"
+            android:label="@string/sos_setting">
         </activity>
     </application>
 
