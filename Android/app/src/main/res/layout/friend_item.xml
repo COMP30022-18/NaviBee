@@ -9,22 +9,62 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="128dp"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp">
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteX="170dp"
+        tools:layout_editor_absoluteY="-2dp">
 
         <ImageView
             android:id="@+id/friend_icon"
-            android:layout_width="112dp"
+            android:layout_width="107dp"
             android:layout_height="match_parent"
             app:srcCompat="@mipmap/ic_launcher_round" />
 
-        <TextView
-            android:id="@+id/friend_name"
-            android:layout_width="330dp"
-            android:layout_height="126dp"
-            android:layout_gravity="center"
-            android:layout_marginLeft="10dip"
-            android:text="friend1"
-            android:textSize="45sp" />
+        <LinearLayout
+            android:layout_width="215dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/friend_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="friend1"
+                android:textSize="45sp" />
+
+            <TextView
+                android:id="@+id/last_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="lastMessage"
+                android:textSize="30sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/time"
+                android:layout_width="wrap_content"
+                android:layout_height="64dp"
+                android:text="12:00"
+                android:textSize="35sp"
+                android:textAlignment="center"/>
+
+            <TextView
+                android:id="@+id/unread"
+                android:layout_width="wrap_content"
+                android:layout_height="64dp"
+                android:background="@drawable/message_notification"
+                android:text="8"
+                android:textColor="#ffffff"
+                android:padding="5dp"
+                android:minWidth="64dp"
+                android:textAlignment="center"
+                android:textSize="50sp" />
+        </LinearLayout>
+
     </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>

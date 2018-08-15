@@ -198,4 +198,5 @@ public class FriendActivity extends AppCompatActivity {
         FriendManager.getInstance().fetchContactPersonList(contactList);
         contactListAdapter.notifyDataSetChanged();
     }
+
 }
