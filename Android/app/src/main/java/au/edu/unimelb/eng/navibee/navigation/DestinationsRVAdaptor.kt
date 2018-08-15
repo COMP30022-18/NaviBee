@@ -9,7 +9,6 @@ import au.edu.unimelb.eng.navibee.R
 import kotlinx.android.synthetic.main.recycler_view_destination_list_button.view.*
 import kotlinx.android.synthetic.main.recycler_view_destination_list_divider.view.*
 import kotlinx.android.synthetic.main.recycler_view_destination_list_entry.view.*
-import java.net.URL
 
 class DestinationsRVAdaptor(private val dataset: ArrayList<DestinationRVItem>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
