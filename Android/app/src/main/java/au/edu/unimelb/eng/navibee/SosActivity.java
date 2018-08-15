@@ -4,26 +4,55 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.LinearLayout;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class SosActivity extends AppCompatActivity {
 
     private static final int REQUEST_PHONE_CALL = 1;
+
+    private FirebaseFirestore db;
+    private String uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sos);
 
+        db = FirebaseFirestore.getInstance();
+        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        TextView phoneNumber = findViewById(R.id.phoneNumber);
+
+        db.collection("users").document(uid).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                String emergency = document.getString("emergency");
+                phoneNumber.setText(emergency);
+            } else {
+                // TODO if fails
+            }
+        });
+
+        makePhoneCall(phoneNumber);
+
+        startSosSettingActivity();
+
+    }
+
+    private void makePhoneCall(TextView phoneNumber) {
         Button callButton = findViewById(R.id.callButton);
-        EditText phoneNumber = findViewById(R.id.phoneNumber);
 
         callButton.setOnClickListener((View view) -> {
 
@@ -40,7 +69,9 @@ public class SosActivity extends AppCompatActivity {
                 startActivity(callIntent);
             }
         });
+    }
 
+    private void startSosSettingActivity() {
         LinearLayout sosSetting = findViewById(R.id.settingLayout);
         Intent settingIntent = new Intent(this, SosSettingActivity.class);
 

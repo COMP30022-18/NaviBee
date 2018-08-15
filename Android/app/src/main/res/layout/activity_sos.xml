@@ -6,16 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".SosActivity">
 
-    <EditText
+    <TextView
         android:id="@+id/phoneNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="250dp"
         android:ems="10"
         android:hint="@android:string/emptyPhoneNumber"
-        android:inputType="phone"
         android:textAlignment="center"
-        android:textSize="30sp"
+        android:textSize="36sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,6 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:background="#ffc107"
         android:text="Call"
         android:textAlignment="center"
         android:textSize="30sp"
