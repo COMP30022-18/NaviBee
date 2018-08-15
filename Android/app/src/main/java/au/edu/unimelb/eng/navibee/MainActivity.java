@@ -77,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void startNavigationActivity(View view) {
         Intent intent = new Intent(this, DestinationsActivity.class);
         startActivity(intent);
+    }
+
     public void onClickEvents(View view) {
         startActivity(new Intent(this, ChatActivity.class));
     }
