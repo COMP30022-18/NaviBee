@@ -57,7 +57,7 @@ public class ConversationManager {
 
                                     Map<String, Boolean> users = (Map<String, Boolean>)((Map<String, Object>)dc.getDocument().getData()).get("users");
                                     for (String userId: users.keySet()) {
-                                        if (userId!=uid) {
+                                        if (!userId.equals(uid)) {
                                             otherUid = userId;
                                         }
                                     }
