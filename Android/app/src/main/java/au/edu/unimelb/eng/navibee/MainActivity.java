@@ -14,6 +14,8 @@ import com.google.firebase.auth.FirebaseUser;
 import au.edu.unimelb.eng.navibee.Social.FriendManager;
 import au.edu.unimelb.eng.navibee.Social.ConversationManager;
 
+import au.edu.unimelb.eng.navibee.navigation.DestinationsActivity;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     private FirebaseAuth mAuth;
@@ -72,6 +74,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    public void startNavigationActivity(View view) {
+        Intent intent = new Intent(this, DestinationsActivity.class);
+        startActivity(intent);
     public void onClickEvents(View view) {
         startActivity(new Intent(this, ChatActivity.class));
     }

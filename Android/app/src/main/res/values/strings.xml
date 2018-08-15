@@ -96,8 +96,15 @@
     <string name="landing_events">Events</string>
     <string name="landing_social">Friends</string>
     <string name="landing_sos">SOS</string>
+    <string name="navigation_search_hint">Where do you want to go?</string>
+    <string name="search_button_text">Search</string>
     <string name="title_activity_friend">FriendActivity</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="we_have_found">We have found…</string>
+    <string name="button_go">Go</string>
+    <string name="button_retry">Try again</string>
+    <string name="location_required_for_navigation">Location permission is required for navigation.</string>
+    <string name="button_got_it">Got it</string>
 </resources>
