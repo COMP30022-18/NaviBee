@@ -7,14 +7,13 @@ import timber.log.Timber
 class NaviBeeApplication : Application() {
 
     companion object {
-        lateinit var naviBeeApplication: NaviBeeApplication
-
-        @JvmStatic fun getInstance() = naviBeeApplication
+        @JvmStatic lateinit var instance: NaviBeeApplication
+            private set
     }
 
     override fun onCreate() {
         super.onCreate()
-        naviBeeApplication = this
+        instance = this
         Timber.plant(Timber.DebugTree())
     }
 
