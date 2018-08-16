@@ -59,7 +59,7 @@ public class ConversationManager {
                                     Date timestamp =  ((Map<String, Date>) dc.getDocument().getData().get("readTimestamps")).get(uid);
 
                                     // load new conversation
-                                    Conversation conv = new Conversation(dc.getDocument().getId(), uid, timestamp);
+                                    au.edu.unimelb.eng.navibee.social.Conversation conv = new Conversation(dc.getDocument().getId(), uid, timestamp);
                                     String otherUid = "";
 
                                     Map<String, Boolean> users = (Map<String, Boolean>)(dc.getDocument().getData()).get("users");
@@ -95,6 +95,7 @@ public class ConversationManager {
         for (FriendManager.ContactPerson cp: list) {
             Conversation conv = getConversationByUID(cp.getUid());
             if (conv!=null && conv.getMessageCount()>0) {
+                cp.setLastMessage(conv.getMessage(conv.getMessageCount()-1).getData());
                 cp.setLastMessageTime(conv.getMessage(conv.getMessageCount()-1).getTime());
                 cp.setUnreadMessage(conv.getUnreadMsgCount());
             } else {

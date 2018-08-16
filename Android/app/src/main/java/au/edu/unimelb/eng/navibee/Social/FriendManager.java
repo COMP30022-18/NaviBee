@@ -69,7 +69,12 @@ public class FriendManager {
                 lastMessage = reduced;
             }
             else{
-                lastMessage = message;
+                String increased = message;
+                int needspace = 16 - message.length();
+                for (int i =0; i < needspace; i++){
+                    increased = increased + "  ";
+                }
+                lastMessage = increased;
             }
             hasLastMessage = true;
         }
