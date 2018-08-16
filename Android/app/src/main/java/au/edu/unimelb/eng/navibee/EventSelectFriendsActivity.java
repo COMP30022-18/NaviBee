@@ -1,6 +1,7 @@
 package au.edu.unimelb.eng.navibee;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -63,5 +64,19 @@ public class EventSelectFriendsActivity extends AppCompatActivity {
             selectedFriendMap.put(p.getUid(), false);
             friendNameList.add(p.getName());
         }
+    }
+
+    public void editEventDetail(View view){
+        // get selected friends' uid
+        ArrayList<String> selectedUidList = new ArrayList<>();
+        for(String uid: selectedFriendMap.keySet()){
+            if(selectedFriendMap.get(uid)){
+                selectedUidList.add(uid);
+            }
+        }
+        // start next step
+        Intent intent = new Intent(this, EventEditActivity.class);
+        intent.putStringArrayListExtra("selectedUid", selectedUidList);
+        startActivity(intent);
     }
 }
