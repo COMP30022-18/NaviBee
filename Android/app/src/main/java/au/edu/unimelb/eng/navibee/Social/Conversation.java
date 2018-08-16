@@ -1,4 +1,4 @@
-package au.edu.unimelb.eng.navibee.Social;
+package au.edu.unimelb.eng.navibee.social;
 
 import android.content.Intent;
 import android.support.annotation.Nullable;
@@ -18,18 +18,21 @@ import au.edu.unimelb.eng.navibee.NaviBeeApplication;
 public class Conversation {
 
     public static final String BROADCAST_NEW_MESSAGE = "broadcast.conversation.newmessage";
-
+    private static final String TAG = "conv";
 
     private final String conversationId;
     private final String uid;
-    FirebaseFirestore db;
+    private final FirebaseFirestore db;
+
     private ArrayList<Message> messages = new ArrayList<>();
+    private int unreadMsgCount = 0;
+    private Date readTimestamp;
 
-    private static final String TAG = "conv";
 
-    public Conversation(String id, String uid) {
+    public Conversation(String id, String uid, Date timestamp) {
         conversationId = id;
         this.uid = uid;
+        this.readTimestamp = timestamp;
         db = FirebaseFirestore.getInstance();
         listen();
 
@@ -51,7 +54,12 @@ public class Conversation {
                             switch (dc.getType()) {
                                 case ADDED:
                                     // new message
-                                    messages.add(dc.getDocument().toObject(Message.class));
+                                    Message msg = dc.getDocument().toObject(Message.class);
+                                    messages.add(msg);
+                                    if (msg.getTime().after(readTimestamp)) {
+                                       unreadMsgCount += 1;
+                                    }
+
                                     break;
                                 case MODIFIED:
                                     //
@@ -63,6 +71,9 @@ public class Conversation {
                         }
 
                         Intent intent = new Intent(BROADCAST_NEW_MESSAGE);
+                        NaviBeeApplication.getInstance().sendBroadcast(intent);
+
+                        intent = new Intent(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE);
                         NaviBeeApplication.getInstance().sendBroadcast(intent);
                     }
                 });
@@ -85,6 +96,23 @@ public class Conversation {
 
     public ArrayList<Message> getCurrentMessageList() {
         return new ArrayList<>(messages);
+    }
+
+    public int getUnreadMsgCount() {
+        return unreadMsgCount;
+    }
+
+    public void markAllAsRead() {
+        unreadMsgCount = 0;
+        if (messages.size()>0) {
+            readTimestamp = messages.get(messages.size()-1).getTime();
+
+            // update timestamp on server
+            db.collection("conversations").document(conversationId).update("readTimestamps." + uid, readTimestamp);
+        }
+
+        Intent intent = new Intent(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE);
+        NaviBeeApplication.getInstance().sendBroadcast(intent);
     }
 
 
