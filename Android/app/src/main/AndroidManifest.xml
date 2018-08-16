@@ -59,6 +59,8 @@
         </activity>
         <activity android:name=".navigation.LocationPermissionRequestActivity"
             android:theme="@style/AppTheme.Translucent"/>
+        <activity android:name=".navigation.DestinationsVoiceSearchActivity"
+            android:theme="@style/AppTheme.Translucent"/>
 
 
         <activity

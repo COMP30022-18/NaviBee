@@ -30,6 +30,7 @@ import com.mapbox.api.geocoding.v5.models.CarmenFeature
 import com.mapbox.api.geocoding.v5.models.GeocodingResponse
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
+import org.jetbrains.anko.startActivity
 import retrofit2.Callback
 import retrofit2.Call
 import retrofit2.Response
@@ -37,10 +38,6 @@ import timber.log.Timber
 
 
 class DestinationsActivity : AppCompatActivity(){
-    companion object {
-        // Voice recognition activity result ID
-        private const val SPEECH_RECOGNITION_RESULT = 1
-    }
 
     // Recycler view
     private lateinit var recyclerView: RecyclerView
@@ -128,30 +125,9 @@ class DestinationsActivity : AppCompatActivity(){
 
 
     private fun startVoiceSearch() {
-        Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).let {
-            it.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH)
-            it.putExtra(RecognizerIntent.EXTRA_PROMPT, resources.getString(R.string.navigation_search_hint))
-            startActivityForResult(it, SPEECH_RECOGNITION_RESULT)
-        }
+        startActivity<DestinationsVoiceSearchActivity>()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        when (requestCode) {
-            SPEECH_RECOGNITION_RESULT -> {
-                if (resultCode == RESULT_OK) {
-                    val results = data!!.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    // TODO: Confirm for location.
-
-                    startActivity(Intent().apply {
-                        action = Intent.ACTION_SEARCH
-                        putExtra(SearchManager.QUERY, results[0])
-                    })
-                }
-            }
-        }
-    }
 }
 
 
