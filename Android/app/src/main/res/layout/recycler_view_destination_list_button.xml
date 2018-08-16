@@ -7,7 +7,7 @@
     android:orientation="horizontal">
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/recycler_view_destinations_list_button_button"
         android:theme="@style/AppTheme.Button.ColoredPrimary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

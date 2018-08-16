@@ -33,7 +33,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".EventActivity" />
         </activity>
-        <activity android:name=".SelectFriendsActivity"></activity>
+        <activity android:name=".SelectFriendsActivity" />
         <activity
             android:name=".SosActivity"
             android:label="@string/landing_sos">
@@ -42,14 +42,27 @@
             android:name=".FriendActivity"
             android:label="@string/title_activity_friend" />
 
+        <!-- Navigation -->
+
         <activity android:name=".navigation.DestinationsActivity"
             android:label="@string/landing_navigation">
+            <meta-data android:name="android.app.default_searchable"
+                android:value=".navigation.DestinationsSearchResultActivity" />
+        </activity>
+        <activity android:name=".navigation.DestinationsSearchResultActivity"
+            android:theme="@style/AppTheme.Translucent">
             <meta-data android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
+        <activity android:name=".navigation.LocationPermissionRequestActivity"
+            android:theme="@style/AppTheme.Translucent"/>
+        <activity android:name=".navigation.DestinationsVoiceSearchActivity"
+            android:theme="@style/AppTheme.Translucent"/>
+
+
         <activity
             android:name=".ChatActivity"
             android:theme="@style/AppTheme.NoActionBar">
