@@ -1,17 +1,9 @@
 package au.edu.unimelb.eng.navibee.navigation
 
-import android.app.AlertDialog
-import android.app.Dialog
 import android.app.SearchManager
 import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.location.Location
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.speech.RecognizerIntent
-import android.support.v4.app.DialogFragment
-import android.support.v4.content.ContextCompat
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -19,22 +11,9 @@ import android.view.Menu
 import android.view.View
 import android.widget.SearchView
 import au.edu.unimelb.eng.navibee.BuildConfig
-import android.Manifest
-import android.support.design.widget.Snackbar
-import android.support.v4.app.ActivityCompat
 import au.edu.unimelb.eng.navibee.R
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import com.mapbox.api.geocoding.v5.MapboxGeocoding
-import com.mapbox.api.geocoding.v5.models.CarmenFeature
-import com.mapbox.api.geocoding.v5.models.GeocodingResponse
-import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
 import org.jetbrains.anko.startActivity
-import retrofit2.Callback
-import retrofit2.Call
-import retrofit2.Response
-import timber.log.Timber
 
 
 class DestinationsActivity : AppCompatActivity(){
