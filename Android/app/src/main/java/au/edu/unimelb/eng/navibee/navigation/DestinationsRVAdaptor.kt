@@ -42,17 +42,17 @@ class DestinationsRVAdaptor(private val dataset: ArrayList<DestinationRVItem>) :
         val data = dataset[position]
         when (data) {
             is DestinationRVDivider -> {
-                holder.itemView.caption.text = data.text
+                holder.itemView.recycler_view_destinations_list_divider_caption.text = data.text
             }
             is DestinationRVButton -> {
-                holder.itemView.button.text = data.text
+                holder.itemView.recycler_view_destinations_list_button_button.text = data.text
                 // Set Icon to the button to "Start"
-                holder.itemView.button.setCompoundDrawablesRelativeWithIntrinsicBounds(data.icon, 0, 0, 0)
-                holder.itemView.button.setOnClickListener(data.onClick)
+                holder.itemView.recycler_view_destinations_list_button_button.setCompoundDrawablesRelativeWithIntrinsicBounds(data.icon, 0, 0, 0)
+                holder.itemView.recycler_view_destinations_list_button_button.setOnClickListener(data.onClick)
             }
             is DestinationRVEntry -> {
-                holder.itemView.title.text = data.name
-                holder.itemView.subtitle.text = data.location
+                holder.itemView.recycler_view_destinations_list_divider_caption_entry_title.text = data.name
+                holder.itemView.recycler_view_destinations_list_divider_caption_entry_subtitle.text = data.location
                 // TODO: Load image.
                 holder.itemView.setOnClickListener(data.onClick)
             }

@@ -9,7 +9,7 @@
 
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/recycler_view_destinations_list_divider_caption_entry_title"
         style="@style/AppTheme.List.ItemTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -20,7 +20,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/subtitle"
+        android:id="@+id/recycler_view_destinations_list_divider_caption_entry_subtitle"
         style="@style/AppTheme.List.ItemSubtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -30,10 +30,10 @@
         android:text="Location 1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title" />
+        app:layout_constraintTop_toBottomOf="@+id/recycler_view_destinations_list_divider_caption_entry_title" />
 
     <ImageView
-        android:id="@+id/preview"
+        android:id="@+id/recycler_view_destinations_list_divider_caption_entry_preview"
         android:layout_width="120dp"
         android:layout_height="0dp"
         android:layout_marginBottom="0dp"
