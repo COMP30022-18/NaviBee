@@ -19,9 +19,8 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 
-import au.edu.unimelb.eng.navibee.Social.Conversation;
-import au.edu.unimelb.eng.navibee.Social.ConversationManager;
-import au.edu.unimelb.eng.navibee.Social.FriendManager;
+import au.edu.unimelb.eng.navibee.social.Conversation;
+import au.edu.unimelb.eng.navibee.social.ConversationManager;
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -57,6 +56,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         chatRecyclerView.setAdapter(chatAdapter);
 
         currentMsgCount = conversation.getMessageCount();
+        conversation.markAllAsRead();
 
         IntentFilter intFilt = new IntentFilter(Conversation.BROADCAST_NEW_MESSAGE);
         registerReceiver(br, intFilt);
@@ -70,6 +70,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             currentMsgCount += 1;
         }
         scrollToBottom();
+        conversation.markAllAsRead();
     }
 
     @Override

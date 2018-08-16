@@ -44,8 +44,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import au.edu.unimelb.eng.navibee.Social.ConversationManager;
-import au.edu.unimelb.eng.navibee.Social.FriendManager;
+import au.edu.unimelb.eng.navibee.social.ConversationManager;
+import au.edu.unimelb.eng.navibee.social.FriendManager;
 
 public class FriendActivity extends AppCompatActivity {
 
@@ -172,6 +172,8 @@ public class FriendActivity extends AppCompatActivity {
         IntentFilter intFilt = new IntentFilter(FriendManager.BROADCAST_FRIEND_UPDATED);
         registerReceiver(br, intFilt);
 
+        registerReceiver(brMsgReadState, new IntentFilter(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE));
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int pos, long l) {
@@ -200,9 +202,18 @@ public class FriendActivity extends AppCompatActivity {
         }
     };
 
+    BroadcastReceiver brMsgReadState = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConversationManager.getInstance().updateConvInfoForContactList(contactList);
+            contactListAdapter.notifyDataSetChanged();
+        }
+    };
+
     private void loadContactList() {
 
         FriendManager.getInstance().fetchContactPersonList(contactList);
+        ConversationManager.getInstance().updateConvInfoForContactList(contactList);
         contactListAdapter.notifyDataSetChanged();
     }
 
