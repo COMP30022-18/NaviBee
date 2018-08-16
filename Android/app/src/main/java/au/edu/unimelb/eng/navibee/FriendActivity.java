@@ -77,6 +77,7 @@ public class FriendActivity extends AppCompatActivity {
                 holder.text = (TextView) convertView.findViewById(R.id.friend_name);
                 holder.lastTime = (TextView) convertView.findViewById(R.id.time);
                 holder.unread = (TextView) convertView.findViewById(R.id.unread);
+                holder.lastMessage = (TextView) convertView.findViewById(R.id.last_message);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
@@ -91,6 +92,12 @@ public class FriendActivity extends AppCompatActivity {
                         .execute(tempPerson.getUrl());
                 holder.lastTime.setText(tempPerson.getLastMessageTime());
                 holder.unread.setText(Integer.toString(tempPerson.getUnreadMessage()));
+                if (tempPerson.hasMessage()){
+                    holder.lastMessage.setText(tempPerson.getLastMessage());
+                }
+                else{
+                    holder.lastMessage.setText("");
+                }
 
             }
 
@@ -102,6 +109,7 @@ public class FriendActivity extends AppCompatActivity {
             public TextView text;
             public TextView unread;
             public TextView lastTime;
+            public TextView lastMessage;
         }
         private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
             ImageView bmImage;
@@ -166,6 +174,8 @@ public class FriendActivity extends AppCompatActivity {
 
         ListView listView = (ListView) findViewById(R.id.contactListView);
         listView.setAdapter(contactListAdapter);
+
+        //add friend code
 //        FriendManager.getInstance().addFriend("QzhIShBiTcSEfa7UiwX3WdOvCpj1");
 //        FriendManager.getInstance().addFriend("56kkUQ97zEXnHBDajgqjCcUdOrD2");
 

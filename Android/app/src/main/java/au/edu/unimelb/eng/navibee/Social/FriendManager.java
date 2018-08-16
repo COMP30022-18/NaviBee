@@ -73,8 +73,15 @@ public class FriendManager {
             }
             hasLastMessage = true;
         }
+        public String getLastMessage(){
+            return this.lastMessage;
+        }
         public void noMessage(){
             hasLastMessage = false;
+        }
+
+        public Boolean hasMessage() {
+            return hasLastMessage;
         }
 
         public String getLastMessageTime (){
