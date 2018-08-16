@@ -44,9 +44,9 @@ public class SosSettingActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-//                Intent returnIntent = new Intent();
-//                returnIntent.putExtra("emergency", emergency);
-//                setResult(Activity.RESULT_OK, returnIntent);
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("emergency", emergency);
+                setResult(Activity.RESULT_OK, returnIntent);
 
                 finish();
             }

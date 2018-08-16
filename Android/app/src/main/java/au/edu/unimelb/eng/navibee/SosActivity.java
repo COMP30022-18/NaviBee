@@ -27,7 +27,6 @@ import java.util.Map;
 public class SosActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE = 1;
-    private static final int REQUEST_PHONE_CALL = 1;
 
     private FirebaseFirestore db;
     private String uid;
@@ -50,13 +49,22 @@ public class SosActivity extends AppCompatActivity {
                 // check emergency field exists
                 if (document.contains("emergency")) {
                     String emergency = document.getString("emergency");
-                    phoneText.setText(emergency);
+
+                    // check field is empty string
+                    if (emergency.isEmpty()) {
+                        goSettingActivity();
+                    } else {
+                        phoneText.setText(emergency);
+                    }
+
                 } else {
                     // merge data to avoid overwriting
                     Map<String, Object> data = new HashMap<>();
                     data.put("emergency", "");
                     db.collection("users").document(uid).set(data, SetOptions.merge());
 
+                    goSettingActivity();
+                    checkPhoneCallPermission();
                 }
 
             } else {
@@ -70,14 +78,40 @@ public class SosActivity extends AppCompatActivity {
 
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (requestCode == REQUEST_CODE) {
-//            if (resultCode == Activity.RESULT_OK) {
-//                String result = data.getStringExtra("emergency");
-//            }
-//        }
-//    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                String result = data.getStringExtra("emergency");
+
+                TextView phoneText = findViewById(R.id.phoneText);
+                phoneText.setText(result);
+
+            }
+        }
+    }
+
+    private void goSettingActivity() {
+        Toast.makeText(SosActivity.this, "Go setting to add emergency contact",
+                Toast.LENGTH_LONG).show();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+//        startActivity(new Intent(this, SosSettingActivity.class));
+        startActivityForResult(new Intent(this, SosSettingActivity.class), REQUEST_CODE);
+    }
+
+    private void checkPhoneCallPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CALL_PHONE},REQUEST_CODE);
+        }
+    }
 
     private void makePhoneCall(TextView phoneText) {
         Button callButton = findViewById(R.id.callButton);
@@ -92,7 +126,7 @@ public class SosActivity extends AppCompatActivity {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
                     != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.CALL_PHONE},REQUEST_PHONE_CALL);
+                        new String[]{Manifest.permission.CALL_PHONE}, REQUEST_CODE);
             } else {
                 startActivity(callIntent);
             }
@@ -106,8 +140,8 @@ public class SosActivity extends AppCompatActivity {
         sosSetting.setOnClickListener(new LinearLayout.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(settingIntent);
-//                startActivityForResult(settingIntent, REQUEST_CODE);
+//                startActivity(settingIntent);
+                startActivityForResult(settingIntent, REQUEST_CODE);
             }
         });
     }
