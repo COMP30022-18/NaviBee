@@ -1,5 +1,7 @@
 package au.edu.unimelb.eng.navibee;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -31,7 +33,22 @@ public class SosSettingActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String emergency = phoneNumber.getText().toString();
                 db.collection("users").document(uid).update("emergency", emergency);
-                Toast.makeText(SosSettingActivity.this, "Contact added", Toast.LENGTH_LONG).show();
+
+                Toast.makeText(SosSettingActivity.this, "Emergency contact added",
+                        Toast.LENGTH_LONG).show();
+
+                // wait 1 second
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+//                Intent returnIntent = new Intent();
+//                returnIntent.putExtra("emergency", emergency);
+//                setResult(Activity.RESULT_OK, returnIntent);
+
+                finish();
             }
         });
 

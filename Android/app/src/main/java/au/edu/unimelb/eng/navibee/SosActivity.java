@@ -2,6 +2,7 @@ package au.edu.unimelb.eng.navibee;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -18,9 +19,14 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SosActivity extends AppCompatActivity {
 
+    private static final int REQUEST_CODE = 1;
     private static final int REQUEST_PHONE_CALL = 1;
 
     private FirebaseFirestore db;
@@ -46,7 +52,11 @@ public class SosActivity extends AppCompatActivity {
                     String emergency = document.getString("emergency");
                     phoneText.setText(emergency);
                 } else {
-                    phoneText.setText("Add contact in setting");
+                    // merge data to avoid overwriting
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("emergency", "");
+                    db.collection("users").document(uid).set(data, SetOptions.merge());
+
                 }
 
             } else {
@@ -60,14 +70,23 @@ public class SosActivity extends AppCompatActivity {
 
     }
 
-    private void makePhoneCall(TextView phoneNumber) {
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (requestCode == REQUEST_CODE) {
+//            if (resultCode == Activity.RESULT_OK) {
+//                String result = data.getStringExtra("emergency");
+//            }
+//        }
+//    }
+
+    private void makePhoneCall(TextView phoneText) {
         Button callButton = findViewById(R.id.callButton);
 
         callButton.setOnClickListener((View view) -> {
 
             Intent callIntent = new Intent(Intent.ACTION_CALL);
 
-            callIntent.setData(Uri.parse("tel:" + phoneNumber.getText().toString()));
+            callIntent.setData(Uri.parse("tel:" + phoneText.getText().toString()));
             callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
@@ -88,6 +107,7 @@ public class SosActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(settingIntent);
+//                startActivityForResult(settingIntent, REQUEST_CODE);
             }
         });
     }
