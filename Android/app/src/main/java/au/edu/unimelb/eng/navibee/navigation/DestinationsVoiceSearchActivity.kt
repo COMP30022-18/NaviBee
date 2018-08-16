@@ -4,10 +4,11 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.app.SearchManager
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
-import android.support.v4.app.DialogFragment
+import android.support.v7.app.AppCompatDialogFragment
 import android.support.v7.app.AppCompatActivity
 import au.edu.unimelb.eng.navibee.R
 
@@ -90,7 +91,7 @@ interface VoiceRecognitionCheckListener {
     fun onOutcomeCheckCancel()
 }
 
-class VoiceRecognitionCheckFragment: DialogFragment() {
+class VoiceRecognitionCheckFragment: AppCompatDialogFragment() {
     companion object {
         const val ARGS_RECOGNITION_RESULT = "result"
     }
@@ -113,13 +114,14 @@ class VoiceRecognitionCheckFragment: DialogFragment() {
             it.setNeutralButton(R.string.button_cancel) { _, _ ->
                 this.dialog.cancel()
                 listener.onOutcomeCheckCancel()
-            } 
-            it.setOnCancelListener { 
-                listener.onOutcomeCheckCancel()
             }
         }
 
         return builder.create()
+    }
+
+    override fun onCancel(dialog: DialogInterface?) {
+        listener.onOutcomeCheckCancel()
     }
 
     override fun onAttach(context: Context?) {
