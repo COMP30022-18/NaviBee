@@ -41,6 +41,9 @@ public class FriendManager {
             this.url = url;
             this.name = name;
             this.uid = uid;
+            this.unreadMessage = 0;
+            Date date = new Date(2018, 12 ,12, 12, 12, 12);
+            setLastMessageTime(date);
         }
 
         public String getUrl() {
