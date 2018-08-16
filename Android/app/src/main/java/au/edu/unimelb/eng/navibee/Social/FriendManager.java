@@ -16,7 +16,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +33,9 @@ public class FriendManager {
         private String url;
         private String name;
         private String uid;
+        private int unreadMessage;
+        private String lastMessageTime;
+
 
         public ContactPerson(String name, String url, String uid) {
             this.url = url;
@@ -47,7 +53,21 @@ public class FriendManager {
         public String getName() {
             return this.name;
         }
+        public int getUnreadMessage(){
+            return this.unreadMessage;
+        }
 
+        public String getLastMessageTime (){
+            return this.lastMessageTime;
+        }
+
+        public void setUnreadMessage(int i){
+            this.unreadMessage = i;
+        }
+        public void setLastMessageTime(Date time){
+            DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+            this.lastMessageTime = df.format(time);
+        }
         public void setUrl(String url){
             this.url = url;
         }

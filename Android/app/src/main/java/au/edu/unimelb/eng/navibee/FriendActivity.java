@@ -75,6 +75,8 @@ public class FriendActivity extends AppCompatActivity {
                 holder = new ViewHolder();
                 holder.image = (ImageView) convertView.findViewById(R.id.friend_icon);
                 holder.text = (TextView) convertView.findViewById(R.id.friend_name);
+                holder.lastTime = (TextView) convertView.findViewById(R.id.time);
+                holder.unread = (TextView) convertView.findViewById(R.id.unread);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
@@ -87,6 +89,9 @@ public class FriendActivity extends AppCompatActivity {
                 holder.text.setText(tempPerson.getName());
                 new DownloadImageTask(holder.image)
                         .execute(tempPerson.getUrl());
+                holder.lastTime.setText(tempPerson.getLastMessageTime());
+                holder.unread.setText(Integer.toString(tempPerson.getUnreadMessage()));
+
             }
 
             return convertView;
@@ -95,6 +100,8 @@ public class FriendActivity extends AppCompatActivity {
         public static class ViewHolder {
             public ImageView image;
             public TextView text;
+            public TextView unread;
+            public TextView lastTime;
         }
         private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
             ImageView bmImage;
