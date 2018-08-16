@@ -15,36 +15,40 @@
 
         <ImageView
             android:id="@+id/friend_icon"
-            android:layout_width="99dp"
-            android:layout_height="match_parent"
-            app:srcCompat="@mipmap/ic_launcher_round" />
+            android:layout_width="94dp"
+            android:layout_height="100dp"
+            app:srcCompat="@mipmap/ic_launcher_round"
+            android:paddingHorizontal="5dp"/>
 
         <LinearLayout
-            android:layout_width="215dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="vertical">
-
+            android:orientation="vertical"
+            android:paddingVertical="5dp">
             <TextView
                 android:id="@+id/friend_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="friend1"
-                android:textSize="50sp" />
+                android:text="Zijun Chen"
+                android:textSize="30sp" />
 
             <TextView
                 android:id="@+id/last_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="lastMessage"
-                android:textSize="25sp"
-            /
+                android:textSize="20sp"
+                android:gravity="center"
+                android:layout_weight="1"/>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:gravity="right">
+            android:gravity="right"
+            android:paddingRight="5dp"
+            android:paddingVertical="5dp">
 
             <TextView
                 android:id="@+id/unread"
@@ -53,21 +57,20 @@
                 android:layout_alignParentRight="true"
                 android:background="@drawable/message_notification"
                 android:minWidth="64dp"
-                android:padding="5dp"
                 android:text="8"
                 android:textAlignment="center"
                 android:textColor="#ffffff"
-                android:textSize="35sp"
+                android:textSize="20sp"
                 android:layout_marginTop="10dp"/>
 
             <TextView
                 android:id="@+id/time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="12:00"
-                android:textAlignment="center"
-                android:textSize="25sp"
-                android:layout_marginTop=""/>
+                android:text="08/16/2018 16:39:45"
+                android:textSize="20sp"
+                android:gravity="center_vertical|right"
+                android:layout_weight="1"/>
 
         </LinearLayout>
     </LinearLayout>

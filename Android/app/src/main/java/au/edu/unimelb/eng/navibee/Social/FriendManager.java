@@ -35,6 +35,8 @@ public class FriendManager {
         private String uid;
         private int unreadMessage;
         private String lastMessageTime;
+        private String lastMessage;
+        private Boolean hasLastMessage;
 
 
         public ContactPerson(String name, String url, String uid) {
@@ -44,6 +46,7 @@ public class FriendManager {
             this.unreadMessage = 0;
             Date date = new Date(2018, 12 ,12, 12, 12, 12);
             setLastMessageTime(date);
+            hasLastMessage = false;
         }
 
         public String getUrl() {
@@ -59,6 +62,20 @@ public class FriendManager {
         public int getUnreadMessage(){
             return this.unreadMessage;
         }
+        public void setLastMessage(String message){
+            if (message.length() > 13){
+                String reduced = message.substring(0, 13);
+                reduced = reduced + "...";
+                lastMessage = reduced;
+            }
+            else{
+                lastMessage = message;
+            }
+            hasLastMessage = true;
+        }
+        public void noMessage(){
+            hasLastMessage = false;
+        }
 
         public String getLastMessageTime (){
             return this.lastMessageTime;
@@ -67,6 +84,7 @@ public class FriendManager {
         public void setUnreadMessage(int i){
             this.unreadMessage = i;
         }
+
         public void setLastMessageTime(Date time){
             DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
             this.lastMessageTime = df.format(time);
