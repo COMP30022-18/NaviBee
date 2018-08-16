@@ -1,15 +1,14 @@
 package au.edu.unimelb.eng.navibee.navigation
 
 import android.Manifest
-import android.app.Activity
-import android.app.AlertDialog
-import android.app.Dialog
-import android.app.SearchManager
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.DialogFragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
@@ -83,8 +82,24 @@ class DestinationsSearchResultActivity: AppCompatActivity(), SearchResultRetryLi
 
     private fun searchForLocation(query: String) {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED)
+                != PackageManager.PERMISSION_GRANTED) {
+            finish()
             return
+        }
+
+        val progressDialog: Dialog
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val builder = AlertDialog.Builder(this)
+            builder.setView(R.layout.layout_indefinite_progress_dialog)
+            progressDialog = builder.create()
+        } else {
+            progressDialog = ProgressDialog(this).apply {
+                setProgressStyle(ProgressDialog.STYLE_SPINNER)
+            }
+        }
+        progressDialog.setCancelable(false)
+        progressDialog.setCanceledOnTouchOutside(false)
+        progressDialog.show()
 
         fusedLocationClient.lastLocation
                 .addOnSuccessListener { location : Location? ->
@@ -102,6 +117,9 @@ class DestinationsSearchResultActivity: AppCompatActivity(), SearchResultRetryLi
                         override fun onResponse(call: Call<GeocodingResponse>, response: Response<GeocodingResponse>) {
                             val results = response.body()!!.features()
                             if (results.size > 0) {
+                                // hide progress dialog
+                                progressDialog.hide()
+
                                 // Log the first results Point.
                                 val firstResultPoint = results[0].center()
                                 Timber.d("onResponse: $firstResultPoint (lat ${firstResultPoint!!.latitude()}, long ${firstResultPoint.longitude()})")
@@ -115,15 +133,38 @@ class DestinationsSearchResultActivity: AppCompatActivity(), SearchResultRetryLi
                                     it.show(supportFragmentManager, "searchResult")
                                 }
                             } else {
-                                // No result for your request were found.
-                                Timber.d("onResponse: No result found")
+                                // hide progress dialog
+                                progressDialog.hide()
+
+                                Snackbar.make(findViewById(R.id.destinations_activity_coordinator_layout),
+                                        R.string.destination_search_no_result,
+                                        Snackbar.LENGTH_LONG).show()
+                                finish()
                             }
                         }
 
                         override fun onFailure(call: Call<GeocodingResponse>, throwable: Throwable) {
-                            throwable.printStackTrace()
+                            Timber.e(throwable, "Error occurred when trying to search for query: $call")
+                            // hide progress dialog
+                            progressDialog.hide()
+
+                            Snackbar.make(findViewById(R.id.destinations_activity_coordinator_layout),
+                                    R.string.destination_search_failed,
+                                    Snackbar.LENGTH_LONG).show()
+                            finish()
                         }
                     })
+                }
+                .addOnFailureListener {
+                    Timber.e(it, "Error occurred when trying to get the last known location.")
+
+                    // hide progress dialog
+                    progressDialog.hide()
+
+                    Snackbar.make(findViewById(R.id.destinations_activity_coordinator_layout),
+                            R.string.fail_to_get_last_location,
+                            Snackbar.LENGTH_LONG).show()
+                    finish()
                 }
     }
 

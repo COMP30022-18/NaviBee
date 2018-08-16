@@ -111,4 +111,7 @@
     <string name="button_yes">Yes</string>
     <string name="button_cancel">Cancel</string>
     <string name="voice_recognition_result_check_title">Did you say…?</string>
+    <string name="fail_to_get_last_location">Failed to get your current location. Please retry later in a more open place with your GPS settings turned on.</string>
+    <string name="destination_search_no_result">We found no place matching your search. Please try rephrase your keyword.</string>
+    <string name="destination_search_failed">Failed to process this search. Please check your internet connection.</string>
 </resources>
