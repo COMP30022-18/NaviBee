@@ -71,6 +71,7 @@ class DestinationsVoiceSearchActivity : AppCompatActivity(), VoiceRecognitionChe
                     putExtra(DestinationsSearchResultActivity.ARGS_SEND_RESULT, true)
                 }
         )
+        finish()
     }
 
     override fun onOutcomeCheckCancel() {
