@@ -13,6 +13,7 @@ import android.widget.SearchView
 import au.edu.unimelb.eng.navibee.BuildConfig
 import au.edu.unimelb.eng.navibee.R
 import com.mapbox.mapboxsdk.Mapbox
+import kotlinx.android.synthetic.main.activity_destinations.*
 import org.jetbrains.anko.startActivity
 
 
@@ -47,7 +48,7 @@ class DestinationsActivity : AppCompatActivity(){
         viewManager = LinearLayoutManager(this)
         viewAdapter = DestinationsRVAdaptor(destinations)
 
-        recyclerView = findViewById<RecyclerView>(R.id.nav_dest_recycler_view).apply {
+        recyclerView = nav_dest_recycler_view.apply {
             setHasFixedSize(true)
             layoutManager = viewManager
             adapter = viewAdapter
@@ -66,7 +67,6 @@ class DestinationsActivity : AppCompatActivity(){
 
         // Set up the search view
         (menu.findItem(R.id.nav_dest_optmnu_search).actionView as SearchView).apply {
-            // TODO: Isolate searchable intent.
             setSearchableInfo(searchManager.getSearchableInfo(componentName))
 
             // Prevent the search view from collapsing within the subview

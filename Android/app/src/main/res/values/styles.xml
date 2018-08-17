@@ -63,4 +63,14 @@
     <style name="AppTheme.Button.ColoredPrimary" parent="AppTheme.Button">
         <item name="colorButtonNormal">@color/colorPrimary</item>
     </style>
+
+    <style name="AppTheme.Text" parent="AppTheme" />
+
+    <style name="AppTheme.Text.FullScreenErrorMessage">
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">@color/colorLightTextSecondary</item>
+    </style>
 </resources>
