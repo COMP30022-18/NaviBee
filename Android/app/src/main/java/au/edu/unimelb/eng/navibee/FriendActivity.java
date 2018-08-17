@@ -92,6 +92,12 @@ public class FriendActivity extends AppCompatActivity {
                         .execute(tempPerson.getUrl());
                 holder.lastTime.setText(tempPerson.getLastMessageTime());
                 holder.unread.setText(Integer.toString(tempPerson.getUnreadMessage()));
+                if (tempPerson.getUnreadMessage() == 0){
+                    holder.unread.setVisibility(View.INVISIBLE);
+                }
+                else{
+                    holder.unread.setVisibility(View.VISIBLE);
+                }
                 if (tempPerson.hasMessage()){
                     holder.lastMessage.setText(tempPerson.getLastMessage());
                 }
