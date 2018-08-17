@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import au.edu.unimelb.eng.navibee.NaviBeeApplication;
+import au.edu.unimelb.eng.navibee.Social.DateManager;
 
 public class FriendManager {
 
@@ -98,8 +99,7 @@ public class FriendManager {
         }
 
         public void setLastMessageTime(Date time){
-            DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-            this.lastMessageTime = df.format(time);
+            this.lastMessageTime = DateManager.DateformatTime(time);
         }
         public void setUrl(String url){
             this.url = url;
