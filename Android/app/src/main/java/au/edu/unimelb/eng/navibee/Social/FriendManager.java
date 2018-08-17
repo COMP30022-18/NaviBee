@@ -64,19 +64,7 @@ public class FriendManager {
             return this.unreadMessage;
         }
         public void setLastMessage(String message){
-            if (message.length() > 13){
-                String reduced = message.substring(0, 13);
-                reduced = reduced + "...";
-                lastMessage = reduced;
-            }
-            else{
-                String increased = message;
-                int needspace = 16 - message.length();
-                for (int i =0; i < needspace; i++){
-                    increased = increased + "  ";
-                }
-                lastMessage = increased;
-            }
+            lastMessage = message;
             hasLastMessage = true;
         }
         public String getLastMessage(){

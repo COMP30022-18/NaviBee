@@ -13,7 +13,7 @@ public class DateManager {
                     if (minute <= 1) {
                         return "just now";
                     } else {
-                        return minute + "minutes ago";
+                        return minute + " mins ago";
                     }
                 } else {
                     return simpleDateFormat.format(date);
@@ -46,12 +46,12 @@ public class DateManager {
                     }
                     return weekday + " " + simpleDateFormat.format(date);
                 } else {
-                    SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm");
+                    SimpleDateFormat sdf = new SimpleDateFormat("MM-dd");
                     return sdf.format(date);
                 }
             }
         } else {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             return sdf.format(date);
         }
     }
