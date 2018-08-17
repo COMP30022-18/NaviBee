@@ -33,8 +33,9 @@ class DownloadImageFromWikiDataToImageViewAsyncTask(imageView: ImageView) : Asyn
     override fun onPostExecute(result: String?) {
         if (result == null)
             return
-
         val json = JSONObject(result)
+        if (!json.has("claims") || !json.getJSONObject("claims").has("P18"))
+            return
         val pictures = json.getJSONObject("claims").getJSONArray("P18")
         if (pictures.length() == 0)
             return
