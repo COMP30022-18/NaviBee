@@ -19,9 +19,6 @@ class DestinationsVoiceSearchActivity : AppCompatActivity(), VoiceRecognitionChe
     companion object {
         // Voice recognition activity result ID
         private const val SPEECH_RECOGNITION_RESULT = 1
-
-        // Send search query to "SearchResultActivity"
-        private const val SEARCH_QUERY_RESULT = 2
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,11 +53,6 @@ class DestinationsVoiceSearchActivity : AppCompatActivity(), VoiceRecognitionChe
                     finish()
                 }
             }
-            SEARCH_QUERY_RESULT -> {
-                if (resultCode == RESULT_CANCELED) {
-                    onOutcomeCheckRetry()
-                }
-            }
         }
     }
 
@@ -69,14 +61,13 @@ class DestinationsVoiceSearchActivity : AppCompatActivity(), VoiceRecognitionChe
     }
 
     override fun onOutcomeCheckOK(result: String) {
-        startActivityForResult(
+        startActivity(
                 Intent(this,
                         DestinationsSearchResultActivity::class.java).apply {
                     action = Intent.ACTION_SEARCH
                     putExtra(SearchManager.QUERY, result)
                     putExtra(DestinationsSearchResultActivity.ARGS_SEND_RESULT, true)
-                },
-                SEARCH_QUERY_RESULT
+                }
         )
     }
 
