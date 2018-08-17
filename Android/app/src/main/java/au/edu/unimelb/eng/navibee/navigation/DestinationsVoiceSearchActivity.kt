@@ -6,12 +6,14 @@ import android.app.SearchManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
 import android.speech.RecognizerIntent
-import android.support.v7.app.AppCompatDialogFragment
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.app.AppCompatDialogFragment
+import android.view.Gravity
+import android.widget.TextView
 import au.edu.unimelb.eng.navibee.R
-
 import org.jetbrains.anko.bundleOf
 
 class DestinationsVoiceSearchActivity : AppCompatActivity(), VoiceRecognitionCheckListener {
@@ -85,6 +87,9 @@ interface VoiceRecognitionCheckListener {
 class VoiceRecognitionCheckFragment: AppCompatDialogFragment() {
     companion object {
         const val ARGS_RECOGNITION_RESULT = "result"
+
+        private const val BODY_FONT_SIZE = 40f
+        private const val BUTTON_FONT_SIZE = 20f
     }
 
     private lateinit var listener: VoiceRecognitionCheckListener
@@ -108,7 +113,17 @@ class VoiceRecognitionCheckFragment: AppCompatDialogFragment() {
             }
         }
 
-        return builder.create()
+        return builder.create().apply {
+            setOnShowListener {
+                val message = findViewById<TextView>(android.R.id.message)
+                message.textSize = BODY_FONT_SIZE
+                message.gravity = Gravity.CENTER
+                message.typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
+                getButton(AlertDialog.BUTTON_POSITIVE).textSize = BUTTON_FONT_SIZE
+                getButton(AlertDialog.BUTTON_NEGATIVE).textSize = BUTTON_FONT_SIZE
+                getButton(AlertDialog.BUTTON_NEUTRAL).textSize = BUTTON_FONT_SIZE
+            }
+        }
     }
 
     override fun onCancel(dialog: DialogInterface?) {

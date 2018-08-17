@@ -3,7 +3,6 @@ package au.edu.unimelb.eng.navibee.navigation
 import android.os.AsyncTask
 import android.widget.ImageView
 import au.edu.unimelb.eng.navibee.utils.DownloadImageToImageViewAsyncTask
-import com.google.common.primitives.UnsignedInts
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
