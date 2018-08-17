@@ -1,11 +1,11 @@
 package au.edu.unimelb.eng.navibee.navigation
 
-import android.support.constraint.ConstraintLayout
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import au.edu.unimelb.eng.navibee.R
+import au.edu.unimelb.eng.navibee.utils.DownloadImageToImageViewAsyncTask
 import kotlinx.android.synthetic.main.recycler_view_destination_list_button.view.*
 import kotlinx.android.synthetic.main.recycler_view_destination_list_divider.view.*
 import kotlinx.android.synthetic.main.recycler_view_destination_list_entry.view.*
@@ -59,9 +59,14 @@ class DestinationsRVAdaptor(private val dataset: ArrayList<DestinationRVItem>) :
                 holder.itemView.recycler_view_destinations_list_button_button.setOnClickListener(data.onClick)
             }
             is DestinationRVEntry -> {
-                holder.itemView.recycler_view_destinations_list_divider_caption_entry_title.text = data.name
-                holder.itemView.recycler_view_destinations_list_divider_caption_entry_subtitle.text = data.location
-                // TODO: Load image.
+                holder.itemView.recycler_view_destinations_list_entry_title.text = data.name
+                holder.itemView.recycler_view_destinations_list_entry_subtitle.text = data.location
+                holder.itemView.recycler_view_destinations_list_entry_preview.visibility = View.GONE
+                if (data.thumbnail != null) {
+                    DownloadImageToImageViewAsyncTask(holder.itemView.recycler_view_destinations_list_entry_preview).execute(data.thumbnail)
+                } else if (data.wikiData != null) {
+                    DownloadImageFromWikiDataToImageViewAsyncTask(holder.itemView.recycler_view_destinations_list_entry_preview).execute(data.wikiData)
+                }
                 holder.itemView.setOnClickListener(data.onClick)
             }
         }
@@ -75,7 +80,8 @@ data class DestinationRVDivider(val text: String): DestinationRVItem()
 data class DestinationRVErrorMessage(val text: String): DestinationRVItem()
 data class DestinationRVEntry(val name: String,
                               val location: String,
-                              val thumbnail: String,
+                              val thumbnail: String? = null,
+                              val wikiData: String? = null,
                               val onClick: View.OnClickListener): DestinationRVItem()
 data class DestinationRVButton(val text: String,
                                val icon: Int,

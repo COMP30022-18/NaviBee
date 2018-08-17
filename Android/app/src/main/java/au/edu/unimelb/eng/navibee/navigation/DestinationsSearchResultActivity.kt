@@ -7,14 +7,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
-import android.support.design.widget.BottomSheetBehavior
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.app.AppCompatDialogFragment
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.DisplayMetrics
 import android.view.View
 import au.edu.unimelb.eng.navibee.R
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -24,13 +21,11 @@ import com.mapbox.api.geocoding.v5.models.GeocodingResponse
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
 import kotlinx.android.synthetic.main.activity_navigation_destinations_search_result.*
-import org.jetbrains.anko.displayMetrics
 import org.jetbrains.anko.startActivityForResult
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import timber.log.Timber
-import kotlin.math.roundToInt
 
 /**
  * Required arguments:
@@ -124,7 +119,7 @@ class DestinationsSearchResultActivity: AppCompatActivity() {
         fusedLocationClient.lastLocation
                 .addOnSuccessListener { location : Location? ->
                     this.lastKnownLocation = location
-                    Timber.d("$location")
+                    Timber.d("Last known location: $location")
                     val builder = MapboxGeocoding.builder()
                             .accessToken(Mapbox.getAccessToken()!!)
                             .query(query)
@@ -147,7 +142,7 @@ class DestinationsSearchResultActivity: AppCompatActivity() {
                                     destinations.add(DestinationRVEntry(
                                             name = item.text() ?: "",
                                             location = item.placeName() ?: "",
-                                            thumbnail = "",
+                                            wikiData = item.properties()?.get("wikidata")?.asString,
                                             onClick = View.OnClickListener {
                                                 // TODO: Navigate to selected place.
                                             }
@@ -177,13 +172,6 @@ class DestinationsSearchResultActivity: AppCompatActivity() {
         destinations.add(DestinationRVErrorMessage(resources.getString(text)))
 
         viewAdapter.notifyDataSetChanged()
-    }
-
-    fun onSearchResultRetry(dialog: AppCompatDialogFragment) {
-        // == true is to avoid getBoolean return null
-        if (dialog.arguments?.getBoolean(ARGS_SEND_RESULT) == true) {
-            setResult(RESULT_CANCELED)
-        }
     }
 
 }

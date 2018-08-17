@@ -38,11 +38,15 @@ class DestinationsActivity : AppCompatActivity(){
                 })
         )
         destinations.add(DestinationRVDivider("Recent destinations"))
-        destinations.add(DestinationRVEntry("Place 1", "Location 1", "", View.OnClickListener {  }))
-        destinations.add(DestinationRVEntry("Place 2", "Location 2", "", View.OnClickListener {  }))
+        destinations.add(DestinationRVEntry("Place 1", "Location 1",
+                onClick = View.OnClickListener {  }))
+        destinations.add(DestinationRVEntry("Place 2", "Location 2",
+                onClick = View.OnClickListener {  }))
         destinations.add(DestinationRVDivider("Recommended place"))
-        destinations.add(DestinationRVEntry("Place 3", "Location 3", "", View.OnClickListener {  }))
-        destinations.add(DestinationRVEntry("Place 4", "Location 4", "", View.OnClickListener {  }))
+        destinations.add(DestinationRVEntry("Place 3", "Location 3",
+                onClick = View.OnClickListener {  }))
+        destinations.add(DestinationRVEntry("Place 4", "Location 4",
+                onClick = View.OnClickListener {  }))
 
         // setup recycler view
         viewManager = LinearLayoutManager(this)
