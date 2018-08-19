@@ -235,4 +235,11 @@ public class FriendActivity extends AppCompatActivity {
         contactListAdapter.notifyDataSetChanged();
     }
 
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.addFriendButton:
+//                startActivity(new Intent(this,  AddFriendQRActivity.class));
+        }
+    }
+
 }

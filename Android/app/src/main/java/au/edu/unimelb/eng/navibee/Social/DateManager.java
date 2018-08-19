@@ -20,7 +20,7 @@ public class DateManager {
                 }
             } else {
                 if (isYestYesterday(date)) {
-                    return "yesterday " + simpleDateFormat.format(date);
+                    return "Yesterday " + simpleDateFormat.format(date);
                 } else if (isThisWeek(date)) {
                     String weekday = null;
                     if (date.getDay() == 1) {
