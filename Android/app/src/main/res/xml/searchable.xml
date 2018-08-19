@@ -5,4 +5,5 @@
     android:voiceSearchMode="launchRecognizer"
     android:voiceLanguageModel="web_search"
     android:voicePromptText="@string/navigation_search_hint">
+
 </searchable>

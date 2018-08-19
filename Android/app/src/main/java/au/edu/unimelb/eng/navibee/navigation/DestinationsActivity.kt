@@ -7,12 +7,10 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.SearchView
 import android.view.Menu
 import android.view.View
-import android.widget.SearchView
-import au.edu.unimelb.eng.navibee.BuildConfig
 import au.edu.unimelb.eng.navibee.R
-import com.mapbox.mapboxsdk.Mapbox
 import kotlinx.android.synthetic.main.activity_destinations.*
 import org.jetbrains.anko.startActivity
 
@@ -59,8 +57,6 @@ class DestinationsActivity : AppCompatActivity(){
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         }
 
-        // Configure Mapbox SDK
-        Mapbox.getInstance(this, BuildConfig.MAPBOX_API_TOKEN)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -78,34 +74,9 @@ class DestinationsActivity : AppCompatActivity(){
 
             // Let the search view to fill the entire space
             maxWidth = Integer.MAX_VALUE
-
-            setOnCloseListener {
-                // TODO: Reset destination views
-                false
-            }
-            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(s: String): Boolean {
-                    return false // do the default
-                }
-
-                override fun onQueryTextChange(s: String): Boolean {
-                    // NOTE: doing anything here is optional, onNewIntent is the important bit
-                    if (s.length > 1) { // 2 chars or more
-                        // TODO: filter/return results
-                    } else if (s.isEmpty()) {
-                        // TODO: reset the displayed data
-                    }
-                    return false
-                }
-
-            })
-
-
         }
         return true
     }
-
-
 
     private fun startVoiceSearch() {
         startActivity<DestinationsVoiceSearchActivity>()

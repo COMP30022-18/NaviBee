@@ -1,11 +1,13 @@
 package au.edu.unimelb.eng.navibee.navigation
 
+import android.content.res.Resources
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import au.edu.unimelb.eng.navibee.R
 import au.edu.unimelb.eng.navibee.utils.DownloadImageToImageViewAsyncTask
+import kotlinx.android.synthetic.main.recycler_view_destination_list_attributions.view.*
 import kotlinx.android.synthetic.main.recycler_view_destination_list_button.view.*
 import kotlinx.android.synthetic.main.recycler_view_destination_list_divider.view.*
 import kotlinx.android.synthetic.main.recycler_view_destination_list_entry.view.*
@@ -24,6 +26,7 @@ class DestinationsRVAdaptor(private val dataset: ArrayList<DestinationRVItem>) :
             3 -> R.layout.recycler_view_destination_list_button
             4 -> R.layout.recycler_view_indefinite_progress
             5 -> R.layout.recycler_view_error_message
+            6 -> R.layout.recycler_view_destination_list_attributions
             else -> R.layout.recycler_view_indefinite_progress
         }
         return DividerViewHolder(LayoutInflater.from(parent.context)
@@ -37,6 +40,7 @@ class DestinationsRVAdaptor(private val dataset: ArrayList<DestinationRVItem>) :
             is DestinationRVButton -> 3
             is DestinationRVIndefiniteProgressBar -> 4
             is DestinationRVErrorMessage -> 5
+            is DestinationRVAttributes -> 6
             else -> 0
         }
     }
@@ -62,12 +66,24 @@ class DestinationsRVAdaptor(private val dataset: ArrayList<DestinationRVItem>) :
                 holder.itemView.recycler_view_destinations_list_entry_title.text = data.name
                 holder.itemView.recycler_view_destinations_list_entry_subtitle.text = data.location
                 holder.itemView.recycler_view_destinations_list_entry_preview.visibility = View.GONE
-                if (data.thumbnail != null) {
-                    DownloadImageToImageViewAsyncTask(holder.itemView.recycler_view_destinations_list_entry_preview).execute(data.thumbnail)
-                } else if (data.wikiData != null) {
-                    DownloadImageFromWikiDataToImageViewAsyncTask(holder.itemView.recycler_view_destinations_list_entry_preview).execute(data.wikiData)
+                when {
+                    data.thumbnail != null ->
+                        DownloadImageToImageViewAsyncTask(holder.itemView.recycler_view_destinations_list_entry_preview).execute(data.thumbnail)
+                    data.googlePhotoReference != null -> {
+                        val viewHeight = Resources.getSystem().displayMetrics.heightPixels
+                        LoadImageFromGoogleMapsByPhotoReferenceToImageView(
+                                data.googlePhotoReference,
+                                holder.itemView.recycler_view_destinations_list_entry_preview,
+                                viewHeight
+                        ).execute()
+                    }
+                    data.wikiData != null ->
+                        DownloadImageFromWikiDataToImageViewAsyncTask(holder.itemView.recycler_view_destinations_list_entry_preview).execute(data.wikiData)
                 }
                 holder.itemView.setOnClickListener(data.onClick)
+            }
+            is DestinationRVAttributes -> {
+                holder.itemView.recycler_view_attribution_text_view.text = data.attributes
             }
         }
     }
@@ -82,7 +98,9 @@ data class DestinationRVEntry(val name: String,
                               val location: String,
                               val thumbnail: String? = null,
                               val wikiData: String? = null,
+                              val googlePhotoReference: String? = null,
                               val onClick: View.OnClickListener): DestinationRVItem()
 data class DestinationRVButton(val text: String,
                                val icon: Int,
                                val onClick: View.OnClickListener): DestinationRVItem()
+data class DestinationRVAttributes(val attributes: CharSequence): DestinationRVItem()

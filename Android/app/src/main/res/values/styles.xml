@@ -73,4 +73,11 @@
         <item name="android:textAlignment">center</item>
         <item name="android:textColor">@color/colorLightTextSecondary</item>
     </style>
+
+    <style name="AppTheme.Text.Footnote">
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:textColor">@color/colorLightTextSecondary</item>
+    </style>
 </resources>

@@ -13,6 +13,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <!-- Metadata -->
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/GOOGLE_MAP_API_KEY"/>
+
+        <!-- Providers -->
+
+        <!-- Activities -->
+
         <activity
             android:name=".LoginActivity"
             android:theme="@style/AppTheme.NoActionBar">

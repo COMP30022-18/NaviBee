@@ -1,11 +1,18 @@
 package au.edu.unimelb.eng.navibee.navigation
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.AsyncTask
+import android.view.View
 import android.widget.ImageView
+import au.edu.unimelb.eng.navibee.BuildConfig
 import au.edu.unimelb.eng.navibee.utils.DownloadImageToImageViewAsyncTask
+import com.google.maps.GeoApiContext
+import com.google.maps.PlacesApi
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
+import timber.log.Timber
 import java.lang.ref.WeakReference
 import java.security.MessageDigest
 
@@ -62,3 +69,36 @@ class DownloadImageFromWikiDataToImageViewAsyncTask(imageView: ImageView) : Asyn
     }
 }
 
+class LoadImageFromGoogleMapsByPhotoReferenceToImageView(val photoReference: String,
+                                                         imageView: ImageView,
+                                                         val maxHeight: Int):
+        AsyncTask<Void, Void, Bitmap>() {
+    private val bmImage: WeakReference<ImageView> = WeakReference(imageView)
+
+    override fun doInBackground(vararg params: Void?): Bitmap? {
+        try {
+            val result = PlacesApi
+                    .photo(geoContext, photoReference)
+                    .maxHeight(maxHeight)
+                    .await()
+
+            return BitmapFactory.decodeByteArray(result.imageData,0, result.imageData.size)
+        } catch (e: Exception) {
+            Timber.e(e,
+                    "Error occurred while trying to download image from Google Maps Place SDK.")
+            return null
+        }
+    }
+
+    override fun onPostExecute(result: Bitmap?) {
+        if (result == null) return
+        bmImage.get()?.visibility = View.VISIBLE
+        bmImage.get()?.setImageBitmap(result)
+    }
+
+    companion object {
+        private val geoContext = GeoApiContext
+                .Builder().apiKey(BuildConfig.GOOGLE_PLACES_API_KEY).build()
+    }
+
+}

@@ -113,7 +113,7 @@ class LocationPermissionRationalConfirmFragment: DialogFragment() {
         val builder = AlertDialog.Builder(activity)
         builder.let {
             it.setMessage(R.string.location_required_for_navigation)
-            it.setPositiveButton(R.string.button_got_it) { dialog, id ->
+            it.setPositiveButton(R.string.button_got_it) { _, _ ->
                 listener.onAcknowledgedLocationPermissionRationale(this)
             }
         }

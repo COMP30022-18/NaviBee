@@ -23,7 +23,8 @@ class DownloadImageToImageViewAsyncTask(imageView: ImageView) : AsyncTask<String
         return bitmap
     }
 
-    override fun onPostExecute(result: Bitmap) {
+    override fun onPostExecute(result: Bitmap?) {
+        if (result == null) return
         bmImage.get()?.visibility = View.VISIBLE
         bmImage.get()?.setImageBitmap(result)
     }

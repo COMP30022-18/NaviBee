@@ -6,25 +6,27 @@ import android.app.SearchManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.Html
 import android.view.View
+import au.edu.unimelb.eng.navibee.BuildConfig
 import au.edu.unimelb.eng.navibee.R
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.mapbox.api.geocoding.v5.MapboxGeocoding
-import com.mapbox.api.geocoding.v5.models.GeocodingResponse
-import com.mapbox.geojson.Point
-import com.mapbox.mapboxsdk.Mapbox
+import com.google.maps.GeoApiContext
+import com.google.maps.PendingResult
+import com.google.maps.PlacesApi
+import com.google.maps.model.LatLng
+import com.google.maps.model.PlacesSearchResponse
+import com.google.maps.model.RankBy
 import kotlinx.android.synthetic.main.activity_navigation_destinations_search_result.*
 import org.jetbrains.anko.startActivityForResult
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import timber.log.Timber
 
 /**
@@ -47,6 +49,8 @@ class DestinationsSearchResultActivity: AppCompatActivity() {
     // incoming parameters
     private var sendResult: Boolean = false
 
+    // Google Maps Geo API Context
+    private lateinit var geoContext: GeoApiContext
 
     // Recycler view
     private lateinit var recyclerView: RecyclerView
@@ -83,6 +87,10 @@ class DestinationsSearchResultActivity: AppCompatActivity() {
         navigation_destinations_search_result_appbar.layoutParams.height =
                 (resources.displayMetrics.heightPixels * 0.618).toInt()
 
+        // setup Google Maps Geo API Context
+        geoContext = GeoApiContext.Builder()
+                .apiKey(BuildConfig.GOOGLE_PLACES_API_KEY)
+                .build()
 
         handleIntent(intent)
     }
@@ -120,46 +128,67 @@ class DestinationsSearchResultActivity: AppCompatActivity() {
                 .addOnSuccessListener { location : Location? ->
                     this.lastKnownLocation = location
                     Timber.d("Last known location: $location")
-                    val builder = MapboxGeocoding.builder()
-                            .accessToken(Mapbox.getAccessToken()!!)
-                            .query(query)
-                    if (location != null) {
-                        builder.proximity(Point.fromLngLat(location.longitude, location.latitude, location.altitude))
-                    }
-                    val mapboxGeocoding = builder.build()
 
-                    mapboxGeocoding.enqueueCall(object : Callback<GeocodingResponse> {
-                        override fun onResponse(call: Call<GeocodingResponse>, response: Response<GeocodingResponse>) {
-                            val results = response.body()!!.features()
-                            if (results.size > 0) {
+                    val callback = object : PendingResult.Callback<PlacesSearchResponse> {
+                        override fun onFailure(e: Throwable?) {
+                            Timber.e(e, "Error on performing location search.")
+                            renderErrorMessage(R.string.destination_search_failed)
+                        }
 
-                                // Log the first results Point.
-                                val firstResultPoint = results[0].center()
-                                Timber.d("onResponse: $firstResultPoint (lat ${firstResultPoint!!.latitude()}, long ${firstResultPoint.longitude()})")
+                        override fun onResult(result: PlacesSearchResponse) {
+                            destinations.clear()
+                            val attributions: ArrayList<String> = ArrayList()
 
-                                destinations.clear()
-                                for (item in results) {
+                            if (result.results.isEmpty()) {
+                                renderErrorMessage(R.string.destination_search_no_result)
+                            } else {
+                                attributions.addAll(result.htmlAttributions)
+
+                                for (item in result.results) {
+                                    var photoReference: String? = null
+                                    if (item.photos?.isEmpty() == false) {
+                                        photoReference = item.photos[0].photoReference
+                                        attributions.addAll(item.photos[0].htmlAttributions)
+                                    }
                                     destinations.add(DestinationRVEntry(
-                                            name = item.text() ?: "",
-                                            location = item.placeName() ?: "",
-                                            wikiData = item.properties()?.get("wikidata")?.asString,
+                                            name = item.name,
+                                            location = item.vicinity,
+                                            googlePhotoReference = photoReference,
                                             onClick = View.OnClickListener {
                                                 // TODO: Navigate to selected place.
                                             }
                                     ))
                                 }
 
-                                viewAdapter.notifyDataSetChanged()
-                            } else {
-                                renderErrorMessage(R.string.destination_search_no_result)
+                                val attrHTML = resources.getString(R.string.search_result_attributions) +
+                                        "<br>" +
+                                        attributions.joinToString(", ")
+                                val formattedHtml = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    Html.fromHtml(attrHTML, Html.FROM_HTML_MODE_COMPACT)
+                                } else {
+                                    Html.fromHtml(attrHTML)
+                                }
+                                destinations.add(DestinationRVAttributes(formattedHtml))
                             }
+                            runOnUiThread(viewAdapter::notifyDataSetChanged)
                         }
 
-                        override fun onFailure(call: Call<GeocodingResponse>, throwable: Throwable) {
-                            Timber.e(throwable, "Error occurred when trying to search for query: $call")
-                            renderErrorMessage(R.string.destination_search_failed)
-                        }
-                    })
+                    }
+
+                    if (location != null) {
+                        val request = PlacesApi
+                                .nearbySearchQuery(geoContext, LatLng(location.latitude, location.longitude))
+                                .keyword(query)
+                                .rankby(RankBy.DISTANCE)
+                        request.setCallback(callback)
+                    } else {
+                        // TODO: Allow configurable region of search.
+                        val request = PlacesApi
+                                .textSearchQuery(geoContext, query)
+                                .custom("region", "au")
+                        request.setCallback(callback)
+                    }
+
                 }
                 .addOnFailureListener {
                     Timber.e(it, "Error occurred when trying to get the last known location.")
@@ -171,7 +200,7 @@ class DestinationsSearchResultActivity: AppCompatActivity() {
         destinations.clear()
         destinations.add(DestinationRVErrorMessage(resources.getString(text)))
 
-        viewAdapter.notifyDataSetChanged()
+        runOnUiThread(viewAdapter::notifyDataSetChanged)
     }
 
 }

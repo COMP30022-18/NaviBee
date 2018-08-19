@@ -24,6 +24,8 @@ android {
     }
     buildTypes.each {
         it.buildConfigField 'String', 'MAPBOX_API_TOKEN', mapboxApiToken
+        it.buildConfigField 'String', 'GOOGLE_PLACES_API_KEY', googlePlacesApiKey
+        it.resValue 'string', 'GOOGLE_MAP_API_KEY', googlePlacesApiKey
     }
 }
 
@@ -33,11 +35,14 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:28.0.0-rc01'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation 'com.google.firebase:firebase-core:16.0.1'
-    implementation 'com.google.firebase:firebase-auth:16.0.2'
-    implementation 'com.google.firebase:firebase-firestore:17.0.4'
+    implementation 'com.google.firebase:firebase-auth:16.0.3'
+    implementation 'com.google.firebase:firebase-firestore:17.1.0'
     implementation 'com.google.firebase:firebase-functions:16.1.0'
-    implementation 'com.google.android.gms:play-services-auth:15.0.1'
+    implementation 'com.google.android.gms:play-services-auth:16.0.0'
     implementation 'com.google.android.gms:play-services-location:15.0.1'
+    implementation 'com.google.android.gms:play-services-places:15.0.1'
+    implementation 'com.google.maps:google-maps-services:0.2.10'
+    implementation 'org.slf4j:slf4j-nop:1.7.25'
     implementation 'com.android.support:design:28.0.0-rc01'
     implementation 'com.android.support:support-vector-drawable:28.0.0-rc01'
     testImplementation 'junit:junit:4.12'
