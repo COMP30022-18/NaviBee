@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import au.edu.unimelb.eng.navibee.social.AddFriendQRActivity;
 import au.edu.unimelb.eng.navibee.social.ConversationManager;
 import au.edu.unimelb.eng.navibee.social.FriendManager;
 
@@ -239,6 +240,7 @@ public class FriendActivity extends AppCompatActivity {
         switch (view.getId()) {
             case R.id.addFriendButton:
                 startActivity(new Intent(this,  AddFriendQRActivity.class));
+                break;
         }
     }
 

@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import au.edu.unimelb.eng.navibee.NaviBeeApplication;
-import au.edu.unimelb.eng.navibee.Social.DateManager;
+import au.edu.unimelb.eng.navibee.social.DateManager;
 
 public class FriendManager {
 
