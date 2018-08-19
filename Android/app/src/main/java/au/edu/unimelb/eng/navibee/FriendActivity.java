@@ -238,7 +238,7 @@ public class FriendActivity extends AppCompatActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.addFriendButton:
-//                startActivity(new Intent(this,  AddFriendQRActivity.class));
+                startActivity(new Intent(this,  AddFriendQRActivity.class));
         }
     }
 
