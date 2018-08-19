@@ -92,6 +92,12 @@ public class FriendActivity extends AppCompatActivity {
                         .execute(tempPerson.getUrl());
                 holder.lastTime.setText(tempPerson.getLastMessageTime());
                 holder.unread.setText(Integer.toString(tempPerson.getUnreadMessage()));
+                if (tempPerson.getUnreadMessage() == 0){
+                    holder.unread.setVisibility(View.INVISIBLE);
+                }
+                else{
+                    holder.unread.setVisibility(View.VISIBLE);
+                }
                 if (tempPerson.hasMessage()){
                     holder.lastMessage.setText(tempPerson.getLastMessage());
                 }
@@ -227,6 +233,13 @@ public class FriendActivity extends AppCompatActivity {
         FriendManager.getInstance().fetchContactPersonList(contactList);
         ConversationManager.getInstance().updateConvInfoForContactList(contactList);
         contactListAdapter.notifyDataSetChanged();
+    }
+
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.addFriendButton:
+//                startActivity(new Intent(this,  AddFriendQRActivity.class));
+        }
     }
 
 }

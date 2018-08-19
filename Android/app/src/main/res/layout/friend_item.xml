@@ -32,7 +32,9 @@
                 android:layout_height="wrap_content"
                 android:text="Zijun Chen"
                 android:textSize="30sp"
-                android:maxWidth="165dp"/>
+                android:maxWidth="165dp"
+                android:maxLines="1"
+                android:ellipsize="end"/>
 
             <TextView
                 android:id="@+id/last_message"
@@ -42,7 +44,9 @@
                 android:textSize="20sp"
                 android:gravity="center"
                 android:layout_weight="1"
-                android:maxWidth="165dp"/>
+                android:maxWidth="165dp"
+                android:maxLines="1"
+                android:ellipsize="end"/>
         </LinearLayout>
 
         <LinearLayout
