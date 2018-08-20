@@ -182,9 +182,6 @@ public class FriendActivity extends AppCompatActivity {
         ListView listView = (ListView) findViewById(R.id.contactListView);
         listView.setAdapter(contactListAdapter);
 
-        //add friend code
-//        FriendManager.getInstance().addFriend("QzhIShBiTcSEfa7UiwX3WdOvCpj1");
-//        FriendManager.getInstance().addFriend("56kkUQ97zEXnHBDajgqjCcUdOrD2");
 
         loadContactList();
 
