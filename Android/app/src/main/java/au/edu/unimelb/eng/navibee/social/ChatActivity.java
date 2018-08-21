@@ -1,7 +1,9 @@
 package au.edu.unimelb.eng.navibee.social;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.annotation.NonNull;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -75,13 +78,32 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        EditText editText = (EditText)findViewById(R.id.edit_text_message);
+        switch (view.getId()) {
+            case R.id.btn_send_message:
+                EditText editText = (EditText)findViewById(R.id.edit_text_message);
+                String text = editText.getText().toString();
+                if (!text.equals("")) {
+                    conversation.sendMessage("text", text);
+                    editText.setText("");
+                }
+                break;
 
-        String text = editText.getText().toString();
-        if (!text.equals("")) {
-            conversation.sendMessage("text", text);
-            editText.setText("");
+            case R.id.btn_send_extra:
+                String[] items = {"Send a picture"};
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Send");
+                builder.setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(ChatActivity.this, items[which], Toast.LENGTH_LONG).show();
+                    }
+                });
+                builder.show();
+
+                break;
         }
+
     }
 
     public void scrollToBottom() {

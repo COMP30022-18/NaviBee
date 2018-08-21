@@ -48,18 +48,32 @@
         android:paddingRight="8dp"
         android:paddingTop="8dp">
 
+        <Button
+            android:id="@+id/btn_send_extra"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/send_button_background"
+            android:onClick="onClick"
+            android:text="+"
+            android:textColor="#FFFFFF" />
+
         <EditText
             android:id="@+id/edit_text_message"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#555555"
-            android:textSize="14sp"
-            android:hint="Type your message"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_toRightOf="@+id/btn_send_extra"
+            android:layout_toLeftOf="@+id/btn_send_message"
             android:gravity="top"
-            android:layout_toStartOf="@+id/btn_send_message"
-            android:layout_toLeftOf="@+id/btn_send_message" />
+            android:hint="Type your message"
+            android:selectAllOnFocus="false"
+            android:textColor="#555555"
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/btn_send_message"
