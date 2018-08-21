@@ -49,6 +49,7 @@ dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-android-navigation:0.17.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.3.0'
 
+    implementation 'com.android.support:design:28.0.0-alpha3'
 }
 
 apply plugin: 'com.google.gms.google-services'
