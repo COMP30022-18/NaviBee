@@ -1,4 +1,4 @@
-package au.edu.unimelb.eng.navibee;
+package au.edu.unimelb.eng.navibee.social;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -16,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -24,29 +23,10 @@ import android.widget.TextView;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.functions.FirebaseFunctions;
-import com.google.firebase.functions.FirebaseFunctionsException;
-import com.google.firebase.functions.HttpsCallableResult;
-
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import au.edu.unimelb.eng.navibee.social.AddFriendQRActivity;
-import au.edu.unimelb.eng.navibee.social.ConversationManager;
-import au.edu.unimelb.eng.navibee.social.FriendManager;
+import au.edu.unimelb.eng.navibee.R;
 
 public class FriendActivity extends AppCompatActivity {
 

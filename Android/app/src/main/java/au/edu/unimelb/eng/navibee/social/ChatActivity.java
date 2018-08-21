@@ -1,4 +1,4 @@
-package au.edu.unimelb.eng.navibee;
+package au.edu.unimelb.eng.navibee.social;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,8 +19,8 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 
-import au.edu.unimelb.eng.navibee.social.Conversation;
-import au.edu.unimelb.eng.navibee.social.ConversationManager;
+import au.edu.unimelb.eng.navibee.R;
+
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener{
 

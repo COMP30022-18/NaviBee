@@ -40,7 +40,7 @@
             android:name=".SosActivity"
             android:label="@string/landing_sos"></activity>
         <activity
-            android:name=".FriendActivity"
+            android:name=".social.FriendActivity"
             android:label="@string/title_activity_friend" />
         <activity
             android:name=".navigation.DestinationsActivity"
@@ -54,7 +54,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ChatActivity"
+            android:name=".social.ChatActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity android:name=".social.AddFriendQRActivity"></activity>
         <activity
