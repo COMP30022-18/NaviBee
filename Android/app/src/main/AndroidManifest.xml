@@ -36,7 +36,7 @@
         <activity android:name=".EventSelectFriendsActivity" />
         <activity
             android:name=".SosActivity"
-            android:label="@string/landing_sos"></activity>
+            android:label="@string/landing_sos" />
         <activity
             android:name=".FriendActivity"
             android:label="@string/title_activity_friend" />
@@ -53,8 +53,8 @@
         </activity>
         <activity
             android:name=".ChatActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".EventEditActivity"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".EventEditActivity" />
     </application>
 
 </manifest>
