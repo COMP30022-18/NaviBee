@@ -204,3 +204,54 @@ class DestinationsSearchResultActivity: AppCompatActivity() {
     }
 
 }
+
+
+interface SearchResultRetryListener {
+    fun onSearchResultRetry(dialog: DialogFragment)
+    fun onSearchResultCancel()
+    fun onSearchResultOK()
+}
+
+/**
+ * Arguments:
+ *     ARGS_LOCATION: CarmenFeature, the mapbox location required
+ */
+class SearchResultFragment: AppCompatDialogFragment() {
+
+    companion object {
+        const val ARGS_LOCATION = "location"
+    }
+
+    private lateinit var searchResultRetryListener: SearchResultRetryListener
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val builder = AlertDialog.Builder(activity)
+        val location = this.arguments?.getSerializable(ARGS_LOCATION) as CarmenFeature
+        builder.let { it ->
+            it.setTitle(R.string.destination_search_result_title)
+            it.setMessage("${location.placeName()} (${location.text()}) at ${location.center()}")
+            it.setPositiveButton(R.string.button_go) { _, _ ->
+                searchResultRetryListener.onSearchResultOK()
+            }
+            it.setNegativeButton(R.string.button_retry) { _, _ ->
+                this@SearchResultFragment.dialog.cancel()
+                searchResultRetryListener.onSearchResultRetry(this)
+            }
+        }
+
+        return builder.create()
+    }
+
+    override fun onCancel(dialog: DialogInterface?) {
+        searchResultRetryListener.onSearchResultCancel()
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        try {
+            searchResultRetryListener = context as SearchResultRetryListener
+        } catch (e: ClassCastException) {
+            throw ClassCastException("$context must implement SearchResultRetryListener")
+        }
+    }
+}

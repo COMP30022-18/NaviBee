@@ -1,4 +1,4 @@
-package au.edu.unimelb.eng.navibee.Social;
+package au.edu.unimelb.eng.navibee.social;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -16,11 +16,15 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import au.edu.unimelb.eng.navibee.NaviBeeApplication;
+import au.edu.unimelb.eng.navibee.social.DateManager;
 
 public class FriendManager {
 
@@ -30,11 +34,20 @@ public class FriendManager {
         private String url;
         private String name;
         private String uid;
+        private int unreadMessage;
+        private String lastMessageTime;
+        private String lastMessage;
+        private Boolean hasLastMessage;
+
 
         public ContactPerson(String name, String url, String uid) {
             this.url = url;
             this.name = name;
             this.uid = uid;
+            this.unreadMessage = 0;
+            Date date = new Date(2018, 12 ,12, 12, 12, 12);
+            setLastMessageTime(date);
+            hasLastMessage = false;
         }
 
         public String getUrl() {
@@ -47,7 +60,35 @@ public class FriendManager {
         public String getName() {
             return this.name;
         }
+        public int getUnreadMessage(){
+            return this.unreadMessage;
+        }
+        public void setLastMessage(String message){
+            lastMessage = message;
+            hasLastMessage = true;
+        }
+        public String getLastMessage(){
+            return this.lastMessage;
+        }
+        public void noMessage(){
+            hasLastMessage = false;
+        }
 
+        public Boolean hasMessage() {
+            return hasLastMessage;
+        }
+
+        public String getLastMessageTime (){
+            return this.lastMessageTime;
+        }
+
+        public void setUnreadMessage(int i){
+            this.unreadMessage = i;
+        }
+
+        public void setLastMessageTime(Date time){
+            this.lastMessageTime = DateManager.DateformatTime(time);
+        }
         public void setUrl(String url){
             this.url = url;
         }

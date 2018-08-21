@@ -108,6 +108,9 @@
     <string name="button_retry">Try again</string>
     <string name="location_required_for_navigation">Location permission is required for navigation.</string>
     <string name="button_got_it">Got it</string>
+    <string name="sos_btn">Emergency Call</string>
+    <string name="sos_setting">SOS Setting</string>
+    <string name="sos_setting_btn">Save</string>
     <string name="button_yes">Yes</string>
     <string name="button_cancel">Cancel</string>
     <string name="voice_recognition_result_check_title">Did you say…?</string>

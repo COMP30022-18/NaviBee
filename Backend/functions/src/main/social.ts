@@ -37,6 +37,9 @@ export const addFriend = functions.https.onCall(
         conv['users'] = {};
         conv['users'][uid] = true;
         conv['users'][targetUid] = true;
+        conv['readTimestamps'] = {};
+        conv['readTimestamps'][uid] = new Date();
+        conv['readTimestamps'][targetUid] = new Date();
         db.collection('conversations').add(conv);
 
         return {code: 0};
