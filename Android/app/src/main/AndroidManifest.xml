@@ -22,6 +22,10 @@
 
         <!-- Providers -->
 
+        <provider android:name=".navigation.DestinationsSearchSuggestionsContentProvider"
+            android:authorities="au.edu.unimelb.eng.navibee.navigation.DestinationsSearchSuggestionsContentProvider">
+        </provider>
+
         <!-- Activities -->
 
         <activity
@@ -56,7 +60,8 @@
         <!-- Navigation -->
 
         <activity android:name=".navigation.DestinationsActivity"
-            android:label="@string/landing_navigation">
+            android:label="@string/landing_navigation"
+            android:launchMode="singleTop">
             <meta-data android:name="android.app.default_searchable"
                 android:value=".navigation.DestinationsSearchResultActivity" />
         </activity>
