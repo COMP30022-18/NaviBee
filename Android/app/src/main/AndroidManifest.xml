@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="au.edu.unimelb.eng.navibee">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -12,7 +13,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:hardwareAccelerated="true">
         <activity
             android:name=".LoginActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -36,10 +38,9 @@
         <activity android:name=".SelectFriendsActivity" />
         <activity
             android:name=".SosActivity"
-            android:label="@string/landing_sos">
-        </activity>
+            android:label="@string/landing_sos"></activity>
         <activity
-            android:name=".FriendActivity"
+            android:name=".social.FriendActivity"
             android:label="@string/title_activity_friend" />
 
         <!-- Navigation -->
@@ -52,19 +53,28 @@
         <activity android:name=".navigation.DestinationsSearchResultActivity"
             android:theme="@style/AppTheme.Translucent">
             <meta-data android:name="android.app.searchable"
-                       
                 android:resource="@xml/searchable" />
-
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
+
+
         <activity android:name=".navigation.LocationPermissionRequestActivity"
             android:theme="@style/AppTheme.Translucent"/>
         <activity android:name=".navigation.DestinationsVoiceSearchActivity"
             android:theme="@style/AppTheme.Translucent"/>
 
 
+
+        <activity
+            android:name=".social.ChatActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".social.AddFriendQRActivity"></activity>
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            tools:replace="android:screenOrientation"/>
         <activity
             android:name=".ChatActivity"
             android:theme="@style/AppTheme.NoActionBar">
