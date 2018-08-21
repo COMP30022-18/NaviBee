@@ -26,7 +26,51 @@ import java.util.Map;
 
 public class EventActivity extends AppCompatActivity {
 
-    public final static String EVENT_ID = "au.edu.unimelb.eng.navibee.EVENTID";
+    public static class EventItem {
+
+        private String eventId;
+        private String name;
+        private String summary;
+        private Map<String, Boolean> users;
+        private Boolean isTag = false;
+
+        public EventItem(){}
+
+        public EventItem(String name, String summary, Map<String, Boolean> users){
+            this.name = name;
+            this.summary = summary;
+            this.users = users;
+        }
+
+        public String getName(){
+            return name;
+        }
+
+        public String getSummary(){
+            return summary;
+        }
+
+        public Map<String, Boolean> getUsers(){
+            return users;
+        }
+
+        public Boolean isTag() {
+            return isTag;
+        }
+
+        public void setTag(Boolean isTag){
+            this.isTag = isTag;
+        }
+
+        public String getEventId(){
+            return eventId;
+        }
+
+        public void setEventId(String eventId){
+            this.eventId = eventId;
+        }
+    }
+
     private FirebaseFirestore db;
     private String userId;
 
@@ -57,7 +101,7 @@ public class EventActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int pos, long l) {
                 //using switch case, to check the condition.
                 Intent intent = new Intent(EventActivity.this, EventDetailActivity.class);
-                intent.putExtra(EVENT_ID, eventList.get(pos).getEventId());
+                intent.putExtra("eventId", eventList.get(pos).getEventId());
                 startActivity(intent);
             }
         });
@@ -81,6 +125,30 @@ public class EventActivity extends AppCompatActivity {
                             }
                         } else {
                            // fail to pull data
+                        }
+
+                        loadRecommendList();
+                    }
+                });
+    }
+
+    private void loadRecommendList() {
+        EventItem ForYouTag = new EventItem("RECOMMEND EVENT", null, null);
+        ForYouTag.setTag(true);
+        eventList.add(ForYouTag);
+
+        db.collection("events").get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                EventItem eventItem = document.toObject(EventItem.class);
+                                eventItem.setEventId(document.getId());
+                                eventList.add(eventItem);
+                            }
+                        } else {
+                            // fail to pull data
                         }
 
                         finalizeEventList();
@@ -138,52 +206,6 @@ public class EventActivity extends AppCompatActivity {
             return view;
         }
 
-    }
-
-    public static class EventItem {
-
-        private String eventId;
-        private String name;
-        private String summary;
-        private Map<String, Boolean> users;
-        private Boolean isTag = false;
-
-        public EventItem(){}
-
-        public EventItem(String name, String summary, Map<String, Boolean> users){
-            this.name = name;
-            this.summary = summary;
-            this.users = users;
-            this.isTag = isTag;
-        }
-
-        public String getName(){
-            return name;
-        }
-
-        public String getSummary(){
-            return summary;
-        }
-
-        public Map<String, Boolean> getUsers(){
-            return users;
-        }
-
-        public Boolean isTag() {
-            return isTag;
-        }
-
-        public void setTag(Boolean isTag){
-            this.isTag = isTag;
-        }
-
-        public String getEventId(){
-            return eventId;
-        }
-
-        public void setEventId(String eventId){
-            this.eventId = eventId;
-        }
     }
 
     public void selectFriends(View view){
