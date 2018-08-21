@@ -8,19 +8,28 @@
 
     <Button
         android:id="@+id/addfriend_button_scan"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_width="266dp"
+        android:layout_height="103dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorPrimary"
         android:onClick="buttonScanOnClick"
-        android:text="Button"
-        app:layout_constraintStart_toEndOf="@+id/addfriend_imageView_qrcode"
-        tools:layout_editor_absoluteY="391dp" />
+        android:text="Scan"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/addfriend_imageView_qrcode"
+        app:layout_constraintHorizontal_bias="0.511"
+        app:layout_constraintStart_toStartOf="@id/addfriend_imageView_qrcode"
+        app:layout_constraintTop_toBottomOf="@+id/addfriend_imageView_qrcode" />
 
     <ImageView
         android:id="@+id/addfriend_imageView_qrcode"
-        android:layout_width="222dp"
-        android:layout_height="211dp"
-        app:srcCompat="@color/white"
-        tools:layout_editor_absoluteX="94dp"
-        tools:layout_editor_absoluteY="87dp" />
+        android:layout_width="282dp"
+        android:layout_height="271dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="64dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@color/white" />
 </android.support.constraint.ConstraintLayout>
