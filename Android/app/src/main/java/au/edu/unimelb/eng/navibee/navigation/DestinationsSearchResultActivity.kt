@@ -169,7 +169,7 @@ class DestinationsSearchResultActivity: AppCompatActivity(), SearchResultRetryLi
                 }
     }
 
-    override fun onSearchResultRetry(dialog: DialogFragment) {
+    override fun onSearchResultRetry(dialog: AppCompatDialogFragment) {
         // == true is to avoid getBoolean return null
         if (dialog.arguments?.getBoolean(ARGS_SEND_RESULT) == true) {
             setResult(RESULT_CANCELED)
@@ -188,7 +188,7 @@ class DestinationsSearchResultActivity: AppCompatActivity(), SearchResultRetryLi
 
 
 interface SearchResultRetryListener {
-    fun onSearchResultRetry(dialog: DialogFragment)
+    fun onSearchResultRetry(dialog: AppCompatDialogFragment)
     fun onSearchResultCancel()
     fun onSearchResultOK()
 }
