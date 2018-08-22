@@ -3,41 +3,74 @@ package au.edu.unimelb.eng.navibee;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
-import static java.util.stream.IntStream.range;
-
 public class EventActivity extends AppCompatActivity {
 
-    public final static String EVENT_ID = "au.edu.unimelb.eng.navibee.EVENTID";
+    public static class EventItem {
+
+        private String eventId;
+        private String name;
+        private String summary;
+        private Map<String, Boolean> users;
+        private Boolean isTag = false;
+
+        public EventItem(){}
+
+        public EventItem(String name, String summary, Map<String, Boolean> users){
+            this.name = name;
+            this.summary = summary;
+            this.users = users;
+        }
+
+        public String getName(){
+            return name;
+        }
+
+        public String getSummary(){
+            return summary;
+        }
+
+        public Map<String, Boolean> getUsers(){
+            return users;
+        }
+
+        public Boolean isTag() {
+            return isTag;
+        }
+
+        public void setTag(Boolean isTag){
+            this.isTag = isTag;
+        }
+
+        public String getEventId(){
+            return eventId;
+        }
+
+        public void setEventId(String eventId){
+            this.eventId = eventId;
+        }
+    }
+
     private FirebaseFirestore db;
     private String userId;
 
@@ -46,7 +79,7 @@ public class EventActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.acitivity_event);
+        setContentView(R.layout.event_list);
 
         userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         db = FirebaseFirestore.getInstance();
@@ -68,7 +101,7 @@ public class EventActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int pos, long l) {
                 //using switch case, to check the condition.
                 Intent intent = new Intent(EventActivity.this, EventDetailActivity.class);
-                intent.putExtra(EVENT_ID, eventList.get(pos).getEventId());
+                intent.putExtra("eventId", eventList.get(pos).getEventId());
                 startActivity(intent);
             }
         });
@@ -92,6 +125,30 @@ public class EventActivity extends AppCompatActivity {
                             }
                         } else {
                            // fail to pull data
+                        }
+
+                        loadRecommendList();
+                    }
+                });
+    }
+
+    private void loadRecommendList() {
+        EventItem ForYouTag = new EventItem("RECOMMEND EVENT", null, null);
+        ForYouTag.setTag(true);
+        eventList.add(ForYouTag);
+
+        db.collection("events").get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                EventItem eventItem = document.toObject(EventItem.class);
+                                eventItem.setEventId(document.getId());
+                                eventList.add(eventItem);
+                            }
+                        } else {
+                            // fail to pull data
                         }
 
                         finalizeEventList();
@@ -151,50 +208,8 @@ public class EventActivity extends AppCompatActivity {
 
     }
 
-    public static class EventItem {
-
-        private String eventId;
-        private String name;
-        private String summary;
-        private Map<String, Boolean> users;
-        private Boolean isTag = false;
-
-        public EventItem(){}
-
-        public EventItem(String name, String summary, Map<String, Boolean> users){
-            this.name = name;
-            this.summary = summary;
-            this.users = users;
-            this.isTag = isTag;
-        }
-
-        public String getName(){
-            return name;
-        }
-
-        public String getSummary(){
-            return summary;
-        }
-
-        public Map<String, Boolean> getUsers(){
-            return users;
-        }
-
-        public Boolean isTag() {
-            return isTag;
-        }
-
-        public void setTag(Boolean isTag){
-            this.isTag = isTag;
-        }
-
-        public String getEventId(){
-            return eventId;
-        }
-
-        public void setEventId(String eventId){
-            this.eventId = eventId;
-        }
+    public void selectFriends(View view){
+        startActivity(new Intent(this, EventSelectFriendsActivity.class));
     }
 
 }
