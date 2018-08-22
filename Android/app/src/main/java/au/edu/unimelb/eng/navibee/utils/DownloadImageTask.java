@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -31,12 +32,14 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         Bitmap bitmap = null;
         String hashedUrl = hashUrl(urldisplay);
         String[] fileNames = NaviBeeApplication.getInstance().fileList();
+
         if (!Arrays.asList(fileNames).contains(hashedUrl)) {
+            System.out.println("not found");
             try {
+                File file = new File(NaviBeeApplication.getInstance().getFilesDir(), hashedUrl);
                 InputStream input = new java.net.URL(urldisplay).openStream();
                 bitmap = BitmapFactory.decodeStream(input);
-                File file = new File(NaviBeeApplication.getInstance().getCacheDir(), hashedUrl);
-                FileOutputStream outputStream = new FileOutputStream(file);
+                OutputStream outputStream = new FileOutputStream(file);
                 bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream);
                 outputStream.close();
             } catch (Exception e) {
@@ -44,12 +47,76 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
                 e.printStackTrace();
             }
         } else {
+            System.out.println("loading");
             try {
                 FileInputStream inputStream = NaviBeeApplication.getInstance().openFileInput(hashedUrl);
                 bitmap = BitmapFactory.decodeStream(inputStream);
-            } catch (FileNotFoundException e) {
-            }
+            } catch (FileNotFoundException e) { }
         }
+
+//        File file = new File(NaviBeeApplication.getInstance().getCacheDir(), hashedUrl);
+//        if (!file.exists()) {
+//            System.out.println("not found");
+//            try {
+//                file.createNewFile();
+//                InputStream input = new java.net.URL(urldisplay).openStream();
+//                bitmap = BitmapFactory.decodeStream(input);
+//                OutputStream outputStream = new FileOutputStream(file);
+//                bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream);
+//                outputStream.close();
+//            } catch (Exception e) {
+//                Log.e("Error", e.getMessage());
+//                e.printStackTrace();
+//            }
+//        } else {
+//            System.out.println("loading");
+//            try {
+//                FileInputStream inputStream = NaviBeeApplication.getInstance().openFileInput(hashedUrl);
+//                bitmap = BitmapFactory.decodeStream(inputStream);
+//            } catch (FileNotFoundException e) { }
+//        }
+
+//        if (!Arrays.asList(fileNames).contains(hashedUrl)) {
+//            System.out.println("not found");
+//            try {
+//                File file = new File(NaviBeeApplication.getInstance().getFilesDir(), hashedUrl);
+//                InputStream inputStream = new java.net.URL(urldisplay).openStream();
+//                byte[] buffer = new byte[2000000];
+//                inputStream.read(buffer);
+//                OutputStream outputStream = new FileOutputStream(file);
+//                outputStream.write(buffer);
+//                outputStream.close();
+//            } catch (Exception e) {
+//                Log.e("Error", e.getMessage());
+//                e.printStackTrace();
+//            }
+//        }
+//        try {
+//            FileInputStream inputStream = NaviBeeApplication.getInstance().openFileInput(hashedUrl);
+//            bitmap = BitmapFactory.decodeStream(inputStream);
+//        } catch (FileNotFoundException e) { }
+
+//        File file = new File(NaviBeeApplication.getInstance().getCacheDir(), hashedUrl);
+//        if (!file.exists()) {
+//            System.out.println("not found");
+//            try {
+//                file.createNewFile();
+//                InputStream inputStream = new java.net.URL(urldisplay).openStream();
+//                byte[] buffer = new byte[2000000];
+//                inputStream.read(buffer);
+//                OutputStream outputStream = new FileOutputStream(file);
+//                outputStream.write(buffer);
+//                outputStream.close();
+//            } catch (Exception e) {
+//                Log.e("Error", e.getMessage());
+//                e.printStackTrace();
+//            }
+//        }
+//        try {
+//            System.out.println("loading from file");
+//            FileInputStream fileInputStream = NaviBeeApplication.getInstance().openFileInput(hashedUrl);
+//            bitmap = BitmapFactory.decodeStream(fileInputStream);
+//        } catch (FileNotFoundException e) {}
         return bitmap;
     }
 
