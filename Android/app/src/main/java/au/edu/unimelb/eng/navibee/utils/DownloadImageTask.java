@@ -29,7 +29,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     protected Bitmap doInBackground(String... urls) {
         String urldisplay = urls[0];
         Bitmap bitmap = null;
-        String hashedUrl = encryptPassword(urldisplay);
+        String hashedUrl = hashUrl(urldisplay);
         String[] fileNames = NaviBeeApplication.getInstance().fileList();
         if (!Arrays.asList(fileNames).contains(hashedUrl)) {
             try {
@@ -56,13 +56,13 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     protected void onPostExecute(Bitmap result) {
         bmImage.setImageBitmap(result);
     }
-    private static String encryptPassword(String password){
+    private static String hashUrl(String url){
         String sha256 = "";
         try
         {
             MessageDigest crypt = MessageDigest.getInstance("SHA-256");
             crypt.reset();
-            crypt.update(password.getBytes("UTF-8"));
+            crypt.update(url.getBytes("UTF-8"));
             sha256 = byteToHex(crypt.digest());
         }
         catch(NoSuchAlgorithmException e)
