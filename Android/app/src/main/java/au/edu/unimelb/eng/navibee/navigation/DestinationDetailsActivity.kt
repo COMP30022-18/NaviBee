@@ -97,39 +97,44 @@ class DestinationDetailsActivity : AppCompatActivity() {
                     googlePlaceTypeIDToString(i, resources)
                 }
                 listItems.clear()
-                listItems.add(
-                        SimpleRVTextSecondaryPrimaryStatic(
-                                secondary = resources.getString(R.string.place_details_address),
-                                primary = place.address ?: ""
-                        )
-                )
-                listItems.add(
-                        SimpleRVTextSecondaryPrimaryClickable(
-                                secondary = resources.getString(R.string.place_details_phone_number),
-                                primary = place.phoneNumber ?: "",
-                                onClick = View.OnClickListener {
-                                    startActivity(Intent(Intent.ACTION_DIAL).apply {
-                                        data = Uri.parse("tel:${place.phoneNumber}")
-                                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                    })
-                                }
-                        )
-                )
-                listItems.add(
-                        SimpleRVTextSecondaryPrimaryStatic(
-                                secondary = resources.getString(R.string.place_details_ratings),
-                                primary = "%.1f/5.0".format(place.rating)
-                        )
-                )
-                listItems.add(SimpleRVTextSecondaryPrimaryClickable(
-                        secondary = resources.getString(R.string.place_details_website),
-                        primary = "${place.websiteUri}",
-                        onClick = View.OnClickListener {
-                            startActivity(Intent(Intent.ACTION_VIEW).apply {
-                                data = place.websiteUri
-                            })
-                        }
-                ))
+                if (place.address != null)
+                    listItems.add(
+                            SimpleRVTextSecondaryPrimaryStatic(
+                                    secondary = resources.getString(R.string.place_details_address),
+                                    primary = place.address ?: ""
+                            )
+                    )
+                if (place.phoneNumber != null)
+                    listItems.add(
+                            SimpleRVTextSecondaryPrimaryClickable(
+                                    secondary = resources.getString(R.string.place_details_phone_number),
+                                    primary = place.phoneNumber ?: "",
+                                    onClick = View.OnClickListener {
+                                        startActivity(Intent(Intent.ACTION_DIAL).apply {
+                                            data = Uri.parse("tel:${place.phoneNumber}")
+                                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                        })
+                                    }
+                            )
+                    )
+                if (place.rating >= 0)
+                    listItems.add(
+                            SimpleRVTextSecondaryPrimaryStatic(
+                                    secondary = resources.getString(R.string.place_details_ratings),
+                                    primary = "%.1f/5.0".format(place.rating)
+                            )
+                    )
+                if (place.websiteUri != null)
+                    listItems.add(SimpleRVTextSecondaryPrimaryClickable(
+                            secondary = resources.getString(R.string.place_details_website),
+                            primary = "${place.websiteUri}",
+                            onClick = View.OnClickListener {
+                                startActivity(Intent(Intent.ACTION_VIEW).apply {
+                                    data = place.websiteUri
+                                })
+                            }
+                    ))
+
             } else {
                 listItems.clear()
             }
