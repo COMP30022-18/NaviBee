@@ -20,7 +20,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -28,26 +30,30 @@ public class EventActivity extends AppCompatActivity {
 
     public static class EventItem {
 
+        private String holder;
         private String eventId;
         private String name;
-        private String summary;
+        private String location;
+        private Date time;
         private Map<String, Boolean> users;
         private Boolean isTag = false;
 
         public EventItem(){}
 
-        public EventItem(String name, String summary, Map<String, Boolean> users){
+        public EventItem(String name, String holder, String location, Date time, Map<String, Boolean> users){
+            this.holder = holder;
             this.name = name;
-            this.summary = summary;
+            this.location = location;
             this.users = users;
+            this.time = time;
         }
 
         public String getName(){
             return name;
         }
 
-        public String getSummary(){
-            return summary;
+        public String getLocation(){
+            return location;
         }
 
         public Map<String, Boolean> getUsers(){
@@ -69,6 +75,8 @@ public class EventActivity extends AppCompatActivity {
         public void setEventId(String eventId){
             this.eventId = eventId;
         }
+
+        public Date getTime() { return time; }
     }
 
     private FirebaseFirestore db;
@@ -109,7 +117,7 @@ public class EventActivity extends AppCompatActivity {
 
     private void loadEventList() {
 
-        EventItem ForYouTag = new EventItem("FOR YOU", null, null);
+        EventItem ForYouTag = new EventItem("FOR YOU", null, null, null, null);
         ForYouTag.setTag(true);
         eventList.add(ForYouTag);
 
@@ -133,7 +141,7 @@ public class EventActivity extends AppCompatActivity {
     }
 
     private void loadRecommendList() {
-        EventItem ForYouTag = new EventItem("RECOMMEND EVENT", null, null);
+        EventItem ForYouTag = new EventItem("RECOMMEND EVENT", null, null, null, null);
         ForYouTag.setTag(true);
         eventList.add(ForYouTag);
 
@@ -197,7 +205,8 @@ public class EventActivity extends AppCompatActivity {
                 name.setText((String) eventList.get(position).getName());
 
                 TextView summary = (TextView) view.findViewById(R.id.event_summary);
-                summary.setText((String) eventList.get(position).getSummary());
+                String summaryText = new SimpleDateFormat("EEE, MMM d, HH:mm").format(eventList.get(position).getTime());
+                summary.setText((String) summaryText);
 
                 ImageView image = (ImageView) view.findViewById(R.id.event_image);
                 image.setImageResource(R.mipmap.ic_launcher);
@@ -208,7 +217,7 @@ public class EventActivity extends AppCompatActivity {
 
     }
 
-    public void selectFriends(View view){
+    public void selectFriends(View view) {
         startActivity(new Intent(this, EventSelectFriendsActivity.class));
     }
 

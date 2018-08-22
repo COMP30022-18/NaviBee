@@ -10,17 +10,26 @@ import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TimePicker;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
-public class EventEditActivity extends AppCompatActivity {
+public class EventEditActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
 
     private ArrayList<String> selectedUidList;
+    private ArrayList<String> selectedNameList;
+    private Date eventDate;
+    private Map<String, Integer> dateMap;
 
-    public static class TimePickerFragment extends DialogFragment
-            implements TimePickerDialog.OnTimeSetListener {
+    public static class TimePickerFragment extends DialogFragment {
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -30,17 +39,13 @@ public class EventEditActivity extends AppCompatActivity {
             int minute = c.get(Calendar.MINUTE);
 
             // Create a new instance of TimePickerDialog and return it
-            return new TimePickerDialog(getActivity(), this, hour, minute,
+            return new TimePickerDialog(getActivity(), (EventEditActivity)getActivity(), hour, minute,
                     DateFormat.is24HourFormat(getActivity()));
         }
 
-        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            // Do something with the time chosen by the user
-        }
     }
 
-    public static class DatePickerFragment extends DialogFragment
-            implements DatePickerDialog.OnDateSetListener {
+    public static class DatePickerFragment extends DialogFragment {
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -51,12 +56,9 @@ public class EventEditActivity extends AppCompatActivity {
             int day = c.get(Calendar.DAY_OF_MONTH);
 
             // Create a new instance of DatePickerDialog and return it
-            return new DatePickerDialog(getActivity(), this, year, month, day);
+            return new DatePickerDialog(getActivity(), (EventEditActivity)getActivity(), year, month, day);
         }
 
-        public void onDateSet(DatePicker view, int year, int month, int day) {
-            // Do something with the date chosen by the user
-        }
     }
 
     @Override
@@ -64,8 +66,25 @@ public class EventEditActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.event_edit);
 
+        dateMap = new HashMap<>();
+
         Intent intent = getIntent();
         selectedUidList = intent.getStringArrayListExtra("selectedUid");
+        selectedNameList = intent.getStringArrayListExtra("selectedName");
+
+    }
+
+    @Override
+    public void onTimeSet(TimePicker view, int hour, int minute) {
+        dateMap.put("hour", hour);
+        dateMap.put("minute", minute);
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int day) {
+        dateMap.put("year", year);
+        dateMap.put("month", month);
+        dateMap.put("day", day);
     }
 
     public void showDatePickerDialog(View v) {
@@ -76,6 +95,32 @@ public class EventEditActivity extends AppCompatActivity {
     public void showTimePickerDialog(View v) {
         DialogFragment newFragment = new TimePickerFragment();
         newFragment.show(getSupportFragmentManager(), "timePicker");
+    }
+
+
+    public void finishedEditEvent(View v) {
+
+        EditText editText = (EditText) findViewById(R.id.eventNameEditText);
+        String name = editText.getText().toString();
+
+        String holder = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        String location = "Test Location";
+
+        eventDate = new Date(dateMap.get("year"), dateMap.get("month"), dateMap.get("day"), dateMap.get("hour"), dateMap.get("minute"));
+
+        Map<String, Boolean> users = new HashMap<>();
+        for(String user: selectedUidList) {
+            users.put(user, true);
+        }
+
+        EventActivity.EventItem newEvent = new EventActivity.EventItem(name, holder, location, eventDate, users);
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("events").add(newEvent);
+
+        startActivity(new Intent(this, EventActivity.class));
+
     }
 
 
