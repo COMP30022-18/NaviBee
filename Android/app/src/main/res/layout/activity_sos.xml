@@ -6,16 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".SosActivity">
 
-    <EditText
-        android:id="@+id/phoneNumber"
+    <TextView
+        android:id="@+id/phoneText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="250dp"
         android:ems="10"
         android:hint="@android:string/emptyPhoneNumber"
-        android:inputType="phone"
         android:textAlignment="center"
-        android:textSize="30sp"
+        android:textSize="36sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,6 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:background="#ffc107"
         android:text="Call"
         android:textAlignment="center"
         android:textSize="30sp"
@@ -33,5 +33,32 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/phoneNumber" />
+        app:layout_constraintTop_toBottomOf="@+id/phoneText" />
+
+    <LinearLayout
+        android:id="@+id/settingLayout"
+        android:layout_width="131dp"
+        android:layout_height="106dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/setting_button"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            app:srcCompat="@drawable/ic_settings_black_24dp" />
+
+        <TextView
+            android:id="@+id/setting_text"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:text="@string/sos_setting"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>
