@@ -208,7 +208,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
             } else if (mDataset.get(position).getType().equals("image")) {
                 ((ImageView) holder.itemView.findViewById(R.id.message_image)).setVisibility(View.VISIBLE);
-                FirebaseStorageHelper.downloadImage(((ImageView) holder.itemView.findViewById(R.id.message_image)), mDataset.get(position).getData());
+                FirebaseStorageHelper.loadImage(((ImageView) holder.itemView.findViewById(R.id.message_image)), mDataset.get(position).getData());
             }
 
 
