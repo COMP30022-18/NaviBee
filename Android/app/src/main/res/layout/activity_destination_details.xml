@@ -19,8 +19,8 @@
             android:id="@+id/navigation.destinations.details.collapsing"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             android:fitsSystemWindows="true"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:contentScrim="@color/colorPrimary">
 
             <android.support.constraint.ConstraintLayout
@@ -60,16 +60,20 @@
                         />
                 </FrameLayout>
 
-                <ImageView
+                <com.synnapps.carouselview.CarouselView
                     android:id="@+id/navigation.destinations.details.image_preview"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/collapsing_action_bar_height"
-                    android:scaleType="centerCrop"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/navigation.destinations.details.place_name_row"
-                    app:srcCompat="@drawable/navibee_placeholder" />
+                    app:fillColor="#FFFFFFFF"
+                    app:pageColor="#00000000"
+                    app:radius="0dp"
+                    app:autoPlay="false"
+                    app:strokeColor="#FFFFFFFF"
+                    app:strokeWidth="1dp"/>
 
                 <LinearLayout
                     android:id="@+id/navigation.destinations.details.place_name_row"

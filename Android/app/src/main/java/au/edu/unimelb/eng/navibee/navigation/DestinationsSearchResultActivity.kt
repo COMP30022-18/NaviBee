@@ -111,10 +111,11 @@ class DestinationsSearchResultActivity: AppCompatActivity() {
             }
             Intent.ACTION_VIEW -> {
                 val placeId = intent.extras?.getString(SearchManager.EXTRA_DATA_KEY)
-                if (placeId == null) finish()
-                startActivity<DestinationDetailsActivity>(
-                        DestinationDetailsActivity.EXTRA_PLACE_ID to placeId
-                )
+                if (placeId != null)
+                    startActivity<DestinationDetailsActivity>(
+                            DestinationDetailsActivity.EXTRA_PLACE_ID to placeId
+                    )
+                finish()
             }
         }
     }

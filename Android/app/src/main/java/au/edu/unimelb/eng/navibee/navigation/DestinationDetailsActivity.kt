@@ -14,6 +14,7 @@ import au.edu.unimelb.eng.navibee.R
 import au.edu.unimelb.eng.navibee.utils.*
 import com.google.android.gms.location.places.GeoDataClient
 import com.google.android.gms.location.places.Place
+import com.google.android.gms.location.places.PlacePhotoMetadataBuffer
 import com.google.android.gms.location.places.Places
 import kotlinx.android.synthetic.main.activity_destination_details.*
 import timber.log.Timber
@@ -36,6 +37,9 @@ class DestinationDetailsActivity : AppCompatActivity() {
     private lateinit var secondaryName: TextView
 
     private lateinit var place: Place
+
+    // Image list
+    private var photoMetadata: PlacePhotoMetadataBuffer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,6 +78,22 @@ class DestinationDetailsActivity : AppCompatActivity() {
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         }
 
+        // Carousel view
+        navigation_destinations_details_image_preview.pageCount = 1
+        navigation_destinations_details_image_preview.setImageListener { position, imageView ->
+            val pm = photoMetadata
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder, null))
+            } else {
+                imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder))
+            }
+            if (pm != null) {
+                geoDataClient.getPhoto(pm[position]).addOnSuccessListener { data ->
+                    imageView.setImageBitmap(data.bitmap)
+                }
+            }
+        }
+
         val placeId: String = intent.getStringExtra(EXTRA_PLACE_ID) ?: return finish()
 
         Timber.v("Place ID retrieved: $placeId")
@@ -81,11 +101,10 @@ class DestinationDetailsActivity : AppCompatActivity() {
         geoDataClient = Places.getGeoDataClient(this)
 
         geoDataClient.getPlacePhotos(placeId).addOnSuccessListener { data ->
-            try {
-                geoDataClient.getPhoto(data.photoMetadata[0]).addOnSuccessListener { data ->
-                    navigation_destinations_details_image_preview.setImageBitmap(data.bitmap)
-                }
-            } catch (e: Exception) {}
+            if (data.photoMetadata.count > 0) {
+                photoMetadata = data.photoMetadata
+                navigation_destinations_details_image_preview.pageCount = data.photoMetadata.count
+            }
         }
 
         geoDataClient.getPlaceById(placeId).addOnCompleteListener { task ->

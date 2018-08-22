@@ -37,11 +37,7 @@ class DestinationsActivity : AppCompatActivity(){
         )
         destinations.add(DestinationRVDivider("Recent destinations"))
         destinations.add(DestinationRVEntry("Place 1", "Location 1",
-                onClick = View.OnClickListener {
-                    startActivity<DestinationDetailsActivity>(
-                            DestinationDetailsActivity.EXTRA_PLACE_ID to "dummy place id"
-                    )
-                }))
+                onClick = View.OnClickListener {  }))
         destinations.add(DestinationRVEntry("Place 2", "Location 2",
                 onClick = View.OnClickListener {  }))
         destinations.add(DestinationRVDivider("Recommended place"))
