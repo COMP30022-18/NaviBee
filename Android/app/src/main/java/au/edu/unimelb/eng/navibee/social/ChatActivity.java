@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener, IPickResult {
@@ -197,7 +199,18 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         public void onBindViewHolder(MessageViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
-            ((TextView) holder.itemView.findViewById(R.id.message_text)).setText(mDataset.get(position).getData());
+
+            ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.GONE);
+            ((ImageView) holder.itemView.findViewById(R.id.message_image)).setVisibility(View.GONE);
+
+            if (mDataset.get(position).getType().equals("text")) {
+                ((TextView) holder.itemView.findViewById(R.id.message_text)).setText(mDataset.get(position).getData());
+                ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
+            } else if (mDataset.get(position).getType().equals("image")) {
+                ((ImageView) holder.itemView.findViewById(R.id.message_image)).setVisibility(View.VISIBLE);
+                FirebaseStorageHelper.downloadImage(((ImageView) holder.itemView.findViewById(R.id.message_image)), mDataset.get(position).getData());
+            }
+
 
         }
 
