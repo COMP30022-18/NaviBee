@@ -19,8 +19,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.vansuita.pickimage.bean.PickResult;
+import com.vansuita.pickimage.bundle.PickSetup;
+import com.vansuita.pickimage.dialog.PickImageDialog;
+import com.vansuita.pickimage.listeners.IPickResult;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,7 +33,7 @@ import java.util.ArrayList;
 import au.edu.unimelb.eng.navibee.R;
 
 
-public class ChatActivity extends AppCompatActivity implements View.OnClickListener{
+public class ChatActivity extends AppCompatActivity implements View.OnClickListener, IPickResult {
 
     private Conversation conversation;
     private String targetUID;
@@ -37,7 +42,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private RecyclerView.Adapter chatAdapter;
     private RecyclerView.LayoutManager chatLayoutManager;
 
-    private int PICK_IMAGE_REQUEST = 1;
 
     private int currentMsgCount = 0;
 
@@ -82,22 +86,24 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    public void onPickResult(PickResult r) {
+        if (r.getError() == null) {
+            //If you want the Uri.
+            //Mandatory to refresh image from Uri.
+            //getImageView().setImageURI(null);
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            //Setting the real returned image.
+            //getImageView().setImageURI(r.getUri());
 
-            Uri uri = data.getData();
+            //If you want the Bitmap.
 
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+            conversation.sendPicture(r.getBitmap());
 
-                conversation.sendPicture(bitmap);
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            //Image path
+            //r.getPath();
+        } else {
+            //Handle possible errors
+            Toast.makeText(this, r.getError().getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -114,7 +120,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.btn_send_extra:
-                String[] items = {"Take a picture", "Choose from gallery"};
+                String[] items = {"Picture"};
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Send");
@@ -122,14 +128,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which==0) {
-
+                            PickImageDialog.build(new PickSetup().setSystemDialog(true)).show(ChatActivity.this);
                         } else if (which==1) {
-                            Intent intent = new Intent();
-                            // Show only images, no videos or anything else
-                            intent.setType("image/*");
-                            intent.setAction(Intent.ACTION_GET_CONTENT);
-                            // Always show the chooser (if there are multiple options available)
-                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+
                         }
                     }
                 });
