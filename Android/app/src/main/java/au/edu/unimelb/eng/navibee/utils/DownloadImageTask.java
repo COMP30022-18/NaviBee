@@ -28,16 +28,16 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
     protected Bitmap doInBackground(String... urls) {
         String urldisplay = urls[0];
-        Bitmap mIcon11 = null;
+        Bitmap bitmap = null;
         String hashedUrl = encryptPassword(urldisplay);
         String[] fileNames = NaviBeeApplication.getInstance().fileList();
         if (!Arrays.asList(fileNames).contains(hashedUrl)) {
             try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
+                InputStream input = new java.net.URL(urldisplay).openStream();
+                bitmap = BitmapFactory.decodeStream(input);
                 File file = new File(NaviBeeApplication.getInstance().getCacheDir(), hashedUrl);
                 FileOutputStream outputStream = new FileOutputStream(file);
-                mIcon11.compress(Bitmap.CompressFormat.PNG, 90, outputStream);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream);
                 outputStream.close();
             } catch (Exception e) {
                 Log.e("Error", e.getMessage());
@@ -46,11 +46,11 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         } else {
             try {
                 FileInputStream inputStream = NaviBeeApplication.getInstance().openFileInput(hashedUrl);
-                mIcon11 = BitmapFactory.decodeStream(inputStream);
+                bitmap = BitmapFactory.decodeStream(inputStream);
             } catch (FileNotFoundException e) {
             }
         }
-        return mIcon11;
+        return bitmap;
     }
 
     protected void onPostExecute(Bitmap result) {
