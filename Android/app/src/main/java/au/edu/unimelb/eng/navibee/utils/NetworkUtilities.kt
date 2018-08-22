@@ -24,7 +24,7 @@ class DownloadImageToImageViewAsyncTask(imageView: ImageView) : AsyncTask<String
     override fun doInBackground(vararg args: String): Bitmap? {
         val url = args[0]
         var bitmap: Bitmap? = null
-        val hashedUrl = encryptPassword(url)
+        val hashedUrl = hashUrl(url)
         val fileNames = NaviBeeApplication.instance.fileList()
         if (!Arrays.asList(*fileNames).contains(hashedUrl)) {
             try {
@@ -56,12 +56,12 @@ class DownloadImageToImageViewAsyncTask(imageView: ImageView) : AsyncTask<String
         bmImage.get()?.setImageBitmap(result)
     }
 
-    private fun encryptPassword(password: String): String {
+    private fun hashUrl(url: String): String {
         var sha256 = ""
         try {
             val crypt = MessageDigest.getInstance("SHA-256")
             crypt.reset()
-            crypt.update(password.toByteArray(charset("UTF-8")))
+            crypt.update(url.toByteArray(charset("UTF-8")))
             sha256 = byteToHex(crypt.digest())
         } catch (e: NoSuchAlgorithmException) {
             e.printStackTrace()
