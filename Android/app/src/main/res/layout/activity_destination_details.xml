@@ -69,7 +69,7 @@
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/navigation.destinations.details.place_name_row"
-                    app:srcCompat="@drawable/ic_navibee_color" />
+                    app:srcCompat="@drawable/navibee_placeholder" />
 
                 <LinearLayout
                     android:id="@+id/navigation.destinations.details.place_name_row"
