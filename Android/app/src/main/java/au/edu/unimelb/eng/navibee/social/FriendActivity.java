@@ -23,10 +23,21 @@ import android.widget.TextView;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Formatter;
 
+import au.edu.unimelb.eng.navibee.NaviBeeApplication;
 import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.utils.DownloadImageTask;
 
 public class FriendActivity extends AppCompatActivity {
 
@@ -97,30 +108,6 @@ public class FriendActivity extends AppCompatActivity {
             public TextView unread;
             public TextView lastTime;
             public TextView lastMessage;
-        }
-        private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-            ImageView bmImage;
-
-            public DownloadImageTask(ImageView bmImage) {
-                this.bmImage = bmImage;
-            }
-
-            protected Bitmap doInBackground(String... urls) {
-                String urldisplay = urls[0];
-                Bitmap mIcon11 = null;
-                try {
-                    InputStream in = new java.net.URL(urldisplay).openStream();
-                    mIcon11 = BitmapFactory.decodeStream(in);
-                } catch (Exception e) {
-                    Log.e("Error", e.getMessage());
-                    e.printStackTrace();
-                }
-                return mIcon11;
-            }
-
-            protected void onPostExecute(Bitmap result) {
-                bmImage.setImageBitmap(result);
-            }
         }
     }
 
