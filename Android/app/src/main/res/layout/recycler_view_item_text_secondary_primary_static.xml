@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    style="@style/AppTheme.List.Row"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tool="http://schemas.android.com/tools">
+    <TextView
+        android:id="@+id/general.recycler_view.text.secondary_primary.static.secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.List.ItemSubtitle"
+        tool:text="A long secondary text." />
+    <TextView
+        android:id="@+id/general.recycler_view.text.secondary_primary.static.primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.List.ItemTitle"
+        tool:text="Primary text"/>
+</LinearLayout>
