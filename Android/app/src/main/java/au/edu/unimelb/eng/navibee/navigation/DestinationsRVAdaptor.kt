@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import au.edu.unimelb.eng.navibee.R
+import au.edu.unimelb.eng.navibee.utils.SimpleRVViewHolder
 import au.edu.unimelb.eng.navibee.utils.DownloadImageToImageViewAsyncTask
 import kotlinx.android.synthetic.main.recycler_view_destination_list_attributions.view.*
 import kotlinx.android.synthetic.main.recycler_view_destination_list_button.view.*
@@ -13,11 +14,8 @@ import kotlinx.android.synthetic.main.recycler_view_destination_list_divider.vie
 import kotlinx.android.synthetic.main.recycler_view_destination_list_entry.view.*
 import kotlinx.android.synthetic.main.recycler_view_error_message.view.*
 
-class DestinationsRVAdaptor(private val dataset: ArrayList<DestinationRVItem>) :
+class DestinationsRVAdaptor(private val data: ArrayList<DestinationRVItem>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-    class DividerViewHolder(view: View) :
-            RecyclerView.ViewHolder(view)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layout = when (viewType) {
@@ -29,12 +27,12 @@ class DestinationsRVAdaptor(private val dataset: ArrayList<DestinationRVItem>) :
             6 -> R.layout.recycler_view_destination_list_attributions
             else -> R.layout.recycler_view_indefinite_progress
         }
-        return DividerViewHolder(LayoutInflater.from(parent.context)
+        return SimpleRVViewHolder(LayoutInflater.from(parent.context)
                     .inflate(layout, parent, false))
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (dataset[position]) {
+        return when (data[position]) {
             is DestinationRVDivider -> 1
             is DestinationRVEntry -> 2
             is DestinationRVButton -> 3
@@ -45,10 +43,10 @@ class DestinationsRVAdaptor(private val dataset: ArrayList<DestinationRVItem>) :
         }
     }
 
-    override fun getItemCount() = dataset.size
+    override fun getItemCount() = data.size
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val data = dataset[position]
+        val data = data[position]
         when (data) {
             is DestinationRVDivider -> {
                 holder.itemView.recycler_view_destinations_list_divider_caption.text = data.text
@@ -92,15 +90,15 @@ class DestinationsRVAdaptor(private val dataset: ArrayList<DestinationRVItem>) :
 abstract class DestinationRVItem
 
 class DestinationRVIndefiniteProgressBar: DestinationRVItem()
-data class DestinationRVDivider(val text: String): DestinationRVItem()
-data class DestinationRVErrorMessage(val text: String): DestinationRVItem()
-data class DestinationRVEntry(val name: String,
-                              val location: String,
+data class DestinationRVDivider(val text: CharSequence): DestinationRVItem()
+data class DestinationRVErrorMessage(val text: CharSequence): DestinationRVItem()
+data class DestinationRVEntry(val name: CharSequence,
+                              val location: CharSequence,
                               val thumbnail: String? = null,
                               val wikiData: String? = null,
                               val googlePhotoReference: String? = null,
                               val onClick: View.OnClickListener): DestinationRVItem()
-data class DestinationRVButton(val text: String,
+data class DestinationRVButton(val text: CharSequence,
                                val icon: Int,
                                val onClick: View.OnClickListener): DestinationRVItem()
 data class DestinationRVAttributes(val attributes: CharSequence): DestinationRVItem()

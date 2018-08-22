@@ -26,6 +26,7 @@ import com.google.maps.model.LatLng
 import com.google.maps.model.PlacesSearchResponse
 import com.google.maps.model.RankBy
 import kotlinx.android.synthetic.main.activity_navigation_destinations_search_result.*
+import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.startActivityForResult
 import timber.log.Timber
 
@@ -62,6 +63,7 @@ class DestinationsSearchResultActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation_destinations_search_result)
 
+        // Setup data for loading screen
         destinations.add(DestinationRVIndefiniteProgressBar())
 
         // setup recycler view
@@ -96,15 +98,24 @@ class DestinationsSearchResultActivity: AppCompatActivity() {
     }
 
     private fun handleIntent(intent: Intent) {
-        if (intent.action == Intent.ACTION_SEARCH) {
-            val query = intent.getStringExtra(SearchManager.QUERY)
-            navigation_destinations_search_result_collapsing.title = query
-                    Timber.d("Handling intent on search query $query.")
-            startActivityForResult<LocationPermissionRequestActivity>(
-                    CHECK_LOCATION_PERMISSION,
-                    "query" to query,
-                    "snackBarLayout" to R.id.destinations_activity_coordinator_layout
-            )
+        when (intent.action) {
+            Intent.ACTION_SEARCH -> {
+                val query = intent.getStringExtra(SearchManager.QUERY)
+                navigation_destinations_search_result_collapsing.title = query
+                Timber.d("Handling intent on search query $query.")
+                startActivityForResult<LocationPermissionRequestActivity>(
+                        CHECK_LOCATION_PERMISSION,
+                        "query" to query,
+                        "snackBarLayout" to R.id.destinations_activity_coordinator_layout
+                )
+            }
+            Intent.ACTION_VIEW -> {
+                val placeId = intent.extras?.getString(SearchManager.EXTRA_DATA_KEY)
+                if (placeId == null) finish()
+                startActivity<DestinationDetailsActivity>(
+                        DestinationDetailsActivity.EXTRA_PLACE_ID to placeId
+                )
+            }
         }
     }
 
@@ -155,7 +166,9 @@ class DestinationsSearchResultActivity: AppCompatActivity() {
                                             location = item.vicinity,
                                             googlePhotoReference = photoReference,
                                             onClick = View.OnClickListener {
-                                                // TODO: Navigate to selected place.
+                                                startActivity<DestinationDetailsActivity>(
+                                                        DestinationDetailsActivity.EXTRA_PLACE_ID to item.placeId
+                                                )
                                             }
                                     ))
                                 }

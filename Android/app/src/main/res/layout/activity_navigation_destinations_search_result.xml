@@ -10,7 +10,7 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/navigation.destinations.search_result.appbar"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="@dimen/collapsing_action_bar_height"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         android:fitsSystemWindows="true"
         >
