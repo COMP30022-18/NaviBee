@@ -56,6 +56,7 @@ dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.3.0'
     implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
     implementation 'com.squareup.okhttp3:okhttp:3.11.0'
+    implementation 'com.google.firebase:firebase-storage:16.0.1'
 }
 
 apply plugin: 'com.google.gms.google-services'
