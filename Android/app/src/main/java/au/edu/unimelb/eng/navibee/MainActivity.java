@@ -11,8 +11,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import au.edu.unimelb.eng.navibee.Social.FriendManager;
-import au.edu.unimelb.eng.navibee.Social.ConversationManager;
+import au.edu.unimelb.eng.navibee.social.FriendActivity;
+import au.edu.unimelb.eng.navibee.social.FriendManager;
+import au.edu.unimelb.eng.navibee.social.ConversationManager;
 
 import au.edu.unimelb.eng.navibee.navigation.DestinationsActivity;
 

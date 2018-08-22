@@ -1,6 +1,5 @@
 package au.edu.unimelb.eng.navibee;
 
-import android.app.ListActivity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import au.edu.unimelb.eng.navibee.Social.FriendManager;
+import au.edu.unimelb.eng.navibee.social.FriendManager;
 
 public class EventSelectFriendsActivity extends AppCompatActivity {
 

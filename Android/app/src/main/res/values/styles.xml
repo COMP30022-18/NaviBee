@@ -16,6 +16,14 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="AppTheme.Translucent" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
@@ -54,5 +62,22 @@
 
     <style name="AppTheme.Button.ColoredPrimary" parent="AppTheme.Button">
         <item name="colorButtonNormal">@color/colorPrimary</item>
+    </style>
+
+    <style name="AppTheme.Text" parent="AppTheme" />
+
+    <style name="AppTheme.Text.FullScreenErrorMessage">
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">@color/colorLightTextSecondary</item>
+    </style>
+
+    <style name="AppTheme.Text.Footnote">
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:textColor">@color/colorLightTextSecondary</item>
     </style>
 </resources>

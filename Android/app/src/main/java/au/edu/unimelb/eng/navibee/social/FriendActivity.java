@@ -1,4 +1,4 @@
-package au.edu.unimelb.eng.navibee;
+package au.edu.unimelb.eng.navibee.social;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -16,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -24,28 +23,10 @@ import android.widget.TextView;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.functions.FirebaseFunctions;
-import com.google.firebase.functions.FirebaseFunctionsException;
-import com.google.firebase.functions.HttpsCallableResult;
-
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import au.edu.unimelb.eng.navibee.Social.ConversationManager;
-import au.edu.unimelb.eng.navibee.Social.FriendManager;
+import au.edu.unimelb.eng.navibee.R;
 
 public class FriendActivity extends AppCompatActivity {
 
@@ -75,6 +56,9 @@ public class FriendActivity extends AppCompatActivity {
                 holder = new ViewHolder();
                 holder.image = (ImageView) convertView.findViewById(R.id.friend_icon);
                 holder.text = (TextView) convertView.findViewById(R.id.friend_name);
+                holder.lastTime = (TextView) convertView.findViewById(R.id.time);
+                holder.unread = (TextView) convertView.findViewById(R.id.unread);
+                holder.lastMessage = (TextView) convertView.findViewById(R.id.last_message);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
@@ -87,6 +71,21 @@ public class FriendActivity extends AppCompatActivity {
                 holder.text.setText(tempPerson.getName());
                 new DownloadImageTask(holder.image)
                         .execute(tempPerson.getUrl());
+                holder.lastTime.setText(tempPerson.getLastMessageTime());
+                holder.unread.setText(Integer.toString(tempPerson.getUnreadMessage()));
+                if (tempPerson.getUnreadMessage() == 0){
+                    holder.unread.setVisibility(View.INVISIBLE);
+                }
+                else{
+                    holder.unread.setVisibility(View.VISIBLE);
+                }
+                if (tempPerson.hasMessage()){
+                    holder.lastMessage.setText(tempPerson.getLastMessage());
+                }
+                else{
+                    holder.lastMessage.setText("");
+                }
+
             }
 
             return convertView;
@@ -95,6 +94,9 @@ public class FriendActivity extends AppCompatActivity {
         public static class ViewHolder {
             public ImageView image;
             public TextView text;
+            public TextView unread;
+            public TextView lastTime;
+            public TextView lastMessage;
         }
         private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
             ImageView bmImage;
@@ -160,10 +162,13 @@ public class FriendActivity extends AppCompatActivity {
         ListView listView = (ListView) findViewById(R.id.contactListView);
         listView.setAdapter(contactListAdapter);
 
+
         loadContactList();
 
         IntentFilter intFilt = new IntentFilter(FriendManager.BROADCAST_FRIEND_UPDATED);
         registerReceiver(br, intFilt);
+
+        registerReceiver(brMsgReadState, new IntentFilter(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE));
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -193,9 +198,27 @@ public class FriendActivity extends AppCompatActivity {
         }
     };
 
+    BroadcastReceiver brMsgReadState = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConversationManager.getInstance().updateConvInfoForContactList(contactList);
+            contactListAdapter.notifyDataSetChanged();
+        }
+    };
+
     private void loadContactList() {
 
         FriendManager.getInstance().fetchContactPersonList(contactList);
+        ConversationManager.getInstance().updateConvInfoForContactList(contactList);
         contactListAdapter.notifyDataSetChanged();
     }
+
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.addFriendButton:
+                startActivity(new Intent(this,  AddFriendQRActivity.class));
+                break;
+        }
+    }
+
 }

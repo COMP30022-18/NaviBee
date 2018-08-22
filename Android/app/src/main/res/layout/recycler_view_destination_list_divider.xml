@@ -7,7 +7,7 @@
     android:orientation="horizontal">
 
     <TextView
-        android:id="@+id/caption"
+        android:id="@+id/recycler_view_destinations_list_divider_caption"
         style="@style/AppTheme.List.SectionHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

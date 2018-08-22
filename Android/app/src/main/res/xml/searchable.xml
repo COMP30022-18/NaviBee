@@ -3,6 +3,9 @@
     android:label="@string/app_name"
     android:hint="@string/navigation_search_hint"
     android:voiceSearchMode="launchRecognizer"
+    android:searchSuggestAuthority="au.edu.unimelb.eng.navibee.navigation.DestinationsSearchSuggestionsContentProvider"
+    android:searchSuggestIntentAction="android.intent.action.VIEW"
     android:voiceLanguageModel="web_search"
     android:voicePromptText="@string/navigation_search_hint">
+
 </searchable>
