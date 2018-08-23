@@ -221,7 +221,7 @@
     <string name="place_type_roofing_contractor">Roofing Contractor</string>
     <string name="place_type_room">Room</string>
     <string name="place_type_route">Route</string>
-    <string name="place_type_rv_park">Rv Park</string>
+    <string name="place_type_rv_park">RV Park</string>
     <string name="place_type_school">School</string>
     <string name="place_type_shoe_store">Shoe Store</string>
     <string name="place_type_shopping_mall">Shopping Mall</string>
@@ -252,4 +252,5 @@
     <string name="place_details_phone_number">Phone number</string>
     <string name="place_details_ratings">Ratings</string>
     <string name="place_details_website">Website</string>
+    <string name="alert_dialog_title_select_method_of_travel">Select a method of travel…</string>
 </resources>

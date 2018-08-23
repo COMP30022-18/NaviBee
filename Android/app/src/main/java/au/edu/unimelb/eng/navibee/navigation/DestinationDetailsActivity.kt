@@ -1,14 +1,17 @@
 package au.edu.unimelb.eng.navibee.navigation
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import au.edu.unimelb.eng.navibee.R
 import au.edu.unimelb.eng.navibee.utils.*
@@ -17,6 +20,7 @@ import com.google.android.gms.location.places.Place
 import com.google.android.gms.location.places.PlacePhotoMetadataBuffer
 import com.google.android.gms.location.places.Places
 import kotlinx.android.synthetic.main.activity_destination_details.*
+import kotlinx.android.synthetic.main.alert_dialog_navigation_choose_transport_manners.view.*
 import timber.log.Timber
 
 class DestinationDetailsActivity : AppCompatActivity() {
@@ -123,7 +127,7 @@ class DestinationDetailsActivity : AppCompatActivity() {
                                     primary = place.address ?: ""
                             )
                     )
-                if (place.phoneNumber != null)
+                if (!place.phoneNumber.isNullOrBlank())
                     listItems.add(
                             SimpleRVTextSecondaryPrimaryClickable(
                                     secondary = resources.getString(R.string.place_details_phone_number),
@@ -159,5 +163,27 @@ class DestinationDetailsActivity : AppCompatActivity() {
             }
             viewAdapter.notifyDataSetChanged()
         }
+    }
+
+    fun onClickGo(view: View) {
+        AlertDialog.Builder(this)
+                .setTitle(R.string.alert_dialog_title_select_method_of_travel)
+                .setView(layoutInflater.inflate(R.layout.alert_dialog_navigation_choose_transport_manners,
+                        currentFocus as ViewGroup?).apply {
+                    this.navigation_directions_transport_manners_dialog_walk.setOnClickListener {
+
+                    }
+                    this.navigation_directions_transport_manners_dialog_transit.setOnClickListener {
+
+                    }
+                    this.navigation_directions_transport_manners_dialog_drive.setOnClickListener {
+
+                    }
+                })
+                .setNegativeButton(R.string.button_cancel, DialogInterface.OnClickListener { dialog, which ->
+                    if (which == DialogInterface.BUTTON_NEGATIVE)
+                        dialog.dismiss()
+                })
+                .show()
     }
 }
