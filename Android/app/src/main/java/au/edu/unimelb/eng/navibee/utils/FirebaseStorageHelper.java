@@ -53,12 +53,12 @@ public class FirebaseStorageHelper {
     public static void loadImage(ImageView imageView, String filePath) {
 
         // fs- is for firebase storage caches
-        String filename = "fs-"+ hashUrl(filePath) + ".jpg";
+        String filename = "fs-"+ NetworkImageHelper.hashUrl(filePath);
         File file = new File(NaviBeeApplication.getInstance().getCacheDir(), filename);
 
         if (file.exists()) {
             // cache exists
-            loadImageFromCacheFile(imageView, file);
+            NetworkImageHelper.loadImageFromCacheFile(imageView, file);
         } else {
             // cache not exists
 
@@ -69,7 +69,7 @@ public class FirebaseStorageHelper {
                 @Override
                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                     // Local temp file has been created
-                    loadImageFromCacheFile(imageView, file);
+                    NetworkImageHelper.loadImageFromCacheFile(imageView, file);
                 }
             });
 
@@ -78,38 +78,4 @@ public class FirebaseStorageHelper {
 
     }
 
-    private static void loadImageFromCacheFile(ImageView imageView, File file) {
-        try {
-            FileInputStream fis = new FileInputStream(file);
-            Bitmap bitmap = BitmapFactory.decodeStream(fis);
-            imageView.setImageBitmap(bitmap);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    private static String hashUrl(String url) {
-        String sha256 = "";
-        try {
-            MessageDigest crypt = MessageDigest.getInstance("SHA-256");
-            crypt.reset();
-            crypt.update(url.getBytes("UTF-8"));
-            sha256 = byteToHex(crypt.digest());
-        }
-        catch(Exception e) {
-            e.printStackTrace();
-        }
-        return sha256;
-    }
-
-    private static String byteToHex(final byte[] hash) {
-        Formatter formatter = new Formatter();
-        for (byte b : hash) {
-            formatter.format("%02x", b);
-        }
-        String result = formatter.toString();
-        formatter.close();
-        return result;
-    }
 }
