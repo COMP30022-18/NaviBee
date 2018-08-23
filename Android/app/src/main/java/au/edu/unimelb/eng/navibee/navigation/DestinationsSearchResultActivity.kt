@@ -19,16 +19,24 @@ import au.edu.unimelb.eng.navibee.BuildConfig
 import au.edu.unimelb.eng.navibee.R
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.GeoApiContext
 import com.google.maps.PendingResult
 import com.google.maps.PlacesApi
-import com.google.maps.model.LatLng
 import com.google.maps.model.PlacesSearchResponse
+import com.google.maps.model.PlacesSearchResult
 import com.google.maps.model.RankBy
 import kotlinx.android.synthetic.main.activity_navigation_destinations_search_result.*
 import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.startActivityForResult
 import timber.log.Timber
+import com.google.android.gms.maps.model.LatLng as GmsLatLng
+import com.google.maps.model.LatLng as MapsLatLng
 
 /**
  * Required arguments:
@@ -36,11 +44,14 @@ import timber.log.Timber
  *     SearchManager.QUERY: string, query to search
  *     ARGS_SEND_RESULT: boolean, set to true to send result back to the intent starter
  */
-class DestinationsSearchResultActivity: AppCompatActivity() {
+class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
         const val CHECK_LOCATION_PERMISSION = 1
         const val ARGS_SEND_RESULT = "sendResult"
+
+        // Padding to the map view from markers (10 meters in coordinate format)
+        private const val MAP_VIEW_PADDING = 0.09
     }
 
     // Location service
@@ -58,6 +69,9 @@ class DestinationsSearchResultActivity: AppCompatActivity() {
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
     private val destinations = ArrayList<DestinationRVItem>()
+
+    private val searchResults = ArrayList<PlacesSearchResult>()
+    private var googleMap: GoogleMap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,6 +107,10 @@ class DestinationsSearchResultActivity: AppCompatActivity() {
         geoContext = GeoApiContext.Builder()
                 .apiKey(BuildConfig.GOOGLE_PLACES_API_KEY)
                 .build()
+
+        val mapFragment = supportFragmentManager
+                .findFragmentById(R.id.navigation_destinations_search_result_map) as SupportMapFragment?
+        mapFragment?.getMapAsync(this)
 
         handleIntent(intent)
     }
@@ -157,6 +175,8 @@ class DestinationsSearchResultActivity: AppCompatActivity() {
                                 attributions.addAll(result.htmlAttributions)
 
                                 for (item in result.results) {
+                                    searchResults.add(item)
+
                                     var photoReference: String? = null
                                     if (item.photos?.isEmpty() == false) {
                                         photoReference = item.photos[0].photoReference
@@ -184,6 +204,7 @@ class DestinationsSearchResultActivity: AppCompatActivity() {
                                 }
                                 destinations.add(DestinationRVAttributes(formattedHtml))
                             }
+                            runOnUiThread{initializeMap()}
                             runOnUiThread(viewAdapter::notifyDataSetChanged)
                         }
 
@@ -191,7 +212,7 @@ class DestinationsSearchResultActivity: AppCompatActivity() {
 
                     if (location != null) {
                         val request = PlacesApi
-                                .nearbySearchQuery(geoContext, LatLng(location.latitude, location.longitude))
+                                .nearbySearchQuery(geoContext, MapsLatLng(location.latitude, location.longitude))
                                 .keyword(query)
                                 .rankby(RankBy.DISTANCE)
                         request.setCallback(callback)
@@ -217,4 +238,33 @@ class DestinationsSearchResultActivity: AppCompatActivity() {
         runOnUiThread(viewAdapter::notifyDataSetChanged)
     }
 
+    private fun initializeMap() {
+        val gm = googleMap
+        if (gm != null) {
+            val latLngBoundsBuilder = LatLngBounds.Builder()
+            for (item in searchResults) {
+                val coord = GmsLatLng(item.geometry.location.lat,
+                        item.geometry.location.lng)
+                latLngBoundsBuilder.include(coord)
+                gm.addMarker(MarkerOptions().position(coord).title(item.name))
+            }
+            gm.animateCamera(CameraUpdateFactory
+                    .newLatLngBounds(latLngBoundsBuilder.build(), 48))
+        }
+
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        // Add a marker in Sydney, Australia,
+        // and move the map's camera to the same location.
+        val lkl = lastKnownLocation
+        this.googleMap = googleMap
+        if (searchResults.size > 0) {
+            initializeMap()
+        } else if (lkl != null) {
+            googleMap.moveCamera(
+                    CameraUpdateFactory.newLatLng(
+                            GmsLatLng(lkl.latitude, lkl.longitude)))
+        }
+    }
 }

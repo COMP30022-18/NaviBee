@@ -16,17 +16,24 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <!-- Specify requirement for Apache HTTP Legacy library -->
+        <!-- https://developers.google.com/maps/documentation/android-sdk/config#specify_requirement_for_apache_http_legacy_library -->
+        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+
         <!-- Metadata -->
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/GOOGLE_MAP_API_KEY" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
         <!-- Providers -->
 
         <provider
             android:name=".navigation.DestinationsSearchSuggestionsContentProvider"
-            android:authorities="au.edu.unimelb.eng.navibee.navigation.DestinationsSearchSuggestionsContentProvider"></provider>
+            android:authorities="au.edu.unimelb.eng.navibee.navigation.DestinationsSearchSuggestionsContentProvider" />
 
         <!-- Activities -->
 

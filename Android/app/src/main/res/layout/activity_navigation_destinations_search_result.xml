@@ -26,13 +26,13 @@
             app:expandedTitleMarginEnd="64dp"
             >
 
-            <TextView
-                android:theme="@style/AppTheme.Text.FullScreenErrorMessage"
+            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/navigation.destinations.search_result.map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                app:layout_collapseMode="parallax"
-                android:text="TODO: Map preview goes here..."/>
+                app:layout_collapseMode="parallax" />
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/navigation.destinations.search_result.toolbar"

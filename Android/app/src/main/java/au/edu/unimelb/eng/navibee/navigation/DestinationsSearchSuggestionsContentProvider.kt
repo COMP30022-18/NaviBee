@@ -44,7 +44,7 @@ class DestinationsSearchSuggestionsContentProvider: ContentProvider() {
             LocationServices.getFusedLocationProviderClient(NaviBeeApplication.instance)
         }
 
-        private const val LAT_LNG_BOUND_RADIUS = 0.009 * 10;
+        private const val LAT_LNG_BOUND_RADIUS = 0.009 * 10
     }
 
     init {
