@@ -23,11 +23,13 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.GeoApiContext
 import com.google.maps.PendingResult
 import com.google.maps.PlacesApi
+import com.google.maps.android.ui.IconGenerator
 import com.google.maps.model.PlacesSearchResponse
 import com.google.maps.model.PlacesSearchResult
 import com.google.maps.model.RankBy
@@ -49,9 +51,6 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
     companion object {
         const val CHECK_LOCATION_PERMISSION = 1
         const val ARGS_SEND_RESULT = "sendResult"
-
-        // Padding to the map view from markers (10 meters in coordinate format)
-        private const val MAP_VIEW_PADDING = 0.09
     }
 
     // Location service
@@ -148,8 +147,8 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
     }
 
     private fun searchForLocation(query: String) {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED) {
             finish()
             return
         }
@@ -242,11 +241,24 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
         val gm = googleMap
         if (gm != null) {
             val latLngBoundsBuilder = LatLngBounds.Builder()
-            for (item in searchResults) {
+            for ((i, item) in searchResults.withIndex()) {
                 val coord = GmsLatLng(item.geometry.location.lat,
                         item.geometry.location.lng)
                 latLngBoundsBuilder.include(coord)
-                gm.addMarker(MarkerOptions().position(coord).title(item.name))
+
+                gm.addMarker(MarkerOptions().position(coord).title(item.name).let {
+                    if (i >= 10) {
+                        it.icon(BitmapDescriptorFactory.fromResource(
+                                R.drawable.navigation_map_minor_marker))
+                    } else {
+                        it.icon(BitmapDescriptorFactory.fromBitmap(
+                                IconGenerator(this).run {
+                                    setColor(IconGenerator.STYLE_RED)
+                                    makeIcon("${(i + 'A'.toInt()).toChar()}")
+                                }))
+
+                    }
+                })
             }
             gm.animateCamera(CameraUpdateFactory
                     .newLatLngBounds(latLngBoundsBuilder.build(), 48))
@@ -259,6 +271,9 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
         // and move the map's camera to the same location.
         val lkl = lastKnownLocation
         this.googleMap = googleMap
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED)
+            googleMap.isMyLocationEnabled = true
         if (searchResults.size > 0) {
             initializeMap()
         } else if (lkl != null) {

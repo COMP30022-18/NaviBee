@@ -18,7 +18,9 @@
 
         <!-- Specify requirement for Apache HTTP Legacy library -->
         <!-- https://developers.google.com/maps/documentation/android-sdk/config#specify_requirement_for_apache_http_legacy_library -->
-        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
 
         <!-- Metadata -->
 
@@ -81,6 +83,7 @@
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
+
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -99,7 +102,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="au.edu.unimelb.eng.navibee.navigation.DestinationsSearchResultActivity" />
         </activity>
-
         <activity
             android:name=".social.ChatActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -114,7 +116,7 @@
         <activity
             android:name=".SosSettingActivity"
             android:label="@string/sos_setting" />
-
+        <activity android:name=".navigation.NavigationActivity"></activity>
     </application>
 
 </manifest>
