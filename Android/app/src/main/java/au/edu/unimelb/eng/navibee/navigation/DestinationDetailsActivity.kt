@@ -1,10 +1,13 @@
 package au.edu.unimelb.eng.navibee.navigation
 
+import android.animation.ValueAnimator
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.support.design.widget.BottomSheetBehavior
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
@@ -12,7 +15,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.BaseInterpolator
 import au.edu.unimelb.eng.navibee.R
 import au.edu.unimelb.eng.navibee.utils.*
 import com.google.android.gms.location.places.GeoDataClient
@@ -22,6 +26,7 @@ import com.google.android.gms.location.places.Places
 import kotlinx.android.synthetic.main.activity_destination_details.*
 import kotlinx.android.synthetic.main.alert_dialog_navigation_choose_transport_manners.view.*
 import timber.log.Timber
+
 
 class DestinationDetailsActivity : AppCompatActivity() {
     companion object {
@@ -36,11 +41,17 @@ class DestinationDetailsActivity : AppCompatActivity() {
 
     private lateinit var geoDataClient: GeoDataClient
 
-    // Static text views
-    private lateinit var primaryName: TextView
-    private lateinit var secondaryName: TextView
-
     private lateinit var place: Place
+
+    private var titleRowHeight = -1
+    private val primaryColor: Int by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            resources.getColor(R.color.colorPrimary, null)
+        } else {
+            resources.getColor(R.color.colorPrimary)
+        }
+    }
+
 
     // Image list
     private var photoMetadata: PlacePhotoMetadataBuffer? = null
@@ -49,27 +60,19 @@ class DestinationDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_destination_details)
 
-        // Setup text view variables
-        primaryName = navigation_destinations_details_place_primary
-        secondaryName = navigation_destinations_details_place_secondary
-
         // Action bar
         setSupportActionBar(navigation_destinations_details_toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(true)
+        // Remove redundant shadow in transparent app bar
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            navigation_destinations_details_appbar.outlineProvider = null
+        }
 
         // Setup data for loading screen
-        navigation_destinations_details_collapsing.apply {
-            title = resources.getString(R.string.loading)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                setExpandedTitleColor(resources.getColor(R.color.transparentBlack, null))
-            } else {
-                setExpandedTitleColor(resources.getColor(R.color.transparentBlack))
-            }
-        }
+        supportActionBar?.title = resources.getString(R.string.loading)
+        navigation_destinations_details_toolbar.setTitleTextColor(0)
         listItems.add(SimpleRVIndefiniteProgressBar())
-        primaryName.text = resources.getString(R.string.loading)
-        secondaryName.text = resources.getString(R.string.loading)
 
         // Recycler View
         viewManager = LinearLayoutManager(this)
@@ -98,6 +101,41 @@ class DestinationDetailsActivity : AppCompatActivity() {
             }
         }
 
+        // Layout adjustment
+        val bottomSheetBehavior =
+                BottomSheetBehavior.from(recyclerView)
+        bottomSheetBehavior.peekHeight = (resources.displayMetrics.heightPixels * 0.618).toInt()
+        recyclerView.minimumHeight = (resources.displayMetrics.heightPixels * 0.618).toInt()
+        navigation_destinations_details_image_preview.apply {
+            val param = layoutParams
+            param.height = (resources.displayMetrics.heightPixels * 0.380).toInt()
+            layoutParams = param
+        }
+
+        bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onSlide(bottomSheet: View, offset: Float) {
+                if (listItems.size > 0 && listItems[0] is SimpleRVTextPrimarySecondaryStatic) {
+                    val item = viewManager.findViewByPosition(0) ?: return
+                    setViewHeightPercent(item, 1 - offset,
+                            supportActionBar?.height!!, titleRowHeight)
+                    navigation_destinations_details_toolbar
+                            .setTitleTextColor(colorRGBA(0, 0, 0, offset))
+                    navigation_destinations_details_toolbar
+                            .setBackgroundColor(colorA(primaryColor, offset))
+                    navigation_destinations_details_fab_text.scaleX = 1 - offset
+                    navigation_destinations_details_fab_text.scaleY = 1 - offset
+                }
+            }
+
+            override fun onStateChanged(bottomSheet: View, state: Int) {
+                if (listItems.size > 0 && listItems[0] is SimpleRVTextPrimarySecondaryStatic)
+                    if (state == BottomSheetBehavior.STATE_DRAGGING && titleRowHeight == -1) {
+                        titleRowHeight = viewManager.findViewByPosition(0)?.height ?: -1
+                    }
+            }
+
+        })
+
         val placeId: String = intent.getStringExtra(EXTRA_PLACE_ID) ?: return finish()
 
         Timber.v("Place ID retrieved: $placeId")
@@ -114,12 +152,17 @@ class DestinationDetailsActivity : AppCompatActivity() {
         geoDataClient.getPlaceById(placeId).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 place = task.result[0]
-                navigation_destinations_details_collapsing.title = place.name
-                primaryName.text = place.name
-                secondaryName.text = place.placeTypes.joinToString(", ") { i ->
-                    googlePlaceTypeIDToString(i, resources)
-                }
+                supportActionBar?.title = place.name
+
                 listItems.clear()
+                listItems.add(
+                        SimpleRVTextPrimarySecondaryStatic(
+                                primary = place.name,
+                                secondary = place.placeTypes.joinToString(", ") { i ->
+                                    googlePlaceTypeIDToString(i, resources)
+                                }
+                        )
+                )
                 if (place.address != null)
                     listItems.add(
                             SimpleRVTextSecondaryPrimaryStatic(
@@ -165,6 +208,21 @@ class DestinationDetailsActivity : AppCompatActivity() {
         }
     }
 
+    private fun setViewHeightPercent(view: View, percentage: Float, min: Int, max: Int) {
+        val height = (min + (max - min) * percentage).toInt()
+        val params = view.layoutParams
+        params.height = height
+        view.layoutParams = params
+    }
+
+    private fun colorA(color: Int, alpha: Float) =
+            colorRGBA(Color.red(color), Color.green(color), Color.blue(color), alpha)
+
+
+    private fun colorRGBA(red: Int, green: Int, blue: Int, alpha: Float): Int {
+        return (alpha * 255).toInt() shl 24 or (red shl 16) or (green shl 8) or blue
+    }
+
     fun onClickGo(view: View) {
         AlertDialog.Builder(this)
                 .setTitle(R.string.alert_dialog_title_select_method_of_travel)
@@ -180,10 +238,27 @@ class DestinationDetailsActivity : AppCompatActivity() {
 
                     }
                 })
-                .setNegativeButton(R.string.button_cancel, DialogInterface.OnClickListener { dialog, which ->
+                .setNegativeButton(R.string.button_cancel) { dialog, which ->
                     if (which == DialogInterface.BUTTON_NEGATIVE)
                         dialog.dismiss()
-                })
+                }
                 .show()
     }
 }
+
+fun heightValueAnimator(view: View, height: Int,
+                        duration: Long = 500,
+                        interpolator: BaseInterpolator? = null) =
+        ValueAnimator.ofInt(view.measuredHeight, height).apply {
+            addUpdateListener { valueAnimator ->
+                val animatedVal = valueAnimator.animatedValue as Int
+                val params = view.layoutParams
+                params.height = animatedVal
+                view.layoutParams = params
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                this.interpolator = interpolator ?: AccelerateDecelerateInterpolator()
+            }
+            this.duration = duration
+        }!!
+

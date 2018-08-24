@@ -107,12 +107,13 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
         // setup collapsible view
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         val bottomSheetBehavior =
-                BottomSheetBehavior.from(navigation_destinations_search_result_recycler_view)
+                BottomSheetBehavior.from(recyclerView)
         bottomSheetBehavior.peekHeight = (resources.displayMetrics.heightPixels * 0.382).toInt()
+        recyclerView.minimumHeight = (resources.displayMetrics.heightPixels * 0.382).toInt()
         navigation_destinations_search_result_map.view?.apply {
             layoutParams = layoutParams?.apply {
-                        height = (resources.displayMetrics.heightPixels * 0.618).toInt()
-                    }
+                height = (resources.displayMetrics.heightPixels * 0.618).toInt()
+            }
         }
 
         // setup Google Maps Geo API Context
