@@ -78,8 +78,7 @@
                 android:value=".navigation.DestinationsSearchResultActivity" />
         </activity>
         <activity
-            android:name=".navigation.DestinationsSearchResultActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:name=".navigation.DestinationsSearchResultActivity">
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />

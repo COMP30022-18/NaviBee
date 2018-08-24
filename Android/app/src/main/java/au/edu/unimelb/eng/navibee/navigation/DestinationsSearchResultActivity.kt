@@ -8,12 +8,14 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
+import android.support.design.widget.BottomSheetBehavior
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Html
+import android.util.TypedValue
 import android.view.View
 import au.edu.unimelb.eng.navibee.BuildConfig
 import au.edu.unimelb.eng.navibee.R
@@ -72,6 +74,12 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
     private val searchResults = ArrayList<PlacesSearchResult>()
     private var googleMap: GoogleMap? = null
 
+    private val actionBarHeight: Int by lazy {
+        val tv = TypedValue()
+        theme.resolveAttribute(R.attr.actionBarSize, tv, true)
+        TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation_destinations_search_result)
@@ -97,10 +105,15 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
         sendResult = intent.getBooleanExtra(ARGS_SEND_RESULT, false)
 
         // setup collapsible view
-        setSupportActionBar(navigation_destinations_search_result_toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        navigation_destinations_search_result_appbar.layoutParams.height =
-                (resources.displayMetrics.heightPixels * 0.618).toInt()
+        val bottomSheetBehavior =
+                BottomSheetBehavior.from(navigation_destinations_search_result_recycler_view)
+        bottomSheetBehavior.peekHeight = (resources.displayMetrics.heightPixels * 0.382).toInt()
+        navigation_destinations_search_result_map.view?.apply {
+            layoutParams = layoutParams?.apply {
+                        height = (resources.displayMetrics.heightPixels * 0.618).toInt()
+                    }
+        }
 
         // setup Google Maps Geo API Context
         geoContext = GeoApiContext.Builder()
@@ -118,7 +131,7 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
         when (intent.action) {
             Intent.ACTION_SEARCH -> {
                 val query = intent.getStringExtra(SearchManager.QUERY)
-                navigation_destinations_search_result_collapsing.title = query
+                supportActionBar?.title = query
                 Timber.d("Handling intent on search query $query.")
                 startActivityForResult<LocationPermissionRequestActivity>(
                         CHECK_LOCATION_PERMISSION,
@@ -253,7 +266,6 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
                     } else {
                         it.icon(BitmapDescriptorFactory.fromBitmap(
                                 IconGenerator(this).run {
-                                    setColor(IconGenerator.STYLE_RED)
                                     makeIcon("${(i + 'A'.toInt()).toChar()}")
                                 }))
 
