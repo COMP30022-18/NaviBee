@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
@@ -16,6 +17,7 @@ import android.widget.TimePicker;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -68,6 +70,11 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
         dateMap = new HashMap<>();
 
+        Button time_button = (Button)findViewById(R.id.button6);
+        time_button.setText("Pick Time");
+        Button date_button = (Button)findViewById(R.id.button5);
+        date_button.setText("Pick Date");
+
         Intent intent = getIntent();
         selectedUidList = intent.getStringArrayListExtra("selectedUid");
         selectedNameList = intent.getStringArrayListExtra("selectedName");
@@ -78,6 +85,10 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     public void onTimeSet(TimePicker view, int hour, int minute) {
         dateMap.put("hour", hour);
         dateMap.put("minute", minute);
+        Button time_button = (Button)findViewById(R.id.button6);
+        Date time = new Date(0, 0, 0, hour, minute);
+        String timeString = new SimpleDateFormat("HH:mm").format(time);
+        time_button.setText(timeString);
     }
 
     @Override
@@ -85,6 +96,10 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         dateMap.put("year", year);
         dateMap.put("month", month);
         dateMap.put("day", day);
+        Date date = new Date(year, month, day);
+        String dateString = new SimpleDateFormat("EEE, MMM d").format(date);
+        Button date_button = (Button)findViewById(R.id.button5);
+        date_button.setText(dateString);
     }
 
     public void showDatePickerDialog(View v) {
