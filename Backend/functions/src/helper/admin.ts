@@ -10,4 +10,3 @@ fs.settings(settings);
 
 export const db = fs;
 export const msg = messaging();
-export const msgType = messaging;
