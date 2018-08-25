@@ -1,15 +1,26 @@
 package au.edu.unimelb.eng.navibee;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import au.edu.unimelb.eng.navibee.social.FriendActivity;
 import au.edu.unimelb.eng.navibee.social.FriendManager;
@@ -43,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         FriendManager.init();
         ConversationManager.init();
+        setFCMToken();
     }
 
     @Override
@@ -58,6 +70,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .requestEmail()
                         .build();
                 GoogleSignIn.getClient(this, gso).signOut();
+
+                // reset token to prevent further messages
+                try {
+                    FirebaseInstanceId.getInstance().deleteInstanceId();
+                } catch (Exception e) {
+                }
+
 
                 Intent intent = new Intent(this, LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
@@ -82,6 +101,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void startNavigationActivity(View view) {
         Intent intent = new Intent(this, DestinationsActivity.class);
         startActivity(intent);
+    }
+
+    private void setFCMToken() {
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            return;
+                        }
+                        // Get Instance ID token
+                        String token = task.getResult().getToken();
+                        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                        Map<String, Object> docData = new HashMap<>();
+                        docData.put("uid", uid);
+                        docData.put("lastSeen", new Date());
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        db.collection("fcmTokens").document(token).set(docData);
+
+                    }
+                });
     }
 
 }

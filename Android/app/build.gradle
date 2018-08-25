@@ -58,6 +58,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.11.0'
     implementation 'com.google.firebase:firebase-storage:16.0.1'
     implementation 'com.github.jrvansuita:PickImage:+'
+    implementation 'com.google.firebase:firebase-messaging:17.3.0'
 }
 
 apply plugin: 'com.google.gms.google-services'
