@@ -9,7 +9,6 @@ import android.content.UriMatcher
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.database.MatrixCursor
-import android.location.Location
 import android.net.Uri
 import android.provider.BaseColumns
 import android.support.v4.content.ContextCompat
@@ -22,7 +21,6 @@ import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.tasks.Tasks
-import timber.log.Timber
 
 
 class DestinationsSearchSuggestionsContentProvider: ContentProvider() {
@@ -31,8 +29,6 @@ class DestinationsSearchSuggestionsContentProvider: ContentProvider() {
     companion object {
         // Match ID for URI Matcher
         private const val SEARCH_SUGGESTIONS = 0
-
-        private var lastKnownLocation: Location? = null
 
         const val AUTHORITY = "au.edu.unimelb.eng.navibee.navigation.DestinationsSearchSuggestionsContentProvider"
 
@@ -48,7 +44,7 @@ class DestinationsSearchSuggestionsContentProvider: ContentProvider() {
             LocationServices.getFusedLocationProviderClient(NaviBeeApplication.instance)
         }
 
-        private const val LAT_LNG_BOUND_RADIUS = 0.009 * 10;
+        private const val LAT_LNG_BOUND_RADIUS = 0.009 * 10
     }
 
     init {
@@ -71,15 +67,11 @@ class DestinationsSearchSuggestionsContentProvider: ContentProvider() {
 
                 val query = uri?.lastPathSegment
 
-                Timber.v("Query received: $query")
-
                 if (ContextCompat.checkSelfPermission(NaviBeeApplication.instance,
                                 Manifest.permission.ACCESS_FINE_LOCATION)
                         != PackageManager.PERMISSION_GRANTED) {
                     return cursor
                 }
-
-                Timber.v("Location permission found.")
 
                 val loc = fusedLocationClient.lastLocation.apply {
                     Tasks.await(this)
@@ -90,21 +82,15 @@ class DestinationsSearchSuggestionsContentProvider: ContentProvider() {
                 val bottomRight = LatLng(loc.latitude + LAT_LNG_BOUND_RADIUS,
                         loc.longitude + LAT_LNG_BOUND_RADIUS)
 
-                Timber.v("topLeft: $topLeft, bottomRight: $bottomRight")
-
                 val results = mGeoDataClient.getAutocompletePredictions(
                         query,
                         LatLngBounds(topLeft, bottomRight),
                         AutocompleteFilter.Builder().setTypeFilter(AutocompleteFilter.TYPE_FILTER_NONE).build()
                 )
 
-                Timber.v("prediction results: $results")
-
                 val suggestions = results.apply {
                     Tasks.await(this)
                 }.result ?: return cursor
-
-                Timber.v("suggestions: $suggestions")
 
                 for ((i, suggestion) in suggestions.withIndex()) {
                     cursor.newRow()
@@ -114,13 +100,11 @@ class DestinationsSearchSuggestionsContentProvider: ContentProvider() {
                             .add(SearchManager.SUGGEST_COLUMN_INTENT_EXTRA_DATA, suggestion.placeId)
                 }
 
-                Timber.v("cursor: $cursor")
-
                 return cursor
             }
         }
 
-        TODO("not implemented")
+        throw IllegalArgumentException()
     }
 
     override fun onCreate(): Boolean {

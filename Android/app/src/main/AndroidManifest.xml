@@ -5,28 +5,38 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".NaviBeeApplication"
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:hardwareAccelerated="true">
+        android:theme="@style/AppTheme">
+
+        <!-- Specify requirement for Apache HTTP Legacy library -->
+        <!-- https://developers.google.com/maps/documentation/android-sdk/config#specify_requirement_for_apache_http_legacy_library -->
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
 
         <!-- Metadata -->
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/GOOGLE_MAP_API_KEY"/>
+            android:value="@string/GOOGLE_MAP_API_KEY" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
         <!-- Providers -->
 
-        <provider android:name=".navigation.DestinationsSearchSuggestionsContentProvider"
-            android:authorities="au.edu.unimelb.eng.navibee.navigation.DestinationsSearchSuggestionsContentProvider">
-        </provider>
+        <provider
+            android:name=".navigation.DestinationsSearchSuggestionsContentProvider"
+            android:authorities="au.edu.unimelb.eng.navibee.navigation.DestinationsSearchSuggestionsContentProvider" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -65,7 +75,7 @@
         <activity android:name=".EventSelectFriendsActivity" />
         <activity
             android:name=".SosActivity"
-            android:label="@string/landing_sos"></activity>
+            android:label="@string/landing_sos" />
         <activity
             android:name=".social.FriendActivity"
             android:label="@string/title_activity_friend" />
@@ -73,35 +83,45 @@
 
         <!-- Navigation -->
 
-        <activity android:name=".navigation.DestinationsActivity"
+        <activity
+            android:name=".navigation.DestinationsActivity"
             android:label="@string/landing_navigation"
             android:launchMode="singleTop">
-            <meta-data android:name="android.app.default_searchable"
+            <meta-data
+                android:name="android.app.default_searchable"
                 android:value=".navigation.DestinationsSearchResultActivity" />
         </activity>
-        <activity android:name=".navigation.DestinationsSearchResultActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data android:name="android.app.searchable"
-
+        <activity
+            android:name=".navigation.DestinationsSearchResultActivity">
+            <meta-data
+                android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
 
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
-
-
-        <activity android:name=".navigation.LocationPermissionRequestActivity"
-            android:theme="@style/AppTheme.Translucent"/>
-        <activity android:name=".navigation.DestinationsVoiceSearchActivity"
-            android:theme="@style/AppTheme.Translucent"/>
-
-
+        <activity
+            android:name=".navigation.LocationPermissionRequestActivity"
+            android:theme="@style/AppTheme.Translucent" />
+        <activity
+            android:name=".navigation.DestinationsVoiceSearchActivity"
+            android:theme="@style/AppTheme.Translucent" />
+        <activity
+            android:name=".navigation.DestinationDetailsActivity"
+            android:parentActivityName=".navigation.DestinationsActivity"
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="au.edu.unimelb.eng.navibee.navigation.DestinationsSearchResultActivity" />
+        </activity>
+        <activity android:name=".navigation.NavigationActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <activity
             android:name=".social.ChatActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".social.AddFriendQRActivity"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".social.AddFriendQRActivity" />
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
@@ -111,8 +131,7 @@
 
         <activity
             android:name=".SosSettingActivity"
-            android:label="@string/sos_setting">
-        </activity>
+            android:label="@string/sos_setting" />
     </application>
 
 </manifest>
