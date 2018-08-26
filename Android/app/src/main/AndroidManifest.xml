@@ -97,7 +97,7 @@
         <activity
             android:name=".navigation.DestinationDetailsActivity"
             android:parentActivityName=".navigation.DestinationsActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="au.edu.unimelb.eng.navibee.navigation.DestinationsSearchResultActivity" />

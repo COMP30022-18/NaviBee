@@ -14,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import au.edu.unimelb.eng.navibee.R
 import au.edu.unimelb.eng.navibee.utils.*
 import com.google.android.gms.location.places.GeoDataClient
@@ -62,6 +63,11 @@ class DestinationDetailsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS and
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+
         setContentView(R.layout.activity_destination_details)
 
         // Action bar
@@ -125,6 +131,8 @@ class DestinationDetailsActivity : AppCompatActivity() {
                     navigation_destinations_details_toolbar
                             .setTitleTextColor(colorRGBA(0, 0, 0, offset))
                     navigation_destinations_details_toolbar
+                            .setBackgroundColor(colorA(primaryColor, offset))
+                    navigation_destinations_details_toolbar_padding
                             .setBackgroundColor(colorA(primaryColor, offset))
                     navigation_destinations_details_fab_text.scaleX = 1 - offset
                     navigation_destinations_details_fab_text.scaleY = 1 - offset
