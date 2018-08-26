@@ -57,6 +57,9 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    private var isMapReady = false
+    private var route: DirectionsRoute? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -102,8 +105,9 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
                     .getRoute(object : Callback<DirectionsResponse> {
                         override fun onResponse(call: Call<DirectionsResponse>,
                                                 response: Response<DirectionsResponse>) {
-                            val route = response.body()?.routes()?.get(0) ?: return
-                            startNavigation(route)
+                            route = response.body()?.routes()?.get(0) ?: return
+                            if (isMapReady)
+                                startNavigation(route!!)
                         }
 
                         override fun onFailure(call: Call<DirectionsResponse>, t: Throwable) {
@@ -181,7 +185,9 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
     }
 
     override fun onNavigationReady(isRunning: Boolean) {
-
+        isMapReady = true
+        if (route != null)
+            startNavigation(route!!)
     }
 
     override fun onNavigationFinished() {
@@ -200,6 +206,7 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
         navigationView.startNavigation(
                 NavigationViewOptions.builder()
                         .directionsRoute(route)
+                        .navigationListener(this)
                         .shouldSimulateRoute(true)
                         .build()
                 )

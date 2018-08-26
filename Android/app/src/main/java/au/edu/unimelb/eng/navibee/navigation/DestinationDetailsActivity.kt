@@ -13,7 +13,6 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import au.edu.unimelb.eng.navibee.R
 import au.edu.unimelb.eng.navibee.utils.*
@@ -236,32 +235,35 @@ class DestinationDetailsActivity : AppCompatActivity() {
     }
 
     fun onClickGo(view: View) {
-        AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.alert_dialog_navigation_choose_transport_manners,
+                null)
+        val dialog = AlertDialog.Builder(this)
                 .setTitle(R.string.alert_dialog_title_select_method_of_travel)
-                .setView(layoutInflater.inflate(R.layout.alert_dialog_navigation_choose_transport_manners,
-                        currentFocus as ViewGroup?).apply {
-                    this.navigation_directions_transport_manners_dialog_walk.setOnClickListener {
-                        startActivity<NavigationActivity>(
-                                NavigationActivity.EXTRA_DEST_LAT to place.latLng.latitude,
-                                NavigationActivity.EXTRA_DEST_LON to place.latLng.longitude,
-                                NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_WALKING
-                        )
-                    }
-                    this.navigation_directions_transport_manners_dialog_transit.setOnClickListener {
-
-                    }
-                    this.navigation_directions_transport_manners_dialog_drive.setOnClickListener {
-                        startActivity<NavigationActivity>(
-                                NavigationActivity.EXTRA_DEST_LAT to place.latLng.latitude,
-                                NavigationActivity.EXTRA_DEST_LON to place.latLng.longitude,
-                                NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_DRIVING
-                        )
-                    }
-                })
+                .setView(dialogView)
                 .setNegativeButton(R.string.button_cancel) { dialog, which ->
                     if (which == DialogInterface.BUTTON_NEGATIVE)
                         dialog.dismiss()
                 }
-                .show()
+                .create()
+        dialogView.navigation_directions_transport_manners_dialog_walk.setOnClickListener {
+            startActivity<NavigationActivity>(
+                    NavigationActivity.EXTRA_DEST_LAT to place.latLng.latitude,
+                    NavigationActivity.EXTRA_DEST_LON to place.latLng.longitude,
+                    NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_WALKING
+            )
+            dialog.dismiss()
+        }
+        dialogView.navigation_directions_transport_manners_dialog_transit.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialogView.navigation_directions_transport_manners_dialog_drive.setOnClickListener {
+            startActivity<NavigationActivity>(
+                    NavigationActivity.EXTRA_DEST_LAT to place.latLng.latitude,
+                    NavigationActivity.EXTRA_DEST_LON to place.latLng.longitude,
+                    NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_DRIVING
+            )
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 }
