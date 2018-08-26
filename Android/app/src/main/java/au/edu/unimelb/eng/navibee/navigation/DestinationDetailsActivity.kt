@@ -1,6 +1,5 @@
 package au.edu.unimelb.eng.navibee.navigation
 
-import android.animation.ValueAnimator
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
@@ -15,8 +14,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.BaseInterpolator
 import au.edu.unimelb.eng.navibee.R
 import au.edu.unimelb.eng.navibee.utils.*
 import com.google.android.gms.location.places.GeoDataClient
@@ -25,9 +22,16 @@ import com.google.android.gms.location.places.PlacePhotoMetadataBuffer
 import com.google.android.gms.location.places.Places
 import kotlinx.android.synthetic.main.activity_destination_details.*
 import kotlinx.android.synthetic.main.alert_dialog_navigation_choose_transport_manners.view.*
+import org.jetbrains.anko.startActivity
 import timber.log.Timber
 
-
+/**
+ * Show details of a destination from Google Maps
+ *
+ * Required extra information:
+ *      DestinationDetailsActivity.EXTRA_PLACE_ID:
+ *          String, the place ID as specified by Google Maps
+ */
 class DestinationDetailsActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_PLACE_ID = "placeId"
@@ -229,13 +233,21 @@ class DestinationDetailsActivity : AppCompatActivity() {
                 .setView(layoutInflater.inflate(R.layout.alert_dialog_navigation_choose_transport_manners,
                         currentFocus as ViewGroup?).apply {
                     this.navigation_directions_transport_manners_dialog_walk.setOnClickListener {
-
+                        startActivity<NavigationActivity>(
+                                NavigationActivity.EXTRA_DEST_LAT to place.latLng.latitude,
+                                NavigationActivity.EXTRA_DEST_LON to place.latLng.longitude,
+                                NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_WALKING
+                        )
                     }
                     this.navigation_directions_transport_manners_dialog_transit.setOnClickListener {
 
                     }
                     this.navigation_directions_transport_manners_dialog_drive.setOnClickListener {
-
+                        startActivity<NavigationActivity>(
+                                NavigationActivity.EXTRA_DEST_LAT to place.latLng.latitude,
+                                NavigationActivity.EXTRA_DEST_LON to place.latLng.longitude,
+                                NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_DRIVING
+                        )
                     }
                 })
                 .setNegativeButton(R.string.button_cancel) { dialog, which ->
@@ -245,20 +257,3 @@ class DestinationDetailsActivity : AppCompatActivity() {
                 .show()
     }
 }
-
-fun heightValueAnimator(view: View, height: Int,
-                        duration: Long = 500,
-                        interpolator: BaseInterpolator? = null) =
-        ValueAnimator.ofInt(view.measuredHeight, height).apply {
-            addUpdateListener { valueAnimator ->
-                val animatedVal = valueAnimator.animatedValue as Int
-                val params = view.layoutParams
-                params.height = animatedVal
-                view.layoutParams = params
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                this.interpolator = interpolator ?: AccelerateDecelerateInterpolator()
-            }
-            this.duration = duration
-        }!!
-

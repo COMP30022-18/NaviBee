@@ -5,6 +5,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".NaviBeeApplication"
@@ -101,6 +102,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="au.edu.unimelb.eng.navibee.navigation.DestinationsSearchResultActivity" />
         </activity>
+        <activity android:name=".navigation.NavigationActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
         <activity
             android:name=".social.ChatActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -115,7 +119,6 @@
         <activity
             android:name=".SosSettingActivity"
             android:label="@string/sos_setting" />
-        <activity android:name=".navigation.NavigationActivity"></activity>
     </application>
 
 </manifest>

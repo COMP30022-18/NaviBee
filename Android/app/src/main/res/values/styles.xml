@@ -88,4 +88,10 @@
         <item name="android:textStyle">italic</item>
         <item name="android:textColor">@color/colorLightTextSecondary</item>
     </style>
+
+    <!-- Navigation styles -->
+    <style name="AppTheme.Navigation" />
+    <style name="AppTheme.Navigation.Light" parent="NavigationViewLight">
+        <item name="navigationViewBannerBackground">@color/colorPrimaryDark</item>
+    </style>
 </resources>

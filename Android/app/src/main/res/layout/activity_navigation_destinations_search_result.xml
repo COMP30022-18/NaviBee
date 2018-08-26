@@ -11,7 +11,8 @@
         android:id="@+id/navigation.destinations.search_result.map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:cameraZoom="13"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/navigation.destinations.search_result.recycler_view"

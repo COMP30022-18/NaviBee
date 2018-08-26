@@ -169,8 +169,9 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
 
         fusedLocationClient.lastLocation
                 .addOnSuccessListener { location : Location? ->
-                    this.lastKnownLocation = location
                     Timber.d("Last known location: $location")
+                    lastKnownLocation = location
+                    if (googleMap != null) onMapReady(googleMap!!)
 
                     val callback = object : PendingResult.Callback<PlacesSearchResponse> {
                         override fun onFailure(e: Throwable?) {
@@ -287,9 +288,8 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED)
             googleMap.isMyLocationEnabled = true
-        if (searchResults.size > 0) {
-            initializeMap()
-        } else if (lkl != null) {
+
+        if (lkl != null) {
             googleMap.moveCamera(
                     CameraUpdateFactory.newLatLng(
                             GmsLatLng(lkl.latitude, lkl.longitude)))
