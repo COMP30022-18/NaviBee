@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import au.edu.unimelb.eng.navibee.R
+import kotlinx.android.synthetic.main.recycler_view_attributions.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_primary_secondary_clickable.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_primary_secondary_static.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_secondary_primary_clickable.view.*
@@ -19,6 +20,7 @@ class SimpleRecyclerViewAdaptor(private val data: ArrayList<SimpleRecyclerViewIt
             3 -> R.layout.recycler_view_item_text_primary_secondary_static
             4 -> R.layout.recycler_view_item_text_secondary_primary_clickable
             5 -> R.layout.recycler_view_item_text_secondary_primary_static
+            6 -> R.layout.recycler_view_attributions
             else -> R.layout.recycler_view_indefinite_progress
         }
         return SimpleRVViewHolder(LayoutInflater.from(parent.context)
@@ -32,6 +34,7 @@ class SimpleRecyclerViewAdaptor(private val data: ArrayList<SimpleRecyclerViewIt
             is SimpleRVTextPrimarySecondaryStatic -> 3
             is SimpleRVTextSecondaryPrimaryClickable -> 4
             is SimpleRVTextSecondaryPrimaryStatic -> 5
+            is SimpleRVAttributions -> 6
             else -> 0
         }
     }
@@ -67,6 +70,9 @@ class SimpleRecyclerViewAdaptor(private val data: ArrayList<SimpleRecyclerViewIt
                 holder.itemView.general_recycler_view_text_secondary_primary_static_secondary.text =
                         data.secondary
             }
+            is SimpleRVAttributions -> {
+                holder.itemView.recycler_view_attribution_text_view.text = data.attributes
+            }
         }
     }
 }
@@ -92,6 +98,7 @@ data class SimpleRVTextSecondaryPrimaryStatic(
         val primary: CharSequence,
         val secondary: CharSequence
 ): SimpleRecyclerViewItem()
+data class SimpleRVAttributions(val attributes: CharSequence): SimpleRecyclerViewItem()
 
 class SimpleRVViewHolder(view: View) :
         RecyclerView.ViewHolder(view)

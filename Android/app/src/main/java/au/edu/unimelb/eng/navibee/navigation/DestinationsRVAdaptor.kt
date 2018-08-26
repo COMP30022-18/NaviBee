@@ -6,9 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import au.edu.unimelb.eng.navibee.R
-import au.edu.unimelb.eng.navibee.utils.SimpleRVViewHolder
 import au.edu.unimelb.eng.navibee.utils.DownloadImageToImageViewAsyncTask
-import kotlinx.android.synthetic.main.recycler_view_destination_list_attributions.view.*
+import au.edu.unimelb.eng.navibee.utils.SimpleRVViewHolder
+import kotlinx.android.synthetic.main.recycler_view_attributions.view.*
 import kotlinx.android.synthetic.main.recycler_view_destination_list_button.view.*
 import kotlinx.android.synthetic.main.recycler_view_destination_list_divider.view.*
 import kotlinx.android.synthetic.main.recycler_view_destination_list_entry.view.*
@@ -24,7 +24,7 @@ class DestinationsRVAdaptor(private val data: ArrayList<DestinationRVItem>) :
             3 -> R.layout.recycler_view_destination_list_button
             4 -> R.layout.recycler_view_indefinite_progress
             5 -> R.layout.recycler_view_error_message
-            6 -> R.layout.recycler_view_destination_list_attributions
+            6 -> R.layout.recycler_view_attributions
             else -> R.layout.recycler_view_indefinite_progress
         }
         return SimpleRVViewHolder(LayoutInflater.from(parent.context)
@@ -38,7 +38,7 @@ class DestinationsRVAdaptor(private val data: ArrayList<DestinationRVItem>) :
             is DestinationRVButton -> 3
             is DestinationRVIndefiniteProgressBar -> 4
             is DestinationRVErrorMessage -> 5
-            is DestinationRVAttributes -> 6
+            is DestinationRVAttributions -> 6
             else -> 0
         }
     }
@@ -80,7 +80,7 @@ class DestinationsRVAdaptor(private val data: ArrayList<DestinationRVItem>) :
                 }
                 holder.itemView.setOnClickListener(data.onClick)
             }
-            is DestinationRVAttributes -> {
+            is DestinationRVAttributions -> {
                 holder.itemView.recycler_view_attribution_text_view.text = data.attributes
             }
         }
@@ -101,4 +101,4 @@ data class DestinationRVEntry(val name: CharSequence,
 data class DestinationRVButton(val text: CharSequence,
                                val icon: Int,
                                val onClick: View.OnClickListener): DestinationRVItem()
-data class DestinationRVAttributes(val attributes: CharSequence): DestinationRVItem()
+data class DestinationRVAttributions(val attributes: CharSequence): DestinationRVItem()

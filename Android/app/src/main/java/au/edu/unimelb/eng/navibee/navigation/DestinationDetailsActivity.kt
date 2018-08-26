@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.Html
 import android.view.View
 import android.view.WindowManager
 import au.edu.unimelb.eng.navibee.R
@@ -23,7 +24,6 @@ import com.google.android.gms.location.places.Places
 import kotlinx.android.synthetic.main.activity_destination_details.*
 import kotlinx.android.synthetic.main.alert_dialog_navigation_choose_transport_manners.view.*
 import org.jetbrains.anko.startActivity
-import timber.log.Timber
 
 /**
  * Show details of a destination from Google Maps
@@ -149,7 +149,7 @@ class DestinationDetailsActivity : AppCompatActivity() {
 
         val placeId: String = intent.getStringExtra(EXTRA_PLACE_ID) ?: return finish()
 
-        Timber.v("Place ID retrieved: $placeId")
+        val attributions: ArrayList<CharSequence> = ArrayList()
 
         geoDataClient = Places.getGeoDataClient(this)
 
@@ -157,6 +157,11 @@ class DestinationDetailsActivity : AppCompatActivity() {
             if (data.photoMetadata.count > 0) {
                 photoMetadata = data.photoMetadata
                 navigation_destinations_details_image_preview.pageCount = data.photoMetadata.count
+                for (i in photoMetadata!!) {
+                    if (!i.attributions.isNullOrBlank())
+                        attributions.add(i.attributions)
+                }
+                updateAttributionsRow(attributions)
             }
         }
 
@@ -211,11 +216,33 @@ class DestinationDetailsActivity : AppCompatActivity() {
                                 })
                             }
                     ))
+                if (!place.attributions.isNullOrBlank()) {
+                    attributions.add(place.attributions!!)
+                }
 
             } else {
                 listItems.clear()
             }
+            updateAttributionsRow(attributions)
             viewAdapter.notifyDataSetChanged()
+        }
+    }
+
+    private fun updateAttributionsRow(attributions: ArrayList<CharSequence>) {
+        val attrHTML = resources.getString(R.string.search_result_attributions) +
+                "<br>" +
+                attributions.joinToString(", ")
+        val formattedHtml = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Html.fromHtml(attrHTML, Html.FROM_HTML_MODE_COMPACT)
+        } else {
+            Html.fromHtml(attrHTML)
+        }
+        if (listItems[listItems.size - 1] is SimpleRVAttributions) {
+            listItems[listItems.size - 1] = SimpleRVAttributions(formattedHtml)
+            viewAdapter.notifyItemChanged(listItems.size - 1)
+        } else {
+            listItems.add(SimpleRVAttributions(formattedHtml))
+            viewAdapter.notifyItemInserted(listItems.size - 1)
         }
     }
 

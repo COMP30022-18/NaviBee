@@ -2,9 +2,13 @@ package au.edu.unimelb.eng.navibee.navigation
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.content.res.Configuration
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.app.AppCompatDelegate
 import au.edu.unimelb.eng.navibee.BuildConfig
 import au.edu.unimelb.eng.navibee.R
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -79,6 +83,10 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
         navigationView.initialize(this)
 
         navigation = MapboxNavigation(this, BuildConfig.MAPBOX_API_TOKEN)
+
+        if (isNightModeEnabled() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.statusBarColor = Color.parseColor("#324148")
+        }
 
         val locationEngine = LocationEngineProvider(this).obtainBestLocationEngineAvailable()
         navigation.locationEngine = locationEngine
@@ -214,6 +222,24 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
 
     override fun onMilestoneEvent(routeProgress: RouteProgress?, instruction: String?, milestone: Milestone?) {
 
+    }
+
+
+    private fun isNightModeEnabled(): Boolean {
+        if (isNightModeFollowSystem()) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO)
+        }
+        val uiMode = retrieveCurrentUiMode()
+        return uiMode == Configuration.UI_MODE_NIGHT_YES
+    }
+
+    private fun isNightModeFollowSystem(): Boolean {
+        val nightMode = AppCompatDelegate.getDefaultNightMode()
+        return nightMode == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+    }
+
+    private fun retrieveCurrentUiMode(): Int {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
     }
 
 }
