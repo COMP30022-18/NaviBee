@@ -61,13 +61,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".EventActivity" />
         </activity>
-        <activity android:name=".SelectFriendsActivity" />
+
+        <activity android:name=".EventSelectFriendsActivity" />
         <activity
             android:name=".SosActivity"
             android:label="@string/landing_sos"></activity>
         <activity
             android:name=".social.FriendActivity"
             android:label="@string/title_activity_friend" />
+
 
         <!-- Navigation -->
 
@@ -80,7 +82,9 @@
         <activity android:name=".navigation.DestinationsSearchResultActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data android:name="android.app.searchable"
+
                 android:resource="@xml/searchable" />
+
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -102,10 +106,9 @@
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="android:screenOrientation"/>
-        <activity
-            android:name=".ChatActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+
+        <activity android:name=".EventEditActivity"></activity>
+
         <activity
             android:name=".SosSettingActivity"
             android:label="@string/sos_setting">
