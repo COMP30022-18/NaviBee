@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+def CONFIG = { k -> "\"${project.properties.get(k)}\"" }
+
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -23,8 +25,8 @@ android {
         }
     }
     buildTypes.each {
-        it.buildConfigField 'String', 'MAPBOX_API_TOKEN', mapboxApiToken
-        it.buildConfigField 'String', 'GOOGLE_PLACES_API_KEY', googlePlacesApiKey
+        it.buildConfigField 'String', 'MAPBOX_API_TOKEN', CONFIG("mapboxApiToken")
+        it.buildConfigField 'String', 'GOOGLE_PLACES_API_KEY', CONFIG("googlePlacesApiKey")
         it.resValue 'string', 'GOOGLE_MAP_API_KEY', googlePlacesApiKey
     }
 }
@@ -42,6 +44,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:15.0.1'
     implementation 'com.google.android.gms:play-services-places:15.0.1'
     implementation 'com.google.maps:google-maps-services:0.2.10'
+    implementation 'com.google.maps.android:android-maps-utils:0.5'
     implementation 'org.slf4j:slf4j-nop:1.7.25'
     implementation 'com.android.support:design:28.0.0-rc01'
     implementation 'com.android.support:support-vector-drawable:28.0.0-rc01'
@@ -52,10 +55,12 @@ dependencies {
     implementation "org.jetbrains.anko:anko-commons:$anko_version"
     implementation 'com.android.support:recyclerview-v7:28.0.0-rc01'
     implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:3.4.1'
-    implementation 'com.mapbox.mapboxsdk:mapbox-android-navigation:0.17.0'
-    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.3.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-navigation:0.18.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.4.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-navigation-ui:0.18.0'
     implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
     implementation 'com.squareup.okhttp3:okhttp:3.11.0'
+    implementation 'com.synnapps:carouselview:0.1.5'
 }
 
 apply plugin: 'com.google.gms.google-services'

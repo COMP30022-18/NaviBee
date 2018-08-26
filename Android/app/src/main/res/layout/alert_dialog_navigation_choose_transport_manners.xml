@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/boundary_margin">
+
+
+    <FrameLayout
+        android:id="@+id/navigation.directions.transport_manners_dialog.walk_frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/navigation.directions.transport_manners_dialog.transit_frame"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/navigation.directions.transport_manners_dialog.walk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:scaleType="center"
+            android:layout_margin="8dp"
+            app:elevation="0dp"
+            app:srcCompat="@drawable/ic_directions_walk_white_60dp"/>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/navigation.directions.transport_manners_dialog.transit_frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/navigation.directions.transport_manners_dialog.drive_frame"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/navigation.directions.transport_manners_dialog.walk_frame"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/navigation.directions.transport_manners_dialog.transit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:scaleType="center"
+            android:layout_margin="8dp"
+            app:elevation="0dp"
+            app:srcCompat="@drawable/ic_directions_transit_white_60dp"/>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/navigation.directions.transport_manners_dialog.drive_frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/navigation.directions.transport_manners_dialog.transit_frame"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/navigation.directions.transport_manners_dialog.drive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:scaleType="center"
+            android:layout_margin="8dp"
+            app:elevation="0dp"
+            app:srcCompat="@drawable/ic_directions_car_white_60dp" />
+    </FrameLayout>
+
+</android.support.constraint.ConstraintLayout>
