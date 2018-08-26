@@ -216,7 +216,7 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
                                 } else {
                                     Html.fromHtml(attrHTML)
                                 }
-                                destinations.add(DestinationRVAttributes(formattedHtml))
+                                destinations.add(DestinationRVAttributions(formattedHtml))
                             }
                             runOnUiThread{initializeMap()}
                             runOnUiThread(viewAdapter::notifyDataSetChanged)

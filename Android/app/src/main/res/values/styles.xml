@@ -47,6 +47,7 @@
     <style name="AppTheme.List.SectionHeader">
         <item name="android:textAllCaps">true</item>
         <item name="android:textSize">20sp</item>
+        <item name="android:letterSpacing">0.1</item>
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textColor">@color/colorLightTextSecondary</item>
     </style>
