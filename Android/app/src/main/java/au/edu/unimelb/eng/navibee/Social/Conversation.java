@@ -1,19 +1,23 @@
 package au.edu.unimelb.eng.navibee.social;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.Date;
 
 import au.edu.unimelb.eng.navibee.NaviBeeApplication;
+import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 
 public class Conversation {
 
@@ -84,6 +88,18 @@ public class Conversation {
 
         db.collection("conversations")
                 .document(conversationId).collection("messages").add(message);
+    }
+
+    public void sendPicture(Bitmap bitmap) {
+        UploadTask uploadTask = FirebaseStorageHelper.uploadImage(bitmap,null, "message", 70);
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                sendMessage("image", taskSnapshot.getStorage().getPath());
+            }
+        });
+
+
     }
 
     public Message getMessage(int index) {

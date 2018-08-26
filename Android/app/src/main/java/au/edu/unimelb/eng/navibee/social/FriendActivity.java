@@ -4,14 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,10 +19,10 @@ import android.widget.TextView;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 
 import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
 
 public class FriendActivity extends AppCompatActivity {
 
@@ -69,8 +65,7 @@ public class FriendActivity extends AppCompatActivity {
             else{
                 FriendManager.ContactPerson tempPerson = contactList.get(position);
                 holder.text.setText(tempPerson.getName());
-                new DownloadImageTask(holder.image)
-                        .execute(tempPerson.getUrl());
+                NetworkImageHelper.loadImage(holder.image, tempPerson.getUrl());
                 holder.lastTime.setText(tempPerson.getLastMessageTime());
                 holder.unread.setText(Integer.toString(tempPerson.getUnreadMessage()));
                 if (tempPerson.getUnreadMessage() == 0){
@@ -97,30 +92,6 @@ public class FriendActivity extends AppCompatActivity {
             public TextView unread;
             public TextView lastTime;
             public TextView lastMessage;
-        }
-        private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-            ImageView bmImage;
-
-            public DownloadImageTask(ImageView bmImage) {
-                this.bmImage = bmImage;
-            }
-
-            protected Bitmap doInBackground(String... urls) {
-                String urldisplay = urls[0];
-                Bitmap mIcon11 = null;
-                try {
-                    InputStream in = new java.net.URL(urldisplay).openStream();
-                    mIcon11 = BitmapFactory.decodeStream(in);
-                } catch (Exception e) {
-                    Log.e("Error", e.getMessage());
-                    e.printStackTrace();
-                }
-                return mIcon11;
-            }
-
-            protected void onPostExecute(Bitmap result) {
-                bmImage.setImageBitmap(result);
-            }
         }
     }
 
