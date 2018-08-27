@@ -122,7 +122,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.btn_send_extra:
-                String[] items = {"Picture"};
+                String[] items = {"Picture", "Voice Call"};
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Send");
@@ -132,7 +132,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         if (which==0) {
                             PickImageDialog.build(new PickSetup().setSystemDialog(true)).show(ChatActivity.this);
                         } else if (which==1) {
-
+                            startActivity(new Intent(getApplicationContext(), VoiceCallActivity.class));
                         }
                     }
                 });

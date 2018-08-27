@@ -6,6 +6,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".NaviBeeApplication"
@@ -37,7 +41,6 @@
         <provider
             android:name=".navigation.DestinationsSearchSuggestionsContentProvider"
             android:authorities="au.edu.unimelb.eng.navibee.navigation.DestinationsSearchSuggestionsContentProvider" />
-
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.com.vansuita.pickimage.provider"
@@ -71,7 +74,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".EventActivity" />
         </activity>
-
         <activity android:name=".EventSelectFriendsActivity" />
         <activity
             android:name=".SosActivity"
@@ -79,7 +81,6 @@
         <activity
             android:name=".social.FriendActivity"
             android:label="@string/title_activity_friend" />
-
 
         <!-- Navigation -->
 
@@ -91,8 +92,7 @@
                 android:name="android.app.default_searchable"
                 android:value=".navigation.DestinationsSearchResultActivity" />
         </activity>
-        <activity
-            android:name=".navigation.DestinationsSearchResultActivity">
+        <activity android:name=".navigation.DestinationsSearchResultActivity">
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -115,9 +115,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="au.edu.unimelb.eng.navibee.navigation.DestinationsSearchResultActivity" />
         </activity>
-        <activity android:name=".navigation.NavigationActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
+        <activity
+            android:name=".navigation.NavigationActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".social.ChatActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -125,13 +125,12 @@
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
-            tools:replace="android:screenOrientation"/>
-
-        <activity android:name=".EventEditActivity"></activity>
-
+            tools:replace="android:screenOrientation" />
+        <activity android:name=".EventEditActivity" />
         <activity
             android:name=".SosSettingActivity"
             android:label="@string/sos_setting" />
+        <activity android:name=".social.VoiceCallActivity"></activity>
     </application>
 
 </manifest>
