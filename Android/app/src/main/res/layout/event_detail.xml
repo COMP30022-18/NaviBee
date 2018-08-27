@@ -30,15 +30,15 @@
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:orientation="vertical"
-        app:layout_constraintTop_toTopOf="@+id/guideline"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline">
 
         <TextView
             android:id="@+id/eventName"
@@ -71,18 +71,18 @@
             android:text="Location"
             android:textColor="@android:color/black"
             android:textSize="28sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/eventAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
             android:padding="8dp"
             android:text="Event Address Test"
             android:textColor="@android:color/black"
-            android:textSize="24sp"
-            android:clickable="true"
-            android:focusable="true"/>
+            android:textSize="24sp" />
 
         <View
             android:layout_width="match_parent"
@@ -96,7 +96,7 @@
             android:text="Participants"
             android:textColor="@android:color/black"
             android:textSize="28sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/eventParticipants"
