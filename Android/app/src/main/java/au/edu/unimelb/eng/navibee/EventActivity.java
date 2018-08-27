@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.EventLog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,29 +97,62 @@ public class EventActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         // load EventList
-        loadEventList();
+        loadPreLoadEventList();
 
     }
 
-//    private void laodPreLoadEventList() {
-//        db.collection("events").whereEqualTo("holder", userId).get()
-//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                        if (task.isSuccessful()) {
-//                            for (QueryDocumentSnapshot document : task.getResult()) {
-//                                EventItem eventItem = document.toObject(EventItem.class);
-//                                eventItem.setEventId(document.getId());
-//                                eventList.add(eventItem);
-//                            }
-//                        } else {
-//                            // fail to pull data
-//                        }
-//
-//                        loadForYouList();
-//                    }
-//                });
-//    }
+    private void loadPreLoadEventList() {
+        db.collection("events").get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                EventItem eventItem = document.toObject(EventItem.class);
+                                eventItem.setEventId(document.getId());
+                                preLoadEventList.add(eventItem);
+                            }
+                        } else {
+                            // fail to pull data
+                        }
+                        loadEventList();
+                        finalizeEventList();
+                    }
+                });
+    }
+
+    private void loadEventList() {
+        ArrayList<EventItem> holdingList = new ArrayList<>();
+        ArrayList<EventItem> joinedList = new ArrayList<>();
+        ArrayList<EventItem> recommendList = new ArrayList<>();
+
+        EventItem holdingTag = new EventItem("YOU ARE HOLDING", null, null, null, null);
+        holdingTag.setTag(true);
+        holdingList.add(holdingTag);
+        EventItem YouJoinedTag = new EventItem("YOU JOINED", null, null, null, null);
+        YouJoinedTag.setTag(true);
+        joinedList.add(YouJoinedTag);
+        EventItem recommendTag = new EventItem("RECOMMEND EVENT", null, null, null, null);
+        recommendTag.setTag(true);
+        recommendList.add(recommendTag);
+
+        for(EventItem i: preLoadEventList) {
+            if(i.getHolder().equals(userId)){
+                holdingList.add(i);
+            }
+            if((!i.getHolder().equals(userId)) && i.getUsers().keySet().contains(userId)){
+                joinedList.add(i);
+            }
+            if(!i.getUsers().keySet().contains(userId)){
+                recommendList.add(i);
+            }
+        }
+
+        eventList.addAll(holdingList);
+        eventList.addAll(joinedList);
+        eventList.addAll(recommendList);
+
+    }
 
     private void finalizeEventList(){
         // create Adapter and bind with eventList
@@ -136,98 +170,6 @@ public class EventActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-    }
-
-    private void loadEventList() {
-
-        EventItem ForYouTag = new EventItem("YOU ARE HOLDING", null, null, null, null);
-        ForYouTag.setTag(true);
-        eventList.add(ForYouTag);
-
-        db.collection("events").whereEqualTo("holder", userId).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                EventItem eventItem = document.toObject(EventItem.class);
-                                eventItem.setEventId(document.getId());
-                                eventList.add(eventItem);
-                            }
-                        } else {
-                           // fail to pull data
-                        }
-
-                        loadForYouList();
-                    }
-                });
-    }
-
-    private void loadForYouList() {
-
-        EventItem ForYouTag = new EventItem("FOR YOU", null, null, null, null);
-        ForYouTag.setTag(true);
-        eventList.add(ForYouTag);
-
-        db.collection("events").whereEqualTo("users." + userId, true).
-                whereLessThan("holder", userId).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                EventItem eventItem = document.toObject(EventItem.class);
-                                eventItem.setEventId(document.getId());
-                                eventList.add(eventItem);
-                            }
-                        } else {
-                            // fail to pull data
-                        }
-
-                        db.collection("events").whereEqualTo("users." + userId, true).
-                                whereGreaterThan("holder", userId).get()
-                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                        if (task.isSuccessful()) {
-                                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                                EventItem eventItem = document.toObject(EventItem.class);
-                                                eventItem.setEventId(document.getId());
-                                                eventList.add(eventItem);
-                                            }
-                                        } else {
-                                            // fail to pull data
-                                        }
-
-                                        loadRecommendList();
-                                    }
-                                });
-                    }
-                });
-    }
-
-    private void loadRecommendList() {
-        EventItem ForYouTag = new EventItem("RECOMMEND EVENT", null, null, null, null);
-        ForYouTag.setTag(true);
-        eventList.add(ForYouTag);
-
-        db.collection("events").get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                EventItem eventItem = document.toObject(EventItem.class);
-                                eventItem.setEventId(document.getId());
-                                eventList.add(eventItem);
-                            }
-                        } else {
-                            // fail to pull data
-                        }
-
-                        finalizeEventList();
-                    }
-                });
     }
 
     private class EventListAdapter extends BaseAdapter {

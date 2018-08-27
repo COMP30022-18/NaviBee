@@ -128,6 +128,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         for(String user: selectedUidList) {
             users.put(user, true);
         }
+        users.put(holder, true);
 
         EventActivity.EventItem newEvent = new EventActivity.EventItem(name, holder, location, eventDate, users);
 
