@@ -116,12 +116,13 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:background="@drawable/send_button_background"
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="onPopupMenuClick"
         android:text="@string/button_join"
         android:textColor="@color/white"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:clickable="true"
-        android:focusable="true" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

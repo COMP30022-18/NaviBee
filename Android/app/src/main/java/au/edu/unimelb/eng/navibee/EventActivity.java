@@ -48,6 +48,8 @@ public class EventActivity extends AppCompatActivity {
             this.time = time;
         }
 
+        public String getHolder() { return holder; }
+
         public String getName(){
             return name;
         }
@@ -83,6 +85,7 @@ public class EventActivity extends AppCompatActivity {
     private String userId;
 
     private List<EventItem> eventList = new ArrayList<>();
+    private List<EventItem> preLoadEventList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +99,26 @@ public class EventActivity extends AppCompatActivity {
         loadEventList();
 
     }
+
+//    private void laodPreLoadEventList() {
+//        db.collection("events").whereEqualTo("holder", userId).get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            for (QueryDocumentSnapshot document : task.getResult()) {
+//                                EventItem eventItem = document.toObject(EventItem.class);
+//                                eventItem.setEventId(document.getId());
+//                                eventList.add(eventItem);
+//                            }
+//                        } else {
+//                            // fail to pull data
+//                        }
+//
+//                        loadForYouList();
+//                    }
+//                });
+//    }
 
     private void finalizeEventList(){
         // create Adapter and bind with eventList
@@ -117,11 +140,11 @@ public class EventActivity extends AppCompatActivity {
 
     private void loadEventList() {
 
-        EventItem ForYouTag = new EventItem("FOR YOU", null, null, null, null);
+        EventItem ForYouTag = new EventItem("YOU ARE HOLDING", null, null, null, null);
         ForYouTag.setTag(true);
         eventList.add(ForYouTag);
 
-        db.collection("events").whereEqualTo("users." + userId, true).get()
+        db.collection("events").whereEqualTo("holder", userId).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -135,7 +158,50 @@ public class EventActivity extends AppCompatActivity {
                            // fail to pull data
                         }
 
-                        loadRecommendList();
+                        loadForYouList();
+                    }
+                });
+    }
+
+    private void loadForYouList() {
+
+        EventItem ForYouTag = new EventItem("FOR YOU", null, null, null, null);
+        ForYouTag.setTag(true);
+        eventList.add(ForYouTag);
+
+        db.collection("events").whereEqualTo("users." + userId, true).
+                whereLessThan("holder", userId).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                EventItem eventItem = document.toObject(EventItem.class);
+                                eventItem.setEventId(document.getId());
+                                eventList.add(eventItem);
+                            }
+                        } else {
+                            // fail to pull data
+                        }
+
+                        db.collection("events").whereEqualTo("users." + userId, true).
+                                whereGreaterThan("holder", userId).get()
+                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                                EventItem eventItem = document.toObject(EventItem.class);
+                                                eventItem.setEventId(document.getId());
+                                                eventList.add(eventItem);
+                                            }
+                                        } else {
+                                            // fail to pull data
+                                        }
+
+                                        loadRecommendList();
+                                    }
+                                });
                     }
                 });
     }
