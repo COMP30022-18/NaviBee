@@ -6,4 +6,50 @@
     android:layout_height="match_parent"
     tools:context=".social.VoiceCallActivity">
 
+    <TextView
+        android:id="@+id/voicecall_textView_time"
+        android:layout_width="118dp"
+        android:layout_height="19dp"
+        android:layout_marginStart="48dp"
+        android:text="TextView"
+        app:layout_constraintStart_toEndOf="@+id/voicecall_textView_status"
+        tools:layout_editor_absoluteY="65dp" />
+
+    <TextView
+        android:id="@+id/voicecall_textView_status"
+        android:layout_width="118dp"
+        android:layout_height="0dp"
+        android:text="TextView"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="65dp" />
+
+    <Button
+        android:id="@+id/voicecall_button_hangup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:onClick="onClick"
+        android:text="Hang Up"
+        app:layout_constraintStart_toEndOf="@+id/voicecall_textView_time"
+        tools:layout_editor_absoluteY="100dp" />
+
+    <Button
+        android:id="@+id/voicecall_button_accept"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:onClick="onClick"
+        android:text="Accept"
+        app:layout_constraintTop_toBottomOf="@+id/voicecall_button_hangup"
+        tools:layout_editor_absoluteX="61dp" />
+
+    <Button
+        android:id="@+id/voicecall_button_decline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:onClick="onClick"
+        android:text="Decline"
+        app:layout_constraintTop_toBottomOf="@+id/voicecall_button_accept"
+        tools:layout_editor_absoluteX="272dp" />
 </android.support.constraint.ConstraintLayout>
