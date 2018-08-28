@@ -122,7 +122,12 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
         String location = "Test Location";
 
-        eventDate = new Date(dateMap.get("year"), dateMap.get("month"), dateMap.get("day"), dateMap.get("hour"), dateMap.get("minute"));
+        if(dateMap.isEmpty()){
+            eventDate = new Date();
+        }
+        else{
+            eventDate = new Date(dateMap.get("year"), dateMap.get("month"), dateMap.get("day"), dateMap.get("hour"), dateMap.get("minute"));
+        }
 
         Map<String, Boolean> users = new HashMap<>();
         for(String user: selectedUidList) {

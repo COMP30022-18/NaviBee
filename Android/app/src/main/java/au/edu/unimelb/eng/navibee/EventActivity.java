@@ -166,7 +166,7 @@ public class EventActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int pos, long l) {
                 //using switch case, to check the condition.
                 String relationship;
-                if(eventList.get(pos).getHolder() == userId) {
+                if(eventList.get(pos).getHolder().equals(userId)) {
                     relationship = "holder";
                 }
                 else if(eventList.get(pos).getUsers().keySet().contains(userId)){
