@@ -28,31 +28,31 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     }
 
     protected Bitmap doInBackground(String... urls) {
-        String urldisplay = urls[0];
-        Bitmap bitmap = null;
-        String hashedUrl = hashUrl(urldisplay);
-        String[] fileNames = NaviBeeApplication.getInstance().fileList();
-
-        if (!Arrays.asList(fileNames).contains(hashedUrl)) {
-            System.out.println("not found");
-            try {
-                File file = new File(NaviBeeApplication.getInstance().getFilesDir(), hashedUrl);
-                InputStream input = new java.net.URL(urldisplay).openStream();
-                bitmap = BitmapFactory.decodeStream(input);
-                OutputStream outputStream = new FileOutputStream(file);
-                bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream);
-                outputStream.close();
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("loading");
-            try {
-                FileInputStream inputStream = NaviBeeApplication.getInstance().openFileInput(hashedUrl);
-                bitmap = BitmapFactory.decodeStream(inputStream);
-            } catch (FileNotFoundException e) { }
-        }
+//        String urldisplay = urls[0];
+//        Bitmap bitmap = null;
+//        String hashedUrl = hashUrl(urldisplay);
+//        String[] fileNames = NaviBeeApplication.getInstance().fileList();
+//
+//        if (!Arrays.asList(fileNames).contains(hashedUrl)) {
+//            System.out.println("not found");
+//            try {
+//                File file = new File(NaviBeeApplication.getInstance().getFilesDir(), hashedUrl);
+//                InputStream input = new java.net.URL(urldisplay).openStream();
+//                bitmap = BitmapFactory.decodeStream(input);
+//                OutputStream outputStream = new FileOutputStream(file);
+//                bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream);
+//                outputStream.close();
+//            } catch (Exception e) {
+//                Log.e("Error", e.getMessage());
+//                e.printStackTrace();
+//            }
+//        } else {
+//            System.out.println("loading");
+//            try {
+//                FileInputStream inputStream = NaviBeeApplication.getInstance().openFileInput(hashedUrl);
+//                bitmap = BitmapFactory.decodeStream(inputStream);
+//            } catch (FileNotFoundException e) { }
+//        }
 
 //        File file = new File(NaviBeeApplication.getInstance().getCacheDir(), hashedUrl);
 //        if (!file.exists()) {
@@ -96,27 +96,32 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 //            bitmap = BitmapFactory.decodeStream(inputStream);
 //        } catch (FileNotFoundException e) { }
 
-//        File file = new File(NaviBeeApplication.getInstance().getCacheDir(), hashedUrl);
-//        if (!file.exists()) {
-//            System.out.println("not found");
-//            try {
-//                file.createNewFile();
-//                InputStream inputStream = new java.net.URL(urldisplay).openStream();
+        String urldisplay = urls[0];
+        Bitmap bitmap = null;
+        String hashedUrl = hashUrl(urldisplay);
+        File file = new File(NaviBeeApplication.getInstance().getCacheDir(), hashedUrl);
+        if (!file.exists()) {
+            System.out.println("not found");
+            try {
+                file.createTempFile(hashedUrl, null, NaviBeeApplication.getInstance().getCacheDir());
+                InputStream inputStream = new java.net.URL(urldisplay).openStream();
+                bitmap = BitmapFactory.decodeStream(inputStream);
 //                byte[] buffer = new byte[2000000];
 //                inputStream.read(buffer);
-//                OutputStream outputStream = new FileOutputStream(file);
+                OutputStream outputStream = new FileOutputStream(file);
 //                outputStream.write(buffer);
-//                outputStream.close();
-//            } catch (Exception e) {
-//                Log.e("Error", e.getMessage());
-//                e.printStackTrace();
-//            }
-//        }
-//        try {
-//            System.out.println("loading from file");
-//            FileInputStream fileInputStream = NaviBeeApplication.getInstance().openFileInput(hashedUrl);
-//            bitmap = BitmapFactory.decodeStream(fileInputStream);
-//        } catch (FileNotFoundException e) {}
+                bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream);
+                outputStream.close();
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        try {
+            System.out.println("loading from file");
+            FileInputStream fileInputStream = NaviBeeApplication.getInstance().openFileInput(hashedUrl);
+            bitmap = BitmapFactory.decodeStream(fileInputStream);
+        } catch (FileNotFoundException e) {}
         return bitmap;
     }
 
@@ -125,19 +130,16 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     }
     private static String hashUrl(String url){
         String sha256 = "";
-        try
-        {
+        try {
             MessageDigest crypt = MessageDigest.getInstance("SHA-256");
             crypt.reset();
             crypt.update(url.getBytes("UTF-8"));
             sha256 = byteToHex(crypt.digest());
         }
-        catch(NoSuchAlgorithmException e)
-        {
+        catch(NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        catch(UnsupportedEncodingException e)
-        {
+        catch(UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return sha256;
@@ -145,8 +147,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
     private static String byteToHex(final byte[] hash){
         Formatter formatter = new Formatter();
-        for (byte b : hash)
-        {
+        for (byte b : hash) {
             formatter.format("%02x", b);
         }
         String result = formatter.toString();
