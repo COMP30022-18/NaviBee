@@ -12,9 +12,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
@@ -37,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        firestoreTimestamp();
+
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
 
@@ -55,6 +59,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FriendManager.init();
         ConversationManager.init();
         setFCMToken();
+    }
+
+    // The behavior for java.util.Date objects stored in Firestore is going to chang
+    private void firestoreTimestamp() {
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setTimestampsInSnapshotsEnabled(true)
+                .build();
+        FirebaseFirestore.getInstance().setFirestoreSettings(settings);
+
     }
 
     @Override
@@ -117,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         Map<String, Object> docData = new HashMap<>();
                         docData.put("uid", uid);
-                        docData.put("lastSeen", new Date());
+                        docData.put("lastSeen", new Timestamp(new Date()));
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
                         db.collection("fcmTokens").document(token).set(docData);
 
