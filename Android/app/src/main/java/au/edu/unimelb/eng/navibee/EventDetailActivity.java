@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.PopupMenu;
@@ -31,9 +32,6 @@ public class EventDetailActivity extends AppCompatActivity {
     private String eid;
     private Map<String, Boolean> users;
 
-    private PopupMenu popupMenu;
-    private Menu menu;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,23 +41,34 @@ public class EventDetailActivity extends AppCompatActivity {
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         eid = getIntent().getStringExtra("eventId");
 
-        popupMenu = new PopupMenu(this, findViewById(R.id.joinButton));
-        menu = popupMenu.getMenu();
-
-        menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Join the event");
-        menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Quit the event");
-
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.menu_event_detial, menu);
-
 //        getEventInfo();
 //
 //        joinEvent();
 
     }
 
-    public void onPopupMenuClick (View v) {
-        popupMenu.show();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Join the event");
+        menu.add(Menu.NONE, Menu.FIRST + 1, 1, "Quit the event");
+        getMenuInflater().inflate(R.menu.menu_event_detial, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()){
+            case Menu.FIRST + 0:
+                Toast.makeText(this, "Join is clicked", Toast.LENGTH_SHORT).show();
+                break;
+            case Menu.FIRST + 1:
+                Toast.makeText(this, "Quit is clicked", Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 
 
