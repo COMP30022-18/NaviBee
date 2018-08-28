@@ -3,6 +3,7 @@ package au.edu.unimelb.eng.navibee.social;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
@@ -56,10 +57,10 @@ public class ConversationManager {
                             switch (dc.getType()) {
                                 case ADDED:
                                     // read message timestamp
-                                    Date timestamp =  ((Map<String, Date>) dc.getDocument().getData().get("readTimestamps")).get(uid);
+                                    Timestamp timestamp =  ((Map<String, Timestamp>) dc.getDocument().getData().get("readTimestamps")).get(uid);
 
                                     // load new conversation
-                                    au.edu.unimelb.eng.navibee.social.Conversation conv = new Conversation(dc.getDocument().getId(), uid, timestamp);
+                                    au.edu.unimelb.eng.navibee.social.Conversation conv = new Conversation(dc.getDocument().getId(), uid, timestamp.toDate());
                                     String otherUid = "";
 
                                     Map<String, Boolean> users = (Map<String, Boolean>)(dc.getDocument().getData()).get("users");
@@ -96,7 +97,7 @@ public class ConversationManager {
             Conversation conv = getConversationByUID(cp.getUid());
             if (conv!=null && conv.getMessageCount()>0) {
                 cp.setLastMessage(conv.getMessage(conv.getMessageCount()-1).getData());
-                cp.setLastMessageTime(conv.getMessage(conv.getMessageCount()-1).getTime());
+                cp.setLastMessageTime(conv.getMessage(conv.getMessageCount()-1).getTime_());
                 cp.setUnreadMessage(conv.getUnreadMsgCount());
             } else {
                 cp.setUnreadMessage(0);

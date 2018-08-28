@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -60,7 +61,7 @@ public class Conversation {
                                     // new message
                                     Message msg = dc.getDocument().toObject(Message.class);
                                     messages.add(msg);
-                                    if (msg.getTime().after(readTimestamp)) {
+                                    if (msg.getTime_().after(readTimestamp)) {
                                        unreadMsgCount += 1;
                                     }
 
@@ -121,7 +122,7 @@ public class Conversation {
     public void markAllAsRead() {
         unreadMsgCount = 0;
         if (messages.size()>0) {
-            readTimestamp = messages.get(messages.size()-1).getTime();
+            readTimestamp = messages.get(messages.size()-1).getTime_();
 
             // update timestamp on server
             db.collection("conversations").document(conversationId).update("readTimestamps." + uid, readTimestamp);
@@ -134,7 +135,7 @@ public class Conversation {
 
     public static class Message{
         private String data, type, sender;
-        private Date time;
+        private Timestamp time;
 
         public Message() {
         }
@@ -142,13 +143,22 @@ public class Conversation {
         public Message(String data, String sender, Date time, String type) {
             this.data = data;
             this.sender = sender;
+            this.time = new Timestamp(time);
+            this.type = type;
+        }
+
+        public Message(String data, String sender, Timestamp time, String type) {
+            this.data = data;
+            this.sender = sender;
             this.time = time;
             this.type = type;
         }
 
-        public Date getTime() {
+        public Timestamp getTime() {
             return time;
         }
+
+        public Date getTime_() { return time.toDate();}
 
         public String getData() {
             return data;
