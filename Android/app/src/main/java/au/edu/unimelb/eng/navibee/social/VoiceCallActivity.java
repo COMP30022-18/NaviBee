@@ -1,5 +1,9 @@
 package au.edu.unimelb.eng.navibee.social;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +17,8 @@ import au.edu.unimelb.eng.navibee.R;
 public class VoiceCallActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "VOICECALL";
+    private static final int MY_PERMISSIONS_RECORD_AUDIO = 1;
+
     private RtcEngine mRtcEngine;
 
     private final IRtcEngineEventHandler mRtcEventHandler = new IRtcEngineEventHandler() {
@@ -33,9 +39,16 @@ public class VoiceCallActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voice_call);
 
+        checkPermission();
         initializeAgoraEngine();
 
-        mRtcEngine.joinChannel(null, "testChannel", "", 0);
+//        mRtcEngine.joinChannel(null, "testChannel", "", 0);
+    }
+
+    private void checkPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, MY_PERMISSIONS_RECORD_AUDIO);
+        }
     }
 
     private void initializeAgoraEngine() {
