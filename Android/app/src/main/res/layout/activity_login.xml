@@ -40,7 +40,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_chainStyle="packed"
                 android:contentDescription="@string/app_name"
-                app:srcCompat="@drawable/navibee_placeholder" />
+                app:srcCompat="@drawable/ic_navibee_color" />
 
             <TextView
                 android:id="@+id/textView3"

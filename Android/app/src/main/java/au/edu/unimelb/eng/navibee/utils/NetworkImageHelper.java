@@ -22,7 +22,7 @@ public class NetworkImageHelper {
 
     public static void loadImage(ImageView imageView, String url) {
         // ni- is for network image
-        String filename = "ni-"+ NetworkImageHelper.hashUrl(url);
+        String filename = "ni-"+ NetworkImageHelper.sha256(url);
         File file = new File(NaviBeeApplication.getInstance().getCacheDir(), filename);
 
         if (file.exists()) {
@@ -33,18 +33,31 @@ public class NetworkImageHelper {
             new DownloadFileFromURLAsync(url, file, imageView).execute();
 
         }
-
     }
 
-    protected static String hashUrl(String url) {
+    public static void loadImage(ImageView imageView, String url, String key) {
+        // ni- is for network image
+        String filename = "ni-" + NetworkImageHelper.sha256(key);
+        File file = new File(NaviBeeApplication.getInstance().getCacheDir(), filename);
+
+        if (file.exists()) {
+            // cache exists
+            loadImageFromCacheFile(imageView, file);
+        } else {
+            // cache not exists
+            new DownloadFileFromURLAsync(url, file, imageView).execute();
+
+        }
+    }
+
+    protected static String sha256(String url) {
         String sha256 = "";
         try {
             MessageDigest crypt = MessageDigest.getInstance("SHA-256");
             crypt.reset();
             crypt.update(url.getBytes("UTF-8"));
             sha256 = byteToHex(crypt.digest());
-        }
-        catch(Exception e) {
+        } catch(Exception e) {
             e.printStackTrace();
         }
         return sha256;
