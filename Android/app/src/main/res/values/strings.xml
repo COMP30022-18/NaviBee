@@ -255,4 +255,5 @@
     <string name="place_details_ratings">Ratings</string>
     <string name="place_details_website">Website</string>
     <string name="alert_dialog_title_select_method_of_travel">Select a method of travel…</string>
+    <string name="title_activity_event_details">EventDetailsActivity</string>
 </resources>
