@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -35,18 +36,26 @@ public class EventActivity extends AppCompatActivity {
         private String eventId;
         private String name;
         private String location;
-        private Date time;
+        private Timestamp time;
         private Map<String, Boolean> users;
         private Boolean isTag = false;
 
         public EventItem(){}
+
+        public EventItem(String name, String holder, String location, Timestamp time, Map<String, Boolean> users){
+            this.holder = holder;
+            this.name = name;
+            this.location = location;
+            this.users = users;
+            this.time = time;
+        }
 
         public EventItem(String name, String holder, String location, Date time, Map<String, Boolean> users){
             this.holder = holder;
             this.name = name;
             this.location = location;
             this.users = users;
-            this.time = time;
+            this.time = new Timestamp(time);
         }
 
         public String getHolder() { return holder; }
@@ -79,7 +88,9 @@ public class EventActivity extends AppCompatActivity {
             this.eventId = eventId;
         }
 
-        public Date getTime() { return time; }
+        public Timestamp getTime() { return time; }
+
+        public Date getTime_() { return time.toDate(); }
     }
 
     private FirebaseFirestore db;
@@ -126,13 +137,13 @@ public class EventActivity extends AppCompatActivity {
         ArrayList<EventItem> joinedList = new ArrayList<>();
         ArrayList<EventItem> recommendList = new ArrayList<>();
 
-        EventItem holdingTag = new EventItem("YOU ARE HOLDING", null, null, null, null);
+        EventItem holdingTag = new EventItem("YOU ARE HOLDING", null, null, new Date(), null);
         holdingTag.setTag(true);
         holdingList.add(holdingTag);
-        EventItem YouJoinedTag = new EventItem("YOU JOINED", null, null, null, null);
+        EventItem YouJoinedTag = new EventItem("YOU JOINED", null, null, new Date(), null);
         YouJoinedTag.setTag(true);
         joinedList.add(YouJoinedTag);
-        EventItem recommendTag = new EventItem("RECOMMEND EVENT", null, null, null, null);
+        EventItem recommendTag = new EventItem("RECOMMEND EVENT", null, null, new Date(), null);
         recommendTag.setTag(true);
         recommendList.add(recommendTag);
 
@@ -213,7 +224,7 @@ public class EventActivity extends AppCompatActivity {
                 name.setText((String) eventList.get(position).getName());
 
                 TextView summary = (TextView) view.findViewById(R.id.event_summary);
-                String summaryText = new SimpleDateFormat("EEE, MMM d, HH:mm").format(eventList.get(position).getTime());
+                String summaryText = new SimpleDateFormat("EEE, MMM d, HH:mm").format(eventList.get(position).getTime_());
                 summary.setText((String) summaryText);
 
                 ImageView image = (ImageView) view.findViewById(R.id.event_image);
