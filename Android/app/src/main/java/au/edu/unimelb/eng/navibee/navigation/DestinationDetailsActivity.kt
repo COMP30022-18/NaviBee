@@ -79,6 +79,29 @@ class DestinationDetailsActivity : AppCompatActivity() {
         setSupportActionBar(navigation_destinations_details_toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(true)
+
+        // set padding for status bar
+        navigation_destinations_details_toolbar_padding.apply {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+                setOnApplyWindowInsetsListener { view, insets ->
+                    view.apply {
+                        val lp = layoutParams
+                        lp.height = insets.systemWindowInsetTop
+                        layoutParams = lp
+                    }
+                    insets
+                }
+            } else {
+                val lp = layoutParams
+                lp.height = getStatusBarHeight(this)
+                layoutParams = lp
+
+            }
+        }
+
+
+
         // Remove redundant shadow in transparent app bar
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             navigation_destinations_details_appbar.outlineProvider = null
