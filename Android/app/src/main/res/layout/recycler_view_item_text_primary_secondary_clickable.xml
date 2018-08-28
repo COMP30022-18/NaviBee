@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    style="@style/AppTheme.List.Row"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="?android:attr/selectableItemBackground"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tool="http://schemas.android.com/tools">
+    <TextView
+        android:id="@+id/general.recycler_view.text.primary_secondary.clickable.primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.List.ItemTitle"
+        tool:text="Primary text"/>
+    <TextView
+        android:id="@+id/general.recycler_view.text.primary_secondary.clickable.secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.List.ItemSubtitle"
+        tool:text="A long secondary text." />
+</LinearLayout>

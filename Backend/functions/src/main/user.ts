@@ -1,5 +1,5 @@
 import * as functions from 'firebase-functions'
-import { db } from './../helper/db';
+import { db } from './../helper/admin';
 
 export const initNewUser = functions.auth.user().onCreate((user) => {
     // write init data for a new user

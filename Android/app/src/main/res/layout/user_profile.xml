@@ -9,7 +9,7 @@
 <ImageView
     android:layout_width="60dp"
     android:layout_height="60dp"
-    app:srcCompat="@drawable/ic_navibee_color"
+    app:srcCompat="@drawable/navibee_placeholder"
     android:id="@+id/img_avatar"
     android:layout_margin="10dp"/>
 

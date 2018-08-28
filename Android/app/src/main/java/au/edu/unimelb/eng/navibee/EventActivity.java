@@ -165,8 +165,19 @@ public class EventActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int pos, long l) {
                 //using switch case, to check the condition.
+                String relationship;
+                if(eventList.get(pos).getHolder() == userId) {
+                    relationship = "holder";
+                }
+                else if(eventList.get(pos).getUsers().keySet().contains(userId)){
+                    relationship = "participant";
+                }
+                else {
+                    relationship = "passerby";
+                }
                 Intent intent = new Intent(EventActivity.this, EventDetailActivity.class);
                 intent.putExtra("eventId", eventList.get(pos).getEventId());
+                intent.putExtra("relationship", relationship);
                 startActivity(intent);
             }
         });

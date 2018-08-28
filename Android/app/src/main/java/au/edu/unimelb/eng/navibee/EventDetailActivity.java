@@ -1,5 +1,6 @@
 package au.edu.unimelb.eng.navibee;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ public class EventDetailActivity extends AppCompatActivity {
     private String uid;
     private String eid;
     private Map<String, Boolean> users;
+    private String relationship;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,7 @@ public class EventDetailActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         eid = getIntent().getStringExtra("eventId");
+        relationship = getIntent().getStringExtra("relationship");
 
 //        getEventInfo();
 //
@@ -49,24 +52,55 @@ public class EventDetailActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Join the event");
-        menu.add(Menu.NONE, Menu.FIRST + 1, 1, "Quit the event");
+        if(relationship.equals("holder")) {
+            menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Edit the Event");
+            menu.add(Menu.NONE, Menu.FIRST + 1, 1, "Delete the Event");
+        }
+        else if(relationship.equals("participant")) {
+            menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Quit the Event");
+        }
+        else {
+            menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Join the Event");
+            menu.add(Menu.NONE, Menu.FIRST + 1, 1, "Follow the Event");
+        }
         getMenuInflater().inflate(R.menu.menu_event_detial, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()){
-            case Menu.FIRST + 0:
-                Toast.makeText(this, "Join is clicked", Toast.LENGTH_SHORT).show();
-                break;
-            case Menu.FIRST + 1:
-                Toast.makeText(this, "Quit is clicked", Toast.LENGTH_SHORT).show();
-                break;
-            default:
-                break;
+        if(relationship.equals("holder")) {
+            switch (item.getItemId()) {
+                case Menu.FIRST + 0:
+                    Toast.makeText(this, "Edit is clicked", Toast.LENGTH_SHORT).show();
+                    break;
+                case Menu.FIRST + 1:
+                    Toast.makeText(this, "Delete is clicked", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if(relationship.equals("participant")) {
+            switch (item.getItemId()) {
+                case Menu.FIRST + 0:
+                    Toast.makeText(this, "Quit is clicked", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    break;
+            }
+        }
+        else {
+            switch (item.getItemId()) {
+                case Menu.FIRST + 0:
+                    Toast.makeText(this, "Join is clicked", Toast.LENGTH_SHORT).show();
+                    break;
+                case Menu.FIRST + 1:
+                    Toast.makeText(this, "Follow is clicked", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    break;
+            }
         }
         return true;
     }
