@@ -1,31 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".EventDetailActivity">
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.5" />
-
-    <ImageView
-        android:id="@+id/eventPhoto"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/ic_launcher_round" />
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".EventDetailActivity"
+    tools:showIn="@layout/activity_event_detail">
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -107,22 +89,30 @@
             android:textColor="@android:color/black"
             android:textSize="24sp" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/colorPrimary" />
+
+        <TextView
+            android:id="@+id/eventParticipant"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Participants"
+            android:textColor="@android:color/black"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/eventParticipants"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Participant Test. Participant Test. Participant Test. Participant Test. "
+            android:textColor="@android:color/black"
+            android:textSize="24sp" />
+
+
     </LinearLayout>
 
-    <Button
-        android:id="@+id/joinButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/send_button_background"
-        android:clickable="true"
-        android:focusable="true"
-        android:onClick="onPopupMenuClick"
-        android:text="@string/button_join"
-        android:textColor="@color/white"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-</android.support.constraint.ConstraintLayout>
+</android.support.v4.widget.NestedScrollView>
