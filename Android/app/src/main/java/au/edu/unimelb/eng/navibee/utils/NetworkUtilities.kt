@@ -3,7 +3,6 @@ package au.edu.unimelb.eng.navibee.utils
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.AsyncTask
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import au.edu.unimelb.eng.navibee.NaviBeeApplication
@@ -17,10 +16,18 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
 
-
+/**
+ * Download image, and show it in an image view
+ *
+ * Constructor: Image view object to fill
+ */
 class DownloadImageToImageViewAsyncTask(imageView: ImageView) : AsyncTask<String, Void, Bitmap>() {
     private val bmImage: WeakReference<ImageView> = WeakReference(imageView)
 
+    /**
+     * args[0]: URL to the image
+     * args[1]: Optional, the string used for hash.
+     */
     override fun doInBackground(vararg args: String): Bitmap? {
         val url = args[0]
         var bitmap: Bitmap? = null
@@ -35,7 +42,7 @@ class DownloadImageToImageViewAsyncTask(imageView: ImageView) : AsyncTask<String
                 bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream)
                 outputStream.close()
             } catch (e: Exception) {
-                Log.e("Error", e.message)
+                Timber.e(e, "Error occurred ")
                 e.printStackTrace()
             }
 
@@ -57,7 +64,7 @@ class DownloadImageToImageViewAsyncTask(imageView: ImageView) : AsyncTask<String
     }
 
     private fun hashUrl(url: String): String {
-        var sha256 = ""
+        var sha256 = url
         try {
             val crypt = MessageDigest.getInstance("SHA-256")
             crypt.reset()
