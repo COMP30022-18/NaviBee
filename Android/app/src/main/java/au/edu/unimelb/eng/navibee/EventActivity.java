@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.EventLog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -28,26 +31,32 @@ public class EventActivity extends AppCompatActivity {
 
     public static class EventItem {
 
+        private String holder;
         private String eventId;
         private String name;
-        private String summary;
+        private String location;
+        private Date time;
         private Map<String, Boolean> users;
         private Boolean isTag = false;
 
         public EventItem(){}
 
-        public EventItem(String name, String summary, Map<String, Boolean> users){
+        public EventItem(String name, String holder, String location, Date time, Map<String, Boolean> users){
+            this.holder = holder;
             this.name = name;
-            this.summary = summary;
+            this.location = location;
             this.users = users;
+            this.time = time;
         }
+
+        public String getHolder() { return holder; }
 
         public String getName(){
             return name;
         }
 
-        public String getSummary(){
-            return summary;
+        public String getLocation(){
+            return location;
         }
 
         public Map<String, Boolean> getUsers(){
@@ -69,12 +78,15 @@ public class EventActivity extends AppCompatActivity {
         public void setEventId(String eventId){
             this.eventId = eventId;
         }
+
+        public Date getTime() { return time; }
     }
 
     private FirebaseFirestore db;
     private String userId;
 
     private List<EventItem> eventList = new ArrayList<>();
+    private List<EventItem> preLoadEventList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +97,60 @@ public class EventActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         // load EventList
-        loadEventList();
+        loadPreLoadEventList();
+
+    }
+
+    private void loadPreLoadEventList() {
+        db.collection("events").get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                EventItem eventItem = document.toObject(EventItem.class);
+                                eventItem.setEventId(document.getId());
+                                preLoadEventList.add(eventItem);
+                            }
+                        } else {
+                            // fail to pull data
+                        }
+                        loadEventList();
+                        finalizeEventList();
+                    }
+                });
+    }
+
+    private void loadEventList() {
+        ArrayList<EventItem> holdingList = new ArrayList<>();
+        ArrayList<EventItem> joinedList = new ArrayList<>();
+        ArrayList<EventItem> recommendList = new ArrayList<>();
+
+        EventItem holdingTag = new EventItem("YOU ARE HOLDING", null, null, null, null);
+        holdingTag.setTag(true);
+        holdingList.add(holdingTag);
+        EventItem YouJoinedTag = new EventItem("YOU JOINED", null, null, null, null);
+        YouJoinedTag.setTag(true);
+        joinedList.add(YouJoinedTag);
+        EventItem recommendTag = new EventItem("RECOMMEND EVENT", null, null, null, null);
+        recommendTag.setTag(true);
+        recommendList.add(recommendTag);
+
+        for(EventItem i: preLoadEventList) {
+            if(i.getHolder().equals(userId)){
+                holdingList.add(i);
+            }
+            if((!i.getHolder().equals(userId)) && i.getUsers().keySet().contains(userId)){
+                joinedList.add(i);
+            }
+            if(!i.getUsers().keySet().contains(userId)){
+                recommendList.add(i);
+            }
+        }
+
+        eventList.addAll(holdingList);
+        eventList.addAll(joinedList);
+        eventList.addAll(recommendList);
 
     }
 
@@ -105,55 +170,6 @@ public class EventActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-    }
-
-    private void loadEventList() {
-
-        EventItem ForYouTag = new EventItem("FOR YOU", null, null);
-        ForYouTag.setTag(true);
-        eventList.add(ForYouTag);
-
-        db.collection("events").whereEqualTo("users." + userId, true).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                EventItem eventItem = document.toObject(EventItem.class);
-                                eventItem.setEventId(document.getId());
-                                eventList.add(eventItem);
-                            }
-                        } else {
-                           // fail to pull data
-                        }
-
-                        loadRecommendList();
-                    }
-                });
-    }
-
-    private void loadRecommendList() {
-        EventItem ForYouTag = new EventItem("RECOMMEND EVENT", null, null);
-        ForYouTag.setTag(true);
-        eventList.add(ForYouTag);
-
-        db.collection("events").get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                EventItem eventItem = document.toObject(EventItem.class);
-                                eventItem.setEventId(document.getId());
-                                eventList.add(eventItem);
-                            }
-                        } else {
-                            // fail to pull data
-                        }
-
-                        finalizeEventList();
-                    }
-                });
     }
 
     private class EventListAdapter extends BaseAdapter {
@@ -197,7 +213,8 @@ public class EventActivity extends AppCompatActivity {
                 name.setText((String) eventList.get(position).getName());
 
                 TextView summary = (TextView) view.findViewById(R.id.event_summary);
-                summary.setText((String) eventList.get(position).getSummary());
+                String summaryText = new SimpleDateFormat("EEE, MMM d, HH:mm").format(eventList.get(position).getTime());
+                summary.setText((String) summaryText);
 
                 ImageView image = (ImageView) view.findViewById(R.id.event_image);
                 image.setImageResource(R.mipmap.ic_launcher);
@@ -208,7 +225,7 @@ public class EventActivity extends AppCompatActivity {
 
     }
 
-    public void selectFriends(View view){
+    public void selectFriends(View view) {
         startActivity(new Intent(this, EventSelectFriendsActivity.class));
     }
 

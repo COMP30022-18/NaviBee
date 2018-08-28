@@ -80,7 +80,6 @@
             android:name=".social.FriendActivity"
             android:label="@string/title_activity_friend" />
 
-
         <!-- Navigation -->
 
         <activity

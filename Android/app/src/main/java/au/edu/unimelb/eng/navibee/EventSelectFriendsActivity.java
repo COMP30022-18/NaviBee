@@ -76,6 +76,7 @@ public class EventSelectFriendsActivity extends AppCompatActivity {
         // start next step
         Intent intent = new Intent(this, EventEditActivity.class);
         intent.putStringArrayListExtra("selectedUid", selectedUidList);
+        intent.putStringArrayListExtra("selectedName", friendNameList);
         startActivity(intent);
     }
 }
