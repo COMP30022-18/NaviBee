@@ -69,14 +69,12 @@ class DestinationsRVAdaptor(private val data: ArrayList<DestinationRVItem>) :
                         DownloadImageToImageViewAsyncTask(holder.itemView.recycler_view_destinations_list_entry_preview).execute(data.thumbnail)
                     data.googlePhotoReference != null -> {
                         val viewHeight = Resources.getSystem().displayMetrics.heightPixels
-                        LoadImageFromGoogleMapsByPhotoReferenceToImageView(
+                        GoogleMapsPhotoReferenceCacheImageLoader(
                                 data.googlePhotoReference,
                                 holder.itemView.recycler_view_destinations_list_entry_preview,
                                 viewHeight
                         ).execute()
                     }
-                    data.wikiData != null ->
-                        DownloadImageFromWikiDataToImageViewAsyncTask(holder.itemView.recycler_view_destinations_list_entry_preview).execute(data.wikiData)
                 }
                 holder.itemView.setOnClickListener(data.onClick)
             }
