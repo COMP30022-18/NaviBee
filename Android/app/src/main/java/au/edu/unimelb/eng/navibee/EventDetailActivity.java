@@ -130,7 +130,7 @@ public class EventDetailActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             // Task completed successfully
-                            startActivity(new Intent(EventDetailActivity.this, EventActivity.class));
+                            finish();
                         } else {
                             // Task failed with an exception
                         }
@@ -155,7 +155,7 @@ public class EventDetailActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             // Task completed successfully
-                            startActivity(new Intent(EventDetailActivity.this, EventActivity.class));
+                            finish();
                         } else {
                             // Task failed with an exception
                         }
@@ -182,7 +182,7 @@ public class EventDetailActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             // Task completed successfully
-                            startActivity(new Intent(EventDetailActivity.this, EventActivity.class));
+                            finish();
                         } else {
                             // Task failed with an exception
                         }

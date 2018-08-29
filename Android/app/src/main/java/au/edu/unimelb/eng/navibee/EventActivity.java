@@ -237,7 +237,7 @@ public class EventActivity extends AppCompatActivity {
     }
 
     public void selectFriends(View view) {
-        startActivity(new Intent(this, EventSelectFriendsActivity.class));
+        startActivity(new Intent(this, EventEditActivity.class));
     }
 
 }
