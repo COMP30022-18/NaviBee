@@ -14,3 +14,16 @@ export const initNewUser = functions.auth.user().onCreate((user) => {
     userRef.set(data);
     return 0;
 });
+
+
+export const getNamesFromUidList = functions.https.onCall(
+    async (data, context) => {
+        const result = {};
+
+        for (let uid of data.uidList) {
+            let userDoc = (await db.collection('users').doc(uid).get()).data();
+            result[uid] = userDoc.name;
+        }
+
+        return result;
+    });
