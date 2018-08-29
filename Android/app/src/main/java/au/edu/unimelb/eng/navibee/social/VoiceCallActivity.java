@@ -16,8 +16,6 @@ import android.widget.TextView;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import io.agora.rtc.Constants;
-import io.agora.rtc.IRtcEngineEventHandler;
 import io.agora.rtc.RtcEngine;
 
 import au.edu.unimelb.eng.navibee.R;
@@ -34,6 +32,8 @@ public class VoiceCallActivity extends AppCompatActivity {
     private static final int ANSWER_TIMEOUT = 20 * 1000;
     private static final int WAITING_TIMEOUT = 40 * 1000;
 
+    private static boolean working = false;
+
     private RtcEngine mRtcEngine = null;
 
     private String channelID = "testChannel";
@@ -49,6 +49,8 @@ public class VoiceCallActivity extends AppCompatActivity {
     private Button buttonHangup;
     private Button buttonAccept;
     private Button buttonDecline;
+
+    private boolean callStarted = false;
 
 
     private long timeCount;
@@ -75,7 +77,7 @@ public class VoiceCallActivity extends AppCompatActivity {
         }
     };
 
-    private final IRtcEngineEventHandler mRtcEventHandler = new IRtcEngineEventHandler() {
+    private final VoiceCallEngine.EventHandler mEventHandler = new VoiceCallEngine.EventHandler() {
         @Override
         public void onUserOffline(final int uid, final int reason) {
             runOnUiThread(new Runnable() {
@@ -91,16 +93,24 @@ public class VoiceCallActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    // call started
-                    timeoutTimer.cancel();
-                    timeoutTimer.purge();
-                    timeCount = 0;
-                    textViewStatus.setText("");
-                    thread.start();
+                    if (!callStarted) {
+                        // call started
+                        callStarted = true;
+                        timeoutTimer.cancel();
+                        timeoutTimer.purge();
+                        timeCount = 0;
+                        textViewStatus.setText("");
+                        thread.start();
+                    }
+
                 }
             });
         }
     };
+
+    public static boolean isWorking() {
+        return working;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +118,8 @@ public class VoiceCallActivity extends AppCompatActivity {
         setContentView(R.layout.activity_voice_call);
 
         checkPermission();
+
+        working = true;
 
         isInitiator = getIntent().getBooleanExtra("INITIATOR", false);
         conv = ConversationManager.getInstance().getConversationById(getIntent().getStringExtra("CONV_ID"));
@@ -166,7 +178,6 @@ public class VoiceCallActivity extends AppCompatActivity {
     }
 
     private void connect() {
-        initializeAgoraEngine();
         if (isInitiator) {
             textViewStatus.setText("Waiting");
 
@@ -196,7 +207,7 @@ public class VoiceCallActivity extends AppCompatActivity {
             }, CONNECTING_TIMEOUT);
         }
 
-        mRtcEngine.joinChannel(null, channelID, "", 0);
+        VoiceCallEngine.getInstance().joinChannel(channelID, mEventHandler);
 
     }
 
@@ -221,17 +232,6 @@ public class VoiceCallActivity extends AppCompatActivity {
         }
     }
 
-    private void initializeAgoraEngine() {
-        try {
-            mRtcEngine = RtcEngine.create(getBaseContext(), getString(R.string.agora_app_id), mRtcEventHandler);
-        } catch (Exception e) {
-            Log.e(LOG_TAG, Log.getStackTraceString(e));
-
-            throw new RuntimeException("NEED TO check rtc sdk init fatal error\n" + Log.getStackTraceString(e));
-        }
-        mRtcEngine.setChannelProfile(Constants.CHANNEL_PROFILE_COMMUNICATION);
-    }
-
     private void showDialogAndClose(String msg) {
         closeVoiceCall();
 
@@ -249,10 +249,13 @@ public class VoiceCallActivity extends AppCompatActivity {
     };
 
     private void closeVoiceCall() {
+        conv.markAllAsRead();
+        working = false;
+
         timeoutTimer.cancel();
         timeoutTimer.purge();
-        if (mRtcEngine!=null) mRtcEngine.leaveChannel();
-        mRtcEngine = null;
+        VoiceCallEngine.getInstance().leaveChannel();
+
         thread.interrupt();
     }
 

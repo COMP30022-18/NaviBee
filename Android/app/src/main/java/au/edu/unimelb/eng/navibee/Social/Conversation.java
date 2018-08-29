@@ -64,23 +64,29 @@ public class Conversation {
                                     messages.add(msg);
                                     if (msg.getTime_().after(readTimestamp)) {
                                        unreadMsgCount += 1;
-                                    }
 
-                                    // check voice call
-                                    if (msg.getType().equals("voicecall")) {
-                                        long dif = new Date().getTime() - msg.getTime_().getTime();
-                                        if (dif < VoiceCallActivity.VOCIECALL_EXPIRE) {
-                                            // new voice call coming
-                                            Intent intent = new Intent(NaviBeeApplication.getInstance().getApplicationContext(),
-                                                                        VoiceCallActivity.class);
-                                            intent.putExtra("INITIATOR", msg.getSender().equals(uid));
-                                            intent.putExtra("CONV_ID", conversationId);
-                                            intent.putExtra("MSG_ID", msg.getId());
-                                            NaviBeeApplication.getInstance().startActivity(intent);
+                                        // check new voice call
+                                        if (msg.getType().equals("voicecall")) {
+                                            long dif = new Date().getTime() - msg.getTime_().getTime();
+                                            if (dif < VoiceCallActivity.VOCIECALL_EXPIRE) {
+                                                // new voice call coming
 
+                                                if (!VoiceCallActivity.isWorking()) {
+                                                    Intent intent = new Intent(NaviBeeApplication.getInstance().getApplicationContext(),
+                                                            VoiceCallActivity.class);
+                                                    intent.putExtra("INITIATOR", msg.getSender().equals(uid));
+                                                    intent.putExtra("CONV_ID", conversationId);
+                                                    intent.putExtra("MSG_ID", msg.getId());
+                                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                    NaviBeeApplication.getInstance().startActivity(intent);
+                                                } else {
+                                                    // todo: handle busy case
+                                                }
+
+                                            }
                                         }
                                     }
-
+/
                                     break;
                                 case MODIFIED:
                                     //

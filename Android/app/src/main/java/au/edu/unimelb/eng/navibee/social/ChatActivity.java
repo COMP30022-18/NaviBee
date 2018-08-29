@@ -215,8 +215,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 ((TextView) holder.itemView.findViewById(R.id.message_text)).setText("Voice Call");
                 ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
             }
-
-
         }
 
         // Return the size of your dataset (invoked by the layout manager)
