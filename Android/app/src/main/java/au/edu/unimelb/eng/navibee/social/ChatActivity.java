@@ -30,6 +30,7 @@ import com.vansuita.pickimage.listeners.IPickResult;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
@@ -122,7 +123,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.btn_send_extra:
-                String[] items = {"Picture"};
+                String[] items = {"Picture", "Voice Call"};
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Send");
@@ -132,7 +133,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         if (which==0) {
                             PickImageDialog.build(new PickSetup().setSystemDialog(true)).show(ChatActivity.this);
                         } else if (which==1) {
-
+                            String voiceCallChannelId = UUID.randomUUID().toString();
+                            conversation.sendMessage("voicecall", voiceCallChannelId);
                         }
                     }
                 });
@@ -209,9 +211,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             } else if (mDataset.get(position).getType().equals("image")) {
                 ((ImageView) holder.itemView.findViewById(R.id.message_image)).setVisibility(View.VISIBLE);
                 FirebaseStorageHelper.loadImage(((ImageView) holder.itemView.findViewById(R.id.message_image)), mDataset.get(position).getData());
+            } else if (mDataset.get(position).getType().equals("voicecall")) {
+                ((TextView) holder.itemView.findViewById(R.id.message_text)).setText("Voice Call");
+                ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
             }
-
-
         }
 
         // Return the size of your dataset (invoked by the layout manager)

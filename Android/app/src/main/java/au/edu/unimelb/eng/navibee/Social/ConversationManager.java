@@ -12,7 +12,6 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +34,8 @@ public class ConversationManager {
     private String uid;
     private FirebaseFirestore db;
 
-    private Map<String, Conversation> conversationMap = new HashMap<>();
+    private Map<String, Conversation> conversationUidMap = new HashMap<>();
+    private Map<String, Conversation> conversationIdMap = new HashMap<>();
 
 
     public ConversationManager() {
@@ -69,7 +69,8 @@ public class ConversationManager {
                                             otherUid = userId;
                                         }
                                     }
-                                    conversationMap.put(otherUid, conv);
+                                    conversationUidMap.put(otherUid, conv);
+                                    conversationIdMap.put(dc.getDocument().getId(), conv);
 
                                     break;
                                 case MODIFIED:
@@ -85,11 +86,13 @@ public class ConversationManager {
     }
 
     public Conversation getConversationByUID(String uid) {
-        return conversationMap.get(uid);
+        return conversationUidMap.get(uid);
     }
 
+    public Conversation getConversationById(String id) { return conversationIdMap.get(id); }
+
     public boolean isConversationExists(String uid) {
-        return conversationMap.containsKey(uid);
+        return conversationUidMap.containsKey(uid);
     }
 
     public void updateConvInfoForContactList(ArrayList<FriendManager.ContactPerson> list) {

@@ -60,11 +60,33 @@ public class Conversation {
                                 case ADDED:
                                     // new message
                                     Message msg = dc.getDocument().toObject(Message.class);
+                                    msg.setId(dc.getDocument().getId());
                                     messages.add(msg);
                                     if (msg.getTime_().after(readTimestamp)) {
                                        unreadMsgCount += 1;
-                                    }
 
+                                        // check new voice call
+                                        if (msg.getType().equals("voicecall")) {
+                                            long dif = new Date().getTime() - msg.getTime_().getTime();
+                                            if (dif < VoiceCallActivity.VOCIECALL_EXPIRE) {
+                                                // new voice call coming
+
+                                                if (!VoiceCallActivity.isWorking()) {
+                                                    Intent intent = new Intent(NaviBeeApplication.getInstance().getApplicationContext(),
+                                                            VoiceCallActivity.class);
+                                                    intent.putExtra("INITIATOR", msg.getSender().equals(uid));
+                                                    intent.putExtra("CONV_ID", conversationId);
+                                                    intent.putExtra("MSG_ID", msg.getId());
+                                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                    NaviBeeApplication.getInstance().startActivity(intent);
+                                                } else {
+                                                    // todo: handle busy case
+                                                }
+
+                                            }
+                                        }
+                                    }
+/
                                     break;
                                 case MODIFIED:
                                     //
@@ -103,6 +125,16 @@ public class Conversation {
 
     }
 
+    public Message getMessageById(String msgId) {
+        for (Message m: messages) {
+            String id = m.getId();
+            if (id!=null && id.equals(msgId)) {
+                return m;
+            }
+        }
+        return null;
+    }
+
     public Message getMessage(int index) {
         return messages.get(index);
     }
@@ -134,7 +166,7 @@ public class Conversation {
 
 
     public static class Message{
-        private String data, type, sender;
+        private String data, type, sender, id = null;
         private Timestamp time;
 
         public Message() {
@@ -152,6 +184,14 @@ public class Conversation {
             this.sender = sender;
             this.time = time;
             this.type = type;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getId() {
+            return id;
         }
 
         public Timestamp getTime() {
