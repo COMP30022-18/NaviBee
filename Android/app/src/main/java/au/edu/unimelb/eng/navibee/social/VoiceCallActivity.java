@@ -24,13 +24,22 @@ import au.edu.unimelb.eng.navibee.R;
 
 public class VoiceCallActivity extends AppCompatActivity {
 
+
     private static final String LOG_TAG = "VOICECALL";
     private static final int MY_PERMISSIONS_RECORD_AUDIO = 1;
+
+    public static final int VOCIECALL_EXPIRE = 60 * 1000;
+
+    private static final int CONNECTING_TIMEOUT = 5 * 1000;
+    private static final int ANSWER_TIMEOUT = 20 * 1000;
+    private static final int WAITING_TIMEOUT = 40 * 1000;
 
     private RtcEngine mRtcEngine = null;
 
     private String channelID = "testChannel";
     private boolean isInitiator;
+    private Conversation conv;
+    private Conversation.Message msg;
 
     private Timer timeoutTimer = new Timer();
     private Timer answerTimer = new Timer();
@@ -100,13 +109,17 @@ public class VoiceCallActivity extends AppCompatActivity {
 
         checkPermission();
 
+        isInitiator = getIntent().getBooleanExtra("INITIATOR", false);
+        conv = ConversationManager.getInstance().getConversationById(getIntent().getStringExtra("CONV_ID"));
+        msg = conv.getMessageById(getIntent().getStringExtra("MSG_ID"));
+        channelID = msg.getData();
+
         textViewStatus = findViewById(R.id.voicecall_textView_status);
         textViewTime = findViewById(R.id.voicecall_textView_time);
         buttonHangup = findViewById(R.id.voicecall_button_hangup);
         buttonAccept = findViewById(R.id.voicecall_button_accept);
         buttonDecline = findViewById(R.id.voicecall_button_decline);
 
-        isInitiator = true;
 
         if (isInitiator) {
             buttonAccept.setVisibility(View.INVISIBLE);
@@ -124,7 +137,7 @@ public class VoiceCallActivity extends AppCompatActivity {
                         }
                     });
                 }
-            }, 20*1000);
+            }, ANSWER_TIMEOUT);
         }
     }
 
@@ -166,7 +179,7 @@ public class VoiceCallActivity extends AppCompatActivity {
                         }
                     });
                 }
-            }, 40*1000);
+            }, WAITING_TIMEOUT);
 
         } else {
             textViewStatus.setText("Connecting");
@@ -180,7 +193,7 @@ public class VoiceCallActivity extends AppCompatActivity {
                         }
                     });
                 }
-            }, 5*1000);
+            }, CONNECTING_TIMEOUT);
         }
 
         mRtcEngine.joinChannel(null, channelID, "", 0);
