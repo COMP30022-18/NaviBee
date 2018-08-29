@@ -19,8 +19,10 @@ import com.google.firebase.functions.HttpsCallableResult;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
+import au.edu.unimelb.eng.navibee.utils.SimpleRVIndefiniteProgressBar;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVTextPrimarySecondaryStatic;
 import au.edu.unimelb.eng.navibee.utils.SimpleRecyclerViewAdaptor;
 import au.edu.unimelb.eng.navibee.utils.SimpleRecyclerViewItem;
@@ -57,6 +59,8 @@ public class EventDetailsActivity extends AppCompatActivity {
             }
         });
 
+        listItems.add(new SimpleRVIndefiniteProgressBar());
+
         // Recycler View
         recyclerView = (RecyclerView) findViewById(R.id.event_details_recycler_view);
 
@@ -73,45 +77,13 @@ public class EventDetailsActivity extends AppCompatActivity {
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 eventItem = documentSnapshot.toObject(EventActivity.EventItem.class);
 
-                getUserName();
-
-                System.out.println(result.toString());
-
-                if (eventItem.getName() != null && eventItem.getTime_() != null) {
-                    listItems.add(new SimpleRVTextPrimarySecondaryStatic(
-                            eventItem.getName(),
-                            new SimpleDateFormat(getResources().getString(R.string.date_format)).format(eventItem.getTime_())
-                    ));
-                }
-
-                if (eventItem.getLocation() != null) {
-                    listItems.add(new SimpleRVTextPrimarySecondaryStatic(
-                            getResources().getString(R.string.event_details_location),
-                            eventItem.getLocation()
-                    ));
-                }
-
-                if (eventItem.getHolder() != null) {
-                    listItems.add(new SimpleRVTextPrimarySecondaryStatic(
-                            getResources().getString(R.string.event_details_organiser),
-                            eventItem.getHolder()
-                    ));
-                }
-
-                if (eventItem.getUsers() != null) {
-                    listItems.add(new SimpleRVTextPrimarySecondaryStatic(
-                            getResources().getString(R.string.event_details_participants),
-                            eventItem.getUsers().keySet().toString()
-                    ));
-                }
-
-                viewAdapter.notifyDataSetChanged();
+                getEventInfo();
             }
         });
 
     }
 
-    private void getUserName() {
+    private void getEventInfo() {
         ArrayList<String> uidList = new ArrayList<>();
 
         uidList.add(eventItem.getHolder());
@@ -129,6 +101,49 @@ public class EventDetailsActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(HttpsCallableResult httpsCallableResult) {
                     result = (Map<String, String>) httpsCallableResult.getData();
+
+                    listItems.clear();
+
+                    if (eventItem.getName() != null && eventItem.getTime_() != null) {
+                        listItems.add(new SimpleRVTextPrimarySecondaryStatic(
+                                eventItem.getName(),
+                                new SimpleDateFormat(getResources().getString(R.string.date_format)).format(eventItem.getTime_())
+                        ));
+                    }
+
+                    if (eventItem.getLocation() != null) {
+                        listItems.add(new SimpleRVTextPrimarySecondaryStatic(
+                                getResources().getString(R.string.event_details_location),
+                                eventItem.getLocation()
+                        ));
+                    }
+
+                    String holder = null;
+                    HashSet<String> participants = new HashSet<>();
+
+                    for (Map.Entry<String, String> entry : result.entrySet()) {
+                        if (entry.getKey().equals(eventItem.getHolder())) {
+                            holder = entry.getValue();
+                        } else {
+                            participants.add(entry.getValue());
+                        }
+                    }
+
+                    if (eventItem.getHolder() != null) {
+                        listItems.add(new SimpleRVTextPrimarySecondaryStatic(
+                                getResources().getString(R.string.event_details_organiser),
+                                holder
+                        ));
+                    }
+
+                    if (eventItem.getUsers() != null) {
+                        listItems.add(new SimpleRVTextPrimarySecondaryStatic(
+                                getResources().getString(R.string.event_details_participants),
+                                participants.toString()
+                        ));
+                    }
+
+                    viewAdapter.notifyDataSetChanged();
                 }
             });
     }

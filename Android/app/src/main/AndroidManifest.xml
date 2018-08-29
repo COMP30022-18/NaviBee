@@ -128,7 +128,7 @@
             android:label="@string/sos_setting" />
         <activity
             android:name=".EventDetailsActivity"
-            android:label="@string/title_activity_event_details" />
+            android:label="@string/event_detail" />
     </application>
 
 </manifest>
