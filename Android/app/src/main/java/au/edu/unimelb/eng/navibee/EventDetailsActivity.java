@@ -13,9 +13,13 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.HttpsCallableResult;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import au.edu.unimelb.eng.navibee.utils.SimpleRVTextPrimarySecondaryStatic;
 import au.edu.unimelb.eng.navibee.utils.SimpleRecyclerViewAdaptor;
@@ -31,6 +35,9 @@ public class EventDetailsActivity extends AppCompatActivity {
     private RecyclerView.Adapter viewAdapter;
     private RecyclerView.LayoutManager viewManager;
     private ArrayList<SimpleRecyclerViewItem> listItems = new ArrayList<>();
+
+    private EventActivity.EventItem eventItem;
+    private Map<String, String> result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +71,11 @@ public class EventDetailsActivity extends AppCompatActivity {
         db.collection("events").document(eid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                EventActivity.EventItem eventItem = documentSnapshot.toObject(EventActivity.EventItem.class);
+                eventItem = documentSnapshot.toObject(EventActivity.EventItem.class);
+
+                getUserName();
+
+                System.out.println(result.toString());
 
                 if (eventItem.getName() != null && eventItem.getTime_() != null) {
                     listItems.add(new SimpleRVTextPrimarySecondaryStatic(
@@ -98,5 +109,27 @@ public class EventDetailsActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void getUserName() {
+        ArrayList<String> uidList = new ArrayList<>();
+
+        uidList.add(eventItem.getHolder());
+        uidList.addAll(eventItem.getUsers().keySet());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("uidList", uidList);
+
+        FirebaseFunctions mFunctions = FirebaseFunctions.getInstance();
+
+        mFunctions
+            .getHttpsCallable("getNamesFromUidList")
+            .call(data)
+            .addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
+                @Override
+                public void onSuccess(HttpsCallableResult httpsCallableResult) {
+                    result = (Map<String, String>) httpsCallableResult.getData();
+                }
+            });
     }
 }
