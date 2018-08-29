@@ -1,11 +1,14 @@
 package au.edu.unimelb.eng.navibee.navigation
 
+import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.support.annotation.RequiresApi
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -21,9 +24,12 @@ import com.google.android.gms.location.places.GeoDataClient
 import com.google.android.gms.location.places.Place
 import com.google.android.gms.location.places.PlacePhotoMetadataBuffer
 import com.google.android.gms.location.places.Places
+import com.google.android.gms.location.places.internal.zzaq
 import kotlinx.android.synthetic.main.activity_destination_details.*
 import kotlinx.android.synthetic.main.alert_dialog_navigation_choose_transport_manners.view.*
 import org.jetbrains.anko.startActivity
+import java.io.File
+import java.io.FileOutputStream
 
 /**
  * Show details of a destination from Google Maps
@@ -73,6 +79,29 @@ class DestinationDetailsActivity : AppCompatActivity() {
         setSupportActionBar(navigation_destinations_details_toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(true)
+
+        // set padding for status bar
+        navigation_destinations_details_toolbar_padding.apply {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+                setOnApplyWindowInsetsListener { view, insets ->
+                    view.apply {
+                        val lp = layoutParams
+                        lp.height = insets.systemWindowInsetTop
+                        layoutParams = lp
+                    }
+                    insets
+                }
+            } else {
+                val lp = layoutParams
+                lp.height = getStatusBarHeight(this)
+                layoutParams = lp
+
+            }
+        }
+
+
+
         // Remove redundant shadow in transparent app bar
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             navigation_destinations_details_appbar.outlineProvider = null
@@ -104,9 +133,23 @@ class DestinationDetailsActivity : AppCompatActivity() {
                 imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder))
             }
             if (pm != null) {
-                geoDataClient.getPhoto(pm[position]).addOnSuccessListener { data ->
-                    imageView.setImageBitmap(data.bitmap)
-                }
+                object : ImageViewCacheLoader(imageView) {
+                    override val defaultKey =
+                        if (pm[position] is zzaq)
+                            (pm[position] as zzaq).zzah()
+                        else
+                            (pm[position].freeze() as zzaq).zzah()
+
+
+                    override fun loadTask(file: File) {
+                        geoDataClient.getPhoto(pm[position]).addOnSuccessListener { data ->
+                            val outputStream = FileOutputStream(file)
+                            data.bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream)
+                            outputStream.close()
+                            postLoad(file)
+                        }
+                    }
+                }.execute()
             }
         }
 
@@ -293,4 +336,5 @@ class DestinationDetailsActivity : AppCompatActivity() {
         }
         dialog.show()
     }
+
 }
