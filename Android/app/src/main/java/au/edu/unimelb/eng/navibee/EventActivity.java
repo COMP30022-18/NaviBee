@@ -176,7 +176,7 @@ public class EventActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int pos, long l) {
                 //using switch case, to check the condition.
-                Intent intent = new Intent(EventActivity.this, EventDetailActivity.class);
+                Intent intent = new Intent(EventActivity.this, EventDetailsActivity.class);
                 intent.putExtra("eventId", eventList.get(pos).getEventId());
                 startActivity(intent);
             }
