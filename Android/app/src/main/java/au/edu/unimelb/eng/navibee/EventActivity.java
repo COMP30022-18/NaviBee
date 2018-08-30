@@ -85,8 +85,8 @@ public class EventActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String userId;
 
-    private List<EventItem> eventList = new ArrayList<>();
-    private List<EventItem> preLoadEventList = new ArrayList<>();
+    private List<EventItem> eventList;
+    private List<EventItem> preLoadEventList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +101,14 @@ public class EventActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        loadPreLoadEventList();
+    }
+
     private void loadPreLoadEventList() {
+        preLoadEventList = new ArrayList<>();
         db.collection("events").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -147,7 +154,7 @@ public class EventActivity extends AppCompatActivity {
                 recommendList.add(i);
             }
         }
-
+        eventList = new ArrayList<>();
         eventList.addAll(holdingList);
         eventList.addAll(joinedList);
         eventList.addAll(recommendList);

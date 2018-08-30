@@ -119,6 +119,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
     public void onInviteFriendClicked(View v) {
         Intent intent = new Intent(this, EventSelectFriendsActivity.class);
+        intent.putStringArrayListExtra("selectedUid", selectedUidList);
         startActivityForResult(intent, 1);
     }
 
@@ -130,26 +131,6 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
                 TextView participantsView = (TextView)findViewById(R.id.textView8);
                 participantsView.setText(selectedUidList.toString());
             }
-        }
-    }
-
-    private void checkValidity() {
-
-        // check if any friends invited
-        if(selectedUidList == null || selectedUidList.size() == 0) {
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-            dialog.setMessage("You haven't invite any friends");
-            dialog.setNegativeButton("I don't need friends", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialoginterface, int i) {
-                    dialoginterface.cancel();
-                    selectedUidList = new ArrayList<>();
-                }});
-            dialog.setPositiveButton("Oops! Forgot", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialoginterface, int i) {
-                    Intent intent = new Intent(EventEditActivity.this, EventSelectFriendsActivity.class);
-                    startActivityForResult(intent, 1);
-                }});
-            dialog.show();
         }
     }
 
