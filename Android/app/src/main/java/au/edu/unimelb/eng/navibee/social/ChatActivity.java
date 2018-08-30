@@ -212,7 +212,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 ((ImageView) holder.itemView.findViewById(R.id.message_image)).setVisibility(View.VISIBLE);
                 FirebaseStorageHelper.loadImage(((ImageView) holder.itemView.findViewById(R.id.message_image)), mDataset.get(position).getData());
             } else if (mDataset.get(position).getType().equals("voicecall")) {
-                ((TextView) holder.itemView.findViewById(R.id.message_text)).setText("Voice Call");
+                ((TextView) holder.itemView.findViewById(R.id.message_text)).setText("[Voice Call]");
                 ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
             }
         }

@@ -66,7 +66,6 @@ public class FriendActivity extends AppCompatActivity {
                 FriendManager.ContactPerson tempPerson = contactList.get(position);
                 holder.text.setText(tempPerson.getName());
                 NetworkImageHelper.loadImage(holder.image, tempPerson.getUrl());
-                holder.lastTime.setText(tempPerson.getLastMessageTime());
                 holder.unread.setText(Integer.toString(tempPerson.getUnreadMessage()));
                 if (tempPerson.getUnreadMessage() == 0){
                     holder.unread.setVisibility(View.INVISIBLE);
@@ -76,9 +75,11 @@ public class FriendActivity extends AppCompatActivity {
                 }
                 if (tempPerson.hasMessage()){
                     holder.lastMessage.setText(tempPerson.getLastMessage());
+                    holder.lastTime.setText(tempPerson.getLastMessageTime());
                 }
                 else{
                     holder.lastMessage.setText("");
+                    holder.lastTime.setText("");
                 }
 
             }
