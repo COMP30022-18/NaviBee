@@ -38,15 +38,15 @@
 
             <TextView
                 android:id="@+id/last_message"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="lastMessage"
-                android:textSize="20sp"
-                android:gravity="center"
                 android:layout_weight="1"
-                android:maxWidth="165dp"
+                android:ellipsize="end"
+                android:gravity="left|center"
                 android:maxLines="1"
-                android:ellipsize="end"/>
+                android:maxWidth="165dp"
+                android:text="lastMessage"
+                android:textSize="20sp" />
         </LinearLayout>
 
         <LinearLayout
