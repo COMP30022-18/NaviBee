@@ -193,7 +193,7 @@ public class EventActivity extends AppCompatActivity {
                 else {
                     relationship = "passerby";
                 }
-                Intent intent = new Intent(EventActivity.this, EventDetailActivity.class);
+                Intent intent = new Intent(EventActivity.this, EventDetailsActivity.class);
                 intent.putExtra("eventId", eventList.get(pos).getEventId());
                 intent.putExtra("relationship", relationship);
                 startActivity(intent);
