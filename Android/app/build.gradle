@@ -66,6 +66,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:17.3.0'
     implementation 'com.synnapps:carouselview:0.1.5'
     implementation 'io.agora.rtc:voice-sdk:2.2.0'
+    implementation 'com.beust:klaxon:3.0.1'
 }
 
 apply plugin: 'com.google.gms.google-services'
