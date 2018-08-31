@@ -96,8 +96,8 @@ public class EventActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String userId;
 
-    private List<EventItem> eventList = new ArrayList<>();
-    private List<EventItem> preLoadEventList = new ArrayList<>();
+    private List<EventItem> eventList;
+    private List<EventItem> preLoadEventList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +112,14 @@ public class EventActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        loadPreLoadEventList();
+    }
+
     private void loadPreLoadEventList() {
+        preLoadEventList = new ArrayList<>();
         db.collection("events").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -158,7 +165,7 @@ public class EventActivity extends AppCompatActivity {
                 recommendList.add(i);
             }
         }
-
+        eventList = new ArrayList<>();
         eventList.addAll(holdingList);
         eventList.addAll(joinedList);
         eventList.addAll(recommendList);
@@ -176,8 +183,19 @@ public class EventActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int pos, long l) {
                 //using switch case, to check the condition.
-                Intent intent = new Intent(EventActivity.this, EventDetailsActivity.class);
+                String relationship;
+                if(eventList.get(pos).getHolder().equals(userId)) {
+                    relationship = "holder";
+                }
+                else if(eventList.get(pos).getUsers().keySet().contains(userId)){
+                    relationship = "participant";
+                }
+                else {
+                    relationship = "passerby";
+                }
+                Intent intent = new Intent(EventActivity.this, EventDetailActivity.class);
                 intent.putExtra("eventId", eventList.get(pos).getEventId());
+                intent.putExtra("relationship", relationship);
                 startActivity(intent);
             }
         });
@@ -237,7 +255,7 @@ public class EventActivity extends AppCompatActivity {
     }
 
     public void selectFriends(View view) {
-        startActivity(new Intent(this, EventSelectFriendsActivity.class));
+        startActivity(new Intent(this, EventEditActivity.class));
     }
 
 }
