@@ -1,8 +1,8 @@
 package au.edu.unimelb.eng.navibee.social;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.tasks.Continuation;
@@ -16,15 +16,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import au.edu.unimelb.eng.navibee.NaviBeeApplication;
-import au.edu.unimelb.eng.navibee.social.DateManager;
 
 public class FriendManager {
 

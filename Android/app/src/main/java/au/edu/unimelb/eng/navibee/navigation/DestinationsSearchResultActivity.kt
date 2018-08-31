@@ -8,15 +8,11 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
-import android.support.design.widget.BottomSheetBehavior
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.text.Html
 import android.util.TypedValue
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import au.edu.unimelb.eng.navibee.BuildConfig
 import au.edu.unimelb.eng.navibee.R
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -28,6 +24,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.maps.GeoApiContext
 import com.google.maps.PendingResult
 import com.google.maps.PlacesApi
@@ -66,9 +63,9 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
     private lateinit var geoContext: GeoApiContext
 
     // Recycler view
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var viewAdapter: RecyclerView.Adapter<*>
-    private lateinit var viewManager: RecyclerView.LayoutManager
+    private lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
+    private lateinit var viewAdapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>
+    private lateinit var viewManager: androidx.recyclerview.widget.RecyclerView.LayoutManager
     private val destinations = ArrayList<DestinationRVItem>()
 
     private val searchResults = ArrayList<PlacesSearchResult>()
@@ -88,14 +85,15 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
         destinations.add(DestinationRVIndefiniteProgressBar())
 
         // setup recycler view
-        viewManager = LinearLayoutManager(this)
+        viewManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         viewAdapter = DestinationsRVAdaptor(destinations)
 
         recyclerView = navigation_destinations_search_result_recycler_view.apply {
             setHasFixedSize(true)
             layoutManager = viewManager
             adapter = viewAdapter
-            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+            addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(
+                    context, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
         }
 
         // Setup location service

@@ -42,7 +42,7 @@
             android:name=".navigation.DestinationsSearchSuggestionsContentProvider"
             android:authorities="au.edu.unimelb.eng.navibee.navigation.DestinationsSearchSuggestionsContentProvider" />
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.com.vansuita.pickimage.provider"
             android:exported="false"
             android:grantUriPermissions="true"

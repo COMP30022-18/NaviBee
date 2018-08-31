@@ -1,6 +1,5 @@
 package au.edu.unimelb.eng.navibee.navigation
 
-import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
@@ -8,16 +7,11 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
-import android.support.design.widget.BottomSheetBehavior
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.text.Html
 import android.view.View
 import android.view.WindowManager
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import au.edu.unimelb.eng.navibee.R
 import au.edu.unimelb.eng.navibee.utils.*
 import com.google.android.gms.location.places.GeoDataClient
@@ -25,6 +19,7 @@ import com.google.android.gms.location.places.Place
 import com.google.android.gms.location.places.PlacePhotoMetadataBuffer
 import com.google.android.gms.location.places.Places
 import com.google.android.gms.location.places.internal.zzaq
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.activity_destination_details.*
 import kotlinx.android.synthetic.main.alert_dialog_navigation_choose_transport_manners.view.*
 import org.jetbrains.anko.startActivity
@@ -44,9 +39,9 @@ class DestinationDetailsActivity : AppCompatActivity() {
     }
 
     // Recycler view
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var viewAdapter: RecyclerView.Adapter<*>
-    private lateinit var viewManager: RecyclerView.LayoutManager
+    private lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
+    private lateinit var viewAdapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>
+    private lateinit var viewManager: androidx.recyclerview.widget.RecyclerView.LayoutManager
     private val listItems = ArrayList<SimpleRecyclerViewItem>()
 
     private lateinit var geoDataClient: GeoDataClient
@@ -113,14 +108,14 @@ class DestinationDetailsActivity : AppCompatActivity() {
         listItems.add(SimpleRVIndefiniteProgressBar())
 
         // Recycler View
-        viewManager = LinearLayoutManager(this)
+        viewManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         viewAdapter = SimpleRecyclerViewAdaptor(listItems)
 
         recyclerView = navigation_destinations_details_recycler_view.apply {
             setHasFixedSize(true)
             layoutManager = viewManager
             adapter = viewAdapter
-            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+            addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(context, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
         }
 
         // Carousel view
