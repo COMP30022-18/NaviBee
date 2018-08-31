@@ -104,8 +104,7 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
 
         // setup collapsible view
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        val bottomSheetBehavior =
-                BottomSheetBehavior.from(recyclerView)
+        val bottomSheetBehavior = BottomSheetBehavior.from(recyclerView)
         bottomSheetBehavior.peekHeight = (resources.displayMetrics.heightPixels * 0.382).toInt()
         recyclerView.minimumHeight = (resources.displayMetrics.heightPixels * 0.382).toInt()
         navigation_destinations_search_result_map.view?.apply {
