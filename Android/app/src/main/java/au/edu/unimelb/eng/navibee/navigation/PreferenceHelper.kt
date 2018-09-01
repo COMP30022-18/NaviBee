@@ -20,6 +20,9 @@ fun getRecentSearchQueries(): List<LocationSearchHistory> {
 
 fun addRecentSearchQuery(item: LocationSearchHistory): List<LocationSearchHistory> {
     val list = getRecentSearchQueries().toMutableList()
+    if (item in list) {
+        list.removeAt(list.indexOfFirst { i -> i == item })
+    }
     list.add(0, item)
     val newList = list.take(RECENT_QUERIES_LENGTH)
 
@@ -32,6 +35,17 @@ data class LocationSearchHistory (
         val googlePlaceId: String,
         val name: String,
         val address: String,
-        val lastSearchTime: Date,
+        val lastSearchTime: Date = Date(),
         val photoReference: String
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (other is LocationSearchHistory) {
+            return googlePlaceId == other.googlePlaceId
+        }
+        return super.equals(other)
+    }
+
+    override fun hashCode(): Int {
+        return "LocationSearchHistory-$googlePlaceId".hashCode()
+    }
+}

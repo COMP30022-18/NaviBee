@@ -1,3 +1,7 @@
+plugins {
+    id "com.github.ben-manes.versions" version "0.20.0"
+}
+
 apply plugin: 'com.android.application'
 
 def CONFIG = { k -> "\"${project.properties.get(k)}\"" }
@@ -37,14 +41,14 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.0.0-rc02'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
-    implementation 'com.google.firebase:firebase-core:16.0.1'
+    implementation 'com.google.firebase:firebase-core:16.0.3'
     implementation 'com.google.firebase:firebase-auth:16.0.3'
     implementation 'com.google.firebase:firebase-firestore:17.1.0'
     implementation 'com.google.firebase:firebase-functions:16.1.0'
     implementation 'com.google.android.gms:play-services-auth:16.0.0'
     implementation 'com.google.android.gms:play-services-location:15.0.1'
     implementation 'com.google.android.gms:play-services-places:15.0.1'
-    implementation 'com.google.maps:google-maps-services:0.2.10'
+    implementation 'com.google.maps:google-maps-services:0.2.11'
     implementation 'com.google.maps.android:android-maps-utils:0.5'
     implementation 'org.slf4j:slf4j-nop:1.7.25'
     implementation 'com.google.android.material:material:1.0.0-rc01'
@@ -65,8 +69,8 @@ dependencies {
     implementation 'com.github.jrvansuita:PickImage:+'
     implementation 'com.google.firebase:firebase-messaging:17.3.0'
     implementation 'com.synnapps:carouselview:0.1.5'
-    implementation 'io.agora.rtc:voice-sdk:2.2.0'
-    implementation 'com.beust:klaxon:3.0.1'
+    implementation 'io.agora.rtc:voice-sdk:2.3.0'
+    implementation 'com.beust:klaxon:3.0.8'
 }
 
 apply plugin: 'com.google.gms.google-services'

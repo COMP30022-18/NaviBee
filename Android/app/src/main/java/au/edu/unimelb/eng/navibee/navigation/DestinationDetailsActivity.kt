@@ -1,5 +1,6 @@
 package au.edu.unimelb.eng.navibee.navigation
 
+import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
@@ -299,6 +300,7 @@ class DestinationDetailsActivity : AppCompatActivity() {
         return (alpha * 255).toInt() shl 24 or (red shl 16) or (green shl 8) or blue
     }
 
+    @SuppressLint("InflateParams")
     fun onClickGo(view: View) {
         val dialogView = layoutInflater.inflate(R.layout.alert_dialog_navigation_choose_transport_manners,
                 null)
