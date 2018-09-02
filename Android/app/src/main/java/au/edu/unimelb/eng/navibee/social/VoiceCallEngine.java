@@ -2,6 +2,9 @@ package au.edu.unimelb.eng.navibee.social;
 
 import android.util.Log;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import au.edu.unimelb.eng.navibee.NaviBeeApplication;
 import au.edu.unimelb.eng.navibee.R;
 import io.agora.rtc.Constants;
@@ -21,16 +24,21 @@ public class VoiceCallEngine {
 
     private RtcEngine mRtcEngine;
     private EventHandler handler = null;
+    private final Lock mutex = new ReentrantLock(true);
 
     private final IRtcEngineEventHandler mRtcEventHandler = new IRtcEngineEventHandler() {
         @Override
         public void onUserOffline(final int uid, final int reason) {
+            mutex.lock();
             if (handler!=null) handler.onUserOffline(uid, reason);
+            mutex.unlock();
         }
 
         @Override
         public void onUserJoined(int uid, int elapsed) {
+            mutex.lock();
             if (handler!=null) handler.onUserJoined(uid, elapsed);
+            mutex.unlock();
         }
     };
 
@@ -46,12 +54,16 @@ public class VoiceCallEngine {
     }
 
     public void joinChannel(String channelID, EventHandler handler) {
+        mutex.lock();
         this.handler = handler;
+        mutex.unlock();
         mRtcEngine.joinChannel(null, channelID, "", 0);
     }
 
     public void leaveChannel() {
+        mutex.lock();
         handler = null;
+        mutex.unlock();
         mRtcEngine.leaveChannel();
     }
 
