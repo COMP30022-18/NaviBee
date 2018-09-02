@@ -2,7 +2,7 @@ package au.edu.unimelb.eng.navibee.social;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -15,7 +15,6 @@ import com.google.zxing.integration.android.IntentResult;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import au.edu.unimelb.eng.navibee.R;
-import au.edu.unimelb.eng.navibee.navigation.DestinationsActivity;
 
 public class AddFriendQRActivity extends AppCompatActivity {
 

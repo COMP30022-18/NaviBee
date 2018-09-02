@@ -3,13 +3,10 @@ package au.edu.unimelb.eng.navibee.navigation
 import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.SearchView
 import android.view.Menu
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import au.edu.unimelb.eng.navibee.R
 import kotlinx.android.synthetic.main.activity_destinations.*
 import org.jetbrains.anko.startActivity
@@ -18,10 +15,10 @@ import org.jetbrains.anko.startActivity
 class DestinationsActivity : AppCompatActivity(){
 
     // Recycler view
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var viewAdapter: RecyclerView.Adapter<*>
+    private lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
+    private lateinit var viewAdapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>
 
-    private lateinit var viewManager: RecyclerView.LayoutManager
+    private lateinit var viewManager: androidx.recyclerview.widget.RecyclerView.LayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,11 +32,22 @@ class DestinationsActivity : AppCompatActivity(){
                     startVoiceSearch()
                 })
         )
-        destinations.add(DestinationRVDivider("Recent destinations"))
-        destinations.add(DestinationRVEntry("Place 1", "Location 1",
-                onClick = View.OnClickListener {  }))
-        destinations.add(DestinationRVEntry("Place 2", "Location 2",
-                onClick = View.OnClickListener {  }))
+        getRecentSearchQueries().run {
+            if (this.isNotEmpty())
+                destinations.add(DestinationRVDivider("Recent destinations"))
+            for (i in this) {
+                destinations.add(DestinationRVEntry(
+                        name = i.name,
+                        location = i.address,
+                        googlePhotoReference = i.photoReference,
+                        onClick = View.OnClickListener {
+                            startActivity<DestinationDetailsActivity>(
+                                    DestinationDetailsActivity.EXTRA_PLACE_ID to i.googlePlaceId
+                            )
+                        }
+                ))
+            }
+        }
         destinations.add(DestinationRVDivider("Recommended place"))
         destinations.add(DestinationRVEntry("Place 3", "Location 3",
                 onClick = View.OnClickListener {  }))
@@ -47,14 +55,14 @@ class DestinationsActivity : AppCompatActivity(){
                 onClick = View.OnClickListener {  }))
 
         // setup recycler view
-        viewManager = LinearLayoutManager(this)
+        viewManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         viewAdapter = DestinationsRVAdaptor(destinations)
 
         recyclerView = nav_dest_recycler_view.apply {
             setHasFixedSize(true)
             layoutManager = viewManager
             adapter = viewAdapter
-            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+            addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(context, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
         }
 
     }

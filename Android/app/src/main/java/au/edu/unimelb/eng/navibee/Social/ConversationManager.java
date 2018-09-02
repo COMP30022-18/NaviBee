@@ -1,6 +1,6 @@
 package au.edu.unimelb.eng.navibee.social;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
 import com.google.firebase.Timestamp;

@@ -1,6 +1,5 @@
 package au.edu.unimelb.eng.navibee.utils
 
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +11,8 @@ import kotlinx.android.synthetic.main.recycler_view_item_text_secondary_primary_
 import kotlinx.android.synthetic.main.recycler_view_item_text_secondary_primary_static.view.*
 
 class SimpleRecyclerViewAdaptor(private val data: ArrayList<SimpleRecyclerViewItem>) :
-        RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
         val layout = when (viewType) {
             1 -> R.layout.recycler_view_indefinite_progress
             2 -> R.layout.recycler_view_item_text_primary_secondary_clickable
@@ -41,7 +40,7 @@ class SimpleRecyclerViewAdaptor(private val data: ArrayList<SimpleRecyclerViewIt
 
     override fun getItemCount() = data.size
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
         val data = data[position]
         when (data) {
             is SimpleRVTextPrimarySecondaryClickable -> {
@@ -101,4 +100,4 @@ data class SimpleRVTextSecondaryPrimaryStatic(
 data class SimpleRVAttributions(val attributes: CharSequence): SimpleRecyclerViewItem()
 
 class SimpleRVViewHolder(view: View) :
-        RecyclerView.ViewHolder(view)
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(view)

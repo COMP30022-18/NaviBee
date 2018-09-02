@@ -17,9 +17,9 @@ import java.io.FileOutputStream
 
 
 class GMapPRefAsyncTask(private val photoReference: String,
-                                          val maxHeight: Int,
-                                          val file: File,
-                                 val callback: (File) -> Unit):
+                        val maxHeight: Int,
+                        val file: File,
+                        val callback: (File) -> Unit):
         AsyncTask<Void, Void, Bitmap>() {
 
     override fun doInBackground(vararg params: Void?): Bitmap? {
