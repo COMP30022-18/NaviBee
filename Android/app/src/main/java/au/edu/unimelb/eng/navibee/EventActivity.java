@@ -2,9 +2,9 @@ package au.edu.unimelb.eng.navibee;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.util.EventLog;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -193,7 +193,7 @@ public class EventActivity extends AppCompatActivity {
                 else {
                     relationship = "passerby";
                 }
-                Intent intent = new Intent(EventActivity.this, EventDetailsActivity.class);
+                Intent intent = new Intent(EventActivity.this, EventDetailActivity.class);
                 intent.putExtra("eventId", eventList.get(pos).getEventId());
                 intent.putExtra("relationship", relationship);
                 startActivity(intent);

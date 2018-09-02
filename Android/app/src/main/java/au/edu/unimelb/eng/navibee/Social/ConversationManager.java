@@ -1,6 +1,6 @@
 package au.edu.unimelb.eng.navibee.social;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
 import com.google.firebase.Timestamp;
@@ -12,7 +12,6 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +34,8 @@ public class ConversationManager {
     private String uid;
     private FirebaseFirestore db;
 
-    private Map<String, Conversation> conversationMap = new HashMap<>();
+    private Map<String, Conversation> conversationUidMap = new HashMap<>();
+    private Map<String, Conversation> conversationIdMap = new HashMap<>();
 
 
     public ConversationManager() {
@@ -69,7 +69,8 @@ public class ConversationManager {
                                             otherUid = userId;
                                         }
                                     }
-                                    conversationMap.put(otherUid, conv);
+                                    conversationUidMap.put(otherUid, conv);
+                                    conversationIdMap.put(dc.getDocument().getId(), conv);
 
                                     break;
                                 case MODIFIED:
@@ -85,19 +86,38 @@ public class ConversationManager {
     }
 
     public Conversation getConversationByUID(String uid) {
-        return conversationMap.get(uid);
+        return conversationUidMap.get(uid);
     }
 
+    public Conversation getConversationById(String id) { return conversationIdMap.get(id); }
+
     public boolean isConversationExists(String uid) {
-        return conversationMap.containsKey(uid);
+        return conversationUidMap.containsKey(uid);
     }
 
     public void updateConvInfoForContactList(ArrayList<FriendManager.ContactPerson> list) {
         for (FriendManager.ContactPerson cp: list) {
             Conversation conv = getConversationByUID(cp.getUid());
             if (conv!=null && conv.getMessageCount()>0) {
-                cp.setLastMessage(conv.getMessage(conv.getMessageCount()-1).getData());
-                cp.setLastMessageTime(conv.getMessage(conv.getMessageCount()-1).getTime_());
+                Conversation.Message msg = conv.getMessage(conv.getMessageCount()-1);
+                String lastMsgText = "";
+                switch (msg.getType()) {
+                    case "text":
+                        lastMsgText = msg.getData();
+                        break;
+                    case "image":
+                        lastMsgText = "[Picture]";
+                        break;
+                    case "voicecall":
+                        lastMsgText = "[Voice Call]";
+                        break;
+                }
+
+                lastMsgText = lastMsgText.substring(0, Math.min(lastMsgText.length(), 50));
+
+                cp.setLastMessage(lastMsgText);
+                cp.setLastMessageTime(msg.getTime_());
+
                 cp.setUnreadMessage(conv.getUnreadMsgCount());
             } else {
                 cp.setUnreadMessage(0);

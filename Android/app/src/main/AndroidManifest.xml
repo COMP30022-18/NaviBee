@@ -6,6 +6,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".NaviBeeApplication"
@@ -38,7 +42,7 @@
             android:name=".navigation.DestinationsSearchSuggestionsContentProvider"
             android:authorities="au.edu.unimelb.eng.navibee.navigation.DestinationsSearchSuggestionsContentProvider" />
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.com.vansuita.pickimage.provider"
             android:exported="false"
             android:grantUriPermissions="true"
@@ -129,6 +133,7 @@
         <activity
             android:name=".EventDetailsActivity"
             android:label="@string/event_detail" />
+        <activity android:name=".social.VoiceCallActivity"></activity>
     </application>
 
 </manifest>
