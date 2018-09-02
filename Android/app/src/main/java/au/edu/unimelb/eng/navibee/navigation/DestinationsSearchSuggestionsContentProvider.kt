@@ -11,7 +11,7 @@ import android.database.Cursor
 import android.database.MatrixCursor
 import android.net.Uri
 import android.provider.BaseColumns
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import au.edu.unimelb.eng.navibee.NaviBeeApplication
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices

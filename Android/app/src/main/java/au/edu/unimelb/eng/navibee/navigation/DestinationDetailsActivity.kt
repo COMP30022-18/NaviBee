@@ -1,6 +1,5 @@
 package au.edu.unimelb.eng.navibee.navigation
 
-import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
@@ -8,28 +7,33 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
-import android.support.design.widget.BottomSheetBehavior
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.text.Html
 import android.view.View
 import android.view.WindowManager
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import au.edu.unimelb.eng.navibee.R
 import au.edu.unimelb.eng.navibee.utils.*
-import com.google.android.gms.location.places.GeoDataClient
-import com.google.android.gms.location.places.Place
-import com.google.android.gms.location.places.PlacePhotoMetadataBuffer
-import com.google.android.gms.location.places.Places
+import com.google.android.gms.location.places.*
 import com.google.android.gms.location.places.internal.zzaq
+import com.google.android.gms.tasks.Tasks
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.activity_destination_details.*
 import kotlinx.android.synthetic.main.alert_dialog_navigation_choose_transport_manners.view.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.startActivity
 import java.io.File
 import java.io.FileOutputStream
+
+val PlacePhotoMetadata.photoReference: String
+    get() {
+        return if (this is zzaq)
+            zzah()
+        else
+            (freeze() as zzaq).zzah()
+    }
 
 /**
  * Show details of a destination from Google Maps
@@ -44,9 +48,9 @@ class DestinationDetailsActivity : AppCompatActivity() {
     }
 
     // Recycler view
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var viewAdapter: RecyclerView.Adapter<*>
-    private lateinit var viewManager: RecyclerView.LayoutManager
+    private lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
+    private lateinit var viewAdapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>
+    private lateinit var viewManager: androidx.recyclerview.widget.RecyclerView.LayoutManager
     private val listItems = ArrayList<SimpleRecyclerViewItem>()
 
     private lateinit var geoDataClient: GeoDataClient
@@ -54,6 +58,9 @@ class DestinationDetailsActivity : AppCompatActivity() {
     private lateinit var place: Place
 
     private var titleRowHeight = -1
+
+    private val attributions: ArrayList<CharSequence> = ArrayList()
+
     private val primaryColor: Int by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             resources.getColor(R.color.colorPrimary, null)
@@ -113,32 +120,29 @@ class DestinationDetailsActivity : AppCompatActivity() {
         listItems.add(SimpleRVIndefiniteProgressBar())
 
         // Recycler View
-        viewManager = LinearLayoutManager(this)
+        viewManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         viewAdapter = SimpleRecyclerViewAdaptor(listItems)
 
         recyclerView = navigation_destinations_details_recycler_view.apply {
             setHasFixedSize(true)
             layoutManager = viewManager
             adapter = viewAdapter
-            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+            addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(context, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
         }
 
         // Carousel view
         navigation_destinations_details_image_preview.pageCount = 1
         navigation_destinations_details_image_preview.setImageListener { position, imageView ->
-            val pm = photoMetadata
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder, null))
-            } else {
-                imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder))
-            }
-            if (pm != null) {
+            photoMetadata?.let { pm ->
+                val photo = pm[position]
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder, null))
+                } else {
+                    imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder))
+                }
                 object : ImageViewCacheLoader(imageView) {
-                    override val defaultKey =
-                        if (pm[position] is zzaq)
-                            (pm[position] as zzaq).zzah()
-                        else
-                            (pm[position].freeze() as zzaq).zzah()
+                    override val defaultKey = photo.photoReference
+
 
 
                     override fun loadTask(file: File) {
@@ -192,83 +196,29 @@ class DestinationDetailsActivity : AppCompatActivity() {
 
         val placeId: String = intent.getStringExtra(EXTRA_PLACE_ID) ?: return finish()
 
-        val attributions: ArrayList<CharSequence> = ArrayList()
-
         geoDataClient = Places.getGeoDataClient(this)
 
-        geoDataClient.getPlacePhotos(placeId).addOnSuccessListener { data ->
-            if (data.photoMetadata.count > 0) {
-                photoMetadata = data.photoMetadata
-                navigation_destinations_details_image_preview.pageCount = data.photoMetadata.count
-                for (i in photoMetadata!!) {
-                    if (!i.attributions.isNullOrBlank())
-                        attributions.add(i.attributions)
-                }
-                updateAttributionsRow(attributions)
-            }
-        }
+        launch(UI) {
+            val photoTask = async { loadImage(placeId) }
+            val placeTask = async { loadDetails(placeId) }
 
-        geoDataClient.getPlaceById(placeId).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                place = task.result[0]
-                supportActionBar?.title = place.name
+            val photo = photoTask.await()
+            val place = placeTask.await()
 
-                listItems.clear()
-                listItems.add(
-                        SimpleRVTextPrimarySecondaryStatic(
-                                primary = place.name,
-                                secondary = place.placeTypes.joinToString(", ") { i ->
-                                    googlePlaceTypeIDToString(i, resources)
-                                }
-                        )
-                )
-                if (place.address != null)
-                    listItems.add(
-                            SimpleRVTextSecondaryPrimaryStatic(
-                                    secondary = resources.getString(R.string.place_details_address),
-                                    primary = place.address ?: ""
-                            )
-                    )
-                if (!place.phoneNumber.isNullOrBlank())
-                    listItems.add(
-                            SimpleRVTextSecondaryPrimaryClickable(
-                                    secondary = resources.getString(R.string.place_details_phone_number),
-                                    primary = place.phoneNumber ?: "",
-                                    onClick = View.OnClickListener {
-                                        startActivity(Intent(Intent.ACTION_DIAL).apply {
-                                            data = Uri.parse("tel:${place.phoneNumber}")
-                                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                        })
-                                    }
-                            )
-                    )
-                if (place.rating >= 0)
-                    listItems.add(
-                            SimpleRVTextSecondaryPrimaryStatic(
-                                    secondary = resources.getString(R.string.place_details_ratings),
-                                    primary = "%.1f/5.0".format(place.rating)
-                            )
-                    )
-                if (place.websiteUri != null)
-                    listItems.add(SimpleRVTextSecondaryPrimaryClickable(
-                            secondary = resources.getString(R.string.place_details_website),
-                            primary = "${place.websiteUri}",
-                            onClick = View.OnClickListener {
-                                startActivity(Intent(Intent.ACTION_VIEW).apply {
-                                    data = place.websiteUri
-                                })
-                            }
-                    ))
-                if (!place.attributions.isNullOrBlank()) {
-                    attributions.add(place.attributions!!)
-                }
-
-            } else {
-                listItems.clear()
-            }
+            supportActionBar?.title = place?.name
+            navigation_destinations_details_image_preview.pageCount = photo?.count ?: 0
             updateAttributionsRow(attributions)
             viewAdapter.notifyDataSetChanged()
+
+            addRecentSearchQuery(LocationSearchHistory(
+                    googlePlaceId = placeId,
+                    name = place?.name ?: "",
+                    address = place?.address ?: "",
+                    photoReference = photo?.get(0)?.photoReference
+            ))
         }
+
+
     }
 
     private fun updateAttributionsRow(attributions: ArrayList<CharSequence>) {
@@ -337,4 +287,79 @@ class DestinationDetailsActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    private fun loadImage(placeId: String): PlacePhotoMetadataBuffer? {
+        val data = geoDataClient.getPlacePhotos(placeId).run {
+            Tasks.await(this)
+            this.result
+        }.photoMetadata ?: return null
+
+        if (data.count > 0) {
+            photoMetadata = data
+            for (i in photoMetadata!!) {
+                if (!i.attributions.isNullOrBlank())
+                    attributions.add(i.attributions)
+            }
+        }
+
+        return data
+    }
+
+    private fun loadDetails(placeId: String): Place? {
+        val place = geoDataClient.getPlaceById(placeId).run {
+            Tasks.await(this)
+            this.result
+        }[0] ?: return null
+
+        listItems.clear()
+        listItems.add(
+                SimpleRVTextPrimarySecondaryStatic(
+                        primary = place.name,
+                        secondary = place.placeTypes.joinToString(", ") { i ->
+                            googlePlaceTypeIDToString(i, resources)
+                        }
+                )
+        )
+        if (place.address != null)
+            listItems.add(
+                    SimpleRVTextSecondaryPrimaryStatic(
+                            secondary = resources.getString(R.string.place_details_address),
+                            primary = place.address ?: ""
+                    )
+            )
+        if (!place.phoneNumber.isNullOrBlank())
+            listItems.add(
+                    SimpleRVTextSecondaryPrimaryClickable(
+                            secondary = resources.getString(R.string.place_details_phone_number),
+                            primary = place.phoneNumber ?: "",
+                            onClick = View.OnClickListener {
+                                startActivity(Intent(Intent.ACTION_DIAL).apply {
+                                    data = Uri.parse("tel:${place.phoneNumber}")
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                })
+                            }
+                    )
+            )
+        if (place.rating >= 0)
+            listItems.add(
+                    SimpleRVTextSecondaryPrimaryStatic(
+                            secondary = resources.getString(R.string.place_details_ratings),
+                            primary = "%.1f/5.0".format(place.rating)
+                    )
+            )
+        if (place.websiteUri != null)
+            listItems.add(SimpleRVTextSecondaryPrimaryClickable(
+                    secondary = resources.getString(R.string.place_details_website),
+                    primary = "${place.websiteUri}",
+                    onClick = View.OnClickListener {
+                        startActivity(Intent(Intent.ACTION_VIEW).apply {
+                            data = place.websiteUri
+                        })
+                    }
+            ))
+        if (!place.attributions.isNullOrBlank()) {
+            attributions.add(place.attributions!!)
+        }
+
+        return place
+    }
 }
