@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
+import android.provider.SearchRecentSuggestions
 import android.text.Html
 import android.util.TypedValue
 import android.view.View
@@ -130,7 +131,10 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
             Intent.ACTION_SEARCH -> {
                 val query = intent.getStringExtra(SearchManager.QUERY)
                 supportActionBar?.title = query
-                Timber.d("Handling intent on search query $query.")
+                SearchRecentSuggestions(this,
+                        DestinationsSearchSuggestionsContentProvider.AUTHORITY,
+                        DestinationsSearchSuggestionsContentProvider.MODE)
+                        .saveRecentQuery(query, null)
                 startActivityForResult<LocationPermissionRequestActivity>(
                         CHECK_LOCATION_PERMISSION,
                         "query" to query,

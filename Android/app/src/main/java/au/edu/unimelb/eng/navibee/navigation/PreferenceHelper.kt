@@ -33,7 +33,7 @@ fun addRecentSearchQuery(item: LocationSearchHistory): List<LocationSearchHistor
 }
 
 data class LocationSearchHistory (
-        val googlePlaceId: CharSequence,
+        val googlePlaceId: String,
         val name: CharSequence,
         val address: CharSequence,
         val lastSearchTime: Long = System.currentTimeMillis(),

@@ -39,7 +39,7 @@ class DestinationsActivity : AppCompatActivity(){
                 destinations.add(DestinationRVEntry(
                         name = i.name,
                         location = i.address,
-                        googlePhotoReference = i.photoReference,
+                        googlePlaceId = i.googlePlaceId,
                         onClick = View.OnClickListener {
                             startActivity<DestinationDetailsActivity>(
                                     DestinationDetailsActivity.EXTRA_PLACE_ID to i.googlePlaceId
