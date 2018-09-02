@@ -3,13 +3,10 @@ package au.edu.unimelb.eng.navibee.navigation
 import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.appcompat.widget.SearchView
 import android.view.Menu
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import au.edu.unimelb.eng.navibee.R
 import kotlinx.android.synthetic.main.activity_destinations.*
 import org.jetbrains.anko.startActivity
@@ -35,11 +32,22 @@ class DestinationsActivity : AppCompatActivity(){
                     startVoiceSearch()
                 })
         )
-        destinations.add(DestinationRVDivider("Recent destinations"))
-        destinations.add(DestinationRVEntry("Place 1", "Location 1",
-                onClick = View.OnClickListener {  }))
-        destinations.add(DestinationRVEntry("Place 2", "Location 2",
-                onClick = View.OnClickListener {  }))
+        getRecentSearchQueries().run {
+            if (this.isNotEmpty())
+                destinations.add(DestinationRVDivider("Recent destinations"))
+            for (i in this) {
+                destinations.add(DestinationRVEntry(
+                        name = i.name,
+                        location = i.address,
+                        googlePhotoReference = i.photoReference,
+                        onClick = View.OnClickListener {
+                            startActivity<DestinationDetailsActivity>(
+                                    DestinationDetailsActivity.EXTRA_PLACE_ID to i.googlePlaceId
+                            )
+                        }
+                ))
+            }
+        }
         destinations.add(DestinationRVDivider("Recommended place"))
         destinations.add(DestinationRVEntry("Place 3", "Location 3",
                 onClick = View.OnClickListener {  }))

@@ -3,18 +3,19 @@ package au.edu.unimelb.eng.navibee.navigation
 import android.content.Context
 import au.edu.unimelb.eng.navibee.NaviBeeApplication
 import com.beust.klaxon.Klaxon
-import java.util.*
 
 private const val NAVIGATION_PREFERENCE_KEY = "navigation_preference"
 private const val RECENT_QUERIES = "recentQueries"
 private const val RECENT_QUERIES_LENGTH = 5
 
-private val sharedPref = NaviBeeApplication.instance.getSharedPreferences(
+private val sharedPref by lazy {
+    NaviBeeApplication.instance.getSharedPreferences(
         NAVIGATION_PREFERENCE_KEY, Context.MODE_PRIVATE)
+}
 
 fun getRecentSearchQueries(): List<LocationSearchHistory> {
     return Klaxon()
-            .parse(sharedPref.getString(RECENT_QUERIES, "[]") ?: "[]")
+            .parseArray(sharedPref.getString(RECENT_QUERIES, "[]") ?: "[]")
             ?: emptyList()
 }
 
@@ -32,11 +33,11 @@ fun addRecentSearchQuery(item: LocationSearchHistory): List<LocationSearchHistor
 }
 
 data class LocationSearchHistory (
-        val googlePlaceId: String,
-        val name: String,
-        val address: String,
-        val lastSearchTime: Date = Date(),
-        val photoReference: String
+        val googlePlaceId: CharSequence,
+        val name: CharSequence,
+        val address: CharSequence,
+        val lastSearchTime: Long = System.currentTimeMillis(),
+        val photoReference: String? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (other is LocationSearchHistory) {
