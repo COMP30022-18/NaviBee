@@ -117,8 +117,8 @@ class DestinationsActivity : AppCompatActivity(){
 }
 
 
-class DestinationSuggestionModel(private val context: Application): AndroidViewModel(context),
-        LifecycleObserver {
+private class DestinationSuggestionModel(private val context: Application):
+        AndroidViewModel(context), LifecycleObserver {
     val searchHistory = MutableLiveData<List<LocationSearchHistory>>()
 
     init {

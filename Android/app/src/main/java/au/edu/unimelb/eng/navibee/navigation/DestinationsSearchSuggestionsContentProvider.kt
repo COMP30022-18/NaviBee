@@ -57,7 +57,8 @@ class DestinationsSearchSuggestionsContentProvider: SearchRecentSuggestionsProvi
         return null
     }
 
-    override fun query(uri: Uri?, projection: Array<out String>?, selection: String?, selectionArgs: Array<out String>?, sortOrder: String?): Cursor {
+    override fun query(uri: Uri?, projection: Array<out String>?, selection: String?,
+                       selectionArgs: Array<out String>?, sortOrder: String?): Cursor {
         when (uriMatcher.match(uri)) {
             SEARCH_SUGGESTIONS, UriMatcher.NO_MATCH -> {
 
