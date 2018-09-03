@@ -210,7 +210,7 @@ class DestinationDetailsActivity : AppCompatActivity() {
             updateAttributionsRow(attributions)
             viewAdapter.notifyDataSetChanged()
 
-            addRecentSearchQuery(LocationSearchHistory(
+            addRecentSearchQuery(applicationContext, LocationSearchHistory(
                     googlePlaceId = placeId,
                     name = place?.name ?: "",
                     address = place?.address ?: "",

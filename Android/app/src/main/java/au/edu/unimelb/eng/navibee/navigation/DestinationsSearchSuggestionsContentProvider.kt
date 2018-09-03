@@ -70,19 +70,6 @@ class DestinationsSearchSuggestionsContentProvider: SearchRecentSuggestionsProvi
 
                 val query = uri?.lastPathSegment
 
-                if (query.isNullOrBlank()) {
-                    for (i in getRecentSearchQueries()) {
-                        cursor.newRow()
-                                .add(BaseColumns._ID, "$i")
-                                .add(SearchManager.SUGGEST_COLUMN_TEXT_1, i.name)
-                                .add(SearchManager.SUGGEST_COLUMN_TEXT_2, i.address)
-                                .add(SearchManager.SUGGEST_COLUMN_ICON_1, R.drawable.ic_history_black_24dp)
-                                .add(SearchManager.SUGGEST_COLUMN_INTENT_EXTRA_DATA, i.googlePlaceId)
-
-                    }
-                    return cursor
-                }
-
                 if (ContextCompat.checkSelfPermission(NaviBeeApplication.instance,
                                 Manifest.permission.ACCESS_FINE_LOCATION)
                         != PackageManager.PERMISSION_GRANTED) {

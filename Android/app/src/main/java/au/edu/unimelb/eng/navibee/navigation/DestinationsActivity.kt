@@ -1,5 +1,6 @@
 package au.edu.unimelb.eng.navibee.navigation
 
+import android.app.Application
 import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
@@ -7,9 +8,12 @@ import android.view.Menu
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.*
 import au.edu.unimelb.eng.navibee.R
 import kotlinx.android.synthetic.main.activity_destinations.*
 import org.jetbrains.anko.startActivity
+
+
 
 
 class DestinationsActivity : AppCompatActivity(){
@@ -19,20 +23,47 @@ class DestinationsActivity : AppCompatActivity(){
     private lateinit var viewAdapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>
 
     private lateinit var viewManager: androidx.recyclerview.widget.RecyclerView.LayoutManager
+    private lateinit var viewModel: DestinationSuggestionModel
+
+    private val destinations = ArrayList<DestinationRVItem>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_destinations)
 
-        // TODO: Populate the list of destinations with real data
-        val destinations = ArrayList<DestinationRVItem>()
+        viewModel = ViewModelProviders.of(this).get(DestinationSuggestionModel::class.java)
+        lifecycle.addObserver(viewModel)
+
+        subscribe()
+
+        // setup recycler view
+        viewManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+        viewAdapter = DestinationsRVAdaptor(destinations)
+
+        recyclerView = nav_dest_recycler_view.apply {
+            setHasFixedSize(true)
+            layoutManager = viewManager
+            adapter = viewAdapter
+            addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(context, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
+        }
+
+    }
+
+    private fun subscribe() {
+        viewModel.let { vm ->
+            vm.searchHistory.observe(this, Observer { updateRecyclerView() })
+        }
+    }
+
+    private fun updateRecyclerView() {
+        destinations.clear()
         destinations.add(DestinationRVButton("Say a place",
                 R.drawable.ic_keyboard_voice_black_24dp,
                 View.OnClickListener {
                     startVoiceSearch()
                 })
         )
-        getRecentSearchQueries().run {
+        viewModel.searchHistory.value?.run {
             if (this.isNotEmpty())
                 destinations.add(DestinationRVDivider("Recent destinations"))
             for (i in this) {
@@ -48,22 +79,15 @@ class DestinationsActivity : AppCompatActivity(){
                 ))
             }
         }
+
+        // TODO: Populate the list of destination suggestions with real data
         destinations.add(DestinationRVDivider("Recommended place"))
         destinations.add(DestinationRVEntry("Place 3", "Location 3",
                 onClick = View.OnClickListener {  }))
         destinations.add(DestinationRVEntry("Place 4", "Location 4",
                 onClick = View.OnClickListener {  }))
 
-        // setup recycler view
-        viewManager = androidx.recyclerview.widget.LinearLayoutManager(this)
-        viewAdapter = DestinationsRVAdaptor(destinations)
-
-        recyclerView = nav_dest_recycler_view.apply {
-            setHasFixedSize(true)
-            layoutManager = viewManager
-            adapter = viewAdapter
-            addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(context, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
-        }
+        viewAdapter.notifyDataSetChanged()
 
     }
 
@@ -93,3 +117,16 @@ class DestinationsActivity : AppCompatActivity(){
 }
 
 
+class DestinationSuggestionModel(private val context: Application): AndroidViewModel(context),
+        LifecycleObserver {
+    val searchHistory = MutableLiveData<List<LocationSearchHistory>>()
+
+    init {
+        searchHistory.value = getRecentSearchQueries(context)
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun onResume() {
+        searchHistory.postValue(getRecentSearchQueries(context))
+    }
+}

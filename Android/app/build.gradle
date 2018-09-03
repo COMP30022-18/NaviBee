@@ -37,10 +37,13 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.multidex:multidex:2.0.0'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.0.0-rc02'
+    implementation 'androidx.multidex:multidex:2.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
+    implementation 'androidx.vectordrawable:vectordrawable:1.0.0-rc02'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0-rc02'
+    implementation 'androidx.core:core-ktx:1.0.0-alpha1'
     implementation 'com.google.firebase:firebase-core:16.0.3'
     implementation 'com.google.firebase:firebase-auth:16.0.3'
     implementation 'com.google.firebase:firebase-firestore:17.1.0'
@@ -52,7 +55,6 @@ dependencies {
     implementation 'com.google.maps.android:android-maps-utils:0.5'
     implementation 'org.slf4j:slf4j-nop:1.7.25'
     implementation 'com.google.android.material:material:1.0.0-rc01'
-    implementation 'androidx.vectordrawable:vectordrawable:1.0.0-rc02'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
@@ -60,7 +62,6 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.25.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:0.25.0'
     implementation "org.jetbrains.anko:anko-commons:$anko_version"
-    implementation 'androidx.recyclerview:recyclerview:1.0.0-rc02'
     implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:3.4.1'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-navigation:0.18.0'
     //noinspection GradleDependency

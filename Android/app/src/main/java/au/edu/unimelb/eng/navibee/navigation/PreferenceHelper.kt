@@ -1,26 +1,24 @@
 package au.edu.unimelb.eng.navibee.navigation
 
 import android.content.Context
-import au.edu.unimelb.eng.navibee.NaviBeeApplication
 import com.beust.klaxon.Klaxon
 
-private const val NAVIGATION_PREFERENCE_KEY = "navigation_preference"
-private const val RECENT_QUERIES = "recentQueries"
-private const val RECENT_QUERIES_LENGTH = 5
+const val NAVIGATION_PREFERENCE_KEY = "navigation_preference"
+const val RECENT_QUERIES = "recentQueries"
+const val RECENT_QUERIES_LENGTH = 5
 
-private val sharedPref by lazy {
-    NaviBeeApplication.instance.getSharedPreferences(
-        NAVIGATION_PREFERENCE_KEY, Context.MODE_PRIVATE)
-}
+fun getNavigationSharedPref(context: Context) =
+        context.getSharedPreferences(
+                NAVIGATION_PREFERENCE_KEY, Context.MODE_PRIVATE)!!
 
-fun getRecentSearchQueries(): List<LocationSearchHistory> {
+fun getRecentSearchQueries(context: Context): List<LocationSearchHistory> {
     return Klaxon()
-            .parseArray(sharedPref.getString(RECENT_QUERIES, "[]") ?: "[]")
+            .parseArray(getNavigationSharedPref(context).getString(RECENT_QUERIES, "[]") ?: "[]")
             ?: emptyList()
 }
 
-fun addRecentSearchQuery(item: LocationSearchHistory): List<LocationSearchHistory> {
-    val list = getRecentSearchQueries().toMutableList()
+fun addRecentSearchQuery(context: Context, item: LocationSearchHistory): List<LocationSearchHistory> {
+    val list = getRecentSearchQueries(context).toMutableList()
     if (item in list) {
         list.removeAt(list.indexOfFirst { i -> i == item })
     }
@@ -28,7 +26,11 @@ fun addRecentSearchQuery(item: LocationSearchHistory): List<LocationSearchHistor
     val newList = list.take(RECENT_QUERIES_LENGTH)
 
     val json = Klaxon().toJsonString(newList)
-    sharedPref.edit().putString(RECENT_QUERIES, json).apply()
+    getNavigationSharedPref(context).edit()
+            .putString(RECENT_QUERIES, json)
+            .apply()
+
+
     return newList
 }
 
