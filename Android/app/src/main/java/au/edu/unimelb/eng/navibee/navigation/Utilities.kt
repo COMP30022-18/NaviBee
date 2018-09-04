@@ -21,21 +21,28 @@ import java.io.FileOutputStream
 private val geoContext = GeoApiContext
         .Builder().apiKey(BuildConfig.GOOGLE_PLACES_API_KEY).build()
 
-fun loadGoogleMapsImage(placeId: String, iv: ImageView, maxHeight: Int) {
-    val placeDetails = PlacesApi.placeDetails(geoContext, placeId).await()
-    placeDetails?.photos?.run {
-        if (isNotEmpty()) {
-            GoogleMapsPhotoReferenceCacheImageLoader(
-                    this[0]?.photoReference ?: "",
-                    iv,
-                    maxHeight).execute("${placeDetails.placeId}-0")
+class GoogleMapsPlaceIdCacheImageLoader(private val placeId: String,
+                                        iv: ImageView,
+                                        maxHeight: Int,
+                                        index: Int = 0):
+        GoogleMapsPhotoReferenceCacheImageLoader("", iv, maxHeight) {
+    override val defaultKey = "$placeId-$index"
+    override fun loadTask(file: File) {
+        val placeDetails = PlacesApi.placeDetails(geoContext, placeId).await()
+        placeDetails?.photos?.run {
+            if (isNotEmpty()) {
+                photoReference = this[0]?.photoReference ?: ""
+                if (photoReference.isNotBlank()) {
+                    super.loadTask(file)
+                }
+            }
         }
     }
 }
 
-class GoogleMapsPhotoReferenceCacheImageLoader(private val photoReference: String,
-                                               iv: ImageView,
-                                               val maxHeight: Int):
+open class GoogleMapsPhotoReferenceCacheImageLoader(var photoReference: String,
+                                                    iv: ImageView,
+                                                    private val maxHeight: Int):
         ImageViewCacheLoader(iv, prefix="gmpr") {
 
     override val defaultKey = photoReference

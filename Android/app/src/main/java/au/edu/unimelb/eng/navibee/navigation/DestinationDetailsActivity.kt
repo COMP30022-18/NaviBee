@@ -358,6 +358,7 @@ class DestinationDetailsActivity : AppCompatActivity() {
 private class DestinationDetailsViewModel(private val context: Application):
         AndroidViewModel(context) {
 
+    var placeId: String = ""
     val placeDetails = MutableLiveData<Resource<PlaceBufferResponse>>()
     val placePhotos = MutableLiveData<Resource<PlacePhotoMetadataBuffer>>()
     val attributions = MediatorLiveData<List<CharSequence>>()
@@ -388,6 +389,7 @@ private class DestinationDetailsViewModel(private val context: Application):
     private var geoDataClient = Places.getGeoDataClient(context)
 
     fun loadImageList(placeId: String) {
+        this.placeId = placeId
         if (placePhotos.value != null) return
         geoDataClient.getPlacePhotos(placeId).addOnSuccessListener {
             placePhotos.postValue(Resource.success(it.photoMetadata))
@@ -397,6 +399,7 @@ private class DestinationDetailsViewModel(private val context: Application):
     }
 
     fun loadDetails(placeId: String) {
+        this.placeId = placeId
         if (placeDetails.value != null) return
         geoDataClient.getPlaceById(placeId).addOnSuccessListener {
             placeDetails.postValue(Resource.success(it))
@@ -416,7 +419,7 @@ private class DestinationDetailsViewModel(private val context: Application):
                 imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder))
             }
             object : ImageViewCacheLoader(imageView) {
-                override val defaultKey = photo.photoReference
+                override val defaultKey = "$placeId-$position"
 
                 override fun loadTask(file: File) {
                     geoDataClient.getPhoto(pm[position]).addOnSuccessListener { data ->

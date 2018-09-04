@@ -11,6 +11,8 @@ import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.*
 import au.edu.unimelb.eng.navibee.R
 import kotlinx.android.synthetic.main.activity_destinations.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.startActivity
 
 
@@ -47,48 +49,50 @@ class DestinationsActivity : AppCompatActivity(){
             addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(context, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
         }
 
+        viewModel.getDestinationSuggestions()
+
     }
 
     private fun subscribe() {
-        viewModel.let { vm ->
-            vm.searchHistory.observe(this, Observer { updateRecyclerView() })
-        }
+        viewModel.searchHistory.observe(this, Observer { updateRecyclerView() })
     }
 
     private fun updateRecyclerView() {
-        destinations.clear()
-        destinations.add(DestinationRVButton("Say a place",
-                R.drawable.ic_keyboard_voice_black_24dp,
-                View.OnClickListener {
-                    startVoiceSearch()
-                })
-        )
-        viewModel.searchHistory.value?.run {
-            if (this.isNotEmpty())
-                destinations.add(DestinationRVDivider("Recent destinations"))
-            for (i in this) {
-                destinations.add(DestinationRVEntry(
-                        name = i.name,
-                        location = i.address,
-                        googlePlaceId = i.googlePlaceId,
-                        onClick = View.OnClickListener {
-                            startActivity<DestinationDetailsActivity>(
-                                    DestinationDetailsActivity.EXTRA_PLACE_ID to i.googlePlaceId
-                            )
-                        }
-                ))
+        launch(UI){
+
+            destinations.clear()
+            destinations.add(DestinationRVButton("Say a place",
+                    R.drawable.ic_keyboard_voice_black_24dp,
+                    View.OnClickListener {
+                        startVoiceSearch()
+                    })
+            )
+            viewModel.searchHistory.value?.run {
+                if (this.isNotEmpty())
+                    destinations.add(DestinationRVDivider("Recent destinations"))
+                for (i in this) {
+                    destinations.add(DestinationRVEntry(
+                            name = i.name,
+                            location = i.address,
+                            googlePlaceId = i.googlePlaceId,
+                            onClick = View.OnClickListener {
+                                startActivity<DestinationDetailsActivity>(
+                                        DestinationDetailsActivity.EXTRA_PLACE_ID to i.googlePlaceId
+                                )
+                            }
+                    ))
+                }
             }
+
+            // TODO: Populate the list of destination suggestions with real data
+            destinations.add(DestinationRVDivider("Recommended place"))
+            destinations.add(DestinationRVEntry("Place 3", "Location 3",
+                    onClick = View.OnClickListener {  }))
+            destinations.add(DestinationRVEntry("Place 4", "Location 4",
+                    onClick = View.OnClickListener {  }))
+
+            viewAdapter.notifyDataSetChanged()
         }
-
-        // TODO: Populate the list of destination suggestions with real data
-        destinations.add(DestinationRVDivider("Recommended place"))
-        destinations.add(DestinationRVEntry("Place 3", "Location 3",
-                onClick = View.OnClickListener {  }))
-        destinations.add(DestinationRVEntry("Place 4", "Location 4",
-                onClick = View.OnClickListener {  }))
-
-        viewAdapter.notifyDataSetChanged()
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -121,8 +125,9 @@ private class DestinationSuggestionModel(private val context: Application):
         AndroidViewModel(context), LifecycleObserver {
     val searchHistory = MutableLiveData<List<LocationSearchHistory>>()
 
-    init {
-        searchHistory.value = getRecentSearchQueries(context)
+    fun getDestinationSuggestions() {
+        if (searchHistory.value != null)
+            searchHistory.postValue(getRecentSearchQueries(context))
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)

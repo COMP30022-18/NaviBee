@@ -79,11 +79,11 @@ class DestinationsRVAdaptor(private val data: ArrayList<DestinationRVItem>) :
                     data.googlePlaceId != null -> {
                         val viewHeight = Resources.getSystem().displayMetrics.heightPixels
                         launch(UI) {
-                            loadGoogleMapsImage(
+                            GoogleMapsPlaceIdCacheImageLoader(
                                     data.googlePlaceId,
                                     holder.itemView.recycler_view_destinations_list_entry_preview,
                                     viewHeight
-                                )
+                                ).execute()
                         }
                     }
                 }
