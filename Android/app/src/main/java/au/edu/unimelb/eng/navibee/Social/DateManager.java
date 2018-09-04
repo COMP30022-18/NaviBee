@@ -20,7 +20,7 @@ public class DateManager {
                 }
             } else {
                 if (isYestYesterday(date)) {
-                    return "Yesterday " + simpleDateFormat.format(date);
+                    return "Yesterday \n" + simpleDateFormat.format(date);
                 } else if (isThisWeek(date)) {
                     String weekday = null;
                     if (date.getDay() == 1) {
@@ -44,7 +44,7 @@ public class DateManager {
                     if (date.getDay() == 0) {
                         weekday = "Sunday";
                     }
-                    return weekday + " " + simpleDateFormat.format(date);
+                    return weekday + "\n" + simpleDateFormat.format(date);
                 } else {
                     SimpleDateFormat sdf = new SimpleDateFormat("MM-dd");
                     return sdf.format(date);

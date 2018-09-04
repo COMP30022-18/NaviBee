@@ -99,8 +99,25 @@ public class ConversationManager {
         for (FriendManager.ContactPerson cp: list) {
             Conversation conv = getConversationByUID(cp.getUid());
             if (conv!=null && conv.getMessageCount()>0) {
-                cp.setLastMessage(conv.getMessage(conv.getMessageCount()-1).getData());
-                cp.setLastMessageTime(conv.getMessage(conv.getMessageCount()-1).getTime_());
+                Conversation.Message msg = conv.getMessage(conv.getMessageCount()-1);
+                String lastMsgText = "";
+                switch (msg.getType()) {
+                    case "text":
+                        lastMsgText = msg.getData();
+                        break;
+                    case "image":
+                        lastMsgText = "[Picture]";
+                        break;
+                    case "voicecall":
+                        lastMsgText = "[Voice Call]";
+                        break;
+                }
+
+                lastMsgText = lastMsgText.substring(0, Math.min(lastMsgText.length(), 50));
+
+                cp.setLastMessage(lastMsgText);
+                cp.setLastMessageTime(msg.getTime_());
+
                 cp.setUnreadMessage(conv.getUnreadMsgCount());
             } else {
                 cp.setUnreadMessage(0);
