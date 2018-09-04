@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.recycler_view_item_text_primary_secondary_
 import kotlinx.android.synthetic.main.recycler_view_item_text_secondary_primary_clickable.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_secondary_primary_static.view.*
 
-class SimpleRecyclerViewAdaptor(private val data: ArrayList<SimpleRecyclerViewItem>) :
+class SimpleRecyclerViewAdaptor(private val data: List<SimpleRecyclerViewItem>) :
         androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
         val layout = when (viewType) {

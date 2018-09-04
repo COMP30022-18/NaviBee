@@ -90,14 +90,14 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
         // Setup view model
         viewModel = ViewModelProviders.of(this).get(DestinationSearchResultViewModel::class.java)
 
+        subscribe()
+
         // Setup data for loading screen
         destinations.add(DestinationRVIndefiniteProgressBar())
 
         // setup recycler view
         viewManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         viewAdapter = DestinationsRVAdaptor(destinations)
-
-        subscribe()
 
         recyclerView = navigation_destinations_search_result_recycler_view.apply {
             setHasFixedSize(true)
@@ -307,7 +307,7 @@ private class DestinationSearchResultViewModel(context: Application):
     val searchResult = MutableLiveData<Resource<PlacesSearchResponse>>()
 
     fun searchForLocation(query: String, location: Location?) {
-
+        if (searchResult.value != null) return
         val callback = object : PendingResult.Callback<PlacesSearchResponse> {
             override fun onFailure(e: Throwable?) {
                 if (e != null)

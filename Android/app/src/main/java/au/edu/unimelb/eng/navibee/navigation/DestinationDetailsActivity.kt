@@ -1,5 +1,6 @@
 package au.edu.unimelb.eng.navibee.navigation
 
+import android.app.Application
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
@@ -10,19 +11,17 @@ import android.os.Bundle
 import android.text.Html
 import android.view.View
 import android.view.WindowManager
+import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.*
 import au.edu.unimelb.eng.navibee.R
 import au.edu.unimelb.eng.navibee.utils.*
 import com.google.android.gms.location.places.*
 import com.google.android.gms.location.places.internal.zzaq
-import com.google.android.gms.tasks.Tasks
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.activity_destination_details.*
 import kotlinx.android.synthetic.main.alert_dialog_navigation_choose_transport_manners.view.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.startActivity
 import java.io.File
 import java.io.FileOutputStream
@@ -51,11 +50,12 @@ class DestinationDetailsActivity : AppCompatActivity() {
     private lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
     private lateinit var viewAdapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>
     private lateinit var viewManager: androidx.recyclerview.widget.RecyclerView.LayoutManager
-    private val listItems = ArrayList<SimpleRecyclerViewItem>()
-
-    private lateinit var geoDataClient: GeoDataClient
+    private val listItems = mutableListOf<SimpleRecyclerViewItem>()
 
     private lateinit var place: Place
+    private lateinit var placeId: String
+
+    private lateinit var viewModel: DestinationDetailsViewModel
 
     private var titleRowHeight = -1
 
@@ -76,11 +76,19 @@ class DestinationDetailsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        placeId = intent.getStringExtra(EXTRA_PLACE_ID) ?: return finish()
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS and
                 WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
 
         setContentView(R.layout.activity_destination_details)
+
+        // Setup view model
+        viewModel = ViewModelProviders.of(this)
+                .get(DestinationDetailsViewModel::class.java)
+
+        subscribe()
 
         // Action bar
         setSupportActionBar(navigation_destinations_details_toolbar)
@@ -107,8 +115,6 @@ class DestinationDetailsActivity : AppCompatActivity() {
             }
         }
 
-
-
         // Remove redundant shadow in transparent app bar
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             navigation_destinations_details_appbar.outlineProvider = null
@@ -133,31 +139,50 @@ class DestinationDetailsActivity : AppCompatActivity() {
         // Carousel view
         navigation_destinations_details_image_preview.pageCount = 1
         navigation_destinations_details_image_preview.setImageListener { position, imageView ->
-            photoMetadata?.let { pm ->
-                val photo = pm[position]
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder, null))
-                } else {
-                    imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder))
-                }
-                object : ImageViewCacheLoader(imageView) {
-                    override val defaultKey = photo.photoReference
-
-
-
-                    override fun loadTask(file: File) {
-                        geoDataClient.getPhoto(pm[position]).addOnSuccessListener { data ->
-                            val outputStream = FileOutputStream(file)
-                            data.bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream)
-                            outputStream.close()
-                            postLoad(file)
-                        }
-                    }
-                }.execute()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder, null))
+            } else {
+                imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder))
             }
+
+            viewModel.loadImageWithCache(position, imageView)
         }
 
-        // Layout adjustment
+        layoutAdjustment()
+
+        viewModel.loadDetails(placeId)
+        viewModel.loadImageList(placeId)
+
+    }
+
+    private fun subscribe() {
+        viewModel.placeDetails.observe(this, Observer {
+            if (it.status == Resource.Status.SUCCESS)
+                it.data?.get(0)?.run {
+                    renderPlaceDetails(this)
+                    viewAdapter.notifyDataSetChanged()
+
+                    addRecentSearchQuery(applicationContext, LocationSearchHistory(
+                            googlePlaceId = id,
+                            name = name ?: "",
+                            address = address ?: ""
+                    ))
+                }
+        } )
+
+        viewModel.placePhotos.observe(this, Observer {
+            if (it.status == Resource.Status.SUCCESS)
+                it.data?.run {
+                    navigation_destinations_details_image_preview.pageCount = count
+                }
+        } )
+
+        viewModel.attributions.observe(this, Observer {
+            updateAttributionsRow(it)
+        })
+    }
+
+    private fun layoutAdjustment() {
         val bottomSheetBehavior =
                 BottomSheetBehavior.from(recyclerView)
         bottomSheetBehavior.peekHeight = (resources.displayMetrics.heightPixels * 0.618).toInt()
@@ -193,35 +218,16 @@ class DestinationDetailsActivity : AppCompatActivity() {
             }
 
         })
-
-        val placeId: String = intent.getStringExtra(EXTRA_PLACE_ID) ?: return finish()
-
-        geoDataClient = Places.getGeoDataClient(this)
-
-        launch(UI) {
-            val photoTask = async { loadImage(placeId) }
-            val placeTask = async { loadDetails(placeId) }
-
-            val photo = photoTask.await()
-            val place = placeTask.await()
-
-            supportActionBar?.title = place?.name
-            navigation_destinations_details_image_preview.pageCount = photo?.count ?: 0
-            updateAttributionsRow(attributions)
-            viewAdapter.notifyDataSetChanged()
-
-            addRecentSearchQuery(applicationContext, LocationSearchHistory(
-                    googlePlaceId = placeId,
-                    name = place?.name ?: "",
-                    address = place?.address ?: "",
-                    photoReference = photo?.get(0)?.photoReference
-            ))
-        }
-
-
     }
 
-    private fun updateAttributionsRow(attributions: ArrayList<CharSequence>) {
+    private fun updateAttributionsRow(attributions: List<CharSequence>) {
+        if (attributions.isEmpty()) {
+            if (listItems.last() is SimpleRVAttributions) {
+                listItems.removeAt(listItems.lastIndex)
+                viewAdapter.notifyItemRemoved(listItems.size)
+            }
+            return
+        }
         val attrHTML = resources.getString(R.string.search_result_attributions) +
                 "<br>" +
                 attributions.joinToString(", ")
@@ -230,12 +236,12 @@ class DestinationDetailsActivity : AppCompatActivity() {
         } else {
             Html.fromHtml(attrHTML)
         }
-        if (listItems[listItems.size - 1] is SimpleRVAttributions) {
-            listItems[listItems.size - 1] = SimpleRVAttributions(formattedHtml)
-            viewAdapter.notifyItemChanged(listItems.size - 1)
+        if (listItems.last() is SimpleRVAttributions) {
+            listItems[listItems.lastIndex] = SimpleRVAttributions(formattedHtml)
+            viewAdapter.notifyItemChanged(listItems.lastIndex)
         } else {
             listItems.add(SimpleRVAttributions(formattedHtml))
-            viewAdapter.notifyItemInserted(listItems.size - 1)
+            viewAdapter.notifyItemInserted(listItems.lastIndex)
         }
     }
 
@@ -286,30 +292,15 @@ class DestinationDetailsActivity : AppCompatActivity() {
         }
         dialog.show()
     }
+    private fun renderPlaceDetails(place: Place) {
+        supportActionBar?.title = place.name
 
-    private fun loadImage(placeId: String): PlacePhotoMetadataBuffer? {
-        val data = geoDataClient.getPlacePhotos(placeId).run {
-            Tasks.await(this)
-            this.result
-        }.photoMetadata ?: return null
+        var attributions: SimpleRVAttributions? = null
 
-        if (data.count > 0) {
-            photoMetadata = data
-            for (i in photoMetadata!!) {
-                if (!i.attributions.isNullOrBlank())
-                    attributions.add(i.attributions)
-            }
+        if (listItems.isNotEmpty() && listItems.last() is SimpleRVAttributions) {
+            attributions = listItems.last() as SimpleRVAttributions
         }
-
-        return data
-    }
-
-    private fun loadDetails(placeId: String): Place? {
-        val place = geoDataClient.getPlaceById(placeId).run {
-            Tasks.await(this)
-            this.result
-        }[0] ?: return null
-
+        
         listItems.clear()
         listItems.add(
                 SimpleRVTextPrimarySecondaryStatic(
@@ -356,10 +347,83 @@ class DestinationDetailsActivity : AppCompatActivity() {
                         })
                     }
             ))
-        if (!place.attributions.isNullOrBlank()) {
-            attributions.add(place.attributions!!)
-        }
+        if (attributions != null)
+            listItems.add(attributions)
+    }
+}
 
-        return place
+private class DestinationDetailsViewModel(private val context: Application):
+        AndroidViewModel(context) {
+
+    val placeDetails = MutableLiveData<Resource<PlaceBufferResponse>>()
+    val placePhotos = MutableLiveData<Resource<PlacePhotoMetadataBuffer>>()
+    val attributions = MediatorLiveData<List<CharSequence>>()
+
+    private val attributionsObserver = Observer<Any> {
+        val l = mutableListOf<CharSequence>()
+        placeDetails.value?.run {
+            if (status == Resource.Status.SUCCESS &&
+                    !data?.attributions.isNullOrBlank())
+                l.add(data?.attributions!!)
+            data?.mapNotNull { i -> i.attributions }
+                    ?.forEach { i -> if (!i.isBlank()) l.add(i) }
+        }
+        placePhotos.value?.run {
+            if (status == Resource.Status.SUCCESS) {
+                data?.mapNotNull { i -> i.attributions }
+                    ?.forEach { i -> if (!i.isBlank()) l.add(i) }
+            }
+        }
+        attributions.value = l.toList()
+    }
+
+    init {
+        attributions.addSource(placeDetails, attributionsObserver)
+        attributions.addSource(placePhotos, attributionsObserver)
+    }
+
+    private var geoDataClient = Places.getGeoDataClient(context)
+
+    fun loadImageList(placeId: String) {
+        if (placePhotos.value != null) return
+        geoDataClient.getPlacePhotos(placeId).addOnSuccessListener {
+            placePhotos.postValue(Resource.success(it.photoMetadata))
+        }.addOnFailureListener {
+            placePhotos.postValue(Resource.error(it))
+        }
+    }
+
+    fun loadDetails(placeId: String) {
+        if (placeDetails.value != null) return
+        geoDataClient.getPlaceById(placeId).addOnSuccessListener {
+            placeDetails.postValue(Resource.success(it))
+        }.addOnFailureListener {
+            placeDetails.postValue(Resource.error(it))
+        }
+    }
+
+    fun loadImageWithCache(position: Int, imageView: ImageView) {
+        val resources = context.resources
+
+        placePhotos.value?.data?.let { pm ->
+            val photo = pm[position]
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder, null))
+            } else {
+                imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder))
+            }
+            object : ImageViewCacheLoader(imageView) {
+                override val defaultKey = photo.photoReference
+
+                override fun loadTask(file: File) {
+                    geoDataClient.getPhoto(pm[position]).addOnSuccessListener { data ->
+                        val outputStream = FileOutputStream(file)
+                        data.bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream)
+                        outputStream.close()
+                        postLoad(file)
+                    }
+                }
+            }.execute()
+        }
     }
 }
