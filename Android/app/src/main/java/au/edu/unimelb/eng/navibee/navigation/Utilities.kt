@@ -28,7 +28,7 @@ fun loadGoogleMapsImage(placeId: String, iv: ImageView, maxHeight: Int) {
             GoogleMapsPhotoReferenceCacheImageLoader(
                     this[0]?.photoReference ?: "",
                     iv,
-                    maxHeight).execute()
+                    maxHeight).execute("${placeDetails.placeId}-0")
         }
     }
 }

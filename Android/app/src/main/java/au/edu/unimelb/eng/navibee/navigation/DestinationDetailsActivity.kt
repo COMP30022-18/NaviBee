@@ -52,7 +52,6 @@ class DestinationDetailsActivity : AppCompatActivity() {
     private lateinit var viewManager: androidx.recyclerview.widget.RecyclerView.LayoutManager
     private val listItems = mutableListOf<SimpleRecyclerViewItem>()
 
-    private lateinit var place: Place
     private lateinit var placeId: String
 
     private lateinit var viewModel: DestinationDetailsViewModel
@@ -272,22 +271,26 @@ class DestinationDetailsActivity : AppCompatActivity() {
                 }
                 .create()
         dialogView.navigation_directions_transport_manners_dialog_walk.setOnClickListener {
-            startActivity<NavigationActivity>(
-                    NavigationActivity.EXTRA_DEST_LAT to place.latLng.latitude,
-                    NavigationActivity.EXTRA_DEST_LON to place.latLng.longitude,
-                    NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_WALKING
-            )
+            viewModel.placeDetails.value?.data?.get(0)?.also { place ->
+                startActivity<NavigationActivity>(
+                        NavigationActivity.EXTRA_DEST_LAT to place.latLng.latitude,
+                        NavigationActivity.EXTRA_DEST_LON to place.latLng.longitude,
+                        NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_WALKING
+                )
+            }
             dialog.dismiss()
         }
         dialogView.navigation_directions_transport_manners_dialog_transit.setOnClickListener {
             dialog.dismiss()
         }
         dialogView.navigation_directions_transport_manners_dialog_drive.setOnClickListener {
-            startActivity<NavigationActivity>(
-                    NavigationActivity.EXTRA_DEST_LAT to place.latLng.latitude,
-                    NavigationActivity.EXTRA_DEST_LON to place.latLng.longitude,
-                    NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_DRIVING
-            )
+            viewModel.placeDetails.value?.data?.get(0)?.also { place ->
+                startActivity<NavigationActivity>(
+                        NavigationActivity.EXTRA_DEST_LAT to place.latLng.latitude,
+                        NavigationActivity.EXTRA_DEST_LON to place.latLng.longitude,
+                        NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_DRIVING
+                )
+            }
             dialog.dismiss()
         }
         dialog.show()

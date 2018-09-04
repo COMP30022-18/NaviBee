@@ -74,7 +74,7 @@ class DestinationsRVAdaptor(private val data: ArrayList<DestinationRVItem>) :
                                 data.googlePhotoReference,
                                 holder.itemView.recycler_view_destinations_list_entry_preview,
                                 viewHeight
-                        ).execute()
+                        ).execute("${data.googlePlaceId}-0")
                     }
                     data.googlePlaceId != null -> {
                         val viewHeight = Resources.getSystem().displayMetrics.heightPixels
