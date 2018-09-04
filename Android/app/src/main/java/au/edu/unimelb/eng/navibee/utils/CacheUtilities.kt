@@ -33,7 +33,6 @@ abstract class CachedLoader(private val prefix: String = "general-cache") {
         )
 
         if (file.exists()) {
-            Timber.d("Hit cache: $k")
             postLoad(file)
         } else {
             loadTask(file)
