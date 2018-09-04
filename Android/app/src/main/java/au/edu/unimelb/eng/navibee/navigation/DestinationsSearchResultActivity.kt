@@ -250,7 +250,7 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
 
     private fun initializeMap() {
         val gm = googleMap
-        if (gm != null) {
+        if (gm != null && searchResults.isNotEmpty()) {
             val latLngBoundsBuilder = LatLngBounds.Builder()
             for ((i, item) in searchResults.withIndex()) {
                 val coord = GmsLatLng(item.geometry.location.lat,
