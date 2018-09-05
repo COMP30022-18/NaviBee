@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
@@ -118,6 +119,8 @@ public class Conversation {
         try {
             UploadTask uploadTask = FirebaseStorageHelper.uploadImage(uri,null, "message", 70);
             uploadTask.addOnSuccessListener(taskSnapshot -> sendMessage("image", taskSnapshot.getStorage().getPath()));
+            uploadTask.addOnCanceledListener(() -> Toast.makeText(NaviBeeApplication.getInstance(), "Failed to send the photo.", Toast.LENGTH_LONG).show());
+            uploadTask.addOnFailureListener(taskSnapshot -> Toast.makeText(NaviBeeApplication.getInstance(), "Failed to send the photo.", Toast.LENGTH_LONG).show());
         } catch (Exception e) {
             Log.w(TAG, "sendPicture", e);
         }
