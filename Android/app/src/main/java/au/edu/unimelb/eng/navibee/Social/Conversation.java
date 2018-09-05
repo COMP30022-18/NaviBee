@@ -3,6 +3,8 @@ package au.edu.unimelb.eng.navibee.social;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import androidx.annotation.Nullable;
+
+import android.net.Uri;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -112,16 +114,13 @@ public class Conversation {
                 .document(conversationId).collection("messages").add(message);
     }
 
-    public void sendPicture(Bitmap bitmap) {
-        UploadTask uploadTask = FirebaseStorageHelper.uploadImage(bitmap,null, "message", 70);
-        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                sendMessage("image", taskSnapshot.getStorage().getPath());
-            }
-        });
-
-
+    public void sendPicture(Uri uri) {
+        try {
+            UploadTask uploadTask = FirebaseStorageHelper.uploadImage(uri,null, "message", 70);
+            uploadTask.addOnSuccessListener(taskSnapshot -> sendMessage("image", taskSnapshot.getStorage().getPath()));
+        } catch (Exception e) {
+            Log.w(TAG, "sendPicture", e);
+        }
     }
 
     public Message getMessageById(String msgId) {
