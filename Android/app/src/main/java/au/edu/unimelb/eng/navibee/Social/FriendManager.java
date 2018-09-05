@@ -156,28 +156,12 @@ public class FriendManager {
         }
     }
 
-    public void addFriend(String targetUid) {
+    public Task<HttpsCallableResult> addFriend(String targetUid) {
         FirebaseFunctions mFunctions = FirebaseFunctions.getInstance();
         Map<String, Object> data = new HashMap<>();
         data.put("targetUid", targetUid);
 
-        mFunctions
-            .getHttpsCallable("addFriend")
-            .call(data)
-            .continueWith(new Continuation<HttpsCallableResult, String>() {
-                @Override
-                public String then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                    // This continuation runs on either success or failure, but if the task
-                    // has failed then getResult() will throw an Exception which will be
-                    // propagated down.
-//                    String result = (String) task.getResult().getData();
-//                    return result;
-                    return "";
-                }
-            });
-
-
-
+        return mFunctions.getHttpsCallable("addFriend").call(data);
     }
 
 
