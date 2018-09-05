@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -15,19 +16,20 @@
         app:radius="0dp"
         app:autoPlay="false"
         app:strokeColor="#FFFFFFFF"
-        app:strokeWidth="1dp" />
+        app:strokeWidth="1dp">
+    </com.synnapps.carouselview.CarouselView>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/event.details.recycler_view"
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/event.details.recycler_view"
         app:behavior_hideable="false"
         android:background="@color/white"
         app:behavior_peekHeight="600dp"
-        app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         android:fitsSystemWindows="true" />
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/event.details.fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -60,4 +62,5 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.45" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
