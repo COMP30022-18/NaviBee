@@ -97,7 +97,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             //If you want the Bitmap.
 
-            conversation.sendPicture(r.getBitmap());
+            conversation.sendPicture(r.getUri());
 
             //Image path
             //r.getPath();
@@ -207,7 +207,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
             } else if (mDataset.get(position).getType().equals("image")) {
                 ((ImageView) holder.itemView.findViewById(R.id.message_image)).setVisibility(View.VISIBLE);
-                FirebaseStorageHelper.loadImage(((ImageView) holder.itemView.findViewById(R.id.message_image)), mDataset.get(position).getData());
+                FirebaseStorageHelper.loadImage(((ImageView) holder.itemView.findViewById(R.id.message_image)), mDataset.get(position).getData(), true);
             } else if (mDataset.get(position).getType().equals("voicecall")) {
                 ((TextView) holder.itemView.findViewById(R.id.message_text)).setText("[Voice Call]");
                 ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
