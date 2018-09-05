@@ -130,7 +130,10 @@
         <activity
             android:name=".SosSettingActivity"
             android:label="@string/sos_setting" />
-        <activity android:name=".social.VoiceCallActivity"></activity>
+        <activity android:name=".social.VoiceCallActivity" />
+        <activity
+            android:name=".social.ChatImageViewActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

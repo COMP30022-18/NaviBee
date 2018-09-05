@@ -137,6 +137,10 @@ public class FirebaseStorageHelper {
     }
 
     public static void loadImage(ImageView imageView, String filePath, boolean isThumb) {
+        loadImage(imageView, filePath, isThumb, null);
+    }
+
+    public static void loadImage(ImageView imageView, String filePath, boolean isThumb, Callback callback) {
 
         if (isThumb) {
             int where = filePath.lastIndexOf(".");
@@ -150,6 +154,7 @@ public class FirebaseStorageHelper {
         if (file.exists()) {
             // cache exists
             NetworkImageHelper.loadImageFromCacheFile(imageView, file);
+            if (callback!=null) callback.callback(true);
         } else {
             // cache not exists
 
@@ -159,11 +164,16 @@ public class FirebaseStorageHelper {
             storageRef.getFile(file).addOnSuccessListener(taskSnapshot -> {
                 // Local temp file has been created
                 NetworkImageHelper.loadImageFromCacheFile(imageView, file);
+                if (callback!=null) callback.callback(true);
+            }).addOnFailureListener(taskSnapshot -> {
+                if (callback!=null) callback.callback(false);
             });
 
         }
+    }
 
-
+    public interface Callback {
+        void callback(boolean isSuccess);
     }
 
 }

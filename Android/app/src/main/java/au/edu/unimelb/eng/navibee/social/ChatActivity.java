@@ -64,7 +64,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         chatRecyclerView.setHasFixedSize(true);
         chatLayoutManager = new LinearLayoutManager(this);
         chatRecyclerView.setLayoutManager(chatLayoutManager);
-        chatAdapter = new ChatAdapter(conversation.getCurrentMessageList());
+        chatAdapter = new ChatAdapter(conversation.getCurrentMessageList(), chatRecyclerView, this);
         chatRecyclerView.setAdapter(chatAdapter);
 
         currentMsgCount = conversation.getMessageCount();
@@ -147,7 +147,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    public static class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHolder> {
+    public static class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHolder> implements View.OnClickListener {
 
 
         public static class MessageViewHolder extends RecyclerView.ViewHolder{
@@ -158,6 +158,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         private ArrayList<Conversation.Message> mDataset;
+        private RecyclerView mRecyclerView;
+        private ChatActivity chatActivity;
 
         private final String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -165,8 +167,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         private static final int VT_RECV=1;
 
         // Provide a suitable constructor (depends on the kind of dataset)
-        public ChatAdapter(ArrayList<Conversation.Message> myDataset) {
+        public ChatAdapter(ArrayList<Conversation.Message> myDataset, RecyclerView recyclerView, ChatActivity chatActivity) {
+            this.chatActivity = chatActivity;
             mDataset = myDataset;
+            mRecyclerView = recyclerView;
         }
 
         public void addMessage(Conversation.Message message) {
@@ -189,6 +193,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             int resource = (viewType==VT_RECV)? R.layout.layout_recipient_message: R.layout.layout_sender_message;
             View v = LayoutInflater.from(parent.getContext()).inflate(resource, parent, false);
+            v.setOnClickListener(this);
             MessageViewHolder vh = new MessageViewHolder(v);
             return vh;
         }
@@ -219,5 +224,17 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         public int getItemCount() {
             return mDataset.size();
         }
+
+        @Override
+        public void onClick(final View view) {
+            int itemPosition = mRecyclerView.getChildLayoutPosition(view);
+            Conversation.Message msg = mDataset.get(itemPosition);
+            if (msg.getType().equals("image")) {
+                Intent intent = new Intent(chatActivity.getBaseContext(), ChatImageViewActivity.class);
+                intent.putExtra("IMG_FS_PATH", msg.getData());
+                chatActivity.startActivity(intent);
+            }
+        }
+
     }
 }
