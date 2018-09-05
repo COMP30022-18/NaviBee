@@ -2,6 +2,7 @@ package au.edu.unimelb.eng.navibee;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -11,6 +12,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
+import com.synnapps.carouselview.CarouselView;
+import com.synnapps.carouselview.ImageListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,6 +41,8 @@ public class EventDetailsActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager viewManager;
     private ArrayList<SimpleRecyclerViewItem> listItems = new ArrayList<>();
 
+    private CarouselView carouselView;
+
     private EventActivity.EventItem eventItem;
     private Map<String, String> result;
 
@@ -59,6 +64,7 @@ public class EventDetailsActivity extends AppCompatActivity {
             }
         });
 
+        // Loading screen
         listItems.add(new SimpleRVIndefiniteProgressBar());
 
         // Recycler View
@@ -72,6 +78,17 @@ public class EventDetailsActivity extends AppCompatActivity {
         recyclerView.setAdapter(viewAdapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
 
+        // Carousel view
+        carouselView = (CarouselView) findViewById(R.id.event_details_image_preview);
+        carouselView.setPageCount(1);
+        carouselView.setImageListener(new ImageListener() {
+            @Override
+            public void setImageForPosition(int position, ImageView imageView) {
+
+            }
+        });
+
+        // Get event data
         db.collection("events").document(eid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
