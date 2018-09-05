@@ -132,7 +132,7 @@
             android:label="@string/sos_setting" />
         <activity
             android:name=".EventDetailsActivity"
-            android:label="@string/event_detail" />
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
         <activity android:name=".social.VoiceCallActivity"></activity>
     </application>
 

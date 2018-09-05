@@ -1,10 +1,17 @@
 package au.edu.unimelb.eng.navibee;
 
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowInsets;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,7 +28,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,6 +55,9 @@ public class EventDetailsActivity extends AppCompatActivity {
     private EventActivity.EventItem eventItem;
     private Map<String, String> result;
 
+    private int titleRowHeight = -1;
+    private int primaryColor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +75,55 @@ public class EventDetailsActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        AppBarLayout appbar = (AppBarLayout) findViewById(R.id.event_details_appbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.event_details_toolbar);
+        View toolbarPadding = (View) findViewById(R.id.event_details_toolbar_padding);
+        TextView fabText = (TextView) findViewById(R.id.event_details_fab_text);
+
+        // Get primary color
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            primaryColor = getResources().getColor(R.color.colorPrimary, null);
+        } else {
+            primaryColor = getResources().getColor(R.color.colorPrimary);
+        }
+
+        // Action Bar
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(true);
+        }
+
+        // Set padding for status bar
+        // Require API 20
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            toolbarPadding.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+                @Override
+                public WindowInsets onApplyWindowInsets(View view, WindowInsets windowInsets) {
+                    ViewGroup.LayoutParams layoutParams = toolbarPadding.getLayoutParams();
+                    layoutParams.height = windowInsets.getSystemWindowInsetTop();
+                    toolbarPadding.setLayoutParams(layoutParams);
+
+                    return windowInsets;
+                }
+            });
+        } else {
+            ViewGroup.LayoutParams layoutParams = toolbarPadding.getLayoutParams();
+
+            int resId = toolbarPadding.getResources().getIdentifier("status_bar_height", "dimen", "android");
+            if (resId > 0) {
+                layoutParams.height = toolbarPadding.getResources().getDimensionPixelOffset(resId);
+            } else {
+                layoutParams.height = 1024;
+            }
+            toolbarPadding.setLayoutParams(layoutParams);
+        }
+
+        // Remove redundant shadow in transparent app bar
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            appbar.setOutlineProvider(null);
+        }
 
         // Loading screen
         listItems.add(new SimpleRVIndefiniteProgressBar());
@@ -84,7 +145,55 @@ public class EventDetailsActivity extends AppCompatActivity {
         carouselView.setImageListener(new ImageListener() {
             @Override
             public void setImageForPosition(int position, ImageView imageView) {
+//                imageView.setImageBitmap();
+//                imageView.setImageResource(R.drawable.navibee_placeholder);
+                imageView.setImageDrawable(getResources().getDrawable(R.drawable.navibee_placeholder));
 
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    imageView.setImageDrawable(getResources().getDrawable(R.drawable.navibee_placeholder, null));
+                } else {
+                    imageView.setImageDrawable(getResources().getDrawable(R.drawable.navibee_placeholder));
+                }
+            }
+        });
+
+        // Layout adjustment
+        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(recyclerView);
+        bottomSheetBehavior.setPeekHeight((int) (getResources().getDisplayMetrics().heightPixels * 0.618));
+        recyclerView.setMinimumHeight((int) (getResources().getDisplayMetrics().heightPixels * 0.618));
+
+        ViewGroup.LayoutParams layoutParams = carouselView.getLayoutParams();
+        layoutParams.height = (int) (getResources().getDisplayMetrics().heightPixels * 0.380);
+        carouselView.setLayoutParams(layoutParams);
+
+        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View view, int i) {
+                if (listItems.size() > 0 && (listItems.get(0) instanceof SimpleRVTextPrimarySecondaryStatic)) {
+                    if (i == BottomSheetBehavior.STATE_DRAGGING && titleRowHeight == -1) {
+                        if (viewManager.findViewByPosition(0) != null) {
+                            titleRowHeight = viewManager.findViewByPosition(0).getHeight();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View view, float v) {
+                if (listItems.size() > 0 && (listItems.get(0) instanceof  SimpleRVTextPrimarySecondaryStatic)) {
+                    View item = viewManager.findViewByPosition(0);
+                    if (item == null) {
+                        return;
+                    }
+                    setViewHeightPercent(item, 1 - v, getSupportActionBar().getHeight(), titleRowHeight);
+
+                    toolbar.setTitleTextColor(colorRGBA(0, 0, 0, v));
+                    toolbar.setBackgroundColor(colorA(primaryColor, v));
+                    toolbarPadding.setBackgroundColor(colorA(primaryColor, v));
+                    fabText.setScaleX(1 - v);
+                    fabText.setScaleY(1 - v);
+                }
             }
         });
 
@@ -163,5 +272,19 @@ public class EventDetailsActivity extends AppCompatActivity {
                     viewAdapter.notifyDataSetChanged();
                 }
             });
+    }
+
+    private void setViewHeightPercent(View view, float percentage, int min, int max) {
+        ViewGroup.LayoutParams params = view.getLayoutParams();
+        params.height = (int) (min + (max - min) * percentage);
+        view.setLayoutParams(params);
+    }
+
+    private int colorA(int color, float alpha) {
+        return colorRGBA(Color.red(color), Color.green(color), Color.blue(color), alpha);
+    }
+
+    private int colorRGBA(int red, int green, int blue, float alpha) {
+        return (int) (alpha * 255) << 24 | (red << 16) | (green << 8) | blue;
     }
 }
