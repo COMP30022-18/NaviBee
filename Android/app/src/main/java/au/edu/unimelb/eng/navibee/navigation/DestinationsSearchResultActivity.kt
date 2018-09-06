@@ -296,7 +296,7 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
 }
 
 
-private class DestinationSearchResultViewModel(context: Application):
+private class DestinationSearchResultViewModel(val context: Application):
         AndroidViewModel(context) {
 
     // Google Maps Geo API Context
@@ -327,10 +327,9 @@ private class DestinationSearchResultViewModel(context: Application):
                     .rankby(RankBy.DISTANCE)
             request.setCallback(callback)
         } else {
-            // TODO: Allow configurable region of search.
             val request = PlacesApi
                     .textSearchQuery(geoContext, query)
-                    .custom("region", "au")
+                    .custom("region", getSearchRegion(context))
             request.setCallback(callback)
         }
     }

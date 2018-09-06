@@ -260,41 +260,61 @@ class DestinationDetailsActivity : AppCompatActivity() {
     }
 
     fun onClickGo(view: View) {
-        val dialogView = layoutInflater.inflate(R.layout.alert_dialog_navigation_choose_transport_manners,
-                null)
-        val dialog = AlertDialog.Builder(this)
-                .setTitle(R.string.alert_dialog_title_select_method_of_travel)
-                .setView(dialogView)
-                .setNegativeButton(R.string.button_cancel) { dialog, which ->
-                    if (which == DialogInterface.BUTTON_NEGATIVE)
-                        dialog.dismiss()
+        when (getMeanOfTransport(applicationContext)) {
+            MEAN_OF_TRANSPORT_ALWAYS_ASK -> {
+                // TODO: Implement just once/always dialog.
+                val dialogView = layoutInflater.inflate(R.layout.alert_dialog_navigation_choose_transport_manners,
+                        null)
+                val dialog = AlertDialog.Builder(this)
+                        .setTitle(R.string.alert_dialog_title_select_method_of_travel)
+                        .setView(dialogView)
+                        .setNegativeButton(R.string.button_cancel) { dialog, which ->
+                            if (which == DialogInterface.BUTTON_NEGATIVE)
+                                dialog.dismiss()
+                        }
+                        .create()
+                dialogView.navigation_directions_transport_manners_dialog_walk.setOnClickListener {
+                    startWalkingNavigation()
+                    dialog.dismiss()
                 }
-                .create()
-        dialogView.navigation_directions_transport_manners_dialog_walk.setOnClickListener {
-            viewModel.placeDetails.value?.data?.get(0)?.also { place ->
-                startActivity<NavigationActivity>(
-                        NavigationActivity.EXTRA_DEST_LAT to place.latLng.latitude,
-                        NavigationActivity.EXTRA_DEST_LON to place.latLng.longitude,
-                        NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_WALKING
-                )
+                dialogView.navigation_directions_transport_manners_dialog_transit.setOnClickListener {
+                    // TODO("Start walking navigation")
+                    dialog.dismiss()
+                }
+                dialogView.navigation_directions_transport_manners_dialog_drive.setOnClickListener {
+                    startDrivingNavigation()
+                    dialog.dismiss()
+                }
+                dialog.show()
             }
-            dialog.dismiss()
+            MEAN_OF_TRANSPORT_DRIVE -> startDrivingNavigation()
+            MEAN_OF_TRANSPORT_WALK -> startWalkingNavigation()
+            MEAN_OF_TRANSPORT_TRANSIT -> { /* TODO("Start walking navigation") */ }
         }
-        dialogView.navigation_directions_transport_manners_dialog_transit.setOnClickListener {
-            dialog.dismiss()
-        }
-        dialogView.navigation_directions_transport_manners_dialog_drive.setOnClickListener {
-            viewModel.placeDetails.value?.data?.get(0)?.also { place ->
-                startActivity<NavigationActivity>(
-                        NavigationActivity.EXTRA_DEST_LAT to place.latLng.latitude,
-                        NavigationActivity.EXTRA_DEST_LON to place.latLng.longitude,
-                        NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_DRIVING
-                )
-            }
-            dialog.dismiss()
-        }
-        dialog.show()
+
+
     }
+
+    private fun startWalkingNavigation() {
+        viewModel.placeDetails.value?.data?.get(0)?.also { place ->
+            startActivity<NavigationActivity>(
+                    NavigationActivity.EXTRA_DEST_LAT to place.latLng.latitude,
+                    NavigationActivity.EXTRA_DEST_LON to place.latLng.longitude,
+                    NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_WALKING
+            )
+        }
+    }
+
+    private fun startDrivingNavigation() {
+        viewModel.placeDetails.value?.data?.get(0)?.also { place ->
+            startActivity<NavigationActivity>(
+                    NavigationActivity.EXTRA_DEST_LAT to place.latLng.latitude,
+                    NavigationActivity.EXTRA_DEST_LON to place.latLng.longitude,
+                    NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_DRIVING
+            )
+        }
+    }
+
     private fun renderPlaceDetails(place: Place) {
         supportActionBar?.title = place.name
 
