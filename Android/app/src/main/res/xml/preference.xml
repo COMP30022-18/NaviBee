@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/pref_section_title_navigation">
+        <ListPreference
+            android:key="navigation_preferred_mean_of_transport"
+            android:title="@string/pref_navigation_preferred_mean_of_transport"
+            android:dialogTitle="@string/pref_navigation_preferred_mean_of_transport"
+            android:entries="@array/pref_navigation_preferred_mean_of_transport_titles"
+            android:entryValues="@array/pref_navigation_preferred_mean_of_transport_values"
+            android:defaultValue="@string/pref_navigation_preferred_mean_of_transport_default"
+            android:icon="@drawable/ic_directions_car_black80_24dp"/>
+        <ListPreference
+            android:key="navigation_search_region"
+            android:title="@string/pref_navigation_search_region"
+            android:dialogTitle="@string/pref_navigation_search_region"
+            android:entries="@array/pref_navigation_search_region_titles"
+            android:entryValues="@array/pref_navigation_search_region_values"
+            android:defaultValue="@string/pref_navigation_search_region_values_default"
+            android:icon="@drawable/ic_location_on_black80_24dp"
+            android:summary="@string/pref_navigation_search_region_summary"/>
+    </PreferenceCategory>
+</PreferenceScreen>

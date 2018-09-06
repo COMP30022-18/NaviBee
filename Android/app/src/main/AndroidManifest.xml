@@ -100,6 +100,7 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".navigation.DestinationsActivity" />
+
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -121,8 +122,6 @@
         <activity
             android:name=".navigation.NavigationActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-
-
         <activity
             android:name=".social.ChatActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -135,7 +134,15 @@
         <activity
             android:name=".SosSettingActivity"
             android:label="@string/sos_setting" />
-        <activity android:name=".social.VoiceCallActivity"></activity>
+        <activity android:name=".social.VoiceCallActivity" />
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="au.edu.unimelb.eng.navibee.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
