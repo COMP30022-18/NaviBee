@@ -120,7 +120,7 @@ class DestinationDetailsActivity : AppCompatActivity() {
         }
 
         // Setup data for loading screen
-        supportActionBar?.title = resources.getString(R.string.loading)
+        supportActionBar?.title = resources.getString(R.string.prompt_loading)
         navigation_destinations_details_toolbar.setTitleTextColor(0)
         listItems.add(SimpleRVIndefiniteProgressBar())
 

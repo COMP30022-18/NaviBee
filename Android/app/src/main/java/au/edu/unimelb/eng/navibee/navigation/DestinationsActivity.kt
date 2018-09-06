@@ -97,7 +97,7 @@ class DestinationsActivity : AppCompatActivity(){
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu
-        this.menuInflater.inflate(R.menu.navigation_destinations_opiton_menu, menu)
+        this.menuInflater.inflate(R.menu.menu_navigation_destinations_opitons, menu)
 
         val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
 
