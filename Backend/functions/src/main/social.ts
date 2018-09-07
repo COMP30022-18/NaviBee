@@ -56,7 +56,7 @@ export const newMessageNotification = functions.firestore
             let token = tokenDoc.id;
             try {
                 msg.send({token: token, android: android});
-            } catch (Exception ex) {
+            } catch(Error) {
                 // token is invalid
             }
         });
