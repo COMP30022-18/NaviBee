@@ -16,10 +16,10 @@
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="Place 1"
         app:layout_constraintEnd_toStartOf="@+id/recycler_view_destinations_list_entry_preview"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@tools:sample/cities"/>
 
     <TextView
         android:id="@+id/recycler_view_destinations_list_entry_subtitle"
@@ -30,7 +30,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        tools:text="Location 1"
+        tools:text="@tools:sample/lorem"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/recycler_view_destinations_list_entry_preview"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,5 +45,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/navibee_placeholder" />
+        app:srcCompat="@drawable/navibee_placeholder"
+        tools:srcCompat="@tools:sample/backgrounds/scenic"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

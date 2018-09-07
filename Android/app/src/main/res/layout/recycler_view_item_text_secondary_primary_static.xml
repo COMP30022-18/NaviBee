@@ -11,12 +11,12 @@
         android:id="@+id/general.recycler_view.text.secondary_primary.static.secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.List.ItemSubtitle"
+        style="@style/AppTheme.List.ItemSubtitle"
         tool:text="A long secondary text." />
     <TextView
         android:id="@+id/general.recycler_view.text.secondary_primary.static.primary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.List.ItemTitle"
+        style="@style/AppTheme.List.ItemTitle"
         tool:text="Primary text"/>
 </LinearLayout>

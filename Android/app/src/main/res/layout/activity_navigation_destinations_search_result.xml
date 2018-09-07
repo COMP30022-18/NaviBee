@@ -21,7 +21,8 @@
         app:behavior_hideable="false"
         android:background="@color/white"
         app:behavior_peekHeight="300dp"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior" />
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        tools:listitem="@layout/recycler_view_destination_list_entry"/>
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
