@@ -30,6 +30,7 @@ public class EventSelectFriendsActivity extends AppCompatActivity {
         friendNameList = new ArrayList<>();
         selectedFriendMap = new HashMap<>();
         friendList = new ArrayList<>();
+
         loadData();
 
         ListView friendListView = findViewById(R.id.event_select_friends_list);
@@ -37,6 +38,10 @@ public class EventSelectFriendsActivity extends AppCompatActivity {
 
         friendListView.setAdapter(new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_checked, friendNameList));
+        // load already selected friends
+        for(int pos=0;pos<friendList.size();pos++){
+            friendListView.setItemChecked(pos, selectedFriendMap.get(friendList.get(pos).getUid()));
+        }
 
         friendListView.setOnItemClickListener(
                 new AdapterView.OnItemClickListener()
@@ -63,6 +68,14 @@ public class EventSelectFriendsActivity extends AppCompatActivity {
             selectedFriendMap.put(p.getUid(), false);
             friendNameList.add(p.getName());
         }
+        // load already selected friends uid from previews activity
+        Intent intent = getIntent();
+        ArrayList<String> haveSelected = intent.getStringArrayListExtra("selectedUid");
+        if(haveSelected != null){
+            for(String uid: haveSelected){
+                selectedFriendMap.put(uid, true);
+            }
+        }
     }
 
     public void editEventDetail(View view){
@@ -76,7 +89,7 @@ public class EventSelectFriendsActivity extends AppCompatActivity {
         // start next step
         Intent intent = new Intent(this, EventEditActivity.class);
         intent.putStringArrayListExtra("selectedUid", selectedUidList);
-        intent.putStringArrayListExtra("selectedName", friendNameList);
-        startActivity(intent);
+        setResult(RESULT_OK, intent);
+        finish();
     }
 }

@@ -98,6 +98,7 @@
 
     <!-- Navigation styles -->
     <style name="AppTheme.Navigation" />
+
     <style name="AppTheme.Navigation.Light" parent="NavigationViewLight">
         <item name="navigationViewBannerBackground">@color/colorPrimaryDark</item>
     </style>
