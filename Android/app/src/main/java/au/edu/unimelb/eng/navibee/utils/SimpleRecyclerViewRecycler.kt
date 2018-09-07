@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import au.edu.unimelb.eng.navibee.R
+import com.google.android.material.chip.ChipGroup
 import kotlinx.android.synthetic.main.recycler_view_attributions.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_primary_secondary_clickable.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_primary_secondary_static.view.*
@@ -97,7 +98,17 @@ data class SimpleRVTextSecondaryPrimaryStatic(
         val primary: CharSequence,
         val secondary: CharSequence
 ): SimpleRecyclerViewItem()
-data class SimpleRVAttributions(val attributes: CharSequence): SimpleRecyclerViewItem()
-
+data class SimpleRVAttributions(
+        val attributes: CharSequence
+): SimpleRecyclerViewItem()
+data class SimpleRVUserChips(
+        val title: CharSequence,
+        val chips: ChipGroup
+): SimpleRecyclerViewItem()
 class SimpleRVViewHolder(view: View) :
         androidx.recyclerview.widget.RecyclerView.ViewHolder(view)
+
+data class UserChipItem(
+        val text: CharSequence,
+        val photoUrl: String
+)

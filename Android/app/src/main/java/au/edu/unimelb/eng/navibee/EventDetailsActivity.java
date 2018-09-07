@@ -10,8 +10,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipDrawable;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -36,6 +40,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVIndefiniteProgressBar;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVTextPrimarySecondaryStatic;
+import au.edu.unimelb.eng.navibee.utils.SimpleRVTextSecondaryPrimaryStatic;
+import au.edu.unimelb.eng.navibee.utils.SimpleRVUserChips;
 import au.edu.unimelb.eng.navibee.utils.SimpleRecyclerViewAdaptor;
 import au.edu.unimelb.eng.navibee.utils.SimpleRecyclerViewItem;
 
@@ -53,7 +59,7 @@ public class EventDetailsActivity extends AppCompatActivity {
     private CarouselView carouselView;
 
     private EventActivity.EventItem eventItem;
-    private Map<String, String> result;
+    private Map<String, HashMap<String, String>> result;
 
     private int titleRowHeight = -1;
     private int primaryColor;
@@ -222,57 +228,80 @@ public class EventDetailsActivity extends AppCompatActivity {
         FirebaseFunctions mFunctions = FirebaseFunctions.getInstance();
 
         mFunctions
-            .getHttpsCallable("getNamesFromUidList")
-            .call(data)
-            .addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
-                @Override
-                public void onSuccess(HttpsCallableResult httpsCallableResult) {
-                    result = (Map<String, String>) httpsCallableResult.getData();
+                .getHttpsCallable("getUserInfoFromUidList")
+                .call(data)
+                .addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
+                    @Override
+                    public void onSuccess(HttpsCallableResult httpsCallableResult) {
+                        result = (Map<String, HashMap<String, String>>) httpsCallableResult.getData();
 
-                    listItems.clear();
+                        listItems.clear();
 
-                    if (eventItem.getName() != null && eventItem.getTime_() != null) {
-                        listItems.add(new SimpleRVTextPrimarySecondaryStatic(
-                                eventItem.getName(),
-                                new SimpleDateFormat(getResources().getString(R.string.date_format)).format(eventItem.getTime_())
-                        ));
-                    }
-
-                    if (eventItem.getLocation() != null) {
-                        listItems.add(new SimpleRVTextPrimarySecondaryStatic(
-                                getResources().getString(R.string.event_details_location),
-                                eventItem.getLocation()
-                        ));
-                    }
-
-                    String holder = null;
-                    HashSet<String> participants = new HashSet<>();
-
-                    for (Map.Entry<String, String> entry : result.entrySet()) {
-                        if (entry.getKey().equals(eventItem.getHolder())) {
-                            holder = entry.getValue();
-                        } else {
-                            participants.add(entry.getValue());
+                        if (eventItem.getName() != null && eventItem.getTime_() != null) {
+                            listItems.add(new SimpleRVTextPrimarySecondaryStatic(
+                                    eventItem.getName(),
+                                    new SimpleDateFormat(getResources().getString(R.string.date_format)).format(eventItem.getTime_())
+                            ));
                         }
-                    }
 
-                    if (eventItem.getHolder() != null) {
-                        listItems.add(new SimpleRVTextPrimarySecondaryStatic(
-                                getResources().getString(R.string.event_details_organiser),
-                                holder
-                        ));
-                    }
+                        if (eventItem.getLocation() != null) {
+                            listItems.add(new SimpleRVTextSecondaryPrimaryStatic(
+                                    eventItem.getLocation(),
+                                    getResources().getString(R.string.event_details_location)
+                            ));
+                        }
 
-                    if (eventItem.getUsers() != null) {
-                        listItems.add(new SimpleRVTextPrimarySecondaryStatic(
-                                getResources().getString(R.string.event_details_participants),
-                                participants.toString()
-                        ));
-                    }
+                        String holder = null;
+                        ArrayList<String> participants = new ArrayList<>();
+                        ArrayList<String> photos = new ArrayList<>();
 
-                    viewAdapter.notifyDataSetChanged();
-                }
-            });
+                        for (String uid : result.keySet()) {
+                            HashMap<String, String> user = result.get(uid);
+                            if (uid.equals(eventItem.getHolder())) {
+                                holder = user.get("name");
+                            } else {
+                                participants.add(user.get("name"));
+                                photos.add(user.get("photoURL"));
+                            }
+                        }
+
+                        if (eventItem.getHolder() != null) {
+                            listItems.add(new SimpleRVTextSecondaryPrimaryStatic(
+                                    holder,
+                                    getResources().getString(R.string.event_details_organiser)
+                            ));
+                        }
+
+//                        ChipGroup chipGroup = (ChipGroup) findViewById(R.id.general_recycler_view_user_chip_chipgroup);
+//
+//                        for (String participant : participants) {
+//                            Chip chip = new Chip(getApplicationContext());
+//                            chip.setText(participant);
+//                            chip.setCloseIconVisible(true);
+//                            //chip.setCloseIconResource(R.drawable.your_icon);
+//                            //chip.setChipIconResource(R.drawable.your_icon);
+//                            chip.setChipBackgroundColorResource(R.color.colorPrimary);
+////                            chip.setTextAppearanceResource(R.style.ChipTextStyle);
+//                            //chip.setElevation(15);
+//
+//                            chipGroup.addView(chip);
+//                        }
+
+
+                        if (eventItem.getUsers() != null) {
+                            listItems.add(new SimpleRVTextSecondaryPrimaryStatic(
+                                    participants.toString(),
+                                    getResources().getString(R.string.event_details_participants)
+                            ));
+//                            listItems.add(new SimpleRVUserChips(
+//                                    getResources().getString(R.string.event_details_participants),
+//                                    chipGroup
+//                            ));
+                        }
+
+                        viewAdapter.notifyDataSetChanged();
+                    }
+                });
     }
 
     private void setViewHeightPercent(View view, float percentage, int min, int max) {

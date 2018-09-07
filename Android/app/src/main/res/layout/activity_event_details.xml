@@ -45,9 +45,10 @@
         android:id="@+id/event.details.recycler_view"
         app:behavior_hideable="false"
         android:background="@color/white"
-        app:behavior_peekHeight="600dp"
+        app:behavior_peekHeight="300dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-        android:fitsSystemWindows="true" />
+        android:fitsSystemWindows="true"
+        tools:listitem="@layout/recycler_view_item_text_secondary_primary_static"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/event.details.fab"

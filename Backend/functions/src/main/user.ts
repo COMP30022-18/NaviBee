@@ -16,13 +16,15 @@ export const initNewUser = functions.auth.user().onCreate((user) => {
 });
 
 
-export const getNamesFromUidList = functions.https.onCall(
+export const getUserInfoFromUidList = functions.https.onCall(
     async (data, context) => {
         const result = {};
 
         for (let uid of data.uidList) {
             let userDoc = (await db.collection('users').doc(uid).get()).data();
-            result[uid] = userDoc.name;
+            result[uid] = {};
+            result[uid]['name'] = userDoc.name;
+            result[uid]['photoURL'] = userDoc.photoURL;
         }
 
         return result;
