@@ -1,17 +1,20 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorButtonNormal">@color/white</item>
         <item name="buttonStyle">@style/AppTheme.Button</item>
-
+        <item name="materialButtonStyle">@style/AppTheme.Button</item>
     </style>
 
-    <style name="AppTheme.NoActionBar">
+    <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="buttonStyle">@style/AppTheme.Button</item>
+        <item name="materialButtonStyle">@style/AppTheme.Button</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
@@ -22,7 +25,12 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-    <style name="AppTheme.Translucent" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme.Translucent" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="buttonStyle">@style/AppTheme.Button</item>
+        <item name="materialButtonStyle">@style/AppTheme.Button</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
@@ -64,19 +72,35 @@
         <item name="android:textColor">@color/colorLightTextSecondary</item>
     </style>
 
-    <style name="AppTheme.Button" parent="Widget.AppCompat.Button">
+    <style name="AppTheme.Button" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/white</item>
+        <item name="android:textColor">@android:color/primary_text_light</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:minHeight">72sp</item>
         <item name="android:textSize">24sp</item>
     </style>
 
-    <style name="AppTheme.Button.Colored" parent="Widget.AppCompat.Button.Colored">
+    <style name="AppTheme.Button.Colored" parent="AppTheme.Button">
+        <item name="android:textColor">@android:color/primary_text_dark</item>
         <item name="android:minHeight">72sp</item>
         <item name="android:textSize">24sp</item>
     </style>
 
     <style name="AppTheme.Button.ColoredPrimary" parent="AppTheme.Button">
-        <item name="colorButtonNormal">@color/colorPrimary</item>
+        <item name="backgroundTint">@color/colorPrimary</item>
+    </style>
+
+    <style name="AppTheme.Button.LargeTextFAB" parent="AppTheme.Button">
+        <item name="backgroundTint">@color/colorAccent</item>
+        <item name="android:textColor">@android:color/primary_text_dark</item>
+        <item name="android:layout_width">72dp</item>
+        <item name="android:layout_height">84dp</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
+        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:textSize">25sp</item>
+        <item name="android:textAllCaps">true</item>
     </style>
 
     <style name="AppTheme.Text" parent="AppTheme" />

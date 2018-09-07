@@ -204,8 +204,8 @@ class DestinationDetailsActivity : AppCompatActivity() {
                             .setBackgroundColor(colorA(primaryColor, offset))
                     navigation_destinations_details_toolbar_padding
                             .setBackgroundColor(colorA(primaryColor, offset))
-                    navigation_destinations_details_fab_text.scaleX = 1 - offset
-                    navigation_destinations_details_fab_text.scaleY = 1 - offset
+                    navigation_destinations_details_fab_button.scaleX = 1 - offset
+                    navigation_destinations_details_fab_button.scaleY = 1 - offset
                 }
             }
 

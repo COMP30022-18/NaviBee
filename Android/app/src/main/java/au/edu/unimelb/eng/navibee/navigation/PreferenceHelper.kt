@@ -1,6 +1,7 @@
 package au.edu.unimelb.eng.navibee.navigation
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.beust.klaxon.Klaxon
@@ -19,9 +20,9 @@ const val MEAN_OF_TRANSPORT_WALK = "walk"
 private const val SEARCH_REGION = "navigation_search_region"
 private const val DEFAULT_SEARCH_REGION = "au"
 
-fun getNavigationSharedPref(context: Context) =
+fun getNavigationSharedPref(context: Context): SharedPreferences =
         context.getSharedPreferences(
-                NAVIGATION_PREFERENCE_KEY, Context.MODE_PRIVATE)!!
+                NAVIGATION_PREFERENCE_KEY, Context.MODE_PRIVATE)
 
 fun getRecentSearchQueries(context: Context): List<LocationSearchHistory> {
     return Klaxon()

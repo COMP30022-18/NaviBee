@@ -48,32 +48,16 @@
         android:fitsSystemWindows="true" />
 
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/navigation.destinations.details.fab_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:fabCustomSize="80dp"
-        android:layout_margin="16dp"
-        app:rippleColor="@color/white"
-        android:clickable="true"
-        android:focusable="true"
-        android:onClick="onClickGo"
+        style="@style/AppTheme.Button.LargeTextFAB"
+        android:layout_width="72dp"
+        android:layout_height="84dp"
+        android:text="@string/button_go"
+        app:cornerRadius="72dp"
         app:layout_anchor="@id/navigation.destinations.details.recycler_view"
+        android:onClick="onClickGo"
         app:layout_anchorGravity="top|end"
         android:fitsSystemWindows="true"/>
-    <TextView
-        android:id="@+id/navigation.destinations.details.fab_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textAllCaps="true"
-        android:elevation="24sp"
-        android:text="@string/button_go"
-        android:textSize="30sp"
-        android:textColor="@android:color/primary_text_dark"
-        app:layout_anchor="@id/navigation.destinations.details.fab_button"
-        app:layout_anchorGravity="center"
-        android:fitsSystemWindows="true"
-        />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
