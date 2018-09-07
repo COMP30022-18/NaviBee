@@ -242,7 +242,7 @@ public class EventActivity extends AppCompatActivity {
                 name.setText((String) eventList.get(position).getName());
 
                 TextView summary = (TextView) view.findViewById(R.id.event_summary);
-                String summaryText = new SimpleDateFormat("EEE, MMM d, HH:mm").format(eventList.get(position).getTime_());
+                String summaryText = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss").format(eventList.get(position).getTime_());
                 summary.setText((String) summaryText);
 
                 ImageView image = (ImageView) view.findViewById(R.id.event_image);
