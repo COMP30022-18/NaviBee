@@ -7,11 +7,12 @@ import androidx.preference.PreferenceManager
 import com.beust.klaxon.Klaxon
 
 const val NAVIGATION_PREFERENCE_KEY = "navigation_preference"
-const val RECENT_QUERIES = "recentQueries"
+const val RECENT_QUERIES = "recent_queries"
 const val RECENT_QUERIES_LENGTH = 5
-const val FIRST_TIME_SET_NEVER_ASK_MEAN_OF_TRANSPORT = "firstTimeSetNeverAskMeanOfTransport"
+const val FIRST_TIME_SET_NEVER_ASK_MEAN_OF_TRANSPORT = "first_time_set_never_ask_mean_of_transport"
 
 private const val MEAN_OF_TRANSPORT = "navigation_preferred_mean_of_transport"
+private const val LAST_MEAN_OF_TRANSPORT = "navigation_last_mean_of_transport"
 const val MEAN_OF_TRANSPORT_ALWAYS_ASK = "always_ask"
 const val MEAN_OF_TRANSPORT_TRANSIT = "transit"
 const val MEAN_OF_TRANSPORT_DRIVE = "drive"
@@ -48,7 +49,7 @@ fun addRecentSearchQuery(context: Context, item: LocationSearchHistory): List<Lo
 }
 
 fun isFirstTimeSetNeverAskMeanOfTransport(context: Context): Boolean {
-    val pref = PreferenceManager.getDefaultSharedPreferences(context)
+    val pref = getNavigationSharedPref(context)
     val ans = pref.getBoolean(FIRST_TIME_SET_NEVER_ASK_MEAN_OF_TRANSPORT, true)
     if (ans) {
         pref.edit { putBoolean(FIRST_TIME_SET_NEVER_ASK_MEAN_OF_TRANSPORT, false) }
@@ -56,10 +57,25 @@ fun isFirstTimeSetNeverAskMeanOfTransport(context: Context): Boolean {
     return ans
 }
 
+fun getPreviousMeanOfTransport(context: Context): String? =
+    getNavigationSharedPref(context).getString(LAST_MEAN_OF_TRANSPORT, null)
+
+fun setPreviousMeanOfTransport(context: Context, value: String) {
+    getNavigationSharedPref(context).edit {
+        putString(LAST_MEAN_OF_TRANSPORT, value)
+    }
+}
+
 fun getMeanOfTransport(context: Context) =
         PreferenceManager.getDefaultSharedPreferences(context)
             .getString(MEAN_OF_TRANSPORT, MEAN_OF_TRANSPORT_ALWAYS_ASK)
             ?: MEAN_OF_TRANSPORT_ALWAYS_ASK
+
+fun setMeanOfTransport(context: Context, value: String) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit {
+        putString(MEAN_OF_TRANSPORT, value)
+    }
+}
 
 fun getSearchRegion(context: Context) =
         PreferenceManager.getDefaultSharedPreferences(context)

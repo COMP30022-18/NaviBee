@@ -8,14 +8,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
-import androidx.core.app.ActivityCompat
-import androidx.fragment.app.DialogFragment
-import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import au.edu.unimelb.eng.navibee.R
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.material.snackbar.Snackbar
 
 /**
  * Request permission location.
@@ -76,7 +75,6 @@ class LocationPermissionRequestActivity: AppCompatActivity(), LocationPermission
                 ActivityCompat.requestPermissions(this,
                         arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                         PERMISSIONS_REQUEST_FINE_LOCATION)
-
             }
         }
     }
@@ -86,7 +84,6 @@ class LocationPermissionRequestActivity: AppCompatActivity(), LocationPermission
             PERMISSIONS_REQUEST_FINE_LOCATION -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     setResult(Activity.RESULT_OK, resultIntent)
-
                 } else {
                     Snackbar.make(findViewById(snackBarLayout),
                             R.string.location_required_for_navigation,

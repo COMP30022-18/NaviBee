@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:background="@color/white"
+    tools:context=".navigation.MeanOfTransportBottomSheetDialogFragment"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
+
+    <TextView
+        android:id="@+id/navigation_bsd_mean_of_transport_title"
+        style="@style/AppTheme.BottomSheetMenu.Item.Text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_method_of_travel_title" />
+
+    <LinearLayout
+        android:id="@+id/navigation_bsd_mean_of_transport_actions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end|center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/navigation_bsd_mean_of_transport_just_once"
+            style="@style/AppTheme.BottomSheetMenu.Item.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/action_just_once"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/navigation_bsd_mean_of_transport_always"
+            style="@style/AppTheme.BottomSheetMenu.Item.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/action_always"/>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/navigation_bsd_mean_of_transport_hr"
+        style="@style/AppTheme.HorizontalRule"
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
+
+    <TextView
+        android:id="@+id/navigation_bsd_mean_of_transport_alt"
+        style="@style/AppTheme.BottomSheetMenu.Item.Text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_method_of_travel_alt"/>
+
+    <TextView
+        android:id="@+id/navigation_bsd_mean_of_transport_driving"
+        style="@style/AppTheme.BottomSheetMenu.Item.Clickable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_method_of_travel_driving"
+        android:foreground="?selectableItemBackground"
+        android:drawableStart="@drawable/ic_directions_car_black80_24dp" />
+
+    <TextView
+        android:id="@+id/navigation_bsd_mean_of_transport_walking"
+        style="@style/AppTheme.BottomSheetMenu.Item.Clickable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_method_of_travel_walking"
+        android:foreground="?selectableItemBackground"
+        android:drawableStart="@drawable/ic_directions_walk_black80_24dp" />
+
+    <TextView
+        android:id="@+id/navigation_bsd_mean_of_transport_transit"
+        style="@style/AppTheme.BottomSheetMenu.Item.Clickable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_method_of_travel_transit"
+        android:foreground="?selectableItemBackground"
+        android:drawableStart="@drawable/ic_directions_transit_black80_24dp" />
+
+</LinearLayout>

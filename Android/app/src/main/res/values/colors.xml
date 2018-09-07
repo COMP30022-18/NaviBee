@@ -11,4 +11,8 @@
 
     <color name="transparentBlack">#00000000</color>
     <color name="transparentWhite">#00ffffff</color>
+
+    <color name="dividerColor">#30000000</color>
+
+    <color name="colorHighlight">#308bc34a</color>
 </resources>

@@ -1,6 +1,7 @@
 package au.edu.unimelb.eng.navibee.navigation
 
 import android.app.Application
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
@@ -9,19 +10,26 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageView
-import androidx.appcompat.app.AlertDialog
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import au.edu.unimelb.eng.navibee.R
 import au.edu.unimelb.eng.navibee.utils.*
 import com.google.android.gms.location.places.*
 import com.google.android.gms.location.places.internal.zzaq
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.button.MaterialButton
 import kotlinx.android.synthetic.main.activity_destination_details.*
-import kotlinx.android.synthetic.main.alert_dialog_navigation_choose_transport_manners.view.*
+import kotlinx.android.synthetic.main.bottomsheetdialog_navigation_choose_mean_of_transport.*
+import org.jetbrains.anko.alert
 import org.jetbrains.anko.startActivity
 import java.io.File
 import java.io.FileOutputStream
@@ -61,11 +69,7 @@ class DestinationDetailsActivity : AppCompatActivity() {
     private val attributions: ArrayList<CharSequence> = ArrayList()
 
     private val primaryColor: Int by lazy {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            resources.getColor(R.color.colorPrimary, null)
-        } else {
-            resources.getColor(R.color.colorPrimary)
-        }
+        ContextCompat.getColor(this, R.color.colorPrimary)
     }
 
 
@@ -138,12 +142,8 @@ class DestinationDetailsActivity : AppCompatActivity() {
         // Carousel view
         navigation_destinations_details_image_preview.pageCount = 1
         navigation_destinations_details_image_preview.setImageListener { position, imageView ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder, null))
-            } else {
-                imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder))
-            }
-
+            imageView.setImageDrawable(
+                    ContextCompat.getDrawable(this, R.drawable.navibee_placeholder))
             viewModel.loadImageWithCache(position, imageView)
         }
 
@@ -233,6 +233,7 @@ class DestinationDetailsActivity : AppCompatActivity() {
         val formattedHtml = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Html.fromHtml(attrHTML, Html.FROM_HTML_MODE_COMPACT)
         } else {
+            @Suppress("DEPRECATION")
             Html.fromHtml(attrHTML)
         }
         if (listItems.last() is SimpleRVAttributions) {
@@ -263,29 +264,36 @@ class DestinationDetailsActivity : AppCompatActivity() {
         when (getMeanOfTransport(applicationContext)) {
             MEAN_OF_TRANSPORT_ALWAYS_ASK -> {
                 // TODO: Implement just once/always dialog.
-                val dialogView = layoutInflater.inflate(R.layout.alert_dialog_navigation_choose_transport_manners,
-                        null)
-                val dialog = AlertDialog.Builder(this)
-                        .setTitle(R.string.alert_dialog_title_select_method_of_travel)
-                        .setView(dialogView)
-                        .setNegativeButton(R.string.button_cancel) { dialog, which ->
-                            if (which == DialogInterface.BUTTON_NEGATIVE)
-                                dialog.dismiss()
-                        }
-                        .create()
-                dialogView.navigation_directions_transport_manners_dialog_walk.setOnClickListener {
-                    startWalkingNavigation()
-                    dialog.dismiss()
+
+                MeanOfTransportBottomSheetDialogFragment().run {
+                    show(supportFragmentManager, tag)
                 }
-                dialogView.navigation_directions_transport_manners_dialog_transit.setOnClickListener {
-                    // TODO("Start walking navigation")
-                    dialog.dismiss()
-                }
-                dialogView.navigation_directions_transport_manners_dialog_drive.setOnClickListener {
-                    startDrivingNavigation()
-                    dialog.dismiss()
-                }
-                dialog.show()
+
+                return
+
+//                val dialogView = layoutInflater.inflate(R.layout.alert_dialog_navigation_choose_transport_manners,
+//                        null)
+//                val dialog = AlertDialog.Builder(this)
+//                        .setTitle(R.string.dialog_method_of_travel_title)
+//                        .setView(dialogView)
+//                        .setNegativeButton(R.string.button_cancel) { dialog, which ->
+//                            if (which == DialogInterface.BUTTON_NEGATIVE)
+//                                dialog.dismiss()
+//                        }
+//                        .create()
+//                dialogView.navigation_directions_transport_manners_dialog_walk.setOnClickListener {
+//                    startWalkingNavigation()
+//                    dialog.dismiss()
+//                }
+//                dialogView.navigation_directions_transport_manners_dialog_transit.setOnClickListener {
+//                    // TODO("Start walking navigation")
+//                    dialog.dismiss()
+//                }
+//                dialogView.navigation_directions_transport_manners_dialog_drive.setOnClickListener {
+//                    startDrivingNavigation()
+//                    dialog.dismiss()
+//                }
+//                dialog.show()
             }
             MEAN_OF_TRANSPORT_DRIVE -> startDrivingNavigation()
             MEAN_OF_TRANSPORT_WALK -> startWalkingNavigation()
@@ -295,7 +303,7 @@ class DestinationDetailsActivity : AppCompatActivity() {
 
     }
 
-    private fun startWalkingNavigation() {
+    fun startWalkingNavigation() {
         viewModel.placeDetails.value?.data?.get(0)?.also { place ->
             startActivity<NavigationActivity>(
                     NavigationActivity.EXTRA_DEST_LAT to place.latLng.latitude,
@@ -305,7 +313,7 @@ class DestinationDetailsActivity : AppCompatActivity() {
         }
     }
 
-    private fun startDrivingNavigation() {
+    fun startDrivingNavigation() {
         viewModel.placeDetails.value?.data?.get(0)?.also { place ->
             startActivity<NavigationActivity>(
                     NavigationActivity.EXTRA_DEST_LAT to place.latLng.latitude,
@@ -313,6 +321,10 @@ class DestinationDetailsActivity : AppCompatActivity() {
                     NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_DRIVING
             )
         }
+    }
+
+    fun startTransitNavigation() {
+
     }
 
     private fun renderPlaceDetails(place: Place) {
@@ -373,6 +385,163 @@ class DestinationDetailsActivity : AppCompatActivity() {
         if (attributions != null)
             listItems.add(attributions)
     }
+
+}
+
+class MeanOfTransportBottomSheetDialogFragment: BottomSheetDialogFragment() {
+    private var previousChoice: String? = null
+
+    private var chosenMethod: String? = null
+
+    private lateinit var justOnce: MaterialButton
+    private lateinit var always: MaterialButton
+
+    private var white: Int = 0
+    private var highlight: Int = 0
+
+    private lateinit var view: LinearLayout
+    private lateinit var parent: DestinationDetailsActivity
+    private lateinit var appContext: Context
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        view = inflater.inflate(R.layout.bottomsheetdialog_navigation_choose_mean_of_transport,
+                container, false) as LinearLayout
+        return view
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        parent = activity as DestinationDetailsActivity
+        appContext = context!!.applicationContext
+
+
+        previousChoice = getPreviousMeanOfTransport(context!!)
+
+        white = ContextCompat.getColor(context!!, R.color.white)
+        highlight = ContextCompat.getColor(context!!, R.color.colorHighlight)
+
+        justOnce = navigation_bsd_mean_of_transport_just_once
+        always = navigation_bsd_mean_of_transport_always
+
+        justOnce.setOnClickListener {
+            chosenMethod?.let { method ->
+                startNavigationByMethod(method)
+                this.dismiss()
+            }
+        }
+
+        always.setOnClickListener {
+            chosenMethod?.let { method ->
+                if (isFirstTimeSetNeverAskMeanOfTransport(context!!)) {
+                    activity?.alert {
+                        messageResource = R.string.prompt_first_time_always_preferred_mean_of_transport
+                        positiveButton(R.string.button_got_it) { _ ->
+                            setMeanOfTransport(appContext, method)
+                            startNavigationByMethod(method)
+                        }
+                    }?.show()
+                } else {
+                    setMeanOfTransport(context!!, method)
+                    startNavigationByMethod(method)
+
+                }
+                this.dismiss()
+            }
+        }
+
+        if (previousChoice == null) {
+            navigation_bsd_mean_of_transport_hr.visibility = View.GONE
+            navigation_bsd_mean_of_transport_alt.visibility = View.GONE
+            val actions = navigation_bsd_mean_of_transport_actions
+            view.removeView(actions)
+            view.addView(actions)
+
+            justOnce.isEnabled = false
+            always.isEnabled = false
+
+            firstChoiceOnClick(MEAN_OF_TRANSPORT_DRIVE)
+            firstChoiceOnClick(MEAN_OF_TRANSPORT_WALK)
+            firstChoiceOnClick(MEAN_OF_TRANSPORT_TRANSIT)
+        } else {
+            navigation_bsd_mean_of_transport_title.visibility = View.GONE
+            chosenMethod = previousChoice
+
+            val pcFormat = resources.getString(R.string.dialog_method_of_travel_default)
+
+            val pcView: TextView = when (previousChoice) {
+                MEAN_OF_TRANSPORT_DRIVE ->
+                    navigation_bsd_mean_of_transport_driving
+                MEAN_OF_TRANSPORT_WALK ->
+                    navigation_bsd_mean_of_transport_walking
+                MEAN_OF_TRANSPORT_TRANSIT ->
+                    navigation_bsd_mean_of_transport_transit
+                else -> return
+            }
+            val altMethods = hashSetOf(
+                    MEAN_OF_TRANSPORT_DRIVE,
+                    MEAN_OF_TRANSPORT_WALK,
+                    MEAN_OF_TRANSPORT_TRANSIT
+            )
+            altMethods.remove(previousChoice!!)
+            pcView.text = pcFormat.format(pcView.text)
+            pcView.isClickable = false
+            pcView.isFocusable = false
+            altMethods.forEach { altChoiceOnClick(it) }
+            view.removeView(pcView)
+            view.addView(pcView, 1)
+        }
+    }
+
+    private fun firstChoiceOnClick(method: String) {
+        val view = getButtonByMethod(method)
+        justOnce.isEnabled = true
+        always.isEnabled = true
+        view.setOnClickListener {
+            if (chosenMethod == method) {
+                startNavigationByMethod(method)
+                this.dismiss()
+            } else {
+                chosenMethod?.run {
+                    getButtonByMethod(this).setBackgroundColor(white)
+                }
+                view.setBackgroundColor(highlight)
+                chosenMethod = method
+            }
+        }
+    }
+
+    private fun altChoiceOnClick(method: String) {
+        val view = getButtonByMethod(method)
+        view.setOnClickListener {
+            startNavigationByMethod(method)
+            this.dismiss()
+        }
+    }
+
+    private fun startNavigationByMethod(method: String) {
+        setPreviousMeanOfTransport(appContext!!, method)
+        when (method) {
+            MEAN_OF_TRANSPORT_DRIVE -> parent.startDrivingNavigation()
+            MEAN_OF_TRANSPORT_WALK -> parent.startWalkingNavigation()
+            MEAN_OF_TRANSPORT_TRANSIT -> parent.startTransitNavigation()
+        }
+    }
+
+    private fun getButtonByMethod(method: String) = when (method) {
+        MEAN_OF_TRANSPORT_DRIVE -> navigation_bsd_mean_of_transport_driving
+        MEAN_OF_TRANSPORT_WALK -> navigation_bsd_mean_of_transport_walking
+        MEAN_OF_TRANSPORT_TRANSIT -> navigation_bsd_mean_of_transport_transit
+        else -> throw IllegalArgumentException()
+    }
+
+    override fun onCancel(dialog: DialogInterface?) {
+        super.onCancel(dialog)
+    }
+
+    override fun onDismiss(dialog: DialogInterface?) {
+        super.onDismiss(dialog)
+    }
 }
 
 private class DestinationDetailsViewModel(private val context: Application):
@@ -429,15 +598,9 @@ private class DestinationDetailsViewModel(private val context: Application):
     }
 
     fun loadImageWithCache(position: Int, imageView: ImageView) {
-        val resources = context.resources
-
         placePhotos.value?.data?.let { pm ->
-            val photo = pm[position]
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder, null))
-            } else {
-                imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder))
-            }
+            imageView.setImageDrawable(
+                    ContextCompat.getDrawable(context, R.drawable.navibee_placeholder))
             object : ImageViewCacheLoader(imageView) {
                 override val defaultKey = "$placeId-$position"
 

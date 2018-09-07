@@ -173,6 +173,7 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
                     val formattedHtml = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         Html.fromHtml(attrHTML, Html.FROM_HTML_MODE_COMPACT)
                     } else {
+                        @Suppress("DEPRECATION")
                         Html.fromHtml(attrHTML)
                     }
                     destinations.add(DestinationRVAttributions(formattedHtml))
