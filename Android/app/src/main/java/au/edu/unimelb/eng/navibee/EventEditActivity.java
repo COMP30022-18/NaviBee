@@ -3,20 +3,36 @@ package au.edu.unimelb.eng.navibee;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -39,6 +55,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     private ArrayList<String> selectedNameList;
     private Date eventDate;
     private Map<String, Integer> dateMap;
+    private ArrayList<Integer> pics;
 
     public static class TimePickerFragment extends DialogFragment {
 
@@ -84,7 +101,73 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         Button date_button = (Button)findViewById(R.id.button5);
         date_button.setText("Pick Date");
 
+        pics = new ArrayList<>();
+        //Bitmap addButton = BitmapFactory.decodeResource(getResources(), R.drawable.ic_navibee_color);
+        pics.add(R.drawable.ic_navibee_color);
+        pics.add(R.drawable.ic_navibee_color);
+        pics.add(R.drawable.ic_navibee_color);
+        pics.add(R.drawable.ic_navibee_color);
+        pics.add(R.drawable.ic_navibee_color);
+        pics.add(R.drawable.ic_navibee_color);
+        pics.add(R.drawable.ic_navibee_color);
+        pics.add(R.drawable.ic_navibee_color);
+        pics.add(R.drawable.ic_navibee_color);
+       
+
+
+
+        GridView picsView = (GridView) findViewById(R.id.eventPics);
+        picsView.setAdapter(new ImageAdapter(this));
+
+        picsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                Toast.makeText(getApplicationContext(), "" + position,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
+
+    public class ImageAdapter extends BaseAdapter {
+        private Context mContext;
+
+        public ImageAdapter(Context c) {
+            mContext = c;
+        }
+
+        public int getCount() {
+            return pics.size();
+        }
+
+        public Object getItem(int position) {
+            return pics.get(position);
+        }
+
+        public long getItemId(int position) {
+            return position;
+        }
+
+        // create a new ImageView for each item referenced by the Adapter
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ImageView imageView;
+            if (convertView == null) {
+                // if it's not recycled, initialize some attributes
+                imageView = new ImageView(mContext);
+                int width = Resources.getSystem().getDisplayMetrics().widthPixels;
+                imageView.setLayoutParams(new GridView.LayoutParams(width/3, width/3));
+                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                imageView.setPadding(8, 8, 8, 8);
+            } else {
+                imageView = (ImageView) convertView;
+            }
+
+            imageView.setImageResource(pics.get(position));
+            return imageView;
+        }
+
+    }
+
 
     @Override
     public void onTimeSet(TimePicker view, int hour, int minute) {
@@ -147,7 +230,14 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             eventDate = new Date();
         }
         else{
-            eventDate = new Date(dateMap.get("year"), dateMap.get("month"), dateMap.get("day"), dateMap.get("hour"), dateMap.get("minute"));
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.YEAR, dateMap.get("year"));
+            calendar.set(Calendar.MONTH, dateMap.get("month"));
+            calendar.set(Calendar.DAY_OF_MONTH, dateMap.get("day"));
+            calendar.set(Calendar.HOUR, dateMap.get("hour"));
+            calendar.set(Calendar.MINUTE, dateMap.get("minute"));
+            Date date = calendar.getTime();
+            eventDate = date;
         }
 
         Map<String, Boolean> users = new HashMap<>();
