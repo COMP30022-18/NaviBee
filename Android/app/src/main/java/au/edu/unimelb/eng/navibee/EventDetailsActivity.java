@@ -126,6 +126,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         }
 
         // Loading screen
+        toolbar.setTitleTextColor(0);
         listItems.add(new SimpleRVIndefiniteProgressBar());
 
         // Recycler View
