@@ -4,6 +4,8 @@ import android.app.Application
 import timber.log.Timber
 
 
+
+
 class NaviBeeApplication : Application() {
 
     companion object {
@@ -13,8 +15,7 @@ class NaviBeeApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        instance = this
         Timber.plant(Timber.DebugTree())
+        instance = this
     }
-
 }

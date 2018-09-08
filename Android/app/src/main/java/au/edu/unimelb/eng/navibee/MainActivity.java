@@ -1,6 +1,7 @@
 package au.edu.unimelb.eng.navibee;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
@@ -39,6 +40,8 @@ import au.edu.unimelb.eng.navibee.social.FriendManager;
 import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
 import timber.log.Timber;
 
+import static au.edu.unimelb.eng.navibee.utils.DisplayUtilitiesKt.updateDpi;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     private FirebaseAuth mAuth;
@@ -50,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Update app DPI for debug purpose.
+        updateDpi(this);
         setContentView(R.layout.activity_main);
 
         firestoreTimestamp();
@@ -107,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void setupOverflowMenu() {
         mPopupWindow = new ListPopupWindow(this);
-        mPopupWindow.setAnimationStyle(R.style.AppTheme_OverflowMenuAnimation);
         String[] mPopupWindowItems = new String[]{
                 "%ROW_FOR_USER_PROFILE%",
                 getResources().getString(R.string.action_settings),
@@ -121,8 +125,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mPopupWindow.setAdapter(mAdapter);
             mPopupWindow.setWidth(dpToPx(getResources().getInteger(R.integer.popup_menu_main_width)));
             mPopupWindow.setHeight(ListPopupWindow.WRAP_CONTENT);
-            mPopupWindow.setDropDownGravity(Gravity.END);
             mPopupWindow.setVerticalOffset(-mOverflowButton.getLayoutParams().height);
+
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                mPopupWindow.setDropDownGravity(Gravity.START);
+            } else {
+                mPopupWindow.setDropDownGravity(Gravity.END);
+            }
         });
     }
 
