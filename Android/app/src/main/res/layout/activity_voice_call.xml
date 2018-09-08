@@ -4,52 +4,126 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".social.VoiceCallActivity">
-
-    <TextView
-        android:id="@+id/voicecall_textView_time"
-        android:layout_width="118dp"
-        android:layout_height="19dp"
-        android:layout_marginStart="48dp"
-        android:text="TextView"
-        app:layout_constraintStart_toEndOf="@+id/voicecall_textView_status"
-        tools:layout_editor_absoluteY="65dp" />
+    tools:context=".social.VoiceCallActivity"
+    android:background="@color/md_grey_900">
 
     <TextView
         android:id="@+id/voicecall_textView_status"
-        android:layout_width="118dp"
-        android:layout_height="0dp"
-        android:text="TextView"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="65dp" />
-
-    <Button
-        android:id="@+id/voicecall_button_hangup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:onClick="onClick"
-        android:text="Hang Up"
-        app:layout_constraintStart_toEndOf="@+id/voicecall_textView_time"
-        tools:layout_editor_absoluteY="100dp" />
+        android:layout_marginTop="8dp"
+        android:text="Incoming Call"
+        android:textSize="36dp"
+        android:textColor="#FFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.1" />
+    <ImageView
+        android:id="@+id/voicecall_friend_icon"
+        android:layout_width="183dp"
+        android:layout_height="183dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/voicecall_textView_status"
+        app:layout_constraintVertical_bias="0"
+        app:srcCompat="@drawable/ic_navibee_color" />
 
-    <Button
+    <TextView
+        android:id="@+id/voicecall_button_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="User Name"
+        android:textSize="28dp"
+        android:textColor="#FFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/voicecall_friend_icon"
+        app:layout_constraintVertical_bias="0" />
+
+    <TextView
+        android:id="@+id/voicecall_textView_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:text="00:00"
+        android:textSize="25dp"
+        android:textColor="#FFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/voicecall_button_username"
+        app:layout_constraintVertical_bias="0.3" />
+
+    <ImageView
+        android:id="@+id/voicecall_button_hangup"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/voicecall_end_icon_background"
+        android:onClick="onClick"
+        android:paddingVertical="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/voicecall_textView_time"
+        app:layout_constraintVertical_bias="0.1"
+        app:srcCompat="@drawable/ic_call_end_icon_white_70dp" />
+
+    <ImageView
         android:id="@+id/voicecall_button_accept"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:onClick="onClick"
-        android:text="Accept"
-        app:layout_constraintTop_toBottomOf="@+id/voicecall_button_hangup"
-        tools:layout_editor_absoluteX="61dp" />
+        android:paddingHorizontal="16dp"
+        app:srcCompat="@drawable/ic_call_icon_white_70dp"
+        android:background="@drawable/voicecall_icon_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.1"
+        app:layout_constraintHorizontal_bias="0.3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/voicecall_textView_time" />
 
-    <Button
+    <ImageView
         android:id="@+id/voicecall_button_decline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:background="@drawable/voicecall_end_icon_background"
         android:onClick="onClick"
-        android:text="Decline"
-        app:layout_constraintTop_toBottomOf="@+id/voicecall_button_accept"
-        tools:layout_editor_absoluteX="272dp" />
+        android:paddingHorizontal="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.7"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/voicecall_textView_time"
+        app:layout_constraintVertical_bias="0.1"
+        app:srcCompat="@drawable/ic_call_end_icon_white_70dp" />
+
 </android.support.constraint.ConstraintLayout>

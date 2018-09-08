@@ -11,11 +11,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
+import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
 import io.agora.rtc.RtcEngine;
 
 import au.edu.unimelb.eng.navibee.R;
@@ -46,9 +51,11 @@ public class VoiceCallActivity extends AppCompatActivity {
 
     private TextView textViewStatus;
     private TextView textViewTime;
-    private Button buttonHangup;
-    private Button buttonAccept;
-    private Button buttonDecline;
+    private ImageView buttonHangup;
+    private ImageView buttonAccept;
+    private ImageView buttonDecline;
+    private ImageView friendIcon;
+    private TextView friendName;
 
     private boolean callStarted = false;
 
@@ -132,6 +139,14 @@ public class VoiceCallActivity extends AppCompatActivity {
         buttonAccept = findViewById(R.id.voicecall_button_accept);
         buttonDecline = findViewById(R.id.voicecall_button_decline);
 
+        friendIcon = findViewById(R.id.voicecall_friend_icon);
+        friendName = findViewById(R.id.voicecall_button_username);
+
+        String name = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        friendName.setText(name);
+        String photourl = FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString();
+        NetworkImageHelper.loadImage(friendIcon, photourl);
+        textViewTime.setVisibility(View.INVISIBLE);
 
         if (isInitiator) {
             buttonAccept.setVisibility(View.INVISIBLE);
@@ -158,6 +173,7 @@ public class VoiceCallActivity extends AppCompatActivity {
             case R.id.voicecall_button_accept:
                 answerTimer.cancel();
                 answerTimer.purge();
+                textViewTime.setVisibility(View.VISIBLE);
                 buttonHangup.setVisibility(View.VISIBLE);
                 buttonAccept.setVisibility(View.INVISIBLE);
                 buttonDecline.setVisibility(View.INVISIBLE);
