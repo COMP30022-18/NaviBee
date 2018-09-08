@@ -2,7 +2,6 @@ package au.edu.unimelb.eng.navibee.navigation
 
 import android.app.Application
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -269,8 +268,6 @@ class DestinationDetailsActivity : AppCompatActivity() {
                     show(supportFragmentManager, tag)
                 }
 
-                return
-
 //                val dialogView = layoutInflater.inflate(R.layout.alert_dialog_navigation_choose_transport_manners,
 //                        null)
 //                val dialog = AlertDialog.Builder(this)
@@ -297,7 +294,7 @@ class DestinationDetailsActivity : AppCompatActivity() {
             }
             MEAN_OF_TRANSPORT_DRIVE -> startDrivingNavigation()
             MEAN_OF_TRANSPORT_WALK -> startWalkingNavigation()
-            MEAN_OF_TRANSPORT_TRANSIT -> { /* TODO("Start walking navigation") */ }
+            MEAN_OF_TRANSPORT_TRANSIT -> { startTransitNavigation() }
         }
 
 
@@ -324,7 +321,7 @@ class DestinationDetailsActivity : AppCompatActivity() {
     }
 
     fun startTransitNavigation() {
-
+        // TODO: Transit navigation.
     }
 
     private fun renderPlaceDetails(place: Place) {
@@ -520,7 +517,7 @@ class MeanOfTransportBottomSheetDialogFragment: BottomSheetDialogFragment() {
     }
 
     private fun startNavigationByMethod(method: String) {
-        setPreviousMeanOfTransport(appContext!!, method)
+        setPreviousMeanOfTransport(appContext, method)
         when (method) {
             MEAN_OF_TRANSPORT_DRIVE -> parent.startDrivingNavigation()
             MEAN_OF_TRANSPORT_WALK -> parent.startWalkingNavigation()
@@ -533,14 +530,6 @@ class MeanOfTransportBottomSheetDialogFragment: BottomSheetDialogFragment() {
         MEAN_OF_TRANSPORT_WALK -> navigation_bsd_mean_of_transport_walking
         MEAN_OF_TRANSPORT_TRANSIT -> navigation_bsd_mean_of_transport_transit
         else -> throw IllegalArgumentException()
-    }
-
-    override fun onCancel(dialog: DialogInterface?) {
-        super.onCancel(dialog)
-    }
-
-    override fun onDismiss(dialog: DialogInterface?) {
-        super.onDismiss(dialog)
     }
 }
 

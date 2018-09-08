@@ -1,11 +1,15 @@
 package au.edu.unimelb.eng.navibee;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListPopupWindow;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -20,42 +24,67 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import au.edu.unimelb.eng.navibee.navigation.DestinationsActivity;
 import au.edu.unimelb.eng.navibee.social.ConversationManager;
 import au.edu.unimelb.eng.navibee.social.FriendActivity;
 import au.edu.unimelb.eng.navibee.social.FriendManager;
+import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
+import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
+    private PopupAdapter mAdapter;
+    private ListPopupWindow mPopupWindow;
+    private ImageView mOverflowButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setupActionBar();
 
         firestoreTimestamp();
 
         mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
+        mUser = mAuth.getCurrentUser();
 
-        String name = user.getDisplayName();
-        String email = user.getEmail();
+        NetworkImageHelper.loadRoundImage(
+                mOverflowButton,
+                Objects.requireNonNull(mUser.getPhotoUrl()).toString());
 
-        TextView textView = findViewById(R.id.textView);
-        TextView textView2 = findViewById(R.id.textView2);
-        textView.setText(name);
-        textView2.setText(email);
-
-        findViewById(R.id.sign_out_button).setOnClickListener(this);
         findViewById(R.id.landing_sos_btn).setOnClickListener(this);
         findViewById(R.id.landing_social_btn).setOnClickListener(this);
 
         FriendManager.init();
         ConversationManager.init();
         setFCMToken();
+
+        // Setup popup list view from overflow menu.
+        mPopupWindow = new ListPopupWindow(this);
+        mPopupWindow.setAnimationStyle(R.style.AppTheme_OverflowMenuAnimation);
+        String[] mPopupWindowItems = new String[]{
+                "%ROW_FOR_USER_PROFILE%",
+                getResources().getString(R.string.action_settings),
+                getResources().getString(R.string.action_log_out)
+        };
+        mAdapter = new PopupAdapter(mPopupWindowItems, menuClickListeners);
+
+        findViewById(R.id.main_activity_layout).post(() -> {
+            mPopupWindow.setModal(true);
+            mPopupWindow.setAnchorView(mOverflowButton);
+            mPopupWindow.setAdapter(mAdapter);
+            mPopupWindow.setWidth(dpToPx(getResources().getInteger(R.integer.popup_menu_main_width)));
+            mPopupWindow.setHeight(ListPopupWindow.WRAP_CONTENT);
+            mPopupWindow.setDropDownGravity(Gravity.END);
+            mPopupWindow.setVerticalOffset(-mOverflowButton.getLayoutParams().height);
+        });
     }
 
     // The behavior for java.util.Date objects stored in Firestore is going to chang
@@ -70,10 +99,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.sign_out_button:
-                logOut();
-                break;
-            
             case R.id.landing_events_btn:
                 startActivity(new Intent(this, EventActivity.class));
                 break;
@@ -89,9 +114,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void startNavigationActivity(View view) {
-        Intent intent = new Intent(this, DestinationsActivity.class);
-        startActivity(intent);
+        startActivity(new Intent(this, DestinationsActivity.class));
     }
+
+    private View.OnClickListener[] menuClickListeners = new View.OnClickListener[] {
+            null,
+            // Settings
+            (View v) -> {
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                mPopupWindow.dismiss();
+            },
+            // Log out
+            (View v) -> logOut()
+    };
 
     private void setFCMToken() {
         FirebaseInstanceId.getInstance().getInstanceId()
@@ -101,7 +137,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     // Get Instance ID token
                     String token = task.getResult().getToken();
-                    String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    String uid = Objects.requireNonNull(FirebaseAuth.getInstance()
+                            .getCurrentUser()).getUid();
 
                     Map<String, Object> docData = new HashMap<>();
                     docData.put("uid", uid);
@@ -126,7 +163,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // reset token to prevent further messages
         try {
             FirebaseInstanceId.getInstance().deleteInstanceId();
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            Timber.e(e, "Error occurred while resetting tokens.");
         }
 
 
@@ -136,25 +174,96 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.finish();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main_activity, menu);
-        return true;
+    private int dpToPx(int dp) {
+        float density = getApplicationContext().getResources()
+                .getDisplayMetrics().density;
+        return Math.round((float) dp * density);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_main_action_log_out:
-                logOut();
-                return true;
-            case R.id.menu_main_action_settings:
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
-                return true;
+    private void setupActionBar() {
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayShowCustomEnabled(true);
+        ab.setDisplayShowTitleEnabled(false);
+        ab.setDisplayShowHomeEnabled(false);
+        ab.setDisplayHomeAsUpEnabled(false);
+        ab.setHomeButtonEnabled(false);
+        ab.setCustomView(R.layout.action_bar_main_activity);
+        mOverflowButton = ab.getCustomView().findViewById(R.id.action_bar_main_activity_user_icon);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mOverflowButton.setClipToOutline(true);
         }
-        return super.onOptionsItemSelected(item);
+
+        mOverflowButton.setOnClickListener(v -> mPopupWindow.show());
+    }
+
+    private class PopupAdapter extends BaseAdapter {
+        private String[] menuItems;
+        private View.OnClickListener[] listeners;
+
+        PopupAdapter(String[] menuItems, View.OnClickListener[] listeners) {
+            this.menuItems = menuItems;
+            this.listeners = listeners;
+        }
+
+        @Override
+        public int getCount() {
+            return menuItems.length;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return menuItems[position];
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder holder;
+
+            if (position == 0) {
+                if (!(convertView instanceof ConstraintLayout)) {
+                    holder = new ViewHolder();
+                    convertView = getLayoutInflater().inflate(R.layout.popup_menu_main_profile, null);
+                    holder.menuItemView = convertView;
+                    convertView.setTag(holder);
+                } else {
+                    holder = (ViewHolder) convertView.getTag();
+                }
+                ((TextView) holder.menuItemView.findViewById(R.id.popup_menu_main_profile_name))
+                        .setText(mUser.getDisplayName());
+                ((TextView) holder.menuItemView.findViewById(R.id.popup_menu_main_profile_secondary))
+                        .setText(mUser.getEmail());
+                ImageView profile = holder.menuItemView.findViewById(R.id.popup_menu_main_profile_picture);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    profile.setClipToOutline(true);
+                }
+                NetworkImageHelper.loadRoundImage(profile,
+                        Objects.requireNonNull(mUser.getPhotoUrl()).toString());
+            } else {
+                if (!(convertView instanceof LinearLayout)) {
+                    holder = new ViewHolder();
+                    convertView = getLayoutInflater().inflate(R.layout.popup_menu_button, null);
+                    holder.menuItemView = convertView;
+                    convertView.setTag(holder);
+                } else {
+                    holder = (ViewHolder) convertView.getTag();
+                }
+                TextView text = holder.menuItemView.findViewById(R.id.popup_menu_button_text);
+                text.setText(menuItems[position]);
+                holder.menuItemView.setOnClickListener(listeners[position]);
+            }
+            return convertView;
+        }
+
+        private class ViewHolder {
+            View menuItemView;
+        }
+
     }
 }
 
