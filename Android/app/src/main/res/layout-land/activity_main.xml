@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/landing_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".MainActivity">
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/landing_group_16_9"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:constraint_referenced_ids="landing_user_icon"
+        app:layout_constraintDimensionRatio="H,4:3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/landing_navigation_btn"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        android:onClick="startNavigationActivity"
+        app:backgroundTint="@color/colorPrimaryDark"
+        app:cornerRadius="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/landing_group_16_9"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/landing_events_btn"
+        app:layout_constraintVertical_chainStyle="spread_inside"
+        app:layout_constraintVertical_weight="2" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="28dp"
+        android:gravity="center_vertical|start"
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/landing_navigation_btn"
+        app:layout_constraintEnd_toEndOf="@+id/landing_navigation_btn"
+        app:layout_constraintStart_toStartOf="@+id/landing_navigation_btn"
+        app:layout_constraintTop_toTopOf="@+id/landing_navigation_btn">
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:tint="@color/white"
+            app:srcCompat="@drawable/ic_navigation_white_48dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:text="@string/landing_navigation"
+            android:textColor="@color/white"
+            android:textSize="32sp" />
+
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/landing_events_btn"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        android:onClick="onClick"
+        app:cornerRadius="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/landing_social_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/landing_group_16_9"
+        app:layout_constraintTop_toBottomOf="@+id/landing_navigation_btn"
+        app:layout_constraintVertical_weight="1" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="28dp"
+        android:gravity="center_vertical|start"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/landing_events_btn"
+        app:layout_constraintEnd_toEndOf="@+id/landing_events_btn"
+        app:layout_constraintStart_toStartOf="@+id/landing_events_btn"
+        app:layout_constraintTop_toTopOf="@+id/landing_events_btn">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="24dp"
+            android:tint="@color/landing_lightGreen"
+            app:srcCompat="@drawable/ic_event_black_44dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center_vertical"
+            android:includeFontPadding="false"
+            android:text="@string/landing_events"
+            android:textColor="@color/landing_lightGreen"
+            android:textSize="32sp" />
+
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/landing_social_btn"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        app:cornerRadius="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/landing_sos_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/landing_group_16_9"
+        app:layout_constraintTop_toBottomOf="@+id/landing_events_btn"
+        app:layout_constraintVertical_weight="1" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="28dp"
+        android:gravity="center_vertical|start"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/landing_social_btn"
+        app:layout_constraintEnd_toEndOf="@+id/landing_social_btn"
+        app:layout_constraintStart_toStartOf="@+id/landing_social_btn"
+        app:layout_constraintTop_toTopOf="@+id/landing_social_btn">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="24dp"
+            android:tint="@color/landing_blue"
+            app:srcCompat="@drawable/ic_people_black_24dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center_vertical"
+            android:includeFontPadding="false"
+            android:text="@string/landing_social"
+            android:textColor="@color/landing_blue"
+            android:textSize="32sp" />
+
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/landing_sos_btn"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="4dp"
+        app:cornerRadius="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/landing_group_16_9"
+        app:layout_constraintTop_toBottomOf="@+id/landing_social_btn"
+        app:layout_constraintVertical_weight="1" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="28dp"
+        android:gravity="center_vertical|start"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/landing_sos_btn"
+        app:layout_constraintEnd_toEndOf="@+id/landing_sos_btn"
+        app:layout_constraintStart_toStartOf="@+id/landing_sos_btn"
+        app:layout_constraintTop_toTopOf="@+id/landing_sos_btn">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="24dp"
+            android:tint="@color/landing_red"
+            app:srcCompat="@drawable/ic_warning_black_24dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center_vertical"
+            android:includeFontPadding="false"
+            android:text="@string/landing_sos"
+            android:textColor="@color/landing_red"
+            android:textSize="32sp" />
+
+    </LinearLayout>
+
+
+    <ImageView
+        android:id="@+id/landing_user_icon"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/shape_round_background_for_profile_picture"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?selectableItemBackground"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/landing_welcome_line"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        android:breakStrategy="balanced"
+        android:fontFamily="sans-serif-light"
+        android:textColor="@color/colorLightTextPrimary"
+        android:textSize="40sp"
+        app:layout_constraintBottom_toBottomOf="@+id/landing_group_16_9"
+        app:layout_constraintEnd_toEndOf="@+id/landing_group_16_9"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="Hi, Lorem!\nHow can I help you today?" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
