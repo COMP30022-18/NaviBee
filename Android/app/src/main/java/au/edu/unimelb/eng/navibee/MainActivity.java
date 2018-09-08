@@ -3,9 +3,12 @@ package au.edu.unimelb.eng.navibee;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -14,6 +17,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,7 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import au.edu.unimelb.eng.navibee.navigation.DestinationsActivity;
@@ -48,16 +51,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setupActionBar();
 
         firestoreTimestamp();
 
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
 
-        NetworkImageHelper.loadRoundImage(
-                mOverflowButton,
-                Objects.requireNonNull(mUser.getPhotoUrl()).toString());
+
 
         findViewById(R.id.landing_sos_btn).setOnClickListener(this);
         findViewById(R.id.landing_social_btn).setOnClickListener(this);
@@ -66,7 +66,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ConversationManager.init();
         setFCMToken();
 
-        // Setup popup list view from overflow menu.
+        setupWelcomeBanner();
+
+        setupOverflowMenu();
+
+        MaterialButton naviBtn = findViewById(R.id.landing_navigation_btn);
+        naviBtn.setBackgroundTintList(null);
+        naviBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.gradient_landing_major_background));
+    }
+
+    private void setupWelcomeBanner() {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+        mOverflowButton = findViewById(R.id.landing_user_icon);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mOverflowButton.setClipToOutline(true);
+        }
+
+        mOverflowButton.setOnClickListener(v -> mPopupWindow.show());
+
+        NetworkImageHelper.loadRoundImage(
+                mOverflowButton,
+                Objects.requireNonNull(mUser.getPhotoUrl()).toString());
+
+        TextView welcomeLine = findViewById(R.id.landing_welcome_line);
+        String format = getResources().getString(R.string.landing_welcome_line);
+        format = format.replace("\n", "<br>");
+        String name = Objects.requireNonNull(mUser.getDisplayName());
+        name = Html.escapeHtml(name.split(" ", 2)[0]);
+        String text = String.format(format, "<b>" + name + "</b>");
+        Spanned spannedText;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            spannedText = Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT);
+        } else {
+            spannedText = Html.fromHtml(text);
+        }
+        welcomeLine.setText(spannedText);
+    }
+
+    private void setupOverflowMenu() {
         mPopupWindow = new ListPopupWindow(this);
         mPopupWindow.setAnimationStyle(R.style.AppTheme_OverflowMenuAnimation);
         String[] mPopupWindowItems = new String[]{
@@ -76,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
         mAdapter = new PopupAdapter(mPopupWindowItems, menuClickListeners);
 
-        findViewById(R.id.main_activity_layout).post(() -> {
+        findViewById(R.id.landing_layout).post(() -> {
             mPopupWindow.setModal(true);
             mPopupWindow.setAnchorView(mOverflowButton);
             mPopupWindow.setAdapter(mAdapter);
@@ -93,7 +132,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setTimestampsInSnapshotsEnabled(true)
                 .build();
         FirebaseFirestore.getInstance().setFirestoreSettings(settings);
-
     }
 
     @Override
@@ -180,22 +218,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return Math.round((float) dp * density);
     }
 
-    private void setupActionBar() {
-        ActionBar ab = getSupportActionBar();
-        ab.setDisplayShowCustomEnabled(true);
-        ab.setDisplayShowTitleEnabled(false);
-        ab.setDisplayShowHomeEnabled(false);
-        ab.setDisplayHomeAsUpEnabled(false);
-        ab.setHomeButtonEnabled(false);
-        ab.setCustomView(R.layout.action_bar_main_activity);
-        mOverflowButton = ab.getCustomView().findViewById(R.id.action_bar_main_activity_user_icon);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mOverflowButton.setClipToOutline(true);
-        }
-
-        mOverflowButton.setOnClickListener(v -> mPopupWindow.show());
-    }
 
     private class PopupAdapter extends BaseAdapter {
         private String[] menuItems;

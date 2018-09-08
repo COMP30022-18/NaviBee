@@ -15,4 +15,8 @@
     <color name="dividerColor">#30000000</color>
 
     <color name="colorHighlight">#308bc34a</color>
+    
+    <color name="landing_lightGreen">#669A3D</color>
+    <color name="landing_blue">#198BDB</color>
+    <color name="landing_red">#C62828</color>
 </resources>
