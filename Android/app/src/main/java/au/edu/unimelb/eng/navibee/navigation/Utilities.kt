@@ -3,7 +3,6 @@ package au.edu.unimelb.eng.navibee.navigation
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.AsyncTask
 import android.widget.ImageView
 import au.edu.unimelb.eng.navibee.BuildConfig
 import au.edu.unimelb.eng.navibee.R
@@ -11,19 +10,56 @@ import au.edu.unimelb.eng.navibee.utils.ImageViewCacheLoader
 import com.google.android.gms.location.places.Place
 import com.google.maps.GeoApiContext
 import com.google.maps.PlacesApi
+import kotlinx.coroutines.experimental.DefaultDispatcher
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.withContext
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 
+private val geoContext = GeoApiContext
+        .Builder().apiKey(BuildConfig.GOOGLE_PLACES_API_KEY).build()
 
-class GMapPRefAsyncTask(private val photoReference: String,
-                        val maxHeight: Int,
-                        val file: File,
-                        val callback: (File) -> Unit):
-        AsyncTask<Void, Void, Bitmap>() {
+class GoogleMapsPlaceIdCacheImageLoader(private val placeId: String,
+                                        iv: ImageView,
+                                        maxHeight: Int,
+                                        index: Int = 0):
+        GoogleMapsPhotoReferenceCacheImageLoader("", iv, maxHeight) {
+    override val defaultKey = "$placeId-$index"
+    override fun loadTask(file: File) {
+        val placeDetails = PlacesApi.placeDetails(geoContext, placeId).await()
+        placeDetails?.photos?.run {
+            if (isNotEmpty()) {
+                photoReference = this[0]?.photoReference ?: ""
+                if (photoReference.isNotBlank()) {
+                    super.loadTask(file)
+                }
+            }
+        }
+    }
+}
 
-    override fun doInBackground(vararg params: Void?): Bitmap? {
-        return try {
+open class GoogleMapsPhotoReferenceCacheImageLoader(var photoReference: String,
+                                                    iv: ImageView,
+                                                    private val maxHeight: Int):
+        ImageViewCacheLoader(iv, prefix="gmpr") {
+
+    override val defaultKey = photoReference
+    override fun loadTask(file: File) {
+        launch(UI) {
+            val image = withContext(DefaultDispatcher) { loadImage() }
+            if (image != null) {
+                val outputStream = FileOutputStream(file)
+                image.compress(Bitmap.CompressFormat.PNG, 90, outputStream)
+                outputStream.close()
+            }
+            postLoad(file)
+        }
+    }
+
+    private fun loadImage(): Bitmap? =
+        try {
             val result = PlacesApi
                     .photo(geoContext, photoReference)
                     .maxHeight(maxHeight)
@@ -35,34 +71,6 @@ class GMapPRefAsyncTask(private val photoReference: String,
                     "Error occurred while trying to download image from Google Maps Place SDK.")
             null
         }
-    }
-
-    override fun onPostExecute(result: Bitmap?) {
-        if (result == null) return
-        val outputStream = FileOutputStream(file)
-        result.compress(Bitmap.CompressFormat.PNG, 90, outputStream)
-        outputStream.close()
-        callback(file)
-    }
-
-    companion object {
-        private val geoContext = GeoApiContext
-                .Builder().apiKey(BuildConfig.GOOGLE_PLACES_API_KEY).build()
-    }
-}
-
-class GoogleMapsPhotoReferenceCacheImageLoader(private val photoReference: String,
-                                               iv: ImageView,
-                                               val maxHeight: Int):
-        ImageViewCacheLoader(iv, prefix="gmpr") {
-
-    override val defaultKey = photoReference
-    override fun loadTask(file: File) {
-        GMapPRefAsyncTask(photoReference, maxHeight, file) {
-            postLoad(file)
-        }.execute()
-    }
-
 }
 
 fun googlePlaceTypeIDToString(id: Int, resources: Resources) = when (id) {

@@ -13,7 +13,6 @@ import au.edu.unimelb.eng.navibee.BuildConfig
 import au.edu.unimelb.eng.navibee.R
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.api.directions.v5.DirectionsCriteria
 import com.mapbox.api.directions.v5.models.DirectionsResponse
 import com.mapbox.api.directions.v5.models.DirectionsRoute
@@ -25,9 +24,9 @@ import com.mapbox.services.android.navigation.ui.v5.OnNavigationReadyCallback
 import com.mapbox.services.android.navigation.ui.v5.listeners.NavigationListener
 import com.mapbox.services.android.navigation.v5.milestone.Milestone
 import com.mapbox.services.android.navigation.v5.milestone.MilestoneEventListener
-import com.mapbox.services.android.navigation.v5.navigation.MapboxNavigation
 import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute
 import com.mapbox.services.android.navigation.v5.routeprogress.RouteProgress
+import com.mapbox.services.android.navigation.v5.utils.RouteUtils
 import kotlinx.android.synthetic.main.activity_navigation.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -46,6 +45,7 @@ import timber.log.Timber
 class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
         NavigationListener, OnNavigationReadyCallback {
 
+
     companion object {
         const val EXTRA_DEST_LAT = "destinationLatitude"
         const val EXTRA_DEST_LON = "destinationLongitude"
@@ -53,9 +53,9 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
         const val MEAN_DRIVING = DirectionsCriteria.PROFILE_DRIVING
         const val MEAN_WALKING = DirectionsCriteria.PROFILE_WALKING
         const val MEAN_CYCLING = DirectionsCriteria.PROFILE_CYCLING
-    }
 
-    private lateinit var navigation: MapboxNavigation
+        private val routeUtils = RouteUtils()
+    }
 
     private lateinit var navigationView: NavigationView
 
@@ -82,14 +82,9 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
         navigationView = navigation_navigation_navigation_view
         navigationView.initialize(this)
 
-        navigation = MapboxNavigation(this, BuildConfig.MAPBOX_API_TOKEN)
-
         if (isNightModeEnabled() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.statusBarColor = Color.parseColor("#324148")
         }
-
-        val locationEngine = LocationEngineProvider(this).obtainBestLocationEngineAvailable()
-        navigation.locationEngine = locationEngine
 
         if (ContextCompat.checkSelfPermission(this,
                         Manifest.permission.ACCESS_FINE_LOCATION)
@@ -122,12 +117,6 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
                             Timber.e(t, "Error occurred on getting a route: $call")
                         }
                     })
-        }
-
-        navigation.addMilestoneEventListener(this)
-
-        navigation.addNavigationEventListener { running ->
-            Timber.v("Navigation is now ${if (running) "Running" else "not running"}.")
         }
 
     }
@@ -187,8 +176,6 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
 
     override fun onDestroy() {
         super.onDestroy()
-        navigation.stopNavigation()
-        navigation.onDestroy()
         navigationView.onDestroy()
     }
 
@@ -199,7 +186,7 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
     }
 
     override fun onNavigationFinished() {
-        finish()
+        // Intentionally empty
     }
 
     override fun onNavigationRunning() {
@@ -211,19 +198,24 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
     }
 
     private fun startNavigation(route: DirectionsRoute) {
+
         navigationView.startNavigation(
                 NavigationViewOptions.builder()
                         .directionsRoute(route)
                         .navigationListener(this)
                         .shouldSimulateRoute(true)
+                        .milestoneEventListener(this)
+                        .navigationListener(this)
                         .build()
                 )
     }
 
     override fun onMilestoneEvent(routeProgress: RouteProgress?, instruction: String?, milestone: Milestone?) {
-
+        if (routeProgress != null && milestone != null
+                && routeUtils.isArrivalEvent(routeProgress, milestone)) {
+            finish()
+        }
     }
-
 
     private fun isNightModeEnabled(): Boolean {
         if (isNightModeFollowSystem()) {

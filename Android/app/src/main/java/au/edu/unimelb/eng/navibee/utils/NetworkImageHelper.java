@@ -1,9 +1,9 @@
 package au.edu.unimelb.eng.navibee.utils;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.google.common.io.ByteStreams;
@@ -16,23 +16,15 @@ import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.util.Formatter;
 
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import au.edu.unimelb.eng.navibee.NaviBeeApplication;
+import timber.log.Timber;
 
 public class NetworkImageHelper {
 
     public static void loadImage(ImageView imageView, String url) {
-        // ni- is for network image
-        String filename = "ni-"+ NetworkImageHelper.sha256(url);
-        File file = new File(NaviBeeApplication.getInstance().getCacheDir(), filename);
-
-        if (file.exists()) {
-            // cache exists
-            loadImageFromCacheFile(imageView, file);
-        } else {
-            // cache not exists
-            new DownloadFileFromURLAsync(url, file, imageView).execute();
-
-        }
+        loadImage(imageView, url, url);
     }
 
     public static void loadImage(ImageView imageView, String url, String key) {
@@ -46,6 +38,23 @@ public class NetworkImageHelper {
         } else {
             // cache not exists
             new DownloadFileFromURLAsync(url, file, imageView).execute();
+
+        }
+    }
+
+    public static void loadRoundImage(ImageView imageView, String url) {
+        String key = url;
+
+        // ni- is for network image
+        String filename = "ni-" + NetworkImageHelper.sha256(key);
+        File file = new File(NaviBeeApplication.getInstance().getCacheDir(), filename);
+
+        if (file.exists()) {
+            // cache exists
+            loadImageFromCacheFile(imageView, file);
+        } else {
+            // cache not exists
+            new DownloadFileFromURLAsync(url, file, imageView, true).execute();
 
         }
     }
@@ -83,17 +92,36 @@ public class NetworkImageHelper {
         }
     }
 
+    protected static void loadRoundImageFromCacheFile(ImageView imageView, File file) {
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            Resources r = imageView.getResources();
+            Bitmap bitmap = BitmapFactory.decodeStream(fis);
+            RoundedBitmapDrawable drawable = RoundedBitmapDrawableFactory.create(r, bitmap);
+            drawable.setAntiAlias(true);
+            drawable.setCircular(true);
+            imageView.setImageDrawable(drawable);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private static class DownloadFileFromURLAsync extends AsyncTask<Void, Void, Void> {
 
         private String url;
         private File file;
         private ImageView imageView;
-
+        private boolean isRounded = false;
 
         private DownloadFileFromURLAsync(String url, File file, ImageView imageView) {
+            this(url, file, imageView, false);
+        }
+
+        private DownloadFileFromURLAsync(String url, File file, ImageView imageView, boolean isRounded) {
             this.url = url;
             this.file = file;
             this.imageView = imageView;
+            this.isRounded = isRounded;
         }
 
         // Downloading file in background thread
@@ -105,14 +133,17 @@ public class NetworkImageHelper {
 
                 ByteStreams.copy(input, output);
             } catch (Exception e) {
-                Log.e("Error: ", e.getMessage());
+                Timber.e(e.getMessage());
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void nothing) {
-            loadImageFromCacheFile(imageView, file);
+            if (isRounded)
+                loadRoundImageFromCacheFile(imageView, file);
+            else
+                loadImageFromCacheFile(imageView, file);
         }
 
     }

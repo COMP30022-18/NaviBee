@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/pref_section_title_navigation">
+        <ListPreference
+            android:defaultValue="@string/pref_navigation_preferred_mean_of_transport_default"
+            android:dialogTitle="@string/pref_navigation_preferred_mean_of_transport"
+            android:entries="@array/pref_navigation_preferred_mean_of_transport_titles"
+            android:entryValues="@array/pref_navigation_preferred_mean_of_transport_values"
+            android:icon="@drawable/ic_directions_car_black80_24dp"
+            android:key="navigation_preferred_mean_of_transport"
+            android:title="@string/pref_navigation_preferred_mean_of_transport" />
+        <ListPreference
+            android:defaultValue="@string/pref_navigation_search_region_values_default"
+            android:dialogTitle="@string/pref_navigation_search_region"
+            android:entries="@array/pref_navigation_search_region_titles"
+            android:entryValues="@array/pref_navigation_search_region_values"
+            android:icon="@drawable/ic_location_on_black80_24dp"
+            android:key="navigation_search_region"
+            android:summary="@string/pref_navigation_search_region_summary"
+            android:title="@string/pref_navigation_search_region" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_section_title_sos">
+        <EditTextPreference
+            android:dialogTitle="@string/pref_sos_preferred_emergency_call"
+            android:icon="@drawable/ic_people_black_24dp"
+            android:key="sos_emergency_call"
+            android:summary="@string/pref_sos_preferred_emergency_call_titles"
+            android:title="@string/pref_sos_preferred_emergency_call"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

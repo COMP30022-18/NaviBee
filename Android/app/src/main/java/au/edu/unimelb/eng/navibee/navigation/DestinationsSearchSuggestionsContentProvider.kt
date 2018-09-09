@@ -3,8 +3,8 @@ package au.edu.unimelb.eng.navibee.navigation
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.SearchManager
-import android.content.ContentProvider
 import android.content.ContentValues
+import android.content.SearchRecentSuggestionsProvider
 import android.content.UriMatcher
 import android.content.pm.PackageManager
 import android.database.Cursor
@@ -13,6 +13,7 @@ import android.net.Uri
 import android.provider.BaseColumns
 import androidx.core.content.ContextCompat
 import au.edu.unimelb.eng.navibee.NaviBeeApplication
+import au.edu.unimelb.eng.navibee.R
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.places.AutocompleteFilter
@@ -23,7 +24,7 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.tasks.Tasks
 
 
-class DestinationsSearchSuggestionsContentProvider: ContentProvider() {
+class DestinationsSearchSuggestionsContentProvider: SearchRecentSuggestionsProvider() {
 
     @SuppressLint("MissingPermission")
     companion object {
@@ -31,6 +32,7 @@ class DestinationsSearchSuggestionsContentProvider: ContentProvider() {
         private const val SEARCH_SUGGESTIONS = 0
 
         const val AUTHORITY = "au.edu.unimelb.eng.navibee.navigation.DestinationsSearchSuggestionsContentProvider"
+        const val MODE = DATABASE_MODE_QUERIES;
 
         private val uriMatcher = UriMatcher(UriMatcher.NO_MATCH).apply {
             addURI(AUTHORITY, "", SEARCH_SUGGESTIONS)
@@ -48,14 +50,15 @@ class DestinationsSearchSuggestionsContentProvider: ContentProvider() {
     }
 
     init {
-
+        setupSuggestions(AUTHORITY, MODE)
     }
 
     override fun insert(uri: Uri?, values: ContentValues?): Uri? {
         return null
     }
 
-    override fun query(uri: Uri?, projection: Array<out String>?, selection: String?, selectionArgs: Array<out String>?, sortOrder: String?): Cursor {
+    override fun query(uri: Uri?, projection: Array<out String>?, selection: String?,
+                       selectionArgs: Array<out String>?, sortOrder: String?): Cursor {
         when (uriMatcher.match(uri)) {
             SEARCH_SUGGESTIONS, UriMatcher.NO_MATCH -> {
 
@@ -63,6 +66,7 @@ class DestinationsSearchSuggestionsContentProvider: ContentProvider() {
                         BaseColumns._ID,
                         SearchManager.SUGGEST_COLUMN_TEXT_1,
                         SearchManager.SUGGEST_COLUMN_TEXT_2,
+                        SearchManager.SUGGEST_COLUMN_ICON_1,
                         SearchManager.SUGGEST_COLUMN_INTENT_EXTRA_DATA))
 
                 val query = uri?.lastPathSegment
@@ -97,6 +101,7 @@ class DestinationsSearchSuggestionsContentProvider: ContentProvider() {
                             .add(BaseColumns._ID, "$i")
                             .add(SearchManager.SUGGEST_COLUMN_TEXT_1, suggestion.getPrimaryText(null))
                             .add(SearchManager.SUGGEST_COLUMN_TEXT_2, suggestion.getSecondaryText(null))
+                            .add(SearchManager.SUGGEST_COLUMN_ICON_1, R.drawable.ic_search_black_24dp)
                             .add(SearchManager.SUGGEST_COLUMN_INTENT_EXTRA_DATA, suggestion.placeId)
                 }
 

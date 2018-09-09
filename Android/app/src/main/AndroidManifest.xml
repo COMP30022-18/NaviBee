@@ -19,7 +19,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
 
         <!-- Specify requirement for Apache HTTP Legacy library -->
         <!-- https://developers.google.com/maps/documentation/android-sdk/config#specify_requirement_for_apache_http_legacy_library -->
@@ -40,7 +41,7 @@
 
         <provider
             android:name=".navigation.DestinationsSearchSuggestionsContentProvider"
-            android:authorities="au.edu.unimelb.eng.navibee.navigation.DestinationsSearchSuggestionsContentProvider" />
+            android:authorities="${applicationId}.navigation.DestinationsSearchSuggestionsContentProvider" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.com.vansuita.pickimage.provider"
@@ -63,7 +64,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar"/>
         <activity
             android:name=".EventActivity"
             android:parentActivityName=".MainActivity" />
@@ -77,7 +79,7 @@
         <activity android:name=".EventSelectFriendsActivity" />
         <activity
             android:name=".SosActivity"
-            android:label="@string/landing_sos" />
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".social.FriendActivity"
             android:label="@string/title_activity_friend" />
@@ -96,6 +98,9 @@
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".navigation.DestinationsActivity" />
 
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -113,7 +118,7 @@
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="au.edu.unimelb.eng.navibee.navigation.DestinationsSearchResultActivity" />
+                android:value=".navigation.DestinationsSearchResultActivity" />
         </activity>
         <activity
             android:name=".navigation.NavigationActivity"
@@ -138,6 +143,15 @@
         <activity
             android:name=".social.ChatImageViewActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".social.VoiceCallActivity" />
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
     </application>
 
 </manifest>
