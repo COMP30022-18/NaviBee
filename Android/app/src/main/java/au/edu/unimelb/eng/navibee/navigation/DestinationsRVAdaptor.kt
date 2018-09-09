@@ -58,7 +58,7 @@ class DestinationsRVAdaptor(private val data: ArrayList<DestinationRVItem>) :
             is DestinationRVButton -> {
                 holder.itemView.recycler_view_destinations_list_button_button.text = data.text
                 // Set Icon to the button to "Start"
-                holder.itemView.recycler_view_destinations_list_button_button.setCompoundDrawablesRelativeWithIntrinsicBounds(data.icon, 0, 0, 0)
+                holder.itemView.recycler_view_destinations_list_button_button.setIconResource(data.icon)
                 holder.itemView.recycler_view_destinations_list_button_button.setOnClickListener(data.onClick)
             }
             is DestinationRVEntry -> {

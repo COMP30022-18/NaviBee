@@ -6,19 +6,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal">
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/recycler_view_destinations_list_button_button"
         style="@style/AppTheme.Button.ColoredPrimary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:drawableStart="@drawable/ic_keyboard_voice_black_24dp"
+        app:icon="@drawable/ic_keyboard_voice_black_24dp"
+        app:iconTint="@color/colorLightTextPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:iconGravity="textStart"
+        app:cornerRadius="48dp"
         tools:text="Button text."/>
 </androidx.constraintlayout.widget.ConstraintLayout>

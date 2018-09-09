@@ -103,8 +103,8 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
             setHasFixedSize(true)
             layoutManager = viewManager
             adapter = viewAdapter
-            addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(
-                    context, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
+//            addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(
+//                    context, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
         }
 
         // Setup location service

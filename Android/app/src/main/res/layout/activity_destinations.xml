@@ -6,7 +6,8 @@
     android:id="@+id/destinations_activity_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".navigation.DestinationsActivity">
+    tools:context=".navigation.DestinationsActivity"
+    android:background="@color/colorLightGrey">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
