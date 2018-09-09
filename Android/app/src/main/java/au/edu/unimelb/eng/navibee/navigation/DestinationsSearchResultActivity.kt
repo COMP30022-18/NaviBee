@@ -158,6 +158,7 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
                         destinations.add(DestinationRVEntry(
                                 name = item.name,
                                 location = item.vicinity,
+                                googlePlaceId = item.placeId,
                                 googlePhotoReference = photoReference,
                                 onClick = View.OnClickListener { _ ->
                                     startActivity<DestinationDetailsActivity>(
