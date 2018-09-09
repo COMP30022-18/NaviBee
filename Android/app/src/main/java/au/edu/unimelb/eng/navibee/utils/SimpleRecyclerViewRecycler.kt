@@ -5,9 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import au.edu.unimelb.eng.navibee.R
-import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
-import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.recycler_view_attributions.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_ratings.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_primary_secondary_clickable.view.*
@@ -26,11 +23,8 @@ class SimpleRecyclerViewAdaptor(private val data: List<SimpleRecyclerViewItem>) 
             4 -> R.layout.recycler_view_item_text_secondary_primary_clickable
             5 -> R.layout.recycler_view_item_text_secondary_primary_static
             6 -> R.layout.recycler_view_attributions
-<<<<<<< HEAD
-            7 -> R.layout.recycler_view_item_user_chips
-=======
             7 -> R.layout.recycler_view_item_ratings
->>>>>>> master
+            8 -> R.layout.recycler_view_item_user_chips
             else -> R.layout.recycler_view_indefinite_progress
         }
         return SimpleRVViewHolder(LayoutInflater.from(parent.context)
@@ -45,11 +39,8 @@ class SimpleRecyclerViewAdaptor(private val data: List<SimpleRecyclerViewItem>) 
             is SimpleRVTextSecondaryPrimaryClickable -> 4
             is SimpleRVTextSecondaryPrimaryStatic -> 5
             is SimpleRVAttributions -> 6
-<<<<<<< HEAD
-            is SimpleRVUserChips -> 7
-=======
             is SimpleRVRatings -> 7
->>>>>>> master
+            is SimpleRVUserChips -> 8
             else -> 0
         }
     }
@@ -88,18 +79,16 @@ class SimpleRecyclerViewAdaptor(private val data: List<SimpleRecyclerViewItem>) 
             is SimpleRVAttributions -> {
                 holder.itemView.recycler_view_attribution_text_view.text = data.attributes
             }
-<<<<<<< HEAD
             is SimpleRVUserChips -> {
                 holder.itemView.general_recycler_view_user_chip_secondary.text = data.title
                 holder.itemView.general_recycler_view_user_chip_primary.text = data.parts
-=======
+            }
             is SimpleRVRatings -> {
                 holder.itemView.general_recycler_view_ratings_title.text = data.title
                 val stars = holder.itemView.general_recycler_view_ratings_stars
                 stars.numStars = data.maxRating
                 stars.rating = data.rating
                 stars.stepSize = data.step
->>>>>>> master
             }
         }
     }
