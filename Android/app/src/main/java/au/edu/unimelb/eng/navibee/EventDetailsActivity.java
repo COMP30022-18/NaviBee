@@ -1,5 +1,6 @@
 package au.edu.unimelb.eng.navibee;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,6 +36,7 @@ import java.util.Map;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -87,12 +89,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         View toolbarPadding = (View) findViewById(R.id.event_details_toolbar_padding);
         TextView fabText = (TextView) findViewById(R.id.event_details_fab_text);
 
-        // Get primary color
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            primaryColor = getResources().getColor(R.color.colorPrimary, null);
-        } else {
-            primaryColor = getResources().getColor(R.color.colorPrimary);
-        }
+        primaryColor = primaryColor = ContextCompat.getColor(this, R.color.colorPrimary);
 
         // Action Bar
         setSupportActionBar(toolbar);
@@ -227,6 +224,8 @@ public class EventDetailsActivity extends AppCompatActivity {
 
         FirebaseFunctions mFunctions = FirebaseFunctions.getInstance();
 
+        Context activityContext = this;
+
         mFunctions
                 .getHttpsCallable("getUserInfoFromUidList")
                 .call(data)
@@ -279,46 +278,28 @@ public class EventDetailsActivity extends AppCompatActivity {
                             ));
                         }
 
-//                        ChipGroup chipGroup = (ChipGroup) findViewById(R.id.general_recycler_view_user_chip_chipgroup);
+                        ArrayList<Chip> chipList = new ArrayList<>();
 
-//                        for (String participant : participants) {
-//                            Chip chip = new Chip(this);
-//                            chip.setText(participant);
-//                            chip.setCloseIconVisible(true);
-                            //chip.setCloseIconResource(R.drawable.your_icon);
-                            //chip.setChipIconResource(R.drawable.your_icon);
-//                            chip.setChipBackgroundColorResource(R.color.colorPrimary);
-//                            chip.setTextAppearanceResource(R.style.ChipTextStyle);
-                            //chip.setElevation(15);
-//                            Chip chip = generateChip(participant);
-//
-//                            chipGroup.addView(chip);
-//                        }
+                        for (String participant : participants) {
+                            Chip chip = (Chip) getLayoutInflater().inflate(R.layout.chip_user_profile, null);
+                            chip.setText(participant);
+                            // TODO use profile picture instead
+                            chip.setChipIconResource(R.drawable.ic_people_black_24dp);
+
+                            chipList.add(chip);
+                        }
 
                         // Event participants
                         if (eventItem.getUsers() != null) {
-                            listItems.add(new SimpleRVTextSecondaryPrimaryStatic(
-                                    participants.toString(),
-                                    getResources().getString(R.string.event_details_participants)
+                            listItems.add(new SimpleRVUserChips(
+                                    getResources().getString(R.string.event_details_participants),
+                                    chipList
                             ));
-//                            listItems.add(new SimpleRVUserChips(
-//                                    getResources().getString(R.string.event_details_participants),
-//                                    chipGroup
-//                            ));
                         }
 
                         viewAdapter.notifyDataSetChanged();
                     }
                 });
-    }
-
-    private ChipDrawable generateChip(String text) {
-        ChipDrawable chip = ChipDrawable.createFromResource(this, R.xml.standalone_chip);
-
-        chip.setChipBackgroundColorResource(R.color.colorPrimary);
-        chip.setText(text);
-
-        return chip;
     }
 
     private void setViewHeightPercent(View view, float percentage, int min, int max) {

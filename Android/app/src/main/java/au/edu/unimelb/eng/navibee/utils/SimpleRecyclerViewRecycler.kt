@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import au.edu.unimelb.eng.navibee.R
+import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.recycler_view_attributions.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_ratings.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_primary_secondary_clickable.view.*
@@ -79,16 +80,18 @@ class SimpleRecyclerViewAdaptor(private val data: List<SimpleRecyclerViewItem>) 
             is SimpleRVAttributions -> {
                 holder.itemView.recycler_view_attribution_text_view.text = data.attributes
             }
-            is SimpleRVUserChips -> {
-                holder.itemView.general_recycler_view_user_chip_secondary.text = data.title
-                holder.itemView.general_recycler_view_user_chip_primary.text = data.parts
-            }
             is SimpleRVRatings -> {
                 holder.itemView.general_recycler_view_ratings_title.text = data.title
                 val stars = holder.itemView.general_recycler_view_ratings_stars
                 stars.numStars = data.maxRating
                 stars.rating = data.rating
                 stars.stepSize = data.step
+            }
+            is SimpleRVUserChips -> {
+                holder.itemView.general_recycler_view_user_chip_secondary.text = data.title
+                holder.itemView.general_recycler_view_user_chip_chipgroup.apply {
+                    data.chips.forEach { addView(it) }
+                }
             }
         }
     }
@@ -120,8 +123,7 @@ data class SimpleRVAttributions(
 ): SimpleRecyclerViewItem()
 data class SimpleRVUserChips(
         val title: CharSequence,
-        val parts: CharSequence
-//        val chips: ChipGroup
+        val chips: ArrayList<Chip>
 ): SimpleRecyclerViewItem()
 data class SimpleRVRatings(
         val title: CharSequence,
