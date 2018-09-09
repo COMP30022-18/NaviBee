@@ -1,5 +1,6 @@
 package au.edu.unimelb.eng.navibee.navigation
 
+import android.app.Application
 import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
@@ -7,9 +8,14 @@ import android.view.Menu
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.*
 import au.edu.unimelb.eng.navibee.R
 import kotlinx.android.synthetic.main.activity_destinations.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.startActivity
+
+
 
 
 class DestinationsActivity : AppCompatActivity(){
@@ -19,40 +25,18 @@ class DestinationsActivity : AppCompatActivity(){
     private lateinit var viewAdapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>
 
     private lateinit var viewManager: androidx.recyclerview.widget.RecyclerView.LayoutManager
+    private lateinit var viewModel: DestinationSuggestionModel
+
+    private val destinations = ArrayList<DestinationRVItem>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_destinations)
 
-        // TODO: Populate the list of destinations with real data
-        val destinations = ArrayList<DestinationRVItem>()
-        destinations.add(DestinationRVButton("Say a place",
-                R.drawable.ic_keyboard_voice_black_24dp,
-                View.OnClickListener {
-                    startVoiceSearch()
-                })
-        )
-        getRecentSearchQueries().run {
-            if (this.isNotEmpty())
-                destinations.add(DestinationRVDivider("Recent destinations"))
-            for (i in this) {
-                destinations.add(DestinationRVEntry(
-                        name = i.name,
-                        location = i.address,
-                        googlePhotoReference = i.photoReference,
-                        onClick = View.OnClickListener {
-                            startActivity<DestinationDetailsActivity>(
-                                    DestinationDetailsActivity.EXTRA_PLACE_ID to i.googlePlaceId
-                            )
-                        }
-                ))
-            }
-        }
-        destinations.add(DestinationRVDivider("Recommended place"))
-        destinations.add(DestinationRVEntry("Place 3", "Location 3",
-                onClick = View.OnClickListener {  }))
-        destinations.add(DestinationRVEntry("Place 4", "Location 4",
-                onClick = View.OnClickListener {  }))
+        viewModel = ViewModelProviders.of(this).get(DestinationSuggestionModel::class.java)
+        lifecycle.addObserver(viewModel)
+
+        subscribe()
 
         // setup recycler view
         viewManager = androidx.recyclerview.widget.LinearLayoutManager(this)
@@ -62,14 +46,58 @@ class DestinationsActivity : AppCompatActivity(){
             setHasFixedSize(true)
             layoutManager = viewManager
             adapter = viewAdapter
-            addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(context, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
+//            addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(context, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
         }
 
+        viewModel.getDestinationSuggestions()
+
+    }
+
+    private fun subscribe() {
+        viewModel.searchHistory.observe(this, Observer { updateRecyclerView() })
+    }
+
+    private fun updateRecyclerView() {
+        launch(UI){
+
+            destinations.clear()
+            destinations.add(DestinationRVButton("Say a place",
+                    R.drawable.ic_keyboard_voice_black_24dp,
+                    View.OnClickListener {
+                        startVoiceSearch()
+                    })
+            )
+            viewModel.searchHistory.value?.run {
+                if (this.isNotEmpty())
+                    destinations.add(DestinationRVDivider("Recent destinations"))
+                for (i in this) {
+                    destinations.add(DestinationRVEntry(
+                            name = i.name,
+                            location = i.address,
+                            googlePlaceId = i.googlePlaceId,
+                            onClick = View.OnClickListener {
+                                startActivity<DestinationDetailsActivity>(
+                                        DestinationDetailsActivity.EXTRA_PLACE_ID to i.googlePlaceId
+                                )
+                            }
+                    ))
+                }
+            }
+
+            // TODO: Populate the list of destination suggestions with real data
+            destinations.add(DestinationRVDivider("Recommended place"))
+            destinations.add(DestinationRVEntry("Place 3", "Location 3",
+                    onClick = View.OnClickListener {  }))
+            destinations.add(DestinationRVEntry("Place 4", "Location 4",
+                    onClick = View.OnClickListener {  }))
+
+            viewAdapter.notifyDataSetChanged()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu
-        this.menuInflater.inflate(R.menu.navigation_destinations_opiton_menu, menu)
+        this.menuInflater.inflate(R.menu.menu_navigation_destinations_opitons, menu)
 
         val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
 
@@ -93,3 +121,17 @@ class DestinationsActivity : AppCompatActivity(){
 }
 
 
+private class DestinationSuggestionModel(private val context: Application):
+        AndroidViewModel(context), LifecycleObserver {
+    val searchHistory = MutableLiveData<List<LocationSearchHistory>>()
+
+    fun getDestinationSuggestions() {
+        if (searchHistory.value != null)
+            searchHistory.postValue(getRecentSearchQueries(context))
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun onResume() {
+        searchHistory.postValue(getRecentSearchQueries(context))
+    }
+}

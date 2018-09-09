@@ -5,12 +5,13 @@ import android.view.View
 import android.view.ViewGroup
 import au.edu.unimelb.eng.navibee.R
 import kotlinx.android.synthetic.main.recycler_view_attributions.view.*
+import kotlinx.android.synthetic.main.recycler_view_item_ratings.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_primary_secondary_clickable.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_primary_secondary_static.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_secondary_primary_clickable.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_secondary_primary_static.view.*
 
-class SimpleRecyclerViewAdaptor(private val data: ArrayList<SimpleRecyclerViewItem>) :
+class SimpleRecyclerViewAdaptor(private val data: List<SimpleRecyclerViewItem>) :
         androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
         val layout = when (viewType) {
@@ -20,6 +21,7 @@ class SimpleRecyclerViewAdaptor(private val data: ArrayList<SimpleRecyclerViewIt
             4 -> R.layout.recycler_view_item_text_secondary_primary_clickable
             5 -> R.layout.recycler_view_item_text_secondary_primary_static
             6 -> R.layout.recycler_view_attributions
+            7 -> R.layout.recycler_view_item_ratings
             else -> R.layout.recycler_view_indefinite_progress
         }
         return SimpleRVViewHolder(LayoutInflater.from(parent.context)
@@ -34,6 +36,7 @@ class SimpleRecyclerViewAdaptor(private val data: ArrayList<SimpleRecyclerViewIt
             is SimpleRVTextSecondaryPrimaryClickable -> 4
             is SimpleRVTextSecondaryPrimaryStatic -> 5
             is SimpleRVAttributions -> 6
+            is SimpleRVRatings -> 7
             else -> 0
         }
     }
@@ -72,6 +75,13 @@ class SimpleRecyclerViewAdaptor(private val data: ArrayList<SimpleRecyclerViewIt
             is SimpleRVAttributions -> {
                 holder.itemView.recycler_view_attribution_text_view.text = data.attributes
             }
+            is SimpleRVRatings -> {
+                holder.itemView.general_recycler_view_ratings_title.text = data.title
+                val stars = holder.itemView.general_recycler_view_ratings_stars
+                stars.numStars = data.maxRating
+                stars.rating = data.rating
+                stars.stepSize = data.step
+            }
         }
     }
 }
@@ -98,6 +108,11 @@ data class SimpleRVTextSecondaryPrimaryStatic(
         val secondary: CharSequence
 ): SimpleRecyclerViewItem()
 data class SimpleRVAttributions(val attributes: CharSequence): SimpleRecyclerViewItem()
-
+data class SimpleRVRatings(
+        val title: CharSequence,
+        val rating: Float,
+        val step: Float,
+        val maxRating: Int
+): SimpleRecyclerViewItem()
 class SimpleRVViewHolder(view: View) :
         androidx.recyclerview.widget.RecyclerView.ViewHolder(view)

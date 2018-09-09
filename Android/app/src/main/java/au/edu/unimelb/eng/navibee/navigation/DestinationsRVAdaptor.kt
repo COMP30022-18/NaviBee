@@ -12,6 +12,8 @@ import kotlinx.android.synthetic.main.recycler_view_destination_list_button.view
 import kotlinx.android.synthetic.main.recycler_view_destination_list_divider.view.*
 import kotlinx.android.synthetic.main.recycler_view_destination_list_entry.view.*
 import kotlinx.android.synthetic.main.recycler_view_error_message.view.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 
 class DestinationsRVAdaptor(private val data: ArrayList<DestinationRVItem>) :
         androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
@@ -56,7 +58,7 @@ class DestinationsRVAdaptor(private val data: ArrayList<DestinationRVItem>) :
             is DestinationRVButton -> {
                 holder.itemView.recycler_view_destinations_list_button_button.text = data.text
                 // Set Icon to the button to "Start"
-                holder.itemView.recycler_view_destinations_list_button_button.setCompoundDrawablesRelativeWithIntrinsicBounds(data.icon, 0, 0, 0)
+                holder.itemView.recycler_view_destinations_list_button_button.setIconResource(data.icon)
                 holder.itemView.recycler_view_destinations_list_button_button.setOnClickListener(data.onClick)
             }
             is DestinationRVEntry -> {
@@ -72,7 +74,17 @@ class DestinationsRVAdaptor(private val data: ArrayList<DestinationRVItem>) :
                                 data.googlePhotoReference,
                                 holder.itemView.recycler_view_destinations_list_entry_preview,
                                 viewHeight
-                        ).execute()
+                        ).execute("${data.googlePlaceId}-0")
+                    }
+                    data.googlePlaceId != null -> {
+                        val viewHeight = Resources.getSystem().displayMetrics.heightPixels
+                        launch(UI) {
+                            GoogleMapsPlaceIdCacheImageLoader(
+                                    data.googlePlaceId,
+                                    holder.itemView.recycler_view_destinations_list_entry_preview,
+                                    viewHeight
+                                ).execute()
+                        }
                     }
                 }
                 holder.itemView.setOnClickListener(data.onClick)
@@ -80,6 +92,7 @@ class DestinationsRVAdaptor(private val data: ArrayList<DestinationRVItem>) :
             is DestinationRVAttributions -> {
                 holder.itemView.recycler_view_attribution_text_view.text = data.attributes
             }
+
         }
     }
 }
@@ -94,6 +107,7 @@ data class DestinationRVEntry(val name: CharSequence,
                               val thumbnail: String? = null,
                               val wikiData: String? = null,
                               val googlePhotoReference: String? = null,
+                              val googlePlaceId: String? = null,
                               val onClick: View.OnClickListener): DestinationRVItem()
 data class DestinationRVButton(val text: CharSequence,
                                val icon: Int,
