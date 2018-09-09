@@ -4,7 +4,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
-import com.beust.klaxon.Klaxon
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonClass
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
 const val NAVIGATION_PREFERENCE_KEY = "navigation_preference"
 const val RECENT_QUERIES = "recent_queries"
@@ -21,15 +25,19 @@ const val MEAN_OF_TRANSPORT_WALK = "walk"
 private const val SEARCH_REGION = "navigation_search_region"
 private const val DEFAULT_SEARCH_REGION = "au"
 
+private val moshiAdapter: JsonAdapter<List<LocationSearchHistory>> =
+        Moshi.Builder()
+        .add(KotlinJsonAdapterFactory())
+        .build().adapter(Types.newParameterizedType(List::class.java,
+                LocationSearchHistory::class.java))
+
 fun getNavigationSharedPref(context: Context): SharedPreferences =
         context.getSharedPreferences(
                 NAVIGATION_PREFERENCE_KEY, Context.MODE_PRIVATE)
 
 fun getRecentSearchQueries(context: Context): List<LocationSearchHistory> {
-    return Klaxon()
-            .parseArray(getNavigationSharedPref(context)
-                    .getString(RECENT_QUERIES, "[]") ?: "[]")
-            ?: emptyList()
+    return moshiAdapter.fromJson(getNavigationSharedPref(context)
+                    .getString(RECENT_QUERIES, "[]") ?: "[]") ?: emptyList()
 }
 
 fun addRecentSearchQuery(context: Context, item: LocationSearchHistory): List<LocationSearchHistory> {
@@ -40,7 +48,7 @@ fun addRecentSearchQuery(context: Context, item: LocationSearchHistory): List<Lo
     list.add(0, item)
     val newList = list.take(RECENT_QUERIES_LENGTH)
 
-    val json = Klaxon().toJsonString(newList)
+    val json = moshiAdapter.toJson(newList)
     getNavigationSharedPref(context).edit {
         putString(RECENT_QUERIES, json)
     }
@@ -82,13 +90,15 @@ fun getSearchRegion(context: Context) =
                 .getString(SEARCH_REGION, DEFAULT_SEARCH_REGION)
                 ?: DEFAULT_SEARCH_REGION
 
+@JsonClass(generateAdapter = true)
 data class LocationSearchHistory (
         val googlePlaceId: String,
-        val name: CharSequence,
-        val address: CharSequence,
+        val name: String,
+        val address: String,
         val lastSearchTime: Long = System.currentTimeMillis(),
         val photoReference: String? = null
 ) {
+    companion object;
     override fun equals(other: Any?): Boolean {
         if (other is LocationSearchHistory) {
             return googlePlaceId == other.googlePlaceId

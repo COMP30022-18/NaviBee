@@ -161,8 +161,8 @@ class DestinationDetailsActivity : AppCompatActivity() {
                     viewAdapter.notifyDataSetChanged()
                     addRecentSearchQuery(applicationContext, LocationSearchHistory(
                             googlePlaceId = id,
-                            name = name ?: "",
-                            address = address ?: ""
+                            name = name.toString(),
+                            address = address.toString()
                     ))
                 }
         } )

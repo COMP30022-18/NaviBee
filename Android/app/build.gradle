@@ -3,6 +3,11 @@ plugins {
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 def CONFIG = { k -> "\"${project.properties.get(k)}\"" }
 
@@ -87,16 +92,13 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:17.3.1'
     implementation 'com.synnapps:carouselview:0.1.5'
     implementation 'io.agora.rtc:voice-sdk:2.3.0'
-    implementation 'com.beust:klaxon:3.0.8'
+    implementation 'com.squareup.moshi:moshi:1.6.0'
+    implementation 'com.squareup.moshi:moshi-kotlin:1.6.0'
     implementation 'com.github.chrisbanes:PhotoView:2.0.0'
+    kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.6.0'
     implementation(name: 'HERE-sdk', ext: 'aar')
     implementation files('libs/HERE-sdk-javadoc.jar')
 }
-
-apply plugin: 'com.google.gms.google-services'
-
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 kotlin {
     experimental {
