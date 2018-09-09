@@ -61,8 +61,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
 
-
-
         findViewById(R.id.landing_sos_btn).setOnClickListener(this);
         findViewById(R.id.landing_social_btn).setOnClickListener(this);
 
@@ -77,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MaterialButton naviBtn = findViewById(R.id.landing_navigation_btn);
         naviBtn.setBackgroundTintList(null);
         naviBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.gradient_landing_major_background));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            naviBtn.setClipToOutline(true);
+        }
     }
 
     private void setupWelcomeBanner() {

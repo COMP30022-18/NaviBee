@@ -7,8 +7,8 @@
         android:topLeftRadius="16dp"
         android:topRightRadius="16dp"/>
 
-    <padding android:bottom="4dp"
-        android:top="4dp"
+    <padding android:bottom="8dp"
+        android:top="8dp"
         android:left="0dp"
         android:right="0dp"/>
     <gradient

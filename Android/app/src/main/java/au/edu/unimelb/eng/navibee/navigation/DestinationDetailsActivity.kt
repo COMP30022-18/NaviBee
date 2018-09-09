@@ -159,7 +159,6 @@ class DestinationDetailsActivity : AppCompatActivity() {
                 it.data?.get(0)?.run {
                     renderPlaceDetails(this)
                     viewAdapter.notifyDataSetChanged()
-
                     addRecentSearchQuery(applicationContext, LocationSearchHistory(
                             googlePlaceId = id,
                             name = name ?: "",
@@ -209,13 +208,21 @@ class DestinationDetailsActivity : AppCompatActivity() {
             }
 
             override fun onStateChanged(bottomSheet: View, state: Int) {
-                if (listItems.size > 0 && listItems[0] is SimpleRVTextPrimarySecondaryStatic)
-                    if (state == BottomSheetBehavior.STATE_DRAGGING && titleRowHeight == -1) {
-                        titleRowHeight = viewManager.findViewByPosition(0)?.height ?: -1
-                    }
+                if (state == BottomSheetBehavior.STATE_DRAGGING)
+                    updateTitleRowHeight()
             }
-
         })
+
+        recyclerView.viewTreeObserver.addOnDrawListener {
+            updateTitleRowHeight()
+        }
+    }
+
+    private fun updateTitleRowHeight() {
+        if (viewManager.itemCount > 0 && listItems[0] is SimpleRVTextPrimarySecondaryStatic)
+            if (titleRowHeight == -1) {
+                titleRowHeight = viewManager.findViewByPosition(0)?.height ?: -1
+            }
     }
 
     private fun updateAttributionsRow(attributions: List<CharSequence>) {
@@ -262,35 +269,9 @@ class DestinationDetailsActivity : AppCompatActivity() {
     fun onClickGo(view: View) {
         when (getMeanOfTransport(applicationContext)) {
             MEAN_OF_TRANSPORT_ALWAYS_ASK -> {
-                // TODO: Implement just once/always dialog.
-
                 MeanOfTransportBottomSheetDialogFragment().run {
                     show(supportFragmentManager, tag)
                 }
-
-//                val dialogView = layoutInflater.inflate(R.layout.alert_dialog_navigation_choose_transport_manners,
-//                        null)
-//                val dialog = AlertDialog.Builder(this)
-//                        .setTitle(R.string.dialog_method_of_travel_title)
-//                        .setView(dialogView)
-//                        .setNegativeButton(R.string.button_cancel) { dialog, which ->
-//                            if (which == DialogInterface.BUTTON_NEGATIVE)
-//                                dialog.dismiss()
-//                        }
-//                        .create()
-//                dialogView.navigation_directions_transport_manners_dialog_walk.setOnClickListener {
-//                    startWalkingNavigation()
-//                    dialog.dismiss()
-//                }
-//                dialogView.navigation_directions_transport_manners_dialog_transit.setOnClickListener {
-//                    // TODO("Start walking navigation")
-//                    dialog.dismiss()
-//                }
-//                dialogView.navigation_directions_transport_manners_dialog_drive.setOnClickListener {
-//                    startDrivingNavigation()
-//                    dialog.dismiss()
-//                }
-//                dialog.show()
             }
             MEAN_OF_TRANSPORT_DRIVE -> startDrivingNavigation()
             MEAN_OF_TRANSPORT_WALK -> startWalkingNavigation()
@@ -363,12 +344,6 @@ class DestinationDetailsActivity : AppCompatActivity() {
                     )
             )
         if (place.rating >= 0)
-            listItems.add(
-                    SimpleRVTextSecondaryPrimaryStatic(
-                            secondary = resources.getString(R.string.place_details_ratings),
-                            primary = "%.1f/5.0".format(place.rating)
-                    )
-            )
             listItems.add(
                     SimpleRVRatings(
                             title = resources.getString(R.string.place_details_ratings),

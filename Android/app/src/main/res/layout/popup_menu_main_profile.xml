@@ -25,23 +25,29 @@
 
     <TextView
         android:id="@+id/popup_menu_main_profile_name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
         android:textColor="@color/colorLightTextPrimary"
         android:textSize="16sp"
+        android:maxLines="1"
+        app:layout_constraintEnd_toStartOf="@+id/popup_menu_main_profile_picture"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/popup_menu_main_profile_picture"
         tools:text="@tools:sample/full_names" />
 
     <TextView
         android:id="@+id/popup_menu_main_profile_secondary"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
         android:textColor="@color/colorLightTextSecondary"
         android:textSize="16sp"
+        android:maxLines="1"
         app:layout_constraintBottom_toBottomOf="@+id/popup_menu_main_profile_picture"
+        app:layout_constraintEnd_toStartOf="@+id/popup_menu_main_profile_picture"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="webmaster@example.com" />
 
