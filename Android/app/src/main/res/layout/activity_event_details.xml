@@ -47,8 +47,7 @@
         android:background="@color/white"
         app:behavior_peekHeight="300dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-        android:fitsSystemWindows="true"
-        tools:listitem="@layout/recycler_view_item_text_secondary_primary_static"/>
+        android:fitsSystemWindows="true" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/event.details.fab"

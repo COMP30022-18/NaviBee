@@ -237,13 +237,20 @@ public class EventDetailsActivity extends AppCompatActivity {
 
                         listItems.clear();
 
+                        // Event name && time
                         if (eventItem.getName() != null && eventItem.getTime_() != null) {
+                            // Set support action bar title
+                            if (getSupportActionBar() != null) {
+                                getSupportActionBar().setTitle(eventItem.getName());
+                            }
+
                             listItems.add(new SimpleRVTextPrimarySecondaryStatic(
                                     eventItem.getName(),
                                     new SimpleDateFormat(getResources().getString(R.string.date_format)).format(eventItem.getTime_())
                             ));
                         }
 
+                        // Event location
                         if (eventItem.getLocation() != null) {
                             listItems.add(new SimpleRVTextSecondaryPrimaryStatic(
                                     eventItem.getLocation(),
@@ -256,15 +263,15 @@ public class EventDetailsActivity extends AppCompatActivity {
                         ArrayList<String> photos = new ArrayList<>();
 
                         for (String uid : result.keySet()) {
-                            HashMap<String, String> user = result.get(uid);
+                            HashMap<String, String> users = result.get(uid);
                             if (uid.equals(eventItem.getHolder())) {
-                                holder = user.get("name");
-                            } else {
-                                participants.add(user.get("name"));
-                                photos.add(user.get("photoURL"));
+                                holder = users.get("name");
                             }
+                            participants.add(users.get("name"));
+                            photos.add(users.get("photoURL"));
                         }
 
+                        // Event organiser
                         if (eventItem.getHolder() != null) {
                             listItems.add(new SimpleRVTextSecondaryPrimaryStatic(
                                     holder,
@@ -273,21 +280,22 @@ public class EventDetailsActivity extends AppCompatActivity {
                         }
 
 //                        ChipGroup chipGroup = (ChipGroup) findViewById(R.id.general_recycler_view_user_chip_chipgroup);
-//
+
 //                        for (String participant : participants) {
-//                            Chip chip = new Chip(getApplicationContext());
+//                            Chip chip = new Chip(this);
 //                            chip.setText(participant);
 //                            chip.setCloseIconVisible(true);
-//                            //chip.setCloseIconResource(R.drawable.your_icon);
-//                            //chip.setChipIconResource(R.drawable.your_icon);
+                            //chip.setCloseIconResource(R.drawable.your_icon);
+                            //chip.setChipIconResource(R.drawable.your_icon);
 //                            chip.setChipBackgroundColorResource(R.color.colorPrimary);
-////                            chip.setTextAppearanceResource(R.style.ChipTextStyle);
-//                            //chip.setElevation(15);
+//                            chip.setTextAppearanceResource(R.style.ChipTextStyle);
+                            //chip.setElevation(15);
+//                            Chip chip = generateChip(participant);
 //
 //                            chipGroup.addView(chip);
 //                        }
 
-
+                        // Event participants
                         if (eventItem.getUsers() != null) {
                             listItems.add(new SimpleRVTextSecondaryPrimaryStatic(
                                     participants.toString(),
@@ -302,6 +310,15 @@ public class EventDetailsActivity extends AppCompatActivity {
                         viewAdapter.notifyDataSetChanged();
                     }
                 });
+    }
+
+    private ChipDrawable generateChip(String text) {
+        ChipDrawable chip = ChipDrawable.createFromResource(this, R.xml.standalone_chip);
+
+        chip.setChipBackgroundColorResource(R.color.colorPrimary);
+        chip.setText(text);
+
+        return chip;
     }
 
     private void setViewHeightPercent(View view, float percentage, int min, int max) {

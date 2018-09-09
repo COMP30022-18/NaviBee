@@ -3,13 +3,17 @@ package au.edu.unimelb.eng.navibee.utils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import au.edu.unimelb.eng.navibee.R
+import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.recycler_view_attributions.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_primary_secondary_clickable.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_primary_secondary_static.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_secondary_primary_clickable.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_secondary_primary_static.view.*
+import kotlinx.android.synthetic.main.recycler_view_item_user_chips.view.*
 
 class SimpleRecyclerViewAdaptor(private val data: ArrayList<SimpleRecyclerViewItem>) :
         androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
@@ -21,6 +25,7 @@ class SimpleRecyclerViewAdaptor(private val data: ArrayList<SimpleRecyclerViewIt
             4 -> R.layout.recycler_view_item_text_secondary_primary_clickable
             5 -> R.layout.recycler_view_item_text_secondary_primary_static
             6 -> R.layout.recycler_view_attributions
+            7 -> R.layout.recycler_view_item_user_chips
             else -> R.layout.recycler_view_indefinite_progress
         }
         return SimpleRVViewHolder(LayoutInflater.from(parent.context)
@@ -35,13 +40,14 @@ class SimpleRecyclerViewAdaptor(private val data: ArrayList<SimpleRecyclerViewIt
             is SimpleRVTextSecondaryPrimaryClickable -> 4
             is SimpleRVTextSecondaryPrimaryStatic -> 5
             is SimpleRVAttributions -> 6
+            is SimpleRVUserChips -> 7
             else -> 0
         }
     }
 
     override fun getItemCount() = data.size
 
-    override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val data = data[position]
         when (data) {
             is SimpleRVTextPrimarySecondaryClickable -> {
@@ -73,6 +79,10 @@ class SimpleRecyclerViewAdaptor(private val data: ArrayList<SimpleRecyclerViewIt
             is SimpleRVAttributions -> {
                 holder.itemView.recycler_view_attribution_text_view.text = data.attributes
             }
+            is SimpleRVUserChips -> {
+                holder.itemView.general_recycler_view_user_chip_secondary.text = data.title
+                holder.itemView.general_recycler_view_user_chip_primary.text = data.parts
+            }
         }
     }
 }
@@ -103,12 +113,13 @@ data class SimpleRVAttributions(
 ): SimpleRecyclerViewItem()
 data class SimpleRVUserChips(
         val title: CharSequence,
-        val chips: ChipGroup
+        val parts: CharSequence
+//        val chips: ChipGroup
 ): SimpleRecyclerViewItem()
 class SimpleRVViewHolder(view: View) :
         androidx.recyclerview.widget.RecyclerView.ViewHolder(view)
 
-data class UserChipItem(
-        val text: CharSequence,
-        val photoUrl: String
-)
+//data class UserChipItem(
+//        val text: CharSequence,
+//        val photoUrl: String
+//)
