@@ -79,7 +79,7 @@
         <activity android:name=".EventSelectFriendsActivity" />
         <activity
             android:name=".SosActivity"
-            android:label="@string/landing_sos" />
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".social.FriendActivity"
             android:label="@string/title_activity_friend" />

@@ -4,61 +4,59 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="center_horizontal"
     tools:context=".SosActivity">
 
+    <ImageView
+        android:id="@+id/sos_warning"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="24dp"
+        android:tint="@color/landing_red"
+        app:layout_constraintBottom_toTopOf="@+id/sos_guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_warning_black_24dp" />
+
     <TextView
-        android:id="@+id/phoneText"
+        android:id="@+id/sos_phone_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="250dp"
         android:ems="10"
-        android:hint="@android:string/emptyPhoneNumber"
         android:textAlignment="center"
-        android:textSize="36sp"
+        android:textSize="60sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/sos_guideline" />
 
-    <Button
-        android:id="@+id/callButton"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/sos_call_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="#ffc107"
-        android:text="Call"
-        android:textAlignment="center"
-        android:textSize="30sp"
-        android:textStyle="bold"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/sos_btn"
+        android:textSize="50sp"
+        android:textColor="@color/white"
+        app:cornerRadius="16dp"
+        app:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/phoneText" />
+        app:layout_constraintTop_toBottomOf="@+id/sos_phone_number" />
 
-    <LinearLayout
-        android:id="@+id/settingLayout"
-        android:layout_width="131dp"
-        android:layout_height="106dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/setting_button"
-            android:layout_width="match_parent"
-            android:layout_height="72dp"
-            app:srcCompat="@drawable/ic_settings_black_24dp" />
-
-        <TextView
-            android:id="@+id/setting_text"
-            android:layout_width="match_parent"
-            android:layout_height="35dp"
-            android:text="@string/sos_setting"
-            android:textAlignment="center"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/sos_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.4" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
