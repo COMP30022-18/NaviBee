@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -174,12 +175,8 @@ public class EventDetailsActivity extends AppCompatActivity {
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View view, int i) {
-                if (listItems.size() > 0 && (listItems.get(0) instanceof SimpleRVTextPrimarySecondaryStatic)) {
-                    if (i == BottomSheetBehavior.STATE_DRAGGING && titleRowHeight == -1) {
-                        if (viewManager.findViewByPosition(0) != null) {
-                            titleRowHeight = viewManager.findViewByPosition(0).getHeight();
-                        }
-                    }
+                if (i == BottomSheetBehavior.STATE_DRAGGING) {
+                    updateTitleRowHeight(listItems);
                 }
             }
 
@@ -198,6 +195,13 @@ public class EventDetailsActivity extends AppCompatActivity {
                     fabText.setScaleX(1 - v);
                     fabText.setScaleY(1 - v);
                 }
+            }
+        });
+
+        recyclerView.getViewTreeObserver().addOnDrawListener(new ViewTreeObserver.OnDrawListener() {
+            @Override
+            public void onDraw() {
+                updateTitleRowHeight(listItems);
             }
         });
 
@@ -300,6 +304,20 @@ public class EventDetailsActivity extends AppCompatActivity {
                         viewAdapter.notifyDataSetChanged();
                     }
                 });
+    }
+
+
+
+    private void updateTitleRowHeight(ArrayList<SimpleRecyclerViewItem> listItems) {
+        if (viewManager.getItemCount() > 0 && (listItems.get(0) instanceof SimpleRVTextPrimarySecondaryStatic)) {
+            if (titleRowHeight == -1) {
+                if (viewManager.findViewByPosition(0) != null) {
+                    titleRowHeight = viewManager.findViewByPosition(0).getHeight();
+                } else {
+                    titleRowHeight = -1;
+                }
+            }
+        }
     }
 
     private void setViewHeightPercent(View view, float percentage, int min, int max) {
