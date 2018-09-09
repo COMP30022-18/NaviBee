@@ -49,7 +49,9 @@ class DestinationsActivity : AppCompatActivity(){
 //            addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(context, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
         }
 
-        viewModel.getDestinationSuggestions()
+        updateRecyclerView()
+
+//        viewModel.getDestinationSuggestions()
 
     }
 
@@ -126,12 +128,16 @@ private class DestinationSuggestionModel(private val context: Application):
     val searchHistory = MutableLiveData<List<LocationSearchHistory>>()
 
     fun getDestinationSuggestions() {
-        if (searchHistory.value != null)
-            searchHistory.postValue(getRecentSearchQueries(context))
+        launch {
+            if (searchHistory.value != null)
+                searchHistory.postValue(getRecentSearchQueries(context))
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onResume() {
-        searchHistory.postValue(getRecentSearchQueries(context))
+        launch {
+            searchHistory.postValue(getRecentSearchQueries(context))
+        }
     }
 }

@@ -364,12 +364,6 @@ class DestinationDetailsActivity : AppCompatActivity() {
             )
         if (place.rating >= 0)
             listItems.add(
-                    SimpleRVTextSecondaryPrimaryStatic(
-                            secondary = resources.getString(R.string.place_details_ratings),
-                            primary = "%.1f/5.0".format(place.rating)
-                    )
-            )
-            listItems.add(
                     SimpleRVRatings(
                             title = resources.getString(R.string.place_details_ratings),
                             rating = place.rating,
