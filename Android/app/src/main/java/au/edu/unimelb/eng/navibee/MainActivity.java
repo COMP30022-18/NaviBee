@@ -9,7 +9,6 @@ import android.text.Spanned;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -81,8 +80,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setupWelcomeBanner() {
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-
         mOverflowButton = findViewById(R.id.landing_user_icon);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

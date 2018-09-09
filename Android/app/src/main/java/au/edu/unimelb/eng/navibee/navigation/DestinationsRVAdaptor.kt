@@ -92,6 +92,7 @@ class DestinationsRVAdaptor(private val data: ArrayList<DestinationRVItem>) :
             is DestinationRVAttributions -> {
                 holder.itemView.recycler_view_attribution_text_view.text = data.attributes
             }
+
         }
     }
 }

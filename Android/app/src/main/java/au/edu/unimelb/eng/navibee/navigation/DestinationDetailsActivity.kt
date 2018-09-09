@@ -369,6 +369,14 @@ class DestinationDetailsActivity : AppCompatActivity() {
                             primary = "%.1f/5.0".format(place.rating)
                     )
             )
+            listItems.add(
+                    SimpleRVRatings(
+                            title = resources.getString(R.string.place_details_ratings),
+                            rating = place.rating,
+                            maxRating = 5,
+                            step = 0.1f
+                    )
+            )
         if (place.websiteUri != null)
             listItems.add(SimpleRVTextSecondaryPrimaryClickable(
                     secondary = resources.getString(R.string.place_details_website),

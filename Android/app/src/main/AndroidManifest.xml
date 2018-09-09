@@ -65,7 +65,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar"/>
         <activity
             android:name=".EventActivity"
             android:parentActivityName=".MainActivity" />
