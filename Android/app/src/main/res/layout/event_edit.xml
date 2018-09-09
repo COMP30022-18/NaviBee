@@ -9,10 +9,10 @@
     <EditText
         android:id="@+id/eventNameEditText"
         android:layout_width="0dp"
-        android:layout_height="70dp"
-        android:layout_marginEnd="16dp"
+        android:layout_height="42dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="Event Name"
@@ -23,7 +23,7 @@
     <TextView
         android:id="@+id/textView8"
         android:layout_width="0dp"
-        android:layout_height="67dp"
+        android:layout_height="25dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:text="Participants"
@@ -34,10 +34,10 @@
     <TextView
         android:id="@+id/textView9"
         android:layout_width="0dp"
-        android:layout_height="63dp"
-        android:layout_marginEnd="16dp"
+        android:layout_height="22dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:text="Location"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -92,9 +92,9 @@
     <Button
         android:id="@+id/button5"
         android:layout_width="0dp"
-        android:layout_height="80dp"
-        android:layout_marginEnd="16dp"
+        android:layout_height="35dp"
         android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:onClick="showDatePickerDialog"
         android:textSize="20dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -105,9 +105,9 @@
     <Button
         android:id="@+id/button6"
         android:layout_width="0dp"
-        android:layout_height="80dp"
-        android:layout_marginEnd="16dp"
+        android:layout_height="30dp"
         android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:onClick="showTimePickerDialog"
         android:textSize="20dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -118,18 +118,17 @@
     <Button
         android:id="@+id/button"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="16dp"
+        android:layout_height="32dp"
         android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
         android:onClick="onPublishClicked"
         android:text="Publish"
         android:textSize="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button6" />
+        app:layout_constraintStart_toStartOf="parent" />
     <Button
         android:id="@+id/button7"
         android:layout_width="96dp"
@@ -140,4 +139,21 @@
         app:layout_constraintBottom_toTopOf="@+id/textView9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/eventNameEditText" />
+
+    <GridView
+        android:id="@+id/eventPics"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:numColumns="3"
+        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button6"
+        app:layout_constraintVertical_bias="1.0" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
