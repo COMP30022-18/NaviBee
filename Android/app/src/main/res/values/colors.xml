@@ -20,4 +20,7 @@
     <color name="landing_blue">#198BDB</color>
     <color name="landing_red">#C62828</color>
     <color name="colorLightGrey">#F1F1F1</color>
+
+    <color name="rippleOnLight">#42C9C9C9</color>
+    <color name="rippleOnDark">#42ffffff</color>
 </resources>
