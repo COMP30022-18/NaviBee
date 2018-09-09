@@ -65,14 +65,15 @@ class DestinationsRVAdaptor(private val data: ArrayList<DestinationRVItem>) :
                 holder.itemView.recycler_view_destinations_list_entry_title.text = data.name
                 holder.itemView.recycler_view_destinations_list_entry_subtitle.text = data.location
                 holder.itemView.recycler_view_destinations_list_entry_preview.visibility = View.GONE
+                val imageView = holder.itemView.recycler_view_destinations_list_entry_preview
                 when {
                     data.thumbnail != null ->
-                        DownloadImageToImageViewAsyncTask(holder.itemView.recycler_view_destinations_list_entry_preview).execute(data.thumbnail)
+                        DownloadImageToImageViewAsyncTask(imageView).execute(data.thumbnail)
                     data.googlePhotoReference != null -> {
                         val viewHeight = Resources.getSystem().displayMetrics.heightPixels
                         GoogleMapsPhotoReferenceCacheImageLoader(
                                 data.googlePhotoReference,
-                                holder.itemView.recycler_view_destinations_list_entry_preview,
+                                imageView,
                                 viewHeight
                         ).execute("${data.googlePlaceId}-0")
                     }
@@ -81,7 +82,7 @@ class DestinationsRVAdaptor(private val data: ArrayList<DestinationRVItem>) :
                         launch(UI) {
                             GoogleMapsPlaceIdCacheImageLoader(
                                     data.googlePlaceId,
-                                    holder.itemView.recycler_view_destinations_list_entry_preview,
+                                    imageView,
                                     viewHeight
                                 ).execute()
                         }
