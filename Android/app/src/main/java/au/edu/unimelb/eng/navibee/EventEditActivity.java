@@ -3,7 +3,10 @@ package au.edu.unimelb.eng.navibee;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,17 +15,23 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class EventEditActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
 
@@ -75,10 +84,6 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         Button date_button = (Button)findViewById(R.id.button5);
         date_button.setText("Pick Date");
 
-        Intent intent = getIntent();
-        selectedUidList = intent.getStringArrayListExtra("selectedUid");
-        selectedNameList = intent.getStringArrayListExtra("selectedName");
-
     }
 
     @Override
@@ -112,8 +117,24 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         newFragment.show(getSupportFragmentManager(), "timePicker");
     }
 
+    public void onInviteFriendClicked(View v) {
+        Intent intent = new Intent(this, EventSelectFriendsActivity.class);
+        intent.putStringArrayListExtra("selectedUid", selectedUidList);
+        startActivityForResult(intent, 1);
+    }
 
-    public void finishedEditEvent(View v) {
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == 1) {
+            if(resultCode == RESULT_OK) {
+                selectedUidList = intent.getStringArrayListExtra("selectedUid");
+                TextView participantsView = (TextView)findViewById(R.id.textView8);
+                participantsView.setText(selectedUidList.toString());
+            }
+        }
+    }
+
+    public void finishedEditEvent() {
 
         EditText editText = (EditText) findViewById(R.id.eventNameEditText);
         String name = editText.getText().toString();
@@ -122,7 +143,12 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
         String location = "Test Location";
 
-        eventDate = new Date(dateMap.get("year"), dateMap.get("month"), dateMap.get("day"), dateMap.get("hour"), dateMap.get("minute"));
+        if(dateMap.isEmpty()){
+            eventDate = new Date();
+        }
+        else{
+            eventDate = new Date(dateMap.get("year"), dateMap.get("month"), dateMap.get("day"), dateMap.get("hour"), dateMap.get("minute"));
+        }
 
         Map<String, Boolean> users = new HashMap<>();
         for(String user: selectedUidList) {
@@ -133,11 +159,35 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         EventActivity.EventItem newEvent = new EventActivity.EventItem(name, holder, location, eventDate, users);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("events").add(newEvent);
-
-        startActivity(new Intent(this, EventActivity.class));
-
+        db.collection("events").document(UUID.randomUUID().toString()).set(newEvent).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                finish();
+            }
+        });
     }
 
+    public void onPublishClicked(View v) {
 
+        if(selectedUidList == null || selectedUidList.size() == 0) {
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+            dialog.setMessage("You haven't invite any friends");
+            dialog.setNegativeButton("I don't need friends", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialoginterface, int i) {
+                    dialoginterface.cancel();
+                    selectedUidList = new ArrayList<>();
+                    finishedEditEvent();
+                }});
+            dialog.setPositiveButton("Oops! Forgot", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialoginterface, int i) {
+                    Intent intent = new Intent(EventEditActivity.this, EventSelectFriendsActivity.class);
+                    startActivityForResult(intent, 1);
+                }});
+            dialog.show();
+        }
+        else{
+            finishedEditEvent();
+        }
+
+    }
 }

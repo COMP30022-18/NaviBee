@@ -133,7 +133,7 @@
         <!--<item name="android:layout_height">56dp</item>-->
         <item name="android:padding">16dp</item>
         <item name="android:gravity">start|center_vertical</item>
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
     <style name="AppTheme.BottomSheetMenu.Item.Text">
@@ -148,8 +148,8 @@
     </style>
 
     <style name="AppTheme.BottomSheetMenu.Item.Button" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textSize">20sp</item>
-        <item name="android:layout_margin">8dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:layout_marginStart">8dp</item>
     </style>
 
     <style name="AppTheme.HorizontalRule">
@@ -164,6 +164,7 @@
 
     <!-- Navigation styles -->
     <style name="AppTheme.Navigation" />
+
     <style name="AppTheme.Navigation.Light" parent="NavigationViewLight">
         <item name="navigationViewBannerBackground">@color/colorPrimaryDark</item>
     </style>
