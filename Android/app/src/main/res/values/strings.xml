@@ -20,7 +20,7 @@
     <string name="location_required_for_navigation">Location permission is required for navigation.</string>
     <string name="button_got_it">Got it</string>
     <string name="button_join">Join</string>
-    <string name="sos_btn">Emergency Call</string>
+    <string name="sos_btn">Call</string>
     <string name="sos_setting">SOS Setting</string>
     <string name="sos_setting_btn">Save</string>
     <string name="button_yes">Yes</string>
@@ -215,5 +215,9 @@
         <item>fj</item>
     </string-array>
     <string name="pref_navigation_search_region_values_default">au</string>
+
+    <string name="pref_section_title_sos">SOS</string>
+    <string name="pref_sos_preferred_emergency_call">Preferred emergency call</string>
+    <string name="pref_sos_preferred_emergency_call_titles">Required a phone number to contact.</string>
 
 </resources>

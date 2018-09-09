@@ -20,4 +20,14 @@
             android:summary="@string/pref_navigation_search_region_summary"
             android:title="@string/pref_navigation_search_region" />
     </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_section_title_sos">
+        <EditTextPreference
+            android:dialogTitle="@string/pref_sos_preferred_emergency_call"
+            android:icon="@drawable/ic_people_black_24dp"
+            android:key="sos_emergency_call"
+            android:summary="@string/pref_sos_preferred_emergency_call_titles"
+            android:title="@string/pref_sos_preferred_emergency_call"/>
+    </PreferenceCategory>
+
 </PreferenceScreen>

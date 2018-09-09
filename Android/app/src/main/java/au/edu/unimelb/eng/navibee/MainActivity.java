@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.landing_sos_btn:
-                startActivity(new Intent(getApplicationContext(), SosActivity.class));
+                startActivity(new Intent(this, SosActivity.class));
                 break;
 
             case R.id.landing_social_btn:
