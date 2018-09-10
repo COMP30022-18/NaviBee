@@ -56,6 +56,8 @@ public class VoiceCallActivity extends AppCompatActivity {
     private ImageView buttonDecline;
     private ImageView friendIcon;
     private TextView friendName;
+    private TextView changingDot;
+    private int dotCount;
 
     private boolean callStarted = false;
 
@@ -141,6 +143,40 @@ public class VoiceCallActivity extends AppCompatActivity {
 
         friendIcon = findViewById(R.id.voicecall_friend_icon);
         friendName = findViewById(R.id.voicecall_button_username);
+        changingDot = findViewById(R.id.voicecall_textView_dot);
+
+        new Thread() {
+            public void run() {
+                try {
+                    while (!thread.isInterrupted()) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dotCount++;
+                                switch (dotCount) {
+                                    case 0:
+                                        changingDot.setText("");
+                                        break;
+                                    case 1:
+                                        changingDot.setText(".");
+                                        break;
+                                    case 2:
+                                        changingDot.setText("..");
+                                        break;
+                                    case 3:
+                                        changingDot.setText("...");
+                                        dotCount = -1;
+                                        break;
+                                }
+                            }
+                        });
+                        Thread.sleep(300);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
 
         String name = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
         friendName.setText(name);
