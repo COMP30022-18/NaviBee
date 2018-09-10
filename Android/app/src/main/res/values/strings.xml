@@ -167,6 +167,7 @@
     <string name="alert_dialog_title_select_method_of_travel">Select a method of travel…</string>
     <string name="title_activity_event_details">EventDetailsActivity</string>
     <string name="date_format">EEE, MMM d, HH:mm</string>
+    <string name="event_create_event">Create event</string>
     <string name="event_details_location">Location</string>
     <string name="event_details_organiser">Organiser</string>
     <string name="event_details_participants">Participants</string>
