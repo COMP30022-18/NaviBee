@@ -92,38 +92,35 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.event_edit);
+        setContentView(R.layout.event_edit_new);
 
         dateMap = new HashMap<>();
 
-        Button time_button = (Button)findViewById(R.id.button6);
+        Button time_button = (Button)findViewById(R.id.eventPickTime);
         time_button.setText("Pick Time");
-        Button date_button = (Button)findViewById(R.id.button5);
+        Button date_button = (Button)findViewById(R.id.eventPickDate);
         date_button.setText("Pick Date");
 
         pics = new ArrayList<>();
         //Bitmap addButton = BitmapFactory.decodeResource(getResources(), R.drawable.ic_navibee_color);
-        pics.add(R.drawable.ic_navibee_color);
-        pics.add(R.drawable.ic_navibee_color);
-        pics.add(R.drawable.ic_navibee_color);
-        pics.add(R.drawable.ic_navibee_color);
-        pics.add(R.drawable.ic_navibee_color);
-        pics.add(R.drawable.ic_navibee_color);
-        pics.add(R.drawable.ic_navibee_color);
-        pics.add(R.drawable.ic_navibee_color);
-        pics.add(R.drawable.ic_navibee_color);
-       
-
-
+        pics.add(R.drawable.ic_add_box_gray_24dp);
 
         GridView picsView = (GridView) findViewById(R.id.eventPics);
         picsView.setAdapter(new ImageAdapter(this));
+        picsView.setNumColumns(3);
 
         picsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 Toast.makeText(getApplicationContext(), "" + position,
                         Toast.LENGTH_SHORT).show();
+                if(position == (pics.size()-1)){
+                    selectPics();
+                }
+                else{
+                    // preview pics or edit it
+                }
+                picsView.setAdapter(new ImageAdapter(EventEditActivity.this));
             }
         });
 
@@ -155,7 +152,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
                 // if it's not recycled, initialize some attributes
                 imageView = new ImageView(mContext);
                 int width = Resources.getSystem().getDisplayMetrics().widthPixels;
-                imageView.setLayoutParams(new GridView.LayoutParams(width/3, width/3));
+                imageView.setLayoutParams(new GridView.LayoutParams(9*width/30, 9*width/30));
                 imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 imageView.setPadding(8, 8, 8, 8);
             } else {
@@ -173,7 +170,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     public void onTimeSet(TimePicker view, int hour, int minute) {
         dateMap.put("hour", hour);
         dateMap.put("minute", minute);
-        Button time_button = (Button)findViewById(R.id.button6);
+        Button time_button = (Button)findViewById(R.id.eventPickTime);
         Date time = new Date(0, 0, 0, hour, minute);
         String timeString = new SimpleDateFormat("HH:mm").format(time);
         time_button.setText(timeString);
@@ -186,7 +183,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         dateMap.put("day", day);
         Date date = new Date(year, month, day);
         String dateString = new SimpleDateFormat("EEE, MMM d").format(date);
-        Button date_button = (Button)findViewById(R.id.button5);
+        Button date_button = (Button)findViewById(R.id.eventPickDate);
         date_button.setText(dateString);
     }
 
@@ -211,15 +208,17 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         if (requestCode == 1) {
             if(resultCode == RESULT_OK) {
                 selectedUidList = intent.getStringArrayListExtra("selectedUid");
-                TextView participantsView = (TextView)findViewById(R.id.textView8);
-                participantsView.setText(selectedUidList.toString());
+                //TextView participantsView = (TextView)findViewById(R.id.textView8);
+                //participantsView.setText(selectedUidList.toString());
+
+                // show chips result
             }
         }
     }
 
     public void finishedEditEvent() {
 
-        EditText editText = (EditText) findViewById(R.id.eventNameEditText);
+        EditText editText = (EditText) findViewById(R.id.eventName);
         String name = editText.getText().toString();
 
         String holder = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -262,7 +261,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         if(selectedUidList == null || selectedUidList.size() == 0) {
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
             dialog.setMessage("You haven't invite any friends");
-            dialog.setNegativeButton("I don't need friends", new DialogInterface.OnClickListener() {
+            dialog.setNegativeButton("I don't have friends", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialoginterface, int i) {
                     dialoginterface.cancel();
                     selectedUidList = new ArrayList<>();
@@ -278,6 +277,10 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         else{
             finishedEditEvent();
         }
-
     }
+
+    private void selectPics (){
+        pics.add(0, R.drawable.ic_navibee_color);
+    }
+
 }
