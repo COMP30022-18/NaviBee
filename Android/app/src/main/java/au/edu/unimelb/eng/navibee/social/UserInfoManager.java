@@ -49,7 +49,7 @@ public class UserInfoManager {
                         userInfo = new UserInfo("", "");
                         userInfoMap.put(id, userInfo);
                     }
-                    userInfo.setPhotoUrl((String) doc.get("photoUrl"));
+                    userInfo.setPhotoUrl((String) doc.get("photoURL"));
                     userInfo.setName((String) doc.get("name"));
                     callback.callback(userInfo);
                 } else {
