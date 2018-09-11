@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.landing_events_btn:
-                startActivity(new Intent(this, EventActivity.class));
+                startActivity(new Intent(this, EventsActivity.class));
                 break;
 
             case R.id.landing_sos_btn:
