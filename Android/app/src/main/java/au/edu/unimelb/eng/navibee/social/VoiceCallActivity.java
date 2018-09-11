@@ -121,7 +121,7 @@ public class VoiceCallActivity extends AppCompatActivity {
         working = true;
 
         isInitiator = getIntent().getBooleanExtra("INITIATOR", false);
-        conv = ConversationManager.getInstance().getConversationById(getIntent().getStringExtra("CONV_ID"));
+        conv = ConversationManager.getInstance().getConversation(getIntent().getStringExtra("CONV_ID"));
         msg = conv.getMessageById(getIntent().getStringExtra("MSG_ID"));
         channelID = msg.getData();
 

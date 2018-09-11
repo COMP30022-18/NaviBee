@@ -1,8 +1,12 @@
 package au.edu.unimelb.eng.navibee.social;
 
 import androidx.annotation.Nullable;
+import au.edu.unimelb.eng.navibee.NaviBeeApplication;
+
+import android.content.Intent;
 import android.util.Log;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
@@ -10,6 +14,8 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.HttpsCallableResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +23,7 @@ import java.util.Map;
 
 public class ConversationManager {
 
+    public final static String BROADCAST_FRIEND_UPDATED = "broadcast.friend.updated";
     public final static String BROADCAST_MESSAGE_READ_CHANGE = "broadcast.message.readchange";
 
     private static ConversationManager instance = null;
@@ -34,71 +41,86 @@ public class ConversationManager {
     private String uid;
     private FirebaseFirestore db;
 
-    private Map<String, Conversation> conversationUidMap = new HashMap<>();
-    private Map<String, Conversation> conversationIdMap = new HashMap<>();
+    private ArrayList<String> friendList = new ArrayList<>();
+    private Map<String, String> uidToConvId = new HashMap<>();
+    private Map<String, Conversation> convIdMap = new HashMap<>();
 
 
     public ConversationManager() {
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         db = FirebaseFirestore.getInstance();
 
+        // private conversation (friend list)
+        db.collection("conversations")
+                .whereEqualTo("users."+uid, true)
+                .whereEqualTo("type", "private")
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        Log.w(TAG, "listen:error", e);
+                        return;
+                    }
 
-        db.collection("conversations").whereEqualTo("users."+uid, true)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot snapshots,
-                                        @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w(TAG, "listen:error", e);
-                            return;
-                        }
+                    for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                        String friendUid = getOtherUserId(dc.getDocument().get("users"), uid);
+                        String convId = dc.getDocument().getId();
+                        switch (dc.getType()) {
+                            case ADDED:
+                                // read message timestamp
+                                Timestamp timestamp =  ((Map<String, Timestamp>) dc.getDocument().get("readTimestamps")).get(uid);
 
-                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                            switch (dc.getType()) {
-                                case ADDED:
-                                    // read message timestamp
-                                    Timestamp timestamp =  ((Map<String, Timestamp>) dc.getDocument().getData().get("readTimestamps")).get(uid);
+                                // load new conversation
+                                Conversation conv = new Conversation(convId, uid, timestamp.toDate());
 
-                                    // load new conversation
-                                    au.edu.unimelb.eng.navibee.social.Conversation conv = new Conversation(dc.getDocument().getId(), uid, timestamp.toDate());
-                                    String otherUid = "";
+                                uidToConvId.put(friendUid, convId);
+                                convIdMap.put(convId, conv);
+                                friendList.add(friendUid);
+                                break;
 
-                                    Map<String, Boolean> users = (Map<String, Boolean>)(dc.getDocument().getData()).get("users");
-                                    for (String userId: users.keySet()) {
-                                        if (!userId.equals(uid)) {
-                                            otherUid = userId;
-                                        }
-                                    }
-                                    conversationUidMap.put(otherUid, conv);
-                                    conversationIdMap.put(dc.getDocument().getId(), conv);
+                            case MODIFIED:
+                                break;
 
-                                    break;
-                                case MODIFIED:
-
-                                    break;
-                                case REMOVED:
-                                    //
-                                    break;
-                            }
+                            case REMOVED:
+                                uidToConvId.remove(friendUid);
+                                convIdMap.remove(dc.getDocument().getId());
+                                friendList.remove(friendUid);
+                                break;
                         }
                     }
+
+                    Intent intent = new Intent(BROADCAST_FRIEND_UPDATED);
+                    NaviBeeApplication.getInstance().sendBroadcast(intent);
                 });
     }
 
-    public Conversation getConversationByUID(String uid) {
-        return conversationUidMap.get(uid);
+    private static String getOtherUserId(Object map, String myUid) {
+        for (String key: ((Map<String, Boolean>) map).keySet()) {
+            if(!key.equals(myUid)) {
+                return key;
+            }
+        }
+        return "";
     }
 
-    public Conversation getConversationById(String id) { return conversationIdMap.get(id); }
-
-    public boolean isConversationExists(String uid) {
-        return conversationUidMap.containsKey(uid);
+    public Conversation getConversation(String convId) {
+        return convIdMap.get(convId);
     }
 
-    public void updateConvInfoForContactList(ArrayList<FriendManager.ContactPerson> list) {
-        for (FriendManager.ContactPerson cp: list) {
-            Conversation conv = getConversationByUID(cp.getUid());
-            if (conv!=null && conv.getMessageCount()>0) {
+    public String getPrivateConvId(String userId) {
+        return uidToConvId.get(userId);
+    }
+
+    public Conversation getPrivateConversation(String userId) {
+        return getConversation(getPrivateConvId(userId));
+    }
+
+    public ArrayList<String> getFriendList() {
+        return new ArrayList<>(friendList);
+    }
+
+    public void updateConvInfoForContactList(ArrayList<FriendActivity.ContactItem> list) {
+        for (FriendActivity.ContactItem cp: list) {
+            Conversation conv = getConversation(cp.getConvId());
+            if (conv.getMessageCount()>0) {
                 Conversation.Message msg = conv.getMessage(conv.getMessageCount()-1);
                 String lastMsgText = "";
                 switch (msg.getType()) {
@@ -106,7 +128,7 @@ public class ConversationManager {
                         lastMsgText = msg.getData();
                         break;
                     case "image":
-                        lastMsgText = "[Picture]";
+                        lastMsgText = "[Photo]";
                         break;
                     case "voicecall":
                         lastMsgText = "[Voice Call]";
@@ -123,5 +145,14 @@ public class ConversationManager {
                 cp.setUnreadMessage(0);
             }
         }
+    }
+
+
+    public Task<HttpsCallableResult> addFriend(String targetUid) {
+        FirebaseFunctions mFunctions = FirebaseFunctions.getInstance();
+        Map<String, Object> data = new HashMap<>();
+        data.put("targetUid", targetUid);
+
+        return mFunctions.getHttpsCallable("addFriend").call(data);
     }
 }

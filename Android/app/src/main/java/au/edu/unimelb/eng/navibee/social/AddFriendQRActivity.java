@@ -63,7 +63,7 @@ public class AddFriendQRActivity extends AppCompatActivity {
                 if (result.getContents().startsWith(ADD_FRIEND_URL)) {
                     String targetUId = result.getContents().replace(ADD_FRIEND_URL, "");
                     findViewById(R.id.add_friend_progressbar).setVisibility(View.VISIBLE);
-                    Task<HttpsCallableResult> task = FriendManager.getInstance().addFriend(targetUId);
+                    Task<HttpsCallableResult> task = ConversationManager.getInstance().addFriend(targetUId);
 
                     task.addOnFailureListener(httpsCallableResult -> {
                         Toast.makeText(this, "Network error.", Toast.LENGTH_LONG).show();

@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import au.edu.unimelb.eng.navibee.social.FriendActivity;
-import au.edu.unimelb.eng.navibee.social.FriendManager;
 import au.edu.unimelb.eng.navibee.social.ConversationManager;
 
 import au.edu.unimelb.eng.navibee.navigation.DestinationsActivity;
@@ -55,7 +54,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.landing_sos_btn).setOnClickListener(this);
         findViewById(R.id.landing_social_btn).setOnClickListener(this);
 
-        FriendManager.init();
         ConversationManager.init();
         setFCMToken();
     }
