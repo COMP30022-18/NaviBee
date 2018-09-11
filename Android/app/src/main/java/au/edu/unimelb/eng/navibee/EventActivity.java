@@ -169,7 +169,6 @@ public class EventActivity extends AppCompatActivity {
         eventList.addAll(holdingList);
         eventList.addAll(joinedList);
         eventList.addAll(recommendList);
-
     }
 
     private void finalizeEventList(){
@@ -193,7 +192,7 @@ public class EventActivity extends AppCompatActivity {
                 else {
                     relationship = "passerby";
                 }
-                Intent intent = new Intent(EventActivity.this, EventDetailsActivity.class);
+                Intent intent = new Intent(EventActivity.this, EventDetailActivity.class);
                 intent.putExtra("eventId", eventList.get(pos).getEventId());
                 intent.putExtra("relationship", relationship);
                 startActivity(intent);

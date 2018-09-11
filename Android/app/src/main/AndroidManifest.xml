@@ -146,9 +146,8 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
-            android:name=".EventPicFullscreenActivity"
-            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar">
-        </activity>
+            android:name=".EventPicFullscreenActivity"></activity>
+        <activity android:name=".EventDetailActivity"></activity>
     </application>
 
 </manifest>

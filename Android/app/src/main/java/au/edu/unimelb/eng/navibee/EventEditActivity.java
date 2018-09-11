@@ -171,11 +171,6 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         picsView.setAdapter(new ImageAdapter(EventEditActivity.this));
     }
 
-    public void deletePicTest(View v){
-        pics.remove(0);
-        picsUpdate();
-    }
-
     public class ImageAdapter extends BaseAdapter {
         private Context mContext;
 
