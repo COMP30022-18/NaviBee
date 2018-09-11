@@ -82,23 +82,23 @@ export const addFriend = functions.https.onCall(
             return {code:-1, msg:"target user not exists"};
         }
 
-        if (doc.data().contacts[uid]) {
+        let convDoc = await db.collection('conversations')
+                            .where('users.' + uid, '==', true)
+                            .where('users.' + targetUid, '==', true)
+                            .where('type', '==', 'private')
+                            .get();
+
+        if (!convDoc.empty) {
             return {code:-1, msg:"have been friends already"};
         }
 
-        // set contacts
-        let up = {};
-        up['contacts.'+uid] = true;
-        db.collection('users').doc(targetUid).update(up);
-        up = {};
-        up["contacts."+targetUid] = true;
-        db.collection('users').doc(uid).update(up);
-
-        // set up conversations
+        // set up private conversations
+        // private conversation holds relationship
         let conv = {};
         conv['users'] = {};
         conv['users'][uid] = true;
         conv['users'][targetUid] = true;
+        conv['type'] = 'private';
         conv['readTimestamps'] = {};
         conv['readTimestamps'][uid] = new Date();
         conv['readTimestamps'][targetUid] = new Date();
