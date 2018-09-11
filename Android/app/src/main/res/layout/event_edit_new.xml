@@ -51,9 +51,10 @@
             android:id="@+id/button12"
             android:layout_width="117dp"
             android:layout_height="wrap_content"
+            android:layout_margin="4dp"
             android:layout_weight="1"
-            android:text="Button"
-            android:layout_margin="4dp"/>
+            android:onClick="deletePicTest"
+            android:text="Button" />
 
         <Button
             android:id="@+id/button13"
@@ -100,17 +101,17 @@
     <GridView
         android:id="@+id/eventPics"
         android:layout_width="match_parent"
-        android:layout_height="209dp"
+        android:layout_height="wrap_content"
         android:layout_margin="4dp"
         android:horizontalSpacing="4dp"
-        android:verticalSpacing="4dp"/>
+        android:verticalSpacing="4dp" />
 
     <Button
         android:id="@+id/eventPublish"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
         android:onClick="onPublishClicked"
-        android:text="Button"
-        android:layout_margin="4dp"/>
+        android:text="Button" />
 
 </LinearLayout>

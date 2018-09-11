@@ -10,11 +10,15 @@ import android.content.Intent;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
+import au.edu.unimelb.eng.navibee.social.ChatActivity;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.format.DateFormat;
@@ -39,7 +43,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.vansuita.pickimage.bean.PickResult;
+import com.vansuita.pickimage.bundle.PickSetup;
+import com.vansuita.pickimage.dialog.PickImageDialog;
+import com.vansuita.pickimage.listeners.IPickResult;
 
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,13 +58,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class EventEditActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
+public class EventEditActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener, IPickResult {
 
     private ArrayList<String> selectedUidList;
     private ArrayList<String> selectedNameList;
     private Date eventDate;
     private Map<String, Integer> dateMap;
-    private ArrayList<Integer> pics;
+    private ArrayList<Bitmap> pics;
+    private GridView picsView;
+    private Bitmap addIcon;
 
     public static class TimePickerFragment extends DialogFragment {
 
@@ -101,29 +112,68 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         Button date_button = (Button)findViewById(R.id.eventPickDate);
         date_button.setText("Pick Date");
 
-        pics = new ArrayList<>();
-        //Bitmap addButton = BitmapFactory.decodeResource(getResources(), R.drawable.ic_navibee_color);
-        pics.add(R.drawable.ic_add_box_gray_24dp);
+        addIcon = createImage(50, 50, R.color.landing_red);
 
-        GridView picsView = (GridView) findViewById(R.id.eventPics);
-        picsView.setAdapter(new ImageAdapter(this));
+        pics = new ArrayList<>();
+        pics.add(addIcon);
+
+        picsView = (GridView) findViewById(R.id.eventPics);
         picsView.setNumColumns(3);
+        picsUpdate();
 
         picsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 Toast.makeText(getApplicationContext(), "" + position,
                         Toast.LENGTH_SHORT).show();
-                if(position == (pics.size()-1)){
-                    selectPics();
+                if(pics.size() <= 9){
+                    if(position == (pics.size()-1)){
+                        selectPics();
+                    }
+                    else{
+                        // preview pics or edit it
+                        startPicFullscreen(position);
+                    }
                 }
                 else{
                     // preview pics or edit it
+                    startPicFullscreen(position);
                 }
-                picsView.setAdapter(new ImageAdapter(EventEditActivity.this));
+                picsUpdate();
             }
         });
+    }
 
+    private void startPicFullscreen(int position){
+        Intent intent = new Intent(EventEditActivity.this, EventPicFullscreenActivity.class);
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        pics.get(position).compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+
+        intent.putExtra("bitmap", byteArray);
+        intent.putExtra("position", position);
+        startActivityForResult(intent, 2);
+    }
+
+    private void picsUpdate(){
+        Bitmap lastPic = pics.get(pics.size()-1);
+        if(pics.size() > 9){
+            if(lastPic.equals(addIcon)){
+                pics.remove(lastPic);
+            }
+        }
+        else{
+            if(!lastPic.equals(addIcon)){
+                pics.add(addIcon);
+            }
+        }
+        picsView.setAdapter(new ImageAdapter(EventEditActivity.this));
+    }
+
+    public void deletePicTest(View v){
+        pics.remove(0);
+        picsUpdate();
     }
 
     public class ImageAdapter extends BaseAdapter {
@@ -158,8 +208,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             } else {
                 imageView = (ImageView) convertView;
             }
-
-            imageView.setImageResource(pics.get(position));
+            imageView.setImageBitmap(pics.get(position));
             return imageView;
         }
 
@@ -212,6 +261,16 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
                 //participantsView.setText(selectedUidList.toString());
 
                 // show chips result
+            }
+        }
+        if (requestCode == 2) {
+            if(resultCode == RESULT_OK) {
+                Boolean isDeleted = intent.getBooleanExtra("isDeleted", false);
+                int position = intent.getIntExtra("position", -1);
+                if(isDeleted){
+                    pics.remove(position);
+                    picsUpdate();
+                }
             }
         }
     }
@@ -279,8 +338,38 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         }
     }
 
-    private void selectPics (){
-        pics.add(0, R.drawable.ic_navibee_color);
+    private void selectPics(){
+        PickImageDialog.build(new PickSetup().setSystemDialog(true)).show(EventEditActivity.this);
+    }
+
+    @Override
+    public void onPickResult(PickResult r) {
+        if (r.getError() == null) {
+            //If you want the Uri.
+            //Mandatory to refresh image from Uri.
+            //getImageView().setImageURI(null);
+
+            //Setting the real returned image.
+            //getImageView().setImageURI(r.getUri());
+
+            //If you want the Bitmap.
+            pics.add(0, r.getBitmap());
+            picsUpdate();
+            //Image path
+            //r.getPath();
+        } else {
+            //Handle possible errors
+            Toast.makeText(this, r.getError().getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public static Bitmap createImage(int width, int height, int color) {
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Paint paint = new Paint();
+        paint.setColor(color);
+        canvas.drawRect(0F, 0F, (float) width, (float) height, paint);
+        return bitmap;
     }
 
 }

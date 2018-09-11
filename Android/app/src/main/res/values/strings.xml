@@ -221,4 +221,8 @@
     <string name="pref_sos_preferred_emergency_call">Preferred emergency call</string>
     <string name="pref_sos_preferred_emergency_call_titles">Required a phone number to contact.</string>
 
+    <string name="title_activity_event_pic_fullscreen">EventPicFullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
 </resources>
