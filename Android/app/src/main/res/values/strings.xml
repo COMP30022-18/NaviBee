@@ -181,6 +181,9 @@
     <string name="action_always">Always</string>
     <string name="title_activity_settings">Settings</string>
     <string name="prompt_first_time_always_preferred_mean_of_transport">You can change your preferred mean of transport afterwards in the settings.</string>
+    <string name="action_navigation_say_a_place">Say a place</string>
+    <string name="navigation_destinations_header_recent_destinations">Recent destinations</string>
+    <string name="navigation_destinations_header_recommended_places">Recommended places</string>
 
     <string name="landing_welcome_line">Hi, %s!\nHow can I help you today?</string>
 
