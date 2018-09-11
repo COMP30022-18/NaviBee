@@ -46,6 +46,9 @@ public class ConversationManager {
     private Map<String, Conversation> convIdMap = new HashMap<>();
 
 
+    private boolean initialized = false;
+
+
     public ConversationManager() {
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         db = FirebaseFirestore.getInstance();
@@ -85,6 +88,12 @@ public class ConversationManager {
                                 friendList.remove(friendUid);
                                 break;
                         }
+                    }
+
+                    if (!initialized) {
+                        // initializing, warm user info cache
+                        initialized = true;
+                        UserInfoManager.getInstance().warmCache(friendList);
                     }
 
                     Intent intent = new Intent(BROADCAST_FRIEND_UPDATED);

@@ -34,7 +34,7 @@ public class UserInfoManager {
     
     public void getUserInfo(String id, Callback<UserInfo> callback) {
         if (userInfoMap.containsKey(id)) {
-            callback.callback(userInfoMap.get(id));
+            if (callback!=null) callback.callback(userInfoMap.get(id));
             return;
         }
 
@@ -51,7 +51,7 @@ public class UserInfoManager {
                     }
                     userInfo.setPhotoUrl((String) doc.get("photoURL"));
                     userInfo.setName((String) doc.get("name"));
-                    callback.callback(userInfo);
+                    if (callback!=null) callback.callback(userInfo);
                 } else {
                     Log.d(TAG, "get failed: user not exists" + id);
                 }
@@ -70,6 +70,12 @@ public class UserInfoManager {
                     callback.callback(res);
                 }
             });
+        }
+    }
+
+    public void warmCache(ArrayList<String> ids) {
+        for (String id: ids) {
+            getUserInfo(id,null);
         }
     }
 
