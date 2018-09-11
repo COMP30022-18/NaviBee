@@ -172,6 +172,9 @@
     <string name="event_details_organiser">Organiser</string>
     <string name="event_details_participants">Participants</string>
     <string name="event_detail">Event Detail</string>
+    <string name="event_organised_events">Organised Events</string>
+    <string name="event_joined_events">Joined Events</string>
+    <string name="event_recommended_events">Recommended Events</string>
     <string name="dialog_method_of_travel_title">Select a method of travel…</string>
     <string name="dialog_method_of_travel_default">%s navigation</string>
     <string name="dialog_method_of_travel_alt">Or navigate with…</string>

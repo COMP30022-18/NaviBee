@@ -169,19 +169,19 @@ public class EventsActivity extends AppCompatActivity {
         events.clear();
         // Organised event list
         if (!organisedList.isEmpty()) {
-            events.add(new EventRVDivider("Organised events"));
+            events.add(new EventRVDivider(getResources().getString(R.string.event_organised_events)));
             addToEntry(organisedList);
         }
 
         // Joined event list
         if (!joinedList.isEmpty()) {
-            events.add(new EventRVDivider("Joined events"));
+            events.add(new EventRVDivider(getResources().getString(R.string.event_joined_events)));
             addToEntry(joinedList);
         }
 
         // Recommended event list
         if (!recommendedList.isEmpty()) {
-            events.add(new EventRVDivider("Recommended events"));
+            events.add(new EventRVDivider(getResources().getString(R.string.event_recommended_events)));
             addToEntry(recommendedList);
         }
 

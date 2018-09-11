@@ -28,4 +28,19 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/events_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:clickable="true"
+        android:onClick="selectFriends"
+        android:fitsSystemWindows="true"
+        android:layout_gravity="bottom|end"
+        android:focusable="true"
+        app:fabCustomSize="80dp"
+        app:rippleColor="@color/white"
+        app:srcCompat="@drawable/ic_add_white_50dp"
+        app:maxImageSize="40dp" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
