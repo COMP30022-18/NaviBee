@@ -35,6 +35,10 @@ export const newMessageNotification = functions.firestore
             }
         } else if (doc.type == "image") {
             content = "[Photo]"
+        } else if (doc.type == "voicecall") {
+            content = "[Voice Call]"
+        } else if (doc.type == "location") {
+            content = "[Location]"
         }
 
         // android payload
