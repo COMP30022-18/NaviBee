@@ -26,6 +26,7 @@ import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
 
 public class FriendActivity extends AppCompatActivity {
+    // TODO magic string
 
     public static class ContactItem {
         private String uid; // no need for group chat

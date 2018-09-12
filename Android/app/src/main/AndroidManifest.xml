@@ -127,9 +127,6 @@
             tools:replace="android:screenOrientation" />
         <activity android:name=".EventEditActivity" />
         <activity
-            android:name=".SosSettingActivity"
-            android:label="@string/sos_setting" />
-        <activity
             android:name=".EventDetailsActivity"
             android:parentActivityName=".EventsActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />

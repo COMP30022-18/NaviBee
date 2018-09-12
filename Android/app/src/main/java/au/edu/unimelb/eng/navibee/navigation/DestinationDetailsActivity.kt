@@ -65,15 +65,9 @@ class DestinationDetailsActivity : AppCompatActivity() {
 
     private var titleRowHeight = -1
 
-    private val attributions: ArrayList<CharSequence> = ArrayList()
-
     private val primaryColor: Int by lazy {
         ContextCompat.getColor(this, R.color.colorPrimary)
     }
-
-
-    // Image list
-    private var photoMetadata: PlacePhotoMetadataBuffer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

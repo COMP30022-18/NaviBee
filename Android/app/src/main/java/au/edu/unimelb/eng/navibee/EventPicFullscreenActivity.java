@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 public class EventPicFullscreenActivity extends AppCompatActivity {
+    // TODO magic string
 
     private int position;
 
