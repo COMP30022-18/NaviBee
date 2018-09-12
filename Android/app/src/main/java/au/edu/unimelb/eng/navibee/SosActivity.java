@@ -10,6 +10,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -28,8 +29,8 @@ public class SosActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE = 1;
 
-    private FirebaseFirestore db;
-    private String uid;
+//    private FirebaseFirestore db;
+//    private String uid;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -37,84 +38,62 @@ public class SosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sos);
 
-        db = FirebaseFirestore.getInstance();
-        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//        db = FirebaseFirestore.getInstance();
+//        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        TextView phoneText = findViewById(R.id.phoneText);
+        TextView phoneText = findViewById(R.id.sos_phone_number);
 
-        db.collection("users").document(uid).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
+        // Get emergency contact from preference
+        String number = PreferenceManager.getDefaultSharedPreferences(this).getString("sos_emergency_call", "empty");
 
-                // check emergency field exists
-                if (document.contains("emergency")) {
-                    String emergency = document.getString("emergency");
+        phoneText.setText(number);
 
-                    // check field is empty string
-                    if (emergency.isEmpty()) {
-                        goSettingActivity();
-                    } else {
-                        phoneText.setText(emergency);
-                    }
-
-                } else {
-                    // merge data to avoid overwriting
-                    Map<String, Object> data = new HashMap<>();
-                    data.put("emergency", "");
-                    db.collection("users").document(uid).set(data, SetOptions.merge());
-
-                    goSettingActivity();
-                    checkPhoneCallPermission();
-                }
-
-            } else {
-                Toast.makeText(SosActivity.this, "Load data fails", Toast.LENGTH_LONG).show();
-            }
-        });
+        checkPhoneCallPermission();
 
         makePhoneCall(phoneText);
 
-        startSosSettingActivity();
+//        db.collection("users").document(uid).get().addOnCompleteListener(task -> {
+//            if (task.isSuccessful()) {
+//                DocumentSnapshot document = task.getResult();
+//
+//                // check emergency field exists
+//                if (document.contains("emergency")) {
+//                    String emergency = document.getString("emergency");
+//
+//                    // check field is empty string
+//                    if (emergency.isEmpty()) {
+//                        goSettingActivity();
+//                    } else {
+//                        phoneText.setText(emergency);
+//                    }
+//
+//                } else {
+//                    // merge data to avoid overwriting
+//                    Map<String, Object> data = new HashMap<>();
+//                    data.put("emergency", "");
+//                    db.collection("users").document(uid).set(data, SetOptions.merge());
+//
+////                    goSettingActivity();
+//                    checkPhoneCallPermission();
+//                }
+//
+//            } else {
+//                Toast.makeText(SosActivity.this, "Load data fails", Toast.LENGTH_LONG).show();
+//            }
+//        });
 
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                String result = data.getStringExtra("emergency");
-
-                TextView phoneText = findViewById(R.id.phoneText);
-                phoneText.setText(result);
-
-            }
-        }
-    }
-
-    private void goSettingActivity() {
-        Toast.makeText(SosActivity.this, "Go setting to add emergency contact",
-                Toast.LENGTH_LONG).show();
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-//        startActivity(new Intent(this, SosSettingActivity.class));
-        startActivityForResult(new Intent(this, SosSettingActivity.class), REQUEST_CODE);
-    }
-
+    // Check the phone call permission
     private void checkPhoneCallPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CALL_PHONE},REQUEST_CODE);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, REQUEST_CODE);
         }
     }
 
+    // Call the provided phone number
     private void makePhoneCall(TextView phoneText) {
-        Button callButton = findViewById(R.id.callButton);
+        Button callButton = findViewById(R.id.sos_call_button);
 
         callButton.setOnClickListener((View view) -> {
 
@@ -123,25 +102,11 @@ public class SosActivity extends AppCompatActivity {
             callIntent.setData(Uri.parse("tel:" + phoneText.getText().toString()));
             callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.CALL_PHONE}, REQUEST_CODE);
+            // Check the phone call permission before make the call
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, REQUEST_CODE);
             } else {
                 startActivity(callIntent);
-            }
-        });
-    }
-
-    private void startSosSettingActivity() {
-        LinearLayout sosSetting = findViewById(R.id.settingLayout);
-        Intent settingIntent = new Intent(this, SosSettingActivity.class);
-
-        sosSetting.setOnClickListener(new LinearLayout.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                startActivity(settingIntent);
-                startActivityForResult(settingIntent, REQUEST_CODE);
             }
         });
     }

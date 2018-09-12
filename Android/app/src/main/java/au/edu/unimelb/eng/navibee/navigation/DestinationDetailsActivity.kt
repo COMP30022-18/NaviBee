@@ -1,6 +1,7 @@
 package au.edu.unimelb.eng.navibee.navigation
 
-import android.content.DialogInterface
+import android.app.Application
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -8,21 +9,26 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
-import androidx.appcompat.app.AlertDialog
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.*
 import au.edu.unimelb.eng.navibee.R
 import au.edu.unimelb.eng.navibee.utils.*
 import com.google.android.gms.location.places.*
 import com.google.android.gms.location.places.internal.zzaq
-import com.google.android.gms.tasks.Tasks
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.button.MaterialButton
 import kotlinx.android.synthetic.main.activity_destination_details.*
-import kotlinx.android.synthetic.main.alert_dialog_navigation_choose_transport_manners.view.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
+import kotlinx.android.synthetic.main.bottomsheetdialog_navigation_choose_mean_of_transport.*
+import org.jetbrains.anko.alert
 import org.jetbrains.anko.startActivity
 import java.io.File
 import java.io.FileOutputStream
@@ -51,22 +57,18 @@ class DestinationDetailsActivity : AppCompatActivity() {
     private lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
     private lateinit var viewAdapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>
     private lateinit var viewManager: androidx.recyclerview.widget.RecyclerView.LayoutManager
-    private val listItems = ArrayList<SimpleRecyclerViewItem>()
+    private val listItems = mutableListOf<SimpleRecyclerViewItem>()
 
-    private lateinit var geoDataClient: GeoDataClient
+    private lateinit var placeId: String
 
-    private lateinit var place: Place
+    private lateinit var viewModel: DestinationDetailsViewModel
 
     private var titleRowHeight = -1
 
     private val attributions: ArrayList<CharSequence> = ArrayList()
 
     private val primaryColor: Int by lazy {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            resources.getColor(R.color.colorPrimary, null)
-        } else {
-            resources.getColor(R.color.colorPrimary)
-        }
+        ContextCompat.getColor(this, R.color.colorPrimary)
     }
 
 
@@ -76,11 +78,19 @@ class DestinationDetailsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        placeId = intent.getStringExtra(EXTRA_PLACE_ID) ?: return finish()
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS and
                 WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
 
         setContentView(R.layout.activity_destination_details)
+
+        // Setup view model
+        viewModel = ViewModelProviders.of(this)
+                .get(DestinationDetailsViewModel::class.java)
+
+        subscribe()
 
         // Action bar
         setSupportActionBar(navigation_destinations_details_toolbar)
@@ -107,15 +117,13 @@ class DestinationDetailsActivity : AppCompatActivity() {
             }
         }
 
-
-
         // Remove redundant shadow in transparent app bar
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             navigation_destinations_details_appbar.outlineProvider = null
         }
 
         // Setup data for loading screen
-        supportActionBar?.title = resources.getString(R.string.loading)
+        supportActionBar?.title = resources.getString(R.string.prompt_loading)
         navigation_destinations_details_toolbar.setTitleTextColor(0)
         listItems.add(SimpleRVIndefiniteProgressBar())
 
@@ -133,31 +141,45 @@ class DestinationDetailsActivity : AppCompatActivity() {
         // Carousel view
         navigation_destinations_details_image_preview.pageCount = 1
         navigation_destinations_details_image_preview.setImageListener { position, imageView ->
-            photoMetadata?.let { pm ->
-                val photo = pm[position]
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder, null))
-                } else {
-                    imageView.setImageDrawable(resources.getDrawable(R.drawable.navibee_placeholder))
-                }
-                object : ImageViewCacheLoader(imageView) {
-                    override val defaultKey = photo.photoReference
-
-
-
-                    override fun loadTask(file: File) {
-                        geoDataClient.getPhoto(pm[position]).addOnSuccessListener { data ->
-                            val outputStream = FileOutputStream(file)
-                            data.bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream)
-                            outputStream.close()
-                            postLoad(file)
-                        }
-                    }
-                }.execute()
-            }
+            imageView.setImageDrawable(
+                    ContextCompat.getDrawable(this, R.drawable.navibee_placeholder))
+            viewModel.loadImageWithCache(position, imageView)
         }
 
-        // Layout adjustment
+        layoutAdjustment()
+
+        viewModel.loadDetails(placeId)
+        viewModel.loadImageList(placeId)
+
+    }
+
+    private fun subscribe() {
+        viewModel.placeDetails.observe(this, Observer {
+            if (it.status == Resource.Status.SUCCESS)
+                it.data?.get(0)?.run {
+                    renderPlaceDetails(this)
+                    viewAdapter.notifyDataSetChanged()
+                    addRecentSearchQuery(applicationContext, LocationSearchHistory(
+                            googlePlaceId = id,
+                            name = name ?: "",
+                            address = address ?: ""
+                    ))
+                }
+        } )
+
+        viewModel.placePhotos.observe(this, Observer {
+            if (it.status == Resource.Status.SUCCESS)
+                it.data?.run {
+                    navigation_destinations_details_image_preview.pageCount = count
+                }
+        } )
+
+        viewModel.attributions.observe(this, Observer {
+            updateAttributionsRow(it)
+        })
+    }
+
+    private fun layoutAdjustment() {
         val bottomSheetBehavior =
                 BottomSheetBehavior.from(recyclerView)
         bottomSheetBehavior.peekHeight = (resources.displayMetrics.heightPixels * 0.618).toInt()
@@ -180,62 +202,52 @@ class DestinationDetailsActivity : AppCompatActivity() {
                             .setBackgroundColor(colorA(primaryColor, offset))
                     navigation_destinations_details_toolbar_padding
                             .setBackgroundColor(colorA(primaryColor, offset))
-                    navigation_destinations_details_fab_text.scaleX = 1 - offset
-                    navigation_destinations_details_fab_text.scaleY = 1 - offset
+                    navigation_destinations_details_fab_button.scaleX = 1 - offset
+                    navigation_destinations_details_fab_button.scaleY = 1 - offset
                 }
             }
 
             override fun onStateChanged(bottomSheet: View, state: Int) {
-                if (listItems.size > 0 && listItems[0] is SimpleRVTextPrimarySecondaryStatic)
-                    if (state == BottomSheetBehavior.STATE_DRAGGING && titleRowHeight == -1) {
-                        titleRowHeight = viewManager.findViewByPosition(0)?.height ?: -1
-                    }
+                if (state == BottomSheetBehavior.STATE_DRAGGING)
+                    updateTitleRowHeight()
             }
-
         })
 
-        val placeId: String = intent.getStringExtra(EXTRA_PLACE_ID) ?: return finish()
-
-        geoDataClient = Places.getGeoDataClient(this)
-
-        launch(UI) {
-            val photoTask = async { loadImage(placeId) }
-            val placeTask = async { loadDetails(placeId) }
-
-            val photo = photoTask.await()
-            val place = placeTask.await()
-
-            supportActionBar?.title = place?.name
-            navigation_destinations_details_image_preview.pageCount = photo?.count ?: 0
-            updateAttributionsRow(attributions)
-            viewAdapter.notifyDataSetChanged()
-
-            addRecentSearchQuery(LocationSearchHistory(
-                    googlePlaceId = placeId,
-                    name = place?.name ?: "",
-                    address = place?.address ?: "",
-                    photoReference = photo?.get(0)?.photoReference
-            ))
+        recyclerView.viewTreeObserver.addOnDrawListener {
+            updateTitleRowHeight()
         }
-
-
     }
 
-    private fun updateAttributionsRow(attributions: ArrayList<CharSequence>) {
+    private fun updateTitleRowHeight() {
+        if (viewManager.itemCount > 0 && listItems[0] is SimpleRVTextPrimarySecondaryStatic)
+            if (titleRowHeight == -1) {
+                titleRowHeight = viewManager.findViewByPosition(0)?.height ?: -1
+            }
+    }
+
+    private fun updateAttributionsRow(attributions: List<CharSequence>) {
+        if (attributions.isEmpty()) {
+            if (listItems.last() is SimpleRVAttributions) {
+                listItems.removeAt(listItems.lastIndex)
+                viewAdapter.notifyItemRemoved(listItems.size)
+            }
+            return
+        }
         val attrHTML = resources.getString(R.string.search_result_attributions) +
                 "<br>" +
                 attributions.joinToString(", ")
         val formattedHtml = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Html.fromHtml(attrHTML, Html.FROM_HTML_MODE_COMPACT)
         } else {
+            @Suppress("DEPRECATION")
             Html.fromHtml(attrHTML)
         }
-        if (listItems[listItems.size - 1] is SimpleRVAttributions) {
-            listItems[listItems.size - 1] = SimpleRVAttributions(formattedHtml)
-            viewAdapter.notifyItemChanged(listItems.size - 1)
+        if (listItems.last() is SimpleRVAttributions) {
+            listItems[listItems.lastIndex] = SimpleRVAttributions(formattedHtml)
+            viewAdapter.notifyItemChanged(listItems.lastIndex)
         } else {
             listItems.add(SimpleRVAttributions(formattedHtml))
-            viewAdapter.notifyItemInserted(listItems.size - 1)
+            viewAdapter.notifyItemInserted(listItems.lastIndex)
         }
     }
 
@@ -255,61 +267,53 @@ class DestinationDetailsActivity : AppCompatActivity() {
     }
 
     fun onClickGo(view: View) {
-        val dialogView = layoutInflater.inflate(R.layout.alert_dialog_navigation_choose_transport_manners,
-                null)
-        val dialog = AlertDialog.Builder(this)
-                .setTitle(R.string.alert_dialog_title_select_method_of_travel)
-                .setView(dialogView)
-                .setNegativeButton(R.string.button_cancel) { dialog, which ->
-                    if (which == DialogInterface.BUTTON_NEGATIVE)
-                        dialog.dismiss()
+        when (getMeanOfTransport(applicationContext)) {
+            MEAN_OF_TRANSPORT_ALWAYS_ASK -> {
+                MeanOfTransportBottomSheetDialogFragment().run {
+                    show(supportFragmentManager, tag)
                 }
-                .create()
-        dialogView.navigation_directions_transport_manners_dialog_walk.setOnClickListener {
+            }
+            MEAN_OF_TRANSPORT_DRIVE -> startDrivingNavigation()
+            MEAN_OF_TRANSPORT_WALK -> startWalkingNavigation()
+            MEAN_OF_TRANSPORT_TRANSIT -> { startTransitNavigation() }
+        }
+
+
+    }
+
+    fun startWalkingNavigation() {
+        viewModel.placeDetails.value?.data?.get(0)?.also { place ->
             startActivity<NavigationActivity>(
                     NavigationActivity.EXTRA_DEST_LAT to place.latLng.latitude,
                     NavigationActivity.EXTRA_DEST_LON to place.latLng.longitude,
                     NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_WALKING
             )
-            dialog.dismiss()
         }
-        dialogView.navigation_directions_transport_manners_dialog_transit.setOnClickListener {
-            dialog.dismiss()
-        }
-        dialogView.navigation_directions_transport_manners_dialog_drive.setOnClickListener {
+    }
+
+    fun startDrivingNavigation() {
+        viewModel.placeDetails.value?.data?.get(0)?.also { place ->
             startActivity<NavigationActivity>(
                     NavigationActivity.EXTRA_DEST_LAT to place.latLng.latitude,
                     NavigationActivity.EXTRA_DEST_LON to place.latLng.longitude,
                     NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_DRIVING
             )
-            dialog.dismiss()
         }
-        dialog.show()
     }
 
-    private fun loadImage(placeId: String): PlacePhotoMetadataBuffer? {
-        val data = geoDataClient.getPlacePhotos(placeId).run {
-            Tasks.await(this)
-            this.result
-        }.photoMetadata ?: return null
-
-        if (data.count > 0) {
-            photoMetadata = data
-            for (i in photoMetadata!!) {
-                if (!i.attributions.isNullOrBlank())
-                    attributions.add(i.attributions)
-            }
-        }
-
-        return data
+    fun startTransitNavigation() {
+        // TODO: Transit navigation.
     }
 
-    private fun loadDetails(placeId: String): Place? {
-        val place = geoDataClient.getPlaceById(placeId).run {
-            Tasks.await(this)
-            this.result
-        }[0] ?: return null
+    private fun renderPlaceDetails(place: Place) {
+        supportActionBar?.title = place.name
 
+        var attributions: SimpleRVAttributions? = null
+
+        if (listItems.isNotEmpty() && listItems.last() is SimpleRVAttributions) {
+            attributions = listItems.last() as SimpleRVAttributions
+        }
+        
         listItems.clear()
         listItems.add(
                 SimpleRVTextPrimarySecondaryStatic(
@@ -341,9 +345,11 @@ class DestinationDetailsActivity : AppCompatActivity() {
             )
         if (place.rating >= 0)
             listItems.add(
-                    SimpleRVTextSecondaryPrimaryStatic(
-                            secondary = resources.getString(R.string.place_details_ratings),
-                            primary = "%.1f/5.0".format(place.rating)
+                    SimpleRVRatings(
+                            title = resources.getString(R.string.place_details_ratings),
+                            rating = place.rating,
+                            maxRating = 5,
+                            step = 0.1f
                     )
             )
         if (place.websiteUri != null)
@@ -356,10 +362,229 @@ class DestinationDetailsActivity : AppCompatActivity() {
                         })
                     }
             ))
-        if (!place.attributions.isNullOrBlank()) {
-            attributions.add(place.attributions!!)
+        if (attributions != null)
+            listItems.add(attributions)
+    }
+
+}
+
+class MeanOfTransportBottomSheetDialogFragment: BottomSheetDialogFragment() {
+    private var previousChoice: String? = null
+
+    private var chosenMethod: String? = null
+
+    private lateinit var justOnce: MaterialButton
+    private lateinit var always: MaterialButton
+
+    private var white: Int = 0
+    private var highlight: Int = 0
+
+    private lateinit var view: LinearLayout
+    private lateinit var parent: DestinationDetailsActivity
+    private lateinit var appContext: Context
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        view = inflater.inflate(R.layout.bottomsheetdialog_navigation_choose_mean_of_transport,
+                container, false) as LinearLayout
+        return view
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        parent = activity as DestinationDetailsActivity
+        appContext = context!!.applicationContext
+
+
+        previousChoice = getPreviousMeanOfTransport(context!!)
+
+        white = ContextCompat.getColor(context!!, R.color.white)
+        highlight = ContextCompat.getColor(context!!, R.color.colorHighlight)
+
+        justOnce = navigation_bsd_mean_of_transport_just_once
+        always = navigation_bsd_mean_of_transport_always
+
+        justOnce.setOnClickListener {
+            chosenMethod?.let { method ->
+                startNavigationByMethod(method)
+                this.dismiss()
+            }
         }
 
-        return place
+        always.setOnClickListener {
+            chosenMethod?.let { method ->
+                if (isFirstTimeSetNeverAskMeanOfTransport(context!!)) {
+                    activity?.alert {
+                        messageResource = R.string.prompt_first_time_always_preferred_mean_of_transport
+                        positiveButton(R.string.button_got_it) { _ ->
+                            setMeanOfTransport(appContext, method)
+                            startNavigationByMethod(method)
+                        }
+                    }?.show()
+                } else {
+                    setMeanOfTransport(context!!, method)
+                    startNavigationByMethod(method)
+
+                }
+                this.dismiss()
+            }
+        }
+
+        if (previousChoice == null) {
+            navigation_bsd_mean_of_transport_hr.visibility = View.GONE
+            navigation_bsd_mean_of_transport_alt.visibility = View.GONE
+            val actions = navigation_bsd_mean_of_transport_actions
+            view.removeView(actions)
+            view.addView(actions)
+
+            justOnce.isEnabled = false
+            always.isEnabled = false
+
+            firstChoiceOnClick(MEAN_OF_TRANSPORT_DRIVE)
+            firstChoiceOnClick(MEAN_OF_TRANSPORT_WALK)
+            firstChoiceOnClick(MEAN_OF_TRANSPORT_TRANSIT)
+        } else {
+            navigation_bsd_mean_of_transport_title.visibility = View.GONE
+            chosenMethod = previousChoice
+
+            val pcFormat = resources.getString(R.string.dialog_method_of_travel_default)
+
+            val pcView: TextView = when (previousChoice) {
+                MEAN_OF_TRANSPORT_DRIVE ->
+                    navigation_bsd_mean_of_transport_driving
+                MEAN_OF_TRANSPORT_WALK ->
+                    navigation_bsd_mean_of_transport_walking
+                MEAN_OF_TRANSPORT_TRANSIT ->
+                    navigation_bsd_mean_of_transport_transit
+                else -> return
+            }
+            val altMethods = hashSetOf(
+                    MEAN_OF_TRANSPORT_DRIVE,
+                    MEAN_OF_TRANSPORT_WALK,
+                    MEAN_OF_TRANSPORT_TRANSIT
+            )
+            altMethods.remove(previousChoice!!)
+            pcView.text = pcFormat.format(pcView.text)
+            pcView.isClickable = false
+            pcView.isFocusable = false
+            altMethods.forEach { altChoiceOnClick(it) }
+            view.removeView(pcView)
+            view.addView(pcView, 1)
+        }
+    }
+
+    private fun firstChoiceOnClick(method: String) {
+        val view = getButtonByMethod(method)
+        justOnce.isEnabled = true
+        always.isEnabled = true
+        view.setOnClickListener {
+            if (chosenMethod == method) {
+                startNavigationByMethod(method)
+                this.dismiss()
+            } else {
+                chosenMethod?.run {
+                    getButtonByMethod(this).setBackgroundColor(white)
+                }
+                view.setBackgroundColor(highlight)
+                chosenMethod = method
+            }
+        }
+    }
+
+    private fun altChoiceOnClick(method: String) {
+        val view = getButtonByMethod(method)
+        view.setOnClickListener {
+            startNavigationByMethod(method)
+            this.dismiss()
+        }
+    }
+
+    private fun startNavigationByMethod(method: String) {
+        setPreviousMeanOfTransport(appContext, method)
+        when (method) {
+            MEAN_OF_TRANSPORT_DRIVE -> parent.startDrivingNavigation()
+            MEAN_OF_TRANSPORT_WALK -> parent.startWalkingNavigation()
+            MEAN_OF_TRANSPORT_TRANSIT -> parent.startTransitNavigation()
+        }
+    }
+
+    private fun getButtonByMethod(method: String) = when (method) {
+        MEAN_OF_TRANSPORT_DRIVE -> navigation_bsd_mean_of_transport_driving
+        MEAN_OF_TRANSPORT_WALK -> navigation_bsd_mean_of_transport_walking
+        MEAN_OF_TRANSPORT_TRANSIT -> navigation_bsd_mean_of_transport_transit
+        else -> throw IllegalArgumentException()
+    }
+}
+
+private class DestinationDetailsViewModel(private val context: Application):
+        AndroidViewModel(context) {
+
+    var placeId: String = ""
+    val placeDetails = MutableLiveData<Resource<PlaceBufferResponse>>()
+    val placePhotos = MutableLiveData<Resource<PlacePhotoMetadataBuffer>>()
+    val attributions = MediatorLiveData<List<CharSequence>>()
+
+    private val attributionsObserver = Observer<Any> {
+        val l = mutableListOf<CharSequence>()
+        placeDetails.value?.run {
+            if (status == Resource.Status.SUCCESS &&
+                    !data?.attributions.isNullOrBlank())
+                l.add(data?.attributions!!)
+            data?.mapNotNull { i -> i.attributions }
+                    ?.forEach { i -> if (!i.isBlank()) l.add(i) }
+        }
+        placePhotos.value?.run {
+            if (status == Resource.Status.SUCCESS) {
+                data?.mapNotNull { i -> i.attributions }
+                    ?.forEach { i -> if (!i.isBlank()) l.add(i) }
+            }
+        }
+        attributions.value = l.toList()
+    }
+
+    init {
+        attributions.addSource(placeDetails, attributionsObserver)
+        attributions.addSource(placePhotos, attributionsObserver)
+    }
+
+    private var geoDataClient = Places.getGeoDataClient(context)
+
+    fun loadImageList(placeId: String) {
+        this.placeId = placeId
+        if (placePhotos.value != null) return
+        geoDataClient.getPlacePhotos(placeId).addOnSuccessListener {
+            placePhotos.postValue(Resource.success(it.photoMetadata))
+        }.addOnFailureListener {
+            placePhotos.postValue(Resource.error(it))
+        }
+    }
+
+    fun loadDetails(placeId: String) {
+        this.placeId = placeId
+        if (placeDetails.value != null) return
+        geoDataClient.getPlaceById(placeId).addOnSuccessListener {
+            placeDetails.postValue(Resource.success(it))
+        }.addOnFailureListener {
+            placeDetails.postValue(Resource.error(it))
+        }
+    }
+
+    fun loadImageWithCache(position: Int, imageView: ImageView) {
+        placePhotos.value?.data?.let { pm ->
+            imageView.setImageDrawable(
+                    ContextCompat.getDrawable(context, R.drawable.navibee_placeholder))
+            object : ImageViewCacheLoader(imageView) {
+                override val defaultKey = "$placeId-$position"
+
+                override fun loadTask(file: File) {
+                    geoDataClient.getPhoto(pm[position]).addOnSuccessListener { data ->
+                        val outputStream = FileOutputStream(file)
+                        data.bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream)
+                        outputStream.close()
+                        postLoad(file)
+                    }
+                }
+            }.execute()
+        }
     }
 }

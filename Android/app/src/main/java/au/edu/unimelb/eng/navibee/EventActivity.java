@@ -96,13 +96,13 @@ public class EventActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String userId;
 
-    private List<EventItem> eventList = new ArrayList<>();
-    private List<EventItem> preLoadEventList = new ArrayList<>();
+    private List<EventItem> eventList;
+    private List<EventItem> preLoadEventList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.event_list);
+        setContentView(R.layout.activity_event_list);
 
         userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         db = FirebaseFirestore.getInstance();
@@ -112,7 +112,14 @@ public class EventActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        loadPreLoadEventList();
+    }
+
     private void loadPreLoadEventList() {
+        preLoadEventList = new ArrayList<>();
         db.collection("events").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -158,11 +165,10 @@ public class EventActivity extends AppCompatActivity {
                 recommendList.add(i);
             }
         }
-
+        eventList = new ArrayList<>();
         eventList.addAll(holdingList);
         eventList.addAll(joinedList);
         eventList.addAll(recommendList);
-
     }
 
     private void finalizeEventList(){
@@ -176,8 +182,19 @@ public class EventActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int pos, long l) {
                 //using switch case, to check the condition.
+                String relationship;
+                if(eventList.get(pos).getHolder().equals(userId)) {
+                    relationship = "holder";
+                }
+                else if(eventList.get(pos).getUsers().keySet().contains(userId)){
+                    relationship = "participant";
+                }
+                else {
+                    relationship = "passerby";
+                }
                 Intent intent = new Intent(EventActivity.this, EventDetailActivity.class);
                 intent.putExtra("eventId", eventList.get(pos).getEventId());
+                intent.putExtra("relationship", relationship);
                 startActivity(intent);
             }
         });
@@ -224,7 +241,7 @@ public class EventActivity extends AppCompatActivity {
                 name.setText((String) eventList.get(position).getName());
 
                 TextView summary = (TextView) view.findViewById(R.id.event_summary);
-                String summaryText = new SimpleDateFormat("EEE, MMM d, HH:mm").format(eventList.get(position).getTime_());
+                String summaryText = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss").format(eventList.get(position).getTime_());
                 summary.setText((String) summaryText);
 
                 ImageView image = (ImageView) view.findViewById(R.id.event_image);
@@ -237,7 +254,7 @@ public class EventActivity extends AppCompatActivity {
     }
 
     public void selectFriends(View view) {
-        startActivity(new Intent(this, EventSelectFriendsActivity.class));
+        startActivity(new Intent(this, EventEditActivity.class));
     }
 
 }

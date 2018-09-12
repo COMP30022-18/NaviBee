@@ -11,4 +11,18 @@
 
     <color name="transparentBlack">#00000000</color>
     <color name="transparentWhite">#00ffffff</color>
+
+    <color name="dividerColor">#30000000</color>
+
+    <color name="colorHighlight">#308bc34a</color>
+
+    <color name="landing_lightGreen">#669A3D</color>
+    <color name="landing_blue">#198BDB</color>
+    <color name="landing_red">#C62828</color>
+    <color name="colorLightGrey">#F1F1F1</color>
+
+    <color name="rippleOnLight">#42C9C9C9</color>
+    <color name="rippleOnDark">#42ffffff</color>
+
+    <color name="black_overlay">#66000000</color>
 </resources>

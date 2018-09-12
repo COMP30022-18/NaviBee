@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".navigation.DestinationsSearchResultActivity">
 
-    <fragment
-        xmlns:tools="http://schemas.android.com/tools"
+    <fragment xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/navigation.destinations.search_result.map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:cameraZoom="13"/>
+        app:cameraZoom="13" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/navigation.destinations.search_result.recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorLightGrey"
         app:behavior_hideable="false"
-        android:background="@color/white"
         app:behavior_peekHeight="300dp"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior" />
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        tools:listitem="@layout/recycler_view_destination_list_entry" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

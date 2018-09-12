@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?selectableItemBackground"
+    android:id="@+id/popup_menu_main_profile_row">
+
+    <ImageView
+        android:id="@+id/popup_menu_main_profile_picture"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.531"
+        android:background="@drawable/shape_round_background_for_profile_picture"
+        tools:src="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/popup_menu_main_profile_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        android:textColor="@color/colorLightTextPrimary"
+        android:textSize="16sp"
+        android:maxLines="1"
+        app:layout_constraintEnd_toStartOf="@+id/popup_menu_main_profile_picture"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/popup_menu_main_profile_picture"
+        tools:text="@tools:sample/full_names" />
+
+    <TextView
+        android:id="@+id/popup_menu_main_profile_secondary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        android:textColor="@color/colorLightTextSecondary"
+        android:textSize="16sp"
+        android:maxLines="1"
+        app:layout_constraintBottom_toBottomOf="@+id/popup_menu_main_profile_picture"
+        app:layout_constraintEnd_toStartOf="@+id/popup_menu_main_profile_picture"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="webmaster@example.com" />
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

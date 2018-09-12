@@ -2,19 +2,26 @@ package au.edu.unimelb.eng.navibee.navigation
 
 import android.Manifest
 import android.app.Activity
+import android.app.Application
 import android.app.SearchManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
+import android.provider.SearchRecentSuggestions
 import android.text.Html
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import au.edu.unimelb.eng.navibee.BuildConfig
 import au.edu.unimelb.eng.navibee.R
+import au.edu.unimelb.eng.navibee.utils.Resource
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -59,9 +66,6 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
     // incoming parameters
     private var sendResult: Boolean = false
 
-    // Google Maps Geo API Context
-    private lateinit var geoContext: GeoApiContext
-
     // Recycler view
     private lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
     private lateinit var viewAdapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>
@@ -70,6 +74,8 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
 
     private val searchResults = ArrayList<PlacesSearchResult>()
     private var googleMap: GoogleMap? = null
+
+    private lateinit var viewModel: DestinationSearchResultViewModel
 
     private val actionBarHeight: Int by lazy {
         val tv = TypedValue()
@@ -80,6 +86,11 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation_destinations_search_result)
+
+        // Setup view model
+        viewModel = ViewModelProviders.of(this).get(DestinationSearchResultViewModel::class.java)
+
+        subscribe()
 
         // Setup data for loading screen
         destinations.add(DestinationRVIndefiniteProgressBar())
@@ -92,8 +103,8 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
             setHasFixedSize(true)
             layoutManager = viewManager
             adapter = viewAdapter
-            addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(
-                    context, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
+//            addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(
+//                    context, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
         }
 
         // Setup location service
@@ -113,11 +124,6 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
             }
         }
 
-        // setup Google Maps Geo API Context
-        geoContext = GeoApiContext.Builder()
-                .apiKey(BuildConfig.GOOGLE_PLACES_API_KEY)
-                .build()
-
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.navigation_destinations_search_result_map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
@@ -125,12 +131,70 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
         handleIntent(intent)
     }
 
+    private fun subscribe() {
+        viewModel.searchResult.observe(this, Observer {
+            if (it.status == Resource.Status.ERROR) {
+                Timber.e(it.throwable, "Error on performing location search.")
+                renderErrorMessage(R.string.destination_search_failed)
+            } else if (it.status == Resource.Status.SUCCESS) {
+                val result = it.data
+
+                destinations.clear()
+                val attributions: ArrayList<String> = ArrayList()
+
+                if (result?.results?.isEmpty() != false) {
+                    renderErrorMessage(R.string.destination_search_no_result)
+                } else {
+                    attributions.addAll(result.htmlAttributions)
+
+                    for (item in result.results) {
+                        searchResults.add(item)
+
+                        var photoReference: String? = null
+                        if (item.photos?.isEmpty() == false) {
+                            photoReference = item.photos[0].photoReference
+                            attributions.addAll(item.photos[0].htmlAttributions)
+                        }
+                        destinations.add(DestinationRVEntry(
+                                name = item.name,
+                                location = item.vicinity,
+                                googlePlaceId = item.placeId,
+                                googlePhotoReference = photoReference,
+                                onClick = View.OnClickListener { _ ->
+                                    startActivity<DestinationDetailsActivity>(
+                                            DestinationDetailsActivity.EXTRA_PLACE_ID to item.placeId
+                                    )
+                                }
+                        ))
+                    }
+
+                    val attrHTML = resources.getString(R.string.search_result_attributions) +
+                            "<br>" +
+                            attributions.joinToString(", ")
+                    val formattedHtml = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        Html.fromHtml(attrHTML, Html.FROM_HTML_MODE_COMPACT)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        Html.fromHtml(attrHTML)
+                    }
+                    destinations.add(DestinationRVAttributions(formattedHtml))
+                }
+            }
+
+            initializeMap()
+            viewAdapter.notifyDataSetChanged()
+        })
+    }
+
     private fun handleIntent(intent: Intent) {
         when (intent.action) {
             Intent.ACTION_SEARCH -> {
                 val query = intent.getStringExtra(SearchManager.QUERY)
                 supportActionBar?.title = query
-                Timber.d("Handling intent on search query $query.")
+                SearchRecentSuggestions(this,
+                        DestinationsSearchSuggestionsContentProvider.AUTHORITY,
+                        DestinationsSearchSuggestionsContentProvider.MODE)
+                        .saveRecentQuery(query, null)
                 startActivityForResult<LocationPermissionRequestActivity>(
                         CHECK_LOCATION_PERMISSION,
                         "query" to query,
@@ -170,70 +234,7 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
                     lastKnownLocation = location
                     if (googleMap != null) onMapReady(googleMap!!)
 
-                    val callback = object : PendingResult.Callback<PlacesSearchResponse> {
-                        override fun onFailure(e: Throwable?) {
-                            Timber.e(e, "Error on performing location search.")
-                            renderErrorMessage(R.string.destination_search_failed)
-                        }
-
-                        override fun onResult(result: PlacesSearchResponse) {
-                            destinations.clear()
-                            val attributions: ArrayList<String> = ArrayList()
-
-                            if (result.results.isEmpty()) {
-                                renderErrorMessage(R.string.destination_search_no_result)
-                            } else {
-                                attributions.addAll(result.htmlAttributions)
-
-                                for (item in result.results) {
-                                    searchResults.add(item)
-
-                                    var photoReference: String? = null
-                                    if (item.photos?.isEmpty() == false) {
-                                        photoReference = item.photos[0].photoReference
-                                        attributions.addAll(item.photos[0].htmlAttributions)
-                                    }
-                                    destinations.add(DestinationRVEntry(
-                                            name = item.name,
-                                            location = item.vicinity,
-                                            googlePhotoReference = photoReference,
-                                            onClick = View.OnClickListener {
-                                                startActivity<DestinationDetailsActivity>(
-                                                        DestinationDetailsActivity.EXTRA_PLACE_ID to item.placeId
-                                                )
-                                            }
-                                    ))
-                                }
-
-                                val attrHTML = resources.getString(R.string.search_result_attributions) +
-                                        "<br>" +
-                                        attributions.joinToString(", ")
-                                val formattedHtml = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    Html.fromHtml(attrHTML, Html.FROM_HTML_MODE_COMPACT)
-                                } else {
-                                    Html.fromHtml(attrHTML)
-                                }
-                                destinations.add(DestinationRVAttributions(formattedHtml))
-                            }
-                            runOnUiThread{initializeMap()}
-                            runOnUiThread(viewAdapter::notifyDataSetChanged)
-                        }
-
-                    }
-
-                    if (location != null) {
-                        val request = PlacesApi
-                                .nearbySearchQuery(geoContext, MapsLatLng(location.latitude, location.longitude))
-                                .keyword(query)
-                                .rankby(RankBy.DISTANCE)
-                        request.setCallback(callback)
-                    } else {
-                        // TODO: Allow configurable region of search.
-                        val request = PlacesApi
-                                .textSearchQuery(geoContext, query)
-                                .custom("region", "au")
-                        request.setCallback(callback)
-                    }
+                    viewModel.searchForLocation(query, location)
 
                 }
                 .addOnFailureListener {
@@ -251,17 +252,19 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
 
     private fun initializeMap() {
         val gm = googleMap
-        if (gm != null) {
+        if (gm != null && searchResults.isNotEmpty()) {
             val latLngBoundsBuilder = LatLngBounds.Builder()
             for ((i, item) in searchResults.withIndex()) {
                 val coord = GmsLatLng(item.geometry.location.lat,
                         item.geometry.location.lng)
-                latLngBoundsBuilder.include(coord)
 
+                if (i < 10)
+                    latLngBoundsBuilder.include(coord)
                 gm.addMarker(MarkerOptions().position(coord).title(item.name).let {
                     if (i >= 10) {
                         it.icon(BitmapDescriptorFactory.fromResource(
                                 R.drawable.navigation_map_minor_marker))
+
                     } else {
                         it.icon(BitmapDescriptorFactory.fromBitmap(
                                 IconGenerator(this).run {
@@ -272,7 +275,7 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
                 })
             }
             gm.animateCamera(CameraUpdateFactory
-                    .newLatLngBounds(latLngBoundsBuilder.build(), 48))
+                    .newLatLngBounds(latLngBoundsBuilder.build(), 128))
         }
 
     }
@@ -290,6 +293,46 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
             googleMap.moveCamera(
                     CameraUpdateFactory.newLatLng(
                             GmsLatLng(lkl.latitude, lkl.longitude)))
+        }
+    }
+}
+
+
+private class DestinationSearchResultViewModel(val context: Application):
+        AndroidViewModel(context) {
+
+    // Google Maps Geo API Context
+    private var geoContext: GeoApiContext = GeoApiContext.Builder()
+            .apiKey(BuildConfig.GOOGLE_PLACES_API_KEY)
+            .build()
+
+    val searchResult = MutableLiveData<Resource<PlacesSearchResponse>>()
+
+    fun searchForLocation(query: String, location: Location?) {
+        if (searchResult.value != null) return
+        val callback = object : PendingResult.Callback<PlacesSearchResponse> {
+            override fun onFailure(e: Throwable?) {
+                if (e != null)
+                    searchResult.postValue(Resource.error(e))
+            }
+
+            override fun onResult(result: PlacesSearchResponse) {
+                searchResult.postValue(Resource.success(result))
+            }
+
+        }
+
+        if (location != null) {
+            val request = PlacesApi
+                    .nearbySearchQuery(geoContext, MapsLatLng(location.latitude, location.longitude))
+                    .keyword(query)
+                    .rankby(RankBy.DISTANCE)
+            request.setCallback(callback)
+        } else {
+            val request = PlacesApi
+                    .textSearchQuery(geoContext, query)
+                    .custom("region", getSearchRegion(context))
+            request.setCallback(callback)
         }
     }
 }
