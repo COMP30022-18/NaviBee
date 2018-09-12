@@ -91,6 +91,8 @@ dependencies {
     implementation 'com.github.chrisbanes:PhotoView:2.0.0'
     implementation(name: 'HERE-sdk', ext: 'aar')
     implementation files('libs/HERE-sdk-javadoc.jar')
+
+    testImplementation "org.mockito:mockito-core:2.22.0"
 }
 
 apply plugin: 'com.google.gms.google-services'

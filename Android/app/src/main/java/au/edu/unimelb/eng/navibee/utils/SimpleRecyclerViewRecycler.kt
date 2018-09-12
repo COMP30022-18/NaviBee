@@ -133,8 +133,3 @@ data class SimpleRVRatings(
 ): SimpleRecyclerViewItem()
 class SimpleRVViewHolder(view: View) :
         androidx.recyclerview.widget.RecyclerView.ViewHolder(view)
-
-//data class UserChipItem(
-//        val text: CharSequence,
-//        val photoUrl: String
-//)
