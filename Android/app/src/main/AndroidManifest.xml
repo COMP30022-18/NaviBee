@@ -133,11 +133,9 @@
             android:name=".EventDetailsActivity"
             android:parentActivityName=".EventsActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
-        <activity android:name=".social.VoiceCallActivity" />
         <activity
             android:name=".social.ChatImageViewActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".social.VoiceCallActivity" />
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
