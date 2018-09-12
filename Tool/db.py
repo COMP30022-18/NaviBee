@@ -14,4 +14,14 @@ def update1():
     for doc in docs:
         print(doc.id)
         db.collection('conversations').document(doc.id).update({'type': 'private'})
-update1()
+# update1()
+
+# clean contacts and emergency from users
+def update2():
+    docs = db.collection('users').get()
+    for doc in docs:
+        print(doc.id)
+        db.collection('users').document(doc.id).update({'emergency': firestore.DELETE_FIELD, 'contacts': firestore.DELETE_FIELD})
+
+
+update2()
