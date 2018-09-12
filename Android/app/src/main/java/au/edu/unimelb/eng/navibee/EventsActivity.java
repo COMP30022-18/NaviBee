@@ -127,6 +127,12 @@ public class EventsActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        loadEvents();
+    }
+
     private void loadEvents() {
         eventList = new ArrayList<>();
 
