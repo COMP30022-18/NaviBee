@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class UserInfoManager {
@@ -63,7 +64,7 @@ public class UserInfoManager {
 
     public void getUserInfo(ArrayList<String> ids, Callback<Map<String, UserInfo>> callback) {
         Map<String, UserInfo> res = new HashMap<>();
-        for (String id: ids) {
+        for (String id: new HashSet<>(ids)) {
             getUserInfo(id, info -> {
                 res.put(id, info);
                 if (res.size()==ids.size()) {
