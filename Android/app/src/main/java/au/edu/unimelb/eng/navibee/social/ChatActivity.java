@@ -36,7 +36,6 @@ import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener, IPickResult {
 
     private Conversation conversation;
-    private String targetUID;
 
     private RecyclerView chatRecyclerView;
     private RecyclerView.Adapter chatAdapter;
@@ -56,8 +55,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        targetUID = getIntent().getStringExtra("TARGET_USER_ID");
-        conversation = ConversationManager.getInstance().getConversationByUID(targetUID);
+        String convId = getIntent().getStringExtra("CONV_ID");
+        conversation = ConversationManager.getInstance().getConversation(convId);
 
 
         chatRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_chat);

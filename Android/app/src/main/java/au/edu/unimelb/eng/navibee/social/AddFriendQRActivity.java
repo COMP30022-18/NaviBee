@@ -8,11 +8,15 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.functions.HttpsCallableResult;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
+
+import java.util.Map;
 
 import au.edu.unimelb.eng.navibee.R;
 
@@ -26,6 +30,7 @@ public class AddFriendQRActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friend_qr);
         generateQRCode();
+        findViewById(R.id.add_friend_progressbar).setVisibility(View.GONE);
     }
 
     private void generateQRCode() {
@@ -57,7 +62,26 @@ public class AddFriendQRActivity extends AppCompatActivity {
             } else {
                 if (result.getContents().startsWith(ADD_FRIEND_URL)) {
                     String targetUId = result.getContents().replace(ADD_FRIEND_URL, "");
-                    FriendManager.getInstance().addFriend(targetUId);
+                    findViewById(R.id.add_friend_progressbar).setVisibility(View.VISIBLE);
+                    Task<HttpsCallableResult> task = ConversationManager.getInstance().addFriend(targetUId);
+
+                    task.addOnFailureListener(httpsCallableResult -> {
+                        Toast.makeText(this, "Network error.", Toast.LENGTH_LONG).show();
+                        findViewById(R.id.add_friend_progressbar).setVisibility(View.GONE);
+                    });
+                    task.addOnSuccessListener(httpsCallableResult -> {
+                        findViewById(R.id.add_friend_progressbar).setVisibility(View.GONE);
+                        final Map<String, Object> res = ((Map<String, Object>) httpsCallableResult.getData());
+                        if (((Integer) res.get("code"))==0) {
+                            Toast.makeText(this, "Success.", Toast.LENGTH_LONG).show();
+                            this.finish();
+                        } else {
+                            Toast.makeText(this, ((String) res.get("msg")), Toast.LENGTH_LONG).show();
+                        }
+
+                    });
+
+
                 } else {
                     Toast.makeText(this, "Wrong QR code", Toast.LENGTH_LONG).show();
                 }
