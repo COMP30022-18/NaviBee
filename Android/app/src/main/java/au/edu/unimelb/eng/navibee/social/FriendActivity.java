@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -29,24 +30,32 @@ public class FriendActivity extends AppCompatActivity {
 
     public static class ContactItem {
         private String uid; // no need for group chat
+        private String chatName; //no need for private chat
         private String convId;
-//        private boolean isPrivate;
+        private boolean isPrivate;
         private int unreadMessage;
         private String lastMessageTime;
         private String lastMessage;
         private Boolean hasLastMessage;
 
 
-        public ContactItem(String convId, String uid) {
-            this.uid = uid;
+        public ContactItem(String convId, Boolean isPrivate, String extraInfo) {
+            this.isPrivate = isPrivate;
+            if (isPrivate){
+                this.uid = extraInfo;
+            }
+            else{
+                this.chatName = extraInfo;
+            }
             this.convId = convId;
-//            this.isPrivate = isPrivate;
+            this.isPrivate = true;
 
             this.unreadMessage = 0;
             Date date = new Date();
             setLastMessageTime(date);
             hasLastMessage = false;
         }
+        public boolean isPrivate(){ return this.isPrivate; }
 
         public String getConvId() {
             return convId;
@@ -55,6 +64,8 @@ public class FriendActivity extends AppCompatActivity {
         public String getUid(){
             return this.uid;
         }
+
+        public String getChatName() {return this.chatName; }
 
         public int getUnreadMessage(){
             return this.unreadMessage;
@@ -86,6 +97,14 @@ public class FriendActivity extends AppCompatActivity {
             this.lastMessageTime = DateManager.DateformatTime(time);
         }
 
+    }
+
+    public static class ViewHolder {
+        public ImageView image;
+        public TextView text;
+        public TextView unread;
+        public TextView lastTime;
+        public TextView lastMessage;
     }
 
     public static class FriendAdapter extends BaseAdapter {
@@ -155,18 +174,90 @@ public class FriendActivity extends AppCompatActivity {
 
             return convertView;
         }
+    }
 
-        public static class ViewHolder {
-            public ImageView image;
-            public TextView text;
-            public TextView unread;
-            public TextView lastTime;
-            public TextView lastMessage;
+    public static class ChatsAdapter extends BaseAdapter {
+        private ArrayList<ContactItem> chatsList;
+
+        private LayoutInflater l_Inflater;
+
+        public ChatsAdapter(Context context, ArrayList<ContactItem> chatsList){
+            this.chatsList = chatsList;
+            l_Inflater = LayoutInflater.from(context);
+        }
+
+        public int getCount(){
+            return chatsList.size();
+        }
+        public ContactItem getItem(int position){
+            return chatsList.get(position);
+        }
+        public long getItemId(int position){
+            return position;
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent){
+            ViewHolder holder;
+            if (convertView == null) {
+                convertView = l_Inflater.inflate(R.layout.friend_item, null);
+                holder = new ViewHolder();
+                holder.image = (ImageView) convertView.findViewById(R.id.friend_icon);
+                holder.text = (TextView) convertView.findViewById(R.id.friend_name);
+                holder.lastTime = (TextView) convertView.findViewById(R.id.time);
+                holder.unread = (TextView) convertView.findViewById(R.id.unread);
+                holder.lastMessage = (TextView) convertView.findViewById(R.id.last_message);
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+            if (chatsList.size() <= 0){
+                holder.text.setText("No Data");
+            }
+            else{
+                ContactItem tempChat = chatsList.get(position);
+
+                if (tempChat.isPrivate()){
+                    UserInfoManager.getInstance().getUserInfo(tempChat.getUid(), userInfo -> {
+                        holder.text.setText(userInfo.getName());
+                        NetworkImageHelper.loadImage(holder.image, userInfo.getPhotoUrl());
+                    });
+                }
+                else {
+                    holder.image.setImageResource(R.drawable.ic_navibee_color);
+                    holder.text.setText(tempChat.getChatName());
+                }
+
+
+                holder.unread.setText(Integer.toString(tempChat.getUnreadMessage()));
+                if (tempChat.getUnreadMessage() == 0){
+                    holder.unread.setVisibility(View.INVISIBLE);
+                }
+                else{
+                    holder.unread.setVisibility(View.VISIBLE);
+                }
+                if (tempChat.hasMessage()){
+                    holder.lastMessage.setText(tempChat.getLastMessage());
+                    holder.lastTime.setText(tempChat.getLastMessageTime());
+                }
+                else{
+                    holder.lastMessage.setText("");
+                    holder.lastTime.setText("");
+                }
+
+            }
+
+            return convertView;
         }
     }
 
-    ArrayList<ContactItem> contactList = new ArrayList<ContactItem>();
-    FriendAdapter contactListAdapter;
+    private ConversationManager cm = ConversationManager.getInstance();
+    private ArrayList<ContactItem> contactList = new ArrayList<ContactItem>();
+    private ArrayList<ContactItem> chatsList = new ArrayList<ContactItem>();
+    private FriendAdapter contactListAdapter;
+    private ChatsAdapter chatsListAdapter;
+    private Button addFriendButton;
+    private ListView friendLists;
+    private ListView recentChats;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -175,14 +266,15 @@ public class FriendActivity extends AppCompatActivity {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.navigation_home:
-//                    mTextMessage.setText(R.string.title_home);
+                case R.id.switch_friend_list:
+                    recentChats.setVisibility(View.INVISIBLE);
+                    friendLists.setVisibility(View.VISIBLE);
+                    addFriendButton.setVisibility(View.VISIBLE);
                     return true;
-                case R.id.navigation_dashboard:
-//                    mTextMessage.setText(R.string.title_dashboard);
-                    return true;
-                case R.id.navigation_notifications:
-//                    mTextMessage.setText(R.string.title_notifications);
+                case R.id.switch_recent_chat:
+                    recentChats.setVisibility(View.VISIBLE);
+                    friendLists.setVisibility(View.INVISIBLE);
+                    addFriendButton.setVisibility(View.INVISIBLE);
                     return true;
             }
             return false;
@@ -195,13 +287,22 @@ public class FriendActivity extends AppCompatActivity {
         setContentView(R.layout.friend_list);
 
 //        mTextMessage = (TextView) findViewById(R.id.message);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.friend_activity_navbar);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         contactListAdapter = new FriendAdapter(this, contactList);
+        chatsListAdapter = new ChatsAdapter(this, chatsList);
 
-        ListView listView = (ListView) findViewById(R.id.contactListView);
-        listView.setAdapter(contactListAdapter);
+        friendLists = (ListView) findViewById(R.id.contactListView);
+        friendLists.setAdapter(contactListAdapter);
+        recentChats = (ListView) findViewById(R.id.recentChatsListView);
+        recentChats.setAdapter(chatsListAdapter);
+        addFriendButton = (Button) findViewById(R.id.addFriendButton);
+        addFriendButton.setVisibility(View.INVISIBLE);
+        recentChats.setVisibility(View.VISIBLE);
+        friendLists.setVisibility(View.INVISIBLE);
+
+
 
 
         loadContactList();
@@ -211,7 +312,7 @@ public class FriendActivity extends AppCompatActivity {
 
         registerReceiver(brMsgReadState, new IntentFilter(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE));
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        friendLists.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int pos, long l) {
                 //using switch case, to check the condition.
@@ -240,17 +341,30 @@ public class FriendActivity extends AppCompatActivity {
     };
 
     private void loadContactList() {
-        ConversationManager cm = ConversationManager.getInstance();
-
         contactList.clear();
         ArrayList<String> friendList = cm.getFriendList();
 
         for (String friendUid: friendList) {
-            contactList.add(new ContactItem(cm.getPrivateConvId(friendUid), friendUid));
+            contactList.add(new ContactItem(cm.getPrivateConvId(friendUid), true, friendUid));
         }
 
         cm.updateConvInfoForContactList(contactList);
         contactListAdapter.notifyDataSetChanged();
+    }
+
+    private void loadChatsList(){
+        chatsList.clear();
+        ArrayList<String> friendList = cm.getFriendList();
+
+        for (String friendUid: friendList) {
+            if (cm.getPrivateConversation(friendUid).getMessageCount()>0) {
+                contactList.add(new ContactItem(cm.getPrivateConvId(friendUid), true, friendUid));
+            }
+        }
+        ///////
+        //////
+        /////
+        ////
     }
 
     public void onClick(View view) {

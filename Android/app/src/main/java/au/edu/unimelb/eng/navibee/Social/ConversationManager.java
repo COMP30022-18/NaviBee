@@ -72,7 +72,7 @@ public class ConversationManager {
                                 Timestamp timestamp =  ((Map<String, Timestamp>) dc.getDocument().get("readTimestamps")).get(uid);
 
                                 // load new conversation
-                                Conversation conv = new Conversation(convId, uid, timestamp.toDate());
+                                Conversation conv = new Conversation(convId, uid, timestamp.toDate(), true);
 
                                 uidToConvId.put(friendUid, convId);
                                 convIdMap.put(convId, conv);
@@ -124,6 +124,16 @@ public class ConversationManager {
 
     public ArrayList<String> getFriendList() {
         return new ArrayList<>(friendList);
+    }
+
+    public ArrayList<Conversation> getAllInprivateConversation(){
+        ArrayList<Conversation> inprivateConversation = new ArrayList<>();
+        for (Conversation conv:convIdMap.values()){
+            if (!conv.isPrivate()){
+                inprivateConversation.add(conv);
+            }
+        }
+        return inprivateConversation;
     }
 
     public void updateConvInfoForContactList(ArrayList<FriendActivity.ContactItem> list) {

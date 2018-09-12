@@ -35,14 +35,16 @@ public class Conversation {
     private ArrayList<Message> messages = new ArrayList<>();
     private int unreadMsgCount = 0;
     private Date readTimestamp;
+    private Boolean isPrivate;
 
 
-    public Conversation(String id, String uid, Date timestamp) {
+    public Conversation(String id, String uid, Date timestamp, Boolean isPrivate) {
         conversationId = id;
         this.uid = uid;
         this.readTimestamp = timestamp;
         db = FirebaseFirestore.getInstance();
         listen();
+        this.isPrivate = isPrivate;
 
     }
 
@@ -135,6 +137,8 @@ public class Conversation {
         }
         return null;
     }
+
+    public Boolean isPrivate(){ return this.isPrivate; }
 
     public Message getMessage(int index) {
         return messages.get(index);
