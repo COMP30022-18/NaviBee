@@ -156,7 +156,10 @@
             android:name=".EventsActivity"
             android:label="@string/landing_events">
         </activity>
-
+        <activity
+            android:name=".social.VoiceCallActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>
