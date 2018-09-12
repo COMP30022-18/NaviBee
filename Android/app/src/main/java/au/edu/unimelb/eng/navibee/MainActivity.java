@@ -35,7 +35,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import au.edu.unimelb.eng.navibee.navigation.DestinationsActivity;
 import au.edu.unimelb.eng.navibee.social.ConversationManager;
 import au.edu.unimelb.eng.navibee.social.FriendActivity;
-import au.edu.unimelb.eng.navibee.social.FriendManager;
+import au.edu.unimelb.eng.navibee.social.ConversationManager;
 import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
 import timber.log.Timber;
 
@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.landing_sos_btn).setOnClickListener(this);
         findViewById(R.id.landing_social_btn).setOnClickListener(this);
 
-        FriendManager.init();
         ConversationManager.init();
         setFCMToken();
 
@@ -145,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.landing_events_btn:
-                startActivity(new Intent(this, EventActivity.class));
+                startActivity(new Intent(this, EventsActivity.class));
                 break;
 
             case R.id.landing_sos_btn:
@@ -295,4 +294,3 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 }
-

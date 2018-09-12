@@ -64,15 +64,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar"/>
+        <activity
+            android:name=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
         <activity
             android:name=".EventActivity"
             android:parentActivityName=".MainActivity" />
         <activity android:name=".EventSelectFriendsActivity" />
         <activity
             android:name=".SosActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".social.FriendActivity"
             android:label="@string/title_activity_friend" />
@@ -128,15 +129,13 @@
         <activity
             android:name=".SosSettingActivity"
             android:label="@string/sos_setting" />
-
         <activity
             android:name=".EventDetailsActivity"
+            android:parentActivityName=".EventsActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
-        <activity android:name=".social.VoiceCallActivity" />
         <activity
             android:name=".social.ChatImageViewActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".social.VoiceCallActivity" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -144,6 +143,20 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".EventPicFullscreenActivity">
+        </activity>
+        <activity
+            android:name=".EventDetailActivity">
+        </activity>
+        <activity
+            android:name=".EventsActivity"
+            android:label="@string/landing_events">
+        </activity>
+        <activity
+            android:name=".social.VoiceCallActivity"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
 
