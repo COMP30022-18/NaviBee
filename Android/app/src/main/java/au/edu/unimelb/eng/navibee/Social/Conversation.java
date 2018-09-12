@@ -12,6 +12,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -191,6 +192,7 @@ public class Conversation {
             this.id = id;
         }
 
+        @Exclude
         public String getId() {
             return id;
         }
@@ -199,6 +201,7 @@ public class Conversation {
             return time;
         }
 
+        @Exclude
         public Date getTime_() { return time.toDate();}
 
         public String getData() {
