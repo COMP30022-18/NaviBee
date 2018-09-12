@@ -80,7 +80,7 @@ public class UserInfoManager {
     }
 
 
-    interface Callback<T> {
+    public interface Callback<T> {
         void callback(T t);
     }
 
