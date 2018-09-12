@@ -9,12 +9,10 @@ import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,7 +25,6 @@ import au.edu.unimelb.eng.navibee.R;
 public class VoiceCallActivity extends AppCompatActivity {
 
 
-    private static final String LOG_TAG = "VOICECALL";
     private static final int MY_PERMISSIONS_RECORD_AUDIO = 1;
 
     public static final int VOCIECALL_EXPIRE = 60 * 1000;
@@ -177,10 +174,14 @@ public class VoiceCallActivity extends AppCompatActivity {
             }
         }.start();
 
-        String name = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-        friendName.setText(name);
-        String photourl = FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString();
-        NetworkImageHelper.loadImage(friendIcon, photourl);
+
+        String targetUid = ConversationManager.getInstance().getUidOfPrivateConv(conv.getConvId());
+        UserInfoManager.getInstance().getUserInfo(targetUid, userInfo -> {
+            friendName.setText(userInfo.getName());
+            NetworkImageHelper.loadImage(friendIcon, userInfo.getHighResolutionPhotoUrl());
+        });
+
+
         textViewTime.setVisibility(View.INVISIBLE);
 
         if (isInitiator) {

@@ -103,6 +103,10 @@ public class UserInfoManager {
             return photoUrl;
         }
 
+        public String getHighResolutionPhotoUrl() {
+            return photoUrl.replace("s96-c", "s400-c");
+        }
+
         public void setName(String name) {
             this.name = name;
         }
