@@ -49,6 +49,10 @@ public abstract class Conversation {
         listen();
     }
 
+    public String getConvId() {
+        return conversationId;
+    }
+
     private void listen() {
         db.collection("conversations").document(conversationId)
                 .collection("messages").orderBy("time")
