@@ -3,10 +3,13 @@ package au.edu.unimelb.eng.navibee.navigation
 import android.graphics.Color
 import com.squareup.moshi.*
 import org.threeten.bp.Duration
+import java.time.Duration
 import java.util.*
 
 @JsonClass(generateAdapter = true)
-data class Response(val res: Result)
+data class Response(
+    val res: Result
+)
 
 @JsonClass(generateAdapter = true)
 data class Result(
@@ -99,7 +102,8 @@ data class Stn(
     val number: String?,
     val distance: Int?,
     val duration: Duration?,
-    val has_board: Int?,
+    @Json(name = "has_board")
+    val hasBoard: Int?,
     @Json(name = "Transports")
     val transports: Transports?,
     @Json(name = "Info")
@@ -112,7 +116,7 @@ data class Stn(
 data class Addr(
     val x: Float,
     val y: Float,
-    val name: String,
+    val name: String?,
     val id: String?,
     val country: String?,
     /** 3 letter ISO 3166-1 country code */
@@ -133,10 +137,10 @@ data class Addr(
 
 @JsonClass(generateAdapter = true)
 data class Transport(
-        val name: String?,
-        /** Numerical code of the transport mode. See Transit Modes. */
+    val name: String?,
+    /** Numerical code of the transport mode. See Transit Modes. */
     val mode: TransportMode,
-        /** Direction of the line,
+    /** Direction of the line,
      * usually specified as the destination station. */
     val dir: String?,
     @Json(name = "At")
@@ -152,11 +156,14 @@ data class Transport(
  */
 @JsonClass(generateAdapter = true)
 data class RT(
-    val has_arr: Boolean?,
-    val has_dep: Boolean?,
+    @Json(name = "has_arr")
+    val hasArr: Boolean?,
+    @Json(name = "has_dep")
+    val hasDep: Boolean?,
     val arr: Date?,
     val dep: Date?,
-    val new_stop: Boolean?,
+    @Json(name = "new_stop")
+    val newStop: Boolean?,
     val platform: String?,
     val status: String?
 )
@@ -168,23 +175,23 @@ data class RT(
  */
 @JsonClass(generateAdapter = true)
 data class At(
-        val category: String?,
-        val operator: String?,
-        val bikeAllowed: Boolean?,
-        val barrierFree: Boolean?,
-        val escalator: Boolean?,
-        val elevator: Boolean?,
-        val blindGuide: Boolean?,
-        val color: ColorInt?,
-        val textColor: ColorInt?,
-        val outlineColor: ColorInt?,
-        val phone: String,
-        val email: String,
-        val tweetId: String?,
-        val tweetTime: Date?,
-        val tweetFullName: String?,
-        val tweetUser: String?,
-        val tweetAvatar: String?
+    val category: String?,
+    val operator: String?,
+    val bikeAllowed: Boolean?,
+    val barrierFree: Boolean?,
+    val escalator: Boolean?,
+    val elevator: Boolean?,
+    val blindGuide: Boolean?,
+    val color: ColorInt?,
+    val textColor: ColorInt?,
+    val outlineColor: ColorInt?,
+    val phone: String,
+    val email: String,
+    val tweetId: String?,
+    val tweetTime: Date?,
+    val tweetFullName: String?,
+    val tweetUser: String?,
+    val tweetAvatar: String?
 )
 
 @JsonClass(generateAdapter = true)
@@ -221,14 +228,14 @@ data class AP(
  */
 @JsonClass(generateAdapter = true)
 data class Freq(
-        /* Number of minutes between transport scheduled departures. */
-        val min: Int?,
-        val max: Int?,
-        /* number of minutes between expected transport real-time departures. */
-        val minRT: Int?,
-        val maxRT: Int?,
-        @Json(name = "AltDep")
-        val altDeps: List<AltDep>?
+    /* Number of minutes between transport scheduled departures. */
+    val min: Int?,
+    val max: Int?,
+    /* number of minutes between expected transport real-time departures. */
+    val minRT: Int?,
+    val maxRT: Int?,
+    @Json(name = "AltDep")
+    val altDeps: List<AltDep>?
 )
 
 /**
@@ -248,8 +255,8 @@ data class AltDep(
 
 @JsonClass(generateAdapter = true)
 data class Activities(
-        @Json(name = "Act")
-        val act: List<Act>
+    @Json(name = "Act")
+    val act: List<Act>
 )
 
 @JsonClass(generateAdapter = true)
@@ -260,14 +267,14 @@ data class Transports(
 
 @JsonClass(generateAdapter = true)
 data class Operators(
-        @Json(name = "Op")
-        val operators: List<Op>
+    @Json(name = "Op")
+    val operators: List<Op>
 )
 
 @JsonClass(generateAdapter = true)
 data class Act(
-        val type: ActivityType,
-        val duration: Duration
+    val type: ActivityType,
+    val duration: Duration
 )
 
 @JsonClass(generateAdapter = true)
@@ -299,34 +306,37 @@ data class Alerts(
 
 @JsonClass(generateAdapter = true)
 data class Alert(
-        val origin: AlertOrigin,
-        val severity: AlertSeverity?,
-        val operator: String,
-        val id: String,
-        val valid_till: Date?,
-        val valid_from: Date?,
-        val url: String?,
-        val sec_ids: String?,
-        @Json(name = "Info")
-        val info: String?,
-        @Json(name = "Link")
-        val link: Link?,
-        @Json(name = "Transports")
-        val transports: Transports?,
-        @Json(name = "Branding")
-        val branding: Branding?
+    val origin: AlertOrigin,
+    val severity: AlertSeverity?,
+    val operator: String,
+    val id: String,
+    @Json(name = "valid_till")
+    val validTill: Date?,
+    @Json(name = "valid_from")
+    val validFrom: Date?,
+    val url: String?,
+    @Json(name = "sec_ids")
+    val secIds: String?,
+    @Json(name = "Info")
+    val info: String,
+    @Json(name = "Link")
+    val link: Link?,
+    @Json(name = "Transports")
+    val transports: Transports?,
+    @Json(name = "Branding")
+    val branding: Branding?
 )
 
 @JsonClass(generateAdapter = true)
 data class Branding(
-        @Json(name = "At")
-        val ats: List<At>
+    @Json(name = "At")
+    val ats: List<At>
 )
 
 @JsonClass(generateAdapter = true)
 data class MultiNextDepartures(
     @Json(name = "MultiNextDeparture")
-    val multiNextDepartures: List<MultiNextDeparture>?
+    val multiNextDepartures: List<MultiNextDeparture>
 )
 
 @JsonClass(generateAdapter = true)
@@ -339,23 +349,25 @@ data class MultiNextDeparture(
 
 @JsonClass(generateAdapter = true)
 data class Connections(
-        val context: String,
-        @Json(name = "valid_until")
-        val validUntil: String,
-        @Json(name = "sup_changes")
-        val supChanges: Boolean,
-        @Json(name = "sup_speed")
-        val supSpeed: Boolean,
-        @Json(name = "sup_max_dist")
-        val supMaxDist: Boolean,
-        @Json(name = "sup_prod")
-        val supProd: Boolean,
-        @Json(name = "Connection")
-        val connection: List<Connection>,
-        @Json(name = "Operators")
-        val operators: Operators,
-        @Json(name = "Attributions")
-        val attributions: Attributions
+    val context: String,
+    @Json(name = "allow_direction")
+    val allowDirection: String?,
+    @Json(name = "valid_until")
+    val validUntil: String?,
+    @Json(name = "sup_changes")
+    val supChanges: Boolean?,
+    @Json(name = "sup_speed")
+    val supSpeed: Boolean?,
+    @Json(name = "sup_max_dist")
+    val supMaxDist: Boolean?,
+    @Json(name = "sup_prod")
+    val supProd: Boolean?,
+    @Json(name = "Connection")
+    val connections: List<Connection>,
+    @Json(name = "Operators")
+    val operators: Operators,
+    @Json(name = "Attributions")
+    val attributions: Attributions
 )
 
 @JsonClass(generateAdapter = true)
@@ -366,7 +378,7 @@ data class Connection(
     val ridable: Boolean?,
     @Json(name = "has_alt")
     val hasAlt: Boolean?,
-    val alt: Boolean,
+    val alt: Boolean?,
     @Json(name = "first_last_mile")
     val firstLastMile: Boolean?,
     @Json(name = "Dep")
@@ -377,6 +389,323 @@ data class Connection(
     val sections: Sections,
     @Json(name = "Tariff")
     val tariff: Tariff?
+)
+
+@JsonClass(generateAdapter = true)
+data class Arr(
+    val platform: String?,
+    val time: Date,
+    @Json(name = "RT")
+    val rt: RT?,
+    @Json(name = "Addr")
+    val addr: Addr?,
+    @Json(name = "Stn")
+    val stn: Stn?,
+    @Json(name = "AP")
+    val ap: AP?,
+    @Json(name = "Activities")
+    val activities: Activities?
+)
+
+@JsonClass(generateAdapter = true)
+data class Sections(
+    @Json(name = "Sec")
+    val secs: List<Sec>
+)
+
+@JsonClass(generateAdapter = true)
+data class Sec(
+    val uncertainty: Int?,
+    val id: String?,
+    val mode: Int,
+    val context: String?,
+    @Json(name = "Dep")
+    val dep: Dep,
+    @Json(name = "Journey")
+    val journey: Journey,
+    @Json(name = "Arr")
+    val arr: Arr,
+    @Json(name = "Graph")
+    val graph: String?
+)
+
+@JsonClass(generateAdapter = true)
+data class Journey(
+    val duration: Duration,
+    val intermediate: Int?,
+    val distance: Int?,
+    @Json(name = "Stop")
+    val stops: List<Stop>
+)
+
+@JsonClass(generateAdapter = true)
+data class Stop(
+    val arr: Date?,
+    val dep: Date?,
+    @Json(name = "RT")
+    val rt: RT?,
+    @Json(name = "Stn")
+    val stn: Stn
+)
+
+@JsonClass(generateAdapter = true)
+data class Tariff(
+    @Json(name = "Fares")
+    val fares: List<Fares>
+)
+
+@JsonClass(generateAdapter = true)
+data class Fares(
+    @Json(name = "Fare")
+    val fares: List<Fare>
+)
+
+@JsonClass(generateAdapter = true)
+data class Fare(
+    val name: String,
+    val currency: String,
+    val price: RPrice,   // TODO price implementation
+    @Json(name = "sec_ids")
+    val secIds: String,
+    val estimated: Boolean?,
+    // Reason for the cost described in this Fare element. The default is ride.
+    val reason: String?,
+    @Json(name = "Link")
+    val links: List<Link>
+)
+
+@JsonClass(generateAdapter = true)
+data class Guidance(
+    @Json(name = "Maneuvers")
+    val maneuvers: List<Maneuvers>
+)
+
+@JsonClass(generateAdapter = true)
+data class Maneuvers(
+    @Json(name = "sec_ids")
+    val sedIds: String,
+    @Json(name = "Maneuver")
+    val maneuvers: List<Maneuver>?
+)
+
+@JsonClass(generateAdapter = true)
+data class Maneuver(
+    val direction: String,
+    val action: String,
+    val duration: Duration,
+    @Json(name = "next_road")
+    val nextRoad: String?,
+    @Json(name = "next_number")
+    val nextNumber: String?,
+    val distance: Int?,
+    val traffic: Float?,
+    @Json(name = "Instruction")
+    val instruction: String,
+    @Json(name = "Graph")
+    val graph: String
+)
+
+@JsonClass(generateAdapter = true)
+data class Stations(
+    @Json(name = "Stn")
+    val stns: List<Stn>
+)
+
+@JsonClass(generateAdapter = true)
+data class Coverage(
+    @Json(name = "ref_time")
+    val refTime: Date,
+    @Json(name = "CityCount")
+    val cityCount: CityCount,
+    @Json(name = "Cities")
+    val cities: Cities?,
+    @Json(name = "NearbyCities")
+    val nearbyCities: NearbyCities?
+)
+
+@JsonClass(generateAdapter = true)
+data class CityCount(
+    @Json(name = "TT")
+    val tt: Int,
+    @Json(name = "SR")
+    val sr: Int,
+    @Json(name = "RT")
+    val rt: Int
+)
+
+@JsonClass(generateAdapter = true)
+data class Cities(
+    @Json(name = "City")
+    val cities: List<City>
+)
+
+@JsonClass(generateAdapter = true)
+data class City(
+    val name: String,
+    val x: Float,
+    val y: Float,
+    val country: String,
+    val created: Date,
+    val updated: Date,
+    @Json(name = "display_name")
+    val displayName: String?,
+    val state: String?,
+    val relevancy: Float?,
+    val distance: Int?,
+    @Json(name = "Cvg")
+    val cvg: Cvg,
+    @Json(name = "Operators")
+    val operators: Operators?,
+    @Json(name = "Providers")
+    val providers: Providers?,
+    @Json(name = "MissingCoverage")
+    val missingCoverage: MissingCoverage?,
+    // Pop specifies the population of a city.
+    @Json(name = "Pop")
+    val pop: Int?
+)
+
+@JsonClass(generateAdapter = true)
+data class Cvg(
+    val quality: Float,
+    val lines: Int?,
+    val stops: Int?
+)
+
+@JsonClass(generateAdapter = true)
+data class Providers(
+    // Specifies all available information about the data provider.
+    @Json(name = "Pr")
+    val prs: List<Pr>
+)
+
+@JsonClass(generateAdapter = true)
+data class Pr(
+    // Name of the provider.
+    val name: String
+)
+
+@JsonClass(generateAdapter = true)
+data class MissingCoverage(
+    val type: String?,
+    // Contains information about a particular operator.
+    @Json(name = "Op")
+    val ops: List<Op>,
+    // Transports taken from the nearest 5 stops, sorted by mode.
+    @Json(name = "Transport")
+    val transports: List<Transport>
+)
+
+@JsonClass(generateAdapter = true)
+data class NearbyCities(
+    @Json(name = "City")
+    val cities: List<City>
+)
+
+@JsonClass(generateAdapter = true)
+data class LocalCoverage(
+    val georef: String,
+    @Json(name = "NearbyCoverage")
+    val nearbyCoverage: NearbyCoverage,
+    @Json(name = "ExploredCoverage")
+    val exploredCoverage: ExploredCoverage?,
+    @Json(name = "City")
+    val city: City?
+)
+
+@JsonClass(generateAdapter = true)
+data class NearbyCoverage(
+    val radius: Int,
+    val stops: Int,
+    val lines: Int,
+    val type: String?,
+    val covered: Boolean
+)
+
+@JsonClass(generateAdapter = true)
+data class ExploredCoverage(
+    val radius: Int,
+    val stops: Int,
+    val lines: Int,
+    @Json(name = "Stn")
+    val stn: Stn?,
+    @Json(name = "Transports")
+    val transports: Transports?
+)
+
+@JsonClass(generateAdapter = true)
+data class Logos(
+    @Json(name = "Link")
+    val links: List<Link>
+)
+
+@JsonClass(generateAdapter = true)
+data class Isochrone(
+    val x: Float,
+    val y: Float,
+    @Json(name = "max_dur")
+    val maxDur: Duration,
+    @Json(name = "max_change")
+    val maxChange: Int,
+    val time: Date,
+    val timespan: Int,
+    @Json(name = "IsoDest")
+    val isoDests: List<IsoDest>?
+)
+
+@JsonClass(generateAdapter = true)
+data class IsoDest(
+    val duration: Duration,
+    @Json(name = "Stn")
+    val stns: List<Stn>?
+)
+
+@JsonClass(generateAdapter = true)
+data class LineInfos(
+    @Json(name = "LineInfo")
+    val lineInfos: List<LineInfo>
+)
+
+@JsonClass(generateAdapter = true)
+data class LineInfo(
+    @Json(name = "Transport")
+    val transport: Transport,
+    @Json(name = "LineSegments")
+    val lineSegments: List<LineSegments>
+)
+
+@JsonClass(generateAdapter = true)
+data class LineSegments(
+    val type: String,
+    @Json(name = "seg_ids")
+    val segIds: String
+)
+
+@JsonClass(generateAdapter = true)
+data class PathSegments(
+    @Json(name = "PathSeg")
+    val pathSegs: List<PathSeg>,
+    @Json(name = "RefPathSeg")
+    val refPathSegs: List<RefPathSeg>?
+)
+
+@JsonClass(generateAdapter = true)
+data class PathSeg(
+    val id: String,
+    val from: String,
+    val to: String,
+    val duration: Duration?,
+    @Json(name = "Graph")
+    val graph: String?
+)
+
+@JsonClass(generateAdapter = true)
+data class RefPathSeg(
+    val id: String,
+    @Json(name = "seg_id")
+    val segId: String,
+    val reverse: Boolean?,
+    val duration: Duration?
 )
 
 enum class Level {
