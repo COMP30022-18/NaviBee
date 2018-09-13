@@ -305,6 +305,7 @@ public class FriendActivity extends AppCompatActivity {
 
 
 
+        loadChatsList();
         loadContactList();
 
         IntentFilter intFilt = new IntentFilter(ConversationManager.BROADCAST_FRIEND_UPDATED);
@@ -358,9 +359,11 @@ public class FriendActivity extends AppCompatActivity {
 
         for (String friendUid: friendList) {
             if (cm.getPrivateConversation(friendUid).getMessageCount()>0) {
-                contactList.add(new ContactItem(cm.getPrivateConvId(friendUid), true, friendUid));
+                chatsList.add(new ContactItem(cm.getPrivateConvId(friendUid), true, friendUid));
             }
         }
+        cm.updateConvInfoForContactList(chatsList);
+        chatsListAdapter.notifyDataSetChanged();
         ///////
         //////
         /////
