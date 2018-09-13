@@ -96,7 +96,9 @@ dependencies {
     implementation 'com.synnapps:carouselview:0.1.5'
     implementation 'io.agora.rtc:voice-sdk:2.3.0'
     implementation 'com.squareup.moshi:moshi:1.6.0'
+    implementation 'com.squareup.moshi:moshi-adapters:1.6.0'
     implementation 'com.squareup.moshi:moshi-kotlin:1.6.0'
+    implementation 'com.jakewharton.threetenabp:threetenabp:1.1.0'
     implementation 'com.github.chrisbanes:PhotoView:2.0.0'
     kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.6.0'
     implementation(name: 'HERE-sdk', ext: 'aar')
