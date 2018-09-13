@@ -162,17 +162,8 @@ public class ConversationManager {
         return uidToConvId.get(userId);
     }
 
-    public String getUidOfPrivateConv(String convId) {
-        for (Map.Entry<String, String> entry: uidToConvId.entrySet()) {
-            if (entry.getValue().equals(convId)) {
-                return entry.getKey();
-            }
-        }
-        return "";
-    }
-
-    public Conversation getPrivateConversation(String userId) {
-        return getConversation(getPrivateConvId(userId));
+    public PrivateConversation getPrivateConversation(String userId) {
+        return (PrivateConversation) getConversation(getPrivateConvId(userId));
     }
 
     public ArrayList<String> getFriendList() {

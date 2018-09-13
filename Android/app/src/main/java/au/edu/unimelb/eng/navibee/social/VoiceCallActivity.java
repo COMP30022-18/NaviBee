@@ -35,11 +35,9 @@ public class VoiceCallActivity extends AppCompatActivity {
 
     private static boolean working = false;
 
-    private RtcEngine mRtcEngine = null;
-
-    private String channelID = "testChannel";
+    private String channelID;
     private boolean isInitiator;
-    private Conversation conv;
+    private PrivateConversation conv;
     private Conversation.Message msg;
 
     private Timer timeoutTimer = new Timer();
@@ -127,7 +125,8 @@ public class VoiceCallActivity extends AppCompatActivity {
         working = true;
 
         isInitiator = getIntent().getBooleanExtra("INITIATOR", false);
-        conv = ConversationManager.getInstance().getConversation(getIntent().getStringExtra("CONV_ID"));
+        conv = (PrivateConversation) ConversationManager.getInstance()
+                        .getConversation(getIntent().getStringExtra("CONV_ID"));
         msg = conv.getMessageById(getIntent().getStringExtra("MSG_ID"));
         channelID = msg.getData();
 
@@ -175,7 +174,7 @@ public class VoiceCallActivity extends AppCompatActivity {
         }.start();
 
 
-        String targetUid = ConversationManager.getInstance().getUidOfPrivateConv(conv.getConvId());
+        String targetUid = conv.getTargetUid();
         UserInfoManager.getInstance().getUserInfo(targetUid, userInfo -> {
             friendName.setText(userInfo.getName());
             NetworkImageHelper.loadImage(friendIcon, userInfo.getHighResolutionPhotoUrl());
