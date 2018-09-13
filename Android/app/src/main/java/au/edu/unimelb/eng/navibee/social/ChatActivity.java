@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +22,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.gson.Gson;
 import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
@@ -40,6 +45,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private RecyclerView chatRecyclerView;
     private RecyclerView.Adapter chatAdapter;
     private RecyclerView.LayoutManager chatLayoutManager;
+
+    int PLACE_PICKER_REQUEST = 2;
 
 
     private int currentMsgCount = 0;
@@ -87,19 +94,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onPickResult(PickResult r) {
         if (r.getError() == null) {
-            //If you want the Uri.
-            //Mandatory to refresh image from Uri.
-            //getImageView().setImageURI(null);
-
-            //Setting the real returned image.
-            //getImageView().setImageURI(r.getUri());
-
-            //If you want the Bitmap.
-
             conversation.sendPicture(r.getUri());
-
-            //Image path
-            //r.getPath();
         } else {
             //Handle possible errors
             Toast.makeText(this, r.getError().getMessage(), Toast.LENGTH_LONG).show();
@@ -119,7 +114,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.btn_send_extra:
-                String[] items = {"Picture", "Voice Call"};
+                String[] items = {"Picture", "Voice Call", "Location"};
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Send");
@@ -131,6 +126,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         } else if (which==1) {
                             String voiceCallChannelId = UUID.randomUUID().toString();
                             conversation.sendMessage("voicecall", voiceCallChannelId);
+                        } else if (which==2) {
+                            try {
+                                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                                startActivityForResult(builder.build(ChatActivity.this), PLACE_PICKER_REQUEST);
+                            } catch (Exception e) {
+                                Log.d("Chat", "send location error:" + e);
+                            }
+
                         }
                     }
                 });
@@ -140,6 +143,22 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PLACE_PICKER_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                PlacePicker.getLatLngBounds(data);
+                Place place = PlacePicker.getPlace(this, data);
+                double[] coord = new double[2];
+                coord[0] = place.getLatLng().latitude;
+                coord[1] = place.getLatLng().longitude;
+                Gson gson = new Gson();
+                conversation.sendMessage("location", gson.toJson(coord));
+            }
+        }
+    }
+
 
     public void scrollToBottom() {
             chatRecyclerView.scrollToPosition(chatAdapter.getItemCount() - 1);
@@ -215,6 +234,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             } else if (mDataset.get(position).getType().equals("voicecall")) {
                 ((TextView) holder.itemView.findViewById(R.id.message_text)).setText("[Voice Call]");
                 ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
+            } else if (mDataset.get(position).getType().equals("location")) {
+                ((TextView) holder.itemView.findViewById(R.id.message_text)).setText("[Location]");
+                ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
             }
         }
 
@@ -232,6 +254,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 Intent intent = new Intent(chatActivity.getBaseContext(), ChatImageViewActivity.class);
                 intent.putExtra("IMG_FS_PATH", msg.getData());
                 chatActivity.startActivity(intent);
+            } else if (msg.getType().equals("location")) {
+                Gson gson = new Gson();
+                double[] coord = gson.fromJson(msg.getData(), double[].class);
             }
         }
 

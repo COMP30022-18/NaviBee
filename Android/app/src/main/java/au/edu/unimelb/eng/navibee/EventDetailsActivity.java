@@ -1,6 +1,5 @@
 package au.edu.unimelb.eng.navibee;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,26 +11,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipDrawable;
-import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.functions.FirebaseFunctions;
-import com.google.firebase.functions.HttpsCallableResult;
 import com.synnapps.carouselview.CarouselView;
 import com.synnapps.carouselview.ImageListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
@@ -41,6 +34,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import au.edu.unimelb.eng.navibee.social.UserInfoManager;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVIndefiniteProgressBar;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVTextPrimarySecondaryStatic;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVTextSecondaryPrimaryStatic;
@@ -154,7 +148,6 @@ public class EventDetailsActivity extends AppCompatActivity {
 //                imageView.setImageResource(R.drawable.navibee_placeholder);
                 imageView.setImageDrawable(getResources().getDrawable(R.drawable.navibee_placeholder));
 
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     imageView.setImageDrawable(getResources().getDrawable(R.drawable.navibee_placeholder, null));
                 } else {
@@ -219,94 +212,76 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     private void getEventInfo() {
         ArrayList<String> uidList = new ArrayList<>();
-
-        uidList.add(eventItem.getHolder());
         uidList.addAll(eventItem.getUsers().keySet());
 
-        Map<String, Object> data = new HashMap<>();
-        data.put("uidList", uidList);
+        // get the user information
+        UserInfoManager.getInstance().getUserInfo(uidList, stringUserInfoMap -> {
+            updateEventInfo();
 
-        FirebaseFunctions mFunctions = FirebaseFunctions.getInstance();
+            String holder = stringUserInfoMap.get(eventItem.getHolder()).getName();
+            ArrayList<String> participants = new ArrayList<>();
+//            ArrayList<String> photos = new ArrayList<>();
 
-        Context activityContext = this;
+            for (int i = 0; i < uidList.size(); i++) {
+                participants.add(stringUserInfoMap.get(uidList.get(i)).getName());
+            }
 
-        mFunctions
-                .getHttpsCallable("getUserInfoFromUidList")
-                .call(data)
-                .addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
-                    @Override
-                    public void onSuccess(HttpsCallableResult httpsCallableResult) {
-                        result = (Map<String, HashMap<String, String>>) httpsCallableResult.getData();
+            // Event organiser
+            if (eventItem.getHolder() != null) {
+                listItems.add(new SimpleRVTextSecondaryPrimaryStatic(
+                        holder,
+                        getResources().getString(R.string.event_details_organiser)
+                ));
+            }
 
-                        listItems.clear();
+            ArrayList<Chip> chipList = new ArrayList<>();
 
-                        // Event name && time
-                        if (eventItem.getName() != null && eventItem.getTime_() != null) {
-                            // Set support action bar title
-                            if (getSupportActionBar() != null) {
-                                getSupportActionBar().setTitle(eventItem.getName());
-                            }
+            for (String participant : participants) {
+                Chip chip = (Chip) getLayoutInflater().inflate(R.layout.chip_user_profile, null);
+                chip.setText(participant);
+                // TODO use profile picture instead
+                chip.setChipIconResource(R.drawable.ic_people_black_24dp);
 
-                            listItems.add(new SimpleRVTextPrimarySecondaryStatic(
-                                    eventItem.getName(),
-                                    new SimpleDateFormat(getResources().getString(R.string.date_format)).format(eventItem.getTime_())
-                            ));
-                        }
+                chipList.add(chip);
+            }
 
-                        // Event location
-                        if (eventItem.getLocation() != null) {
-                            listItems.add(new SimpleRVTextSecondaryPrimaryStatic(
-                                    eventItem.getLocation(),
-                                    getResources().getString(R.string.event_details_location)
-                            ));
-                        }
+            // Event participants
+            if (eventItem.getUsers() != null) {
+                listItems.add(new SimpleRVUserChips(
+                        getResources().getString(R.string.event_details_participants),
+                        chipList
+                ));
+            }
 
-                        String holder = null;
-                        ArrayList<String> participants = new ArrayList<>();
-                        ArrayList<String> photos = new ArrayList<>();
+            viewAdapter.notifyDataSetChanged();
 
-                        for (String uid : result.keySet()) {
-                            HashMap<String, String> users = result.get(uid);
-                            if (uid.equals(eventItem.getHolder())) {
-                                holder = users.get("name");
-                            }
-                            participants.add(users.get("name"));
-                            photos.add(users.get("photoURL"));
-                        }
-
-                        // Event organiser
-                        if (eventItem.getHolder() != null) {
-                            listItems.add(new SimpleRVTextSecondaryPrimaryStatic(
-                                    holder,
-                                    getResources().getString(R.string.event_details_organiser)
-                            ));
-                        }
-
-                        ArrayList<Chip> chipList = new ArrayList<>();
-
-                        for (String participant : participants) {
-                            Chip chip = (Chip) getLayoutInflater().inflate(R.layout.chip_user_profile, null);
-                            chip.setText(participant);
-                            // TODO use profile picture instead
-                            chip.setChipIconResource(R.drawable.ic_people_black_24dp);
-
-                            chipList.add(chip);
-                        }
-
-                        // Event participants
-                        if (eventItem.getUsers() != null) {
-                            listItems.add(new SimpleRVUserChips(
-                                    getResources().getString(R.string.event_details_participants),
-                                    chipList
-                            ));
-                        }
-
-                        viewAdapter.notifyDataSetChanged();
-                    }
-                });
+        });
     }
 
+    private void updateEventInfo() {
+        listItems.clear();
 
+        // Event name && time
+        if (eventItem.getName() != null && eventItem.getTime_() != null) {
+            // Set support action bar title
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(eventItem.getName());
+            }
+
+            listItems.add(new SimpleRVTextPrimarySecondaryStatic(
+                    eventItem.getName(),
+                    new SimpleDateFormat(getResources().getString(R.string.date_format)).format(eventItem.getTime_())
+            ));
+        }
+
+        // Event location
+        if (eventItem.getLocation() != null) {
+            listItems.add(new SimpleRVTextSecondaryPrimaryStatic(
+                    eventItem.getLocation(),
+                    getResources().getString(R.string.event_details_location)
+            ));
+        }
+    }
 
     private void updateTitleRowHeight(ArrayList<SimpleRecyclerViewItem> listItems) {
         if (viewManager.getItemCount() > 0 && (listItems.get(0) instanceof SimpleRVTextPrimarySecondaryStatic)) {

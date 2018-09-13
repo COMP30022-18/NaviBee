@@ -196,6 +196,9 @@ public class ConversationManager {
                     case "voicecall":
                         lastMsgText = "[Voice Call]";
                         break;
+                    case "location":
+                        lastMsgText = "[Location]";
+                        break;
                 }
 
                 lastMsgText = lastMsgText.substring(0, Math.min(lastMsgText.length(), 50));
