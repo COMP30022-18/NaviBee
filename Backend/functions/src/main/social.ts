@@ -106,3 +106,29 @@ export const addFriend = functions.https.onCall(
 
         return {code: 0};
     });
+
+export const createGroupChat = functions.https.onCall(
+    async (data, context) => {
+        const uid = context.auth.uid;
+
+        if (uid==null) {
+            return {code:-1, msg:"need login"};
+        }
+
+        let conv = {};
+        conv['type'] = 'group';
+        conv['creator'] = uid;
+        conv['name'] = data.name;
+        conv['icon'] = data.icon
+        // add all users
+        conv['users'] = {};
+        conv['readTimestamps'] = {};
+        conv['users'][uid] = true;
+        conv['readTimestamps'][uid] = new Date();
+        for (let entry of data.users) {
+            conv['users'][entry] = true;
+            conv['readTimestamps'][entry] = new Date();
+        }
+        db.collection('conversations').add(conv);
+        return {code: 0};
+    });

@@ -174,4 +174,14 @@ public class ConversationManager {
 
         return mFunctions.getHttpsCallable("addFriend").call(data);
     }
+
+    public Task<HttpsCallableResult> createGroupChat(ArrayList<String> uses, String name, String icon) {
+        FirebaseFunctions mFunctions = FirebaseFunctions.getInstance();
+        Map<String, Object> data = new HashMap<>();
+        data.put("users", uses);
+        data.put("name", name);
+        data.put("icon", icon);
+
+        return mFunctions.getHttpsCallable("createGroupChat").call(data);
+    }
 }
