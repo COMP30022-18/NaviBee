@@ -3,6 +3,7 @@ package au.edu.unimelb.eng.navibee.utils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import au.edu.unimelb.eng.navibee.R
 import kotlinx.android.synthetic.main.recycler_view_attributions.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_ratings.view.*
@@ -43,7 +44,7 @@ class SimpleRecyclerViewAdaptor(private val data: List<SimpleRecyclerViewItem>) 
 
     override fun getItemCount() = data.size
 
-    override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val data = data[position]
         when (data) {
             is SimpleRVTextPrimarySecondaryClickable -> {
@@ -115,4 +116,4 @@ data class SimpleRVRatings(
         val maxRating: Int
 ): SimpleRecyclerViewItem()
 class SimpleRVViewHolder(view: View) :
-        androidx.recyclerview.widget.RecyclerView.ViewHolder(view)
+        RecyclerView.ViewHolder(view)

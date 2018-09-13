@@ -28,6 +28,17 @@
             android:name="org.apache.http.legacy"
             android:required="false" />
 
+        <!-- Services -->
+
+        <service
+            android:name="com.here.android.mpa.service.MapService"
+            android:label="NaviBeeHereMapService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="au.edu.unimelb.eng.navibee.hereService" />
+            </intent-filter>
+        </service>
+
         <!-- Metadata -->
 
         <meta-data
@@ -36,6 +47,15 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.here.android.maps.appid"
+            android:value="@string/HERE_APP_ID" />
+        <meta-data
+            android:name="com.here.android.maps.apptoken"
+            android:value="@string/HERE_APP_CODE" />
+        <meta-data
+            android:name="com.here.android.maps.license.key"
+            android:value="@string/HERE_LICENSE_KEY" />
 
         <!-- Providers -->
 
@@ -64,8 +84,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar"/>
+        <activity
+            android:name=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
         <activity
             android:name=".EventActivity"
             android:parentActivityName=".MainActivity" />
@@ -79,7 +100,7 @@
         <activity android:name=".EventSelectFriendsActivity" />
         <activity
             android:name=".SosActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".social.FriendActivity"
             android:label="@string/title_activity_friend" />
@@ -135,14 +156,13 @@
         <activity
             android:name=".SosSettingActivity"
             android:label="@string/sos_setting" />
-
         <activity
             android:name=".EventDetailsActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
         <activity android:name=".social.VoiceCallActivity" />
         <activity
             android:name=".social.ChatImageViewActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".social.VoiceCallActivity" />
         <activity
             android:name=".SettingsActivity"
@@ -152,6 +172,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+        <activity android:name=".navigation.TransitNavigationActivity"></activity>
     </application>
 
 </manifest>

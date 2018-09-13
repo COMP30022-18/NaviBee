@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".navigation.TransitNavigationActivity"
+    android:orientation="vertical">
+
+    <!--<androidx.recyclerview.widget.RecyclerView-->
+        <!--android:id="@+id/navigation.transit_navigation.recycler_view"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="0dp"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toTopOf="parent">-->
+    <!--</androidx.recyclerview.widget.RecyclerView>-->
+
+    <LinearLayout
+        android:id="@+id/navigation.transit_navigation.rv.origin"
+        style="@style/AppTheme.List.TransitRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+            style="@style/AppTheme.List.TransitIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tint="@color/iconTintOnLightBackground"
+            android:alpha="0.8"
+            app:srcCompat="@drawable/ic_location_on_black_24dp"
+            tools:srcCompat="@drawable/ic_location_on_black_24dp" />
+        <TextView
+            style="@style/AppTheme.List.TransitPrimaryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Starting location"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/navigation.transit_navigation.rv.walking"
+        style="@style/AppTheme.List.TransitRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="16dp"
+                android:tint="#20000000"
+                app:srcCompat="@drawable/transit_navigation_walking_dots"
+                />
+            <View
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <ImageView
+                style="@style/AppTheme.List.TransitIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_directions_walk_black80_24dp"
+                />
+            <TextView
+                style="@style/AppTheme.List.TransitSecondaryText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Walking (10 min)"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="16dp"
+                android:tint="#20000000"
+                app:srcCompat="@drawable/transit_navigation_walking_dots"
+                />
+            <View
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/navigation.transit_navigation.rv.trip_segment_origin"
+        style="@style/AppTheme.List.TransitRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/navigation.transit_navigation.rv.trip_segment_origin.round_bg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:backgroundTint="@color/white"
+            app:elevation="2dp"
+            app:fabCustomSize="24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/textView"
+            app:maxImageSize="16dp"
+            app:srcCompat="@drawable/ic_directions_transit_black80_24dp" />
+
+        <ImageView
+            android:id="@+id/navigation.transit_navigation.rv.trip_segment_origin.icon"
+            android:layout_width="@dimen/transit_navigation_route_bar_width"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/transit_navigation_route_bar_top"
+            android:tint="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/navigation.transit_navigation.rv.trip_segment_origin.round_bg"
+            app:layout_constraintStart_toStartOf="@+id/navigation.transit_navigation.rv.trip_segment_origin.round_bg"
+            app:layout_constraintTop_toTopOf="@+id/navigation.transit_navigation.rv.trip_segment_origin.round_bg" />
+
+        <TextView
+            android:id="@+id/textView"
+            style="@style/AppTheme.List.TransitPrimaryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Bus stop 0" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/textView"
+            app:layout_constraintTop_toBottomOf="@+id/textView"
+            tools:text="Route 1" />
+
+        <TextView
+            style="@style/AppTheme.List.TransitSecondaryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/chip"
+            app:layout_constraintStart_toEndOf="@+id/chip"
+            app:layout_constraintTop_toTopOf="@+id/chip"
+            tools:text="Stop -1 to Stop 255" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/navigation.transit_navigation.rv.trip_segment_extend_toggle"
+        style="@style/AppTheme.List.TransitRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:layout_width="@dimen/transit_navigation_route_bar_width"
+            android:layout_height="match_parent"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
+            android:src="@drawable/transit_navigation_route_bar_middle"
+            android:tint="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/textView"
+            app:layout_constraintTop_toBottomOf="@+id/textView"
+            app:srcCompat="@drawable/ic_expand_more_black_24dp" />
+
+        <TextView
+            style="@style/AppTheme.List.TransitSecondaryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Ride 10 stops (5 mins)" />
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/navigation.transit_navigation.rv.trip_segment_intermediate_stop"
+        style="@style/AppTheme.List.TransitRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/navigation.transit_navigation.rv.trip_segment_intermediate_stop.line"
+            android:layout_width="@dimen/transit_navigation_route_bar_width"
+            android:layout_height="43dp"
+            android:layout_marginStart="2dp"
+            android:src="@drawable/transit_navigation_route_bar_middle"
+            android:tint="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/navigation.transit_navigation.rv.trip_segment_intermediate_stop.dot"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:alpha="0.6"
+            android:src="@drawable/shape_circle"
+            android:tint="@color/white"
+            app:layout_constraintEnd_toEndOf="@+id/navigation.transit_navigation.rv.trip_segment_intermediate_stop.line"
+            app:layout_constraintStart_toStartOf="@+id/navigation.transit_navigation.rv.trip_segment_intermediate_stop.line"
+            app:layout_constraintTop_toTopOf="@+id/navigation.transit_navigation.rv.trip_segment_intermediate_stop.name"
+            app:layout_constraintBottom_toBottomOf="@+id/navigation.transit_navigation.rv.trip_segment_intermediate_stop.name"/>
+
+        <TextView
+            android:id="@+id/navigation.transit_navigation.rv.trip_segment_intermediate_stop.name"
+            style="@style/AppTheme.List.TransitSecondaryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Bus stop 1" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/navigation.transit_navigation.rv.trip_segment_destination"
+        style="@style/AppTheme.List.TransitRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/navigation.transit_navigation.rv.trip_segment_destination.line"
+            android:layout_width="@dimen/transit_navigation_route_bar_width"
+            android:layout_height="0dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/transit_navigation_route_bar_bottom"
+            android:tint="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/navigation.transit_navigation.rv.trip_segment_destination.dot"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginBottom="2dp"
+            android:src="@drawable/shape_circle"
+            android:tint="@color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/navigation.transit_navigation.rv.trip_segment_destination.line"
+            app:layout_constraintEnd_toEndOf="@+id/navigation.transit_navigation.rv.trip_segment_destination.line"
+            app:layout_constraintStart_toStartOf="@+id/navigation.transit_navigation.rv.trip_segment_destination.line" />
+
+        <TextView
+            android:id="@+id/navigation.transit_navigation.rv.trip_segment_destination.name"
+            style="@style/AppTheme.List.TransitPrimaryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Bus stop 5" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/navigation.transit_navigation.rv.divider"
+        style="@style/AppTheme.List.TransitRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+        <View
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/navigation.transit_navigation.rv.destination"
+        style="@style/AppTheme.List.TransitRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+            style="@style/AppTheme.List.TransitIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.8"
+            android:tint="?attr/colorAccent"
+            app:srcCompat="@drawable/ic_check_circle_black_24dp" />
+
+        <TextView
+            style="@style/AppTheme.List.TransitPrimaryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Destination" />
+    </LinearLayout>
+</LinearLayout>

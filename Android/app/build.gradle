@@ -42,6 +42,9 @@ android {
         it.buildConfigField 'String', 'GOOGLE_PLACES_API_KEY', CONFIG("googlePlacesApiKey")
         it.resValue 'string', 'GOOGLE_MAP_API_KEY', googlePlacesApiKey
         it.resValue 'string', 'agora_app_id', agoraAppId
+        it.resValue 'string', 'HERE_APP_ID', hereAppId
+        it.resValue 'string', 'HERE_APP_CODE', hereAppCode
+        it.resValue 'string', 'HERE_LICENSE_KEY', hereLicenseKey
     }
 }
 
