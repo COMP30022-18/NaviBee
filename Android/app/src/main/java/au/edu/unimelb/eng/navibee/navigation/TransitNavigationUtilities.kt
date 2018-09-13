@@ -1,10 +1,7 @@
 package au.edu.unimelb.eng.navibee.navigation
 
-import android.graphics.Color
-import com.squareup.moshi.*
-import org.threeten.bp.Duration
-import java.util.*
 
+val i = """
 @JsonClass(generateAdapter = true)
 data class Response(val res: Result)
 
@@ -467,7 +464,7 @@ class TransportModeAdapter: JsonAdapter<TransportMode>(){
 
 data class ColorInt(val color: Int) {
     override fun toString(): String =
-        "#${Integer.toHexString(color)}"
+        "#" + Integer.toHexString(color)
 }
 
 class ColorAdapter: JsonAdapter<ColorInt>(){
@@ -515,3 +512,4 @@ enum class TransportMode (val value: Int) {
         }
     }
 }
+"""

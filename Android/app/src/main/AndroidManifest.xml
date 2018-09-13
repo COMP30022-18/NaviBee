@@ -32,8 +32,8 @@
 
         <service
             android:name="com.here.android.mpa.service.MapService"
-            android:label="NaviBeeHereMapService"
-            android:exported="false">
+            android:exported="false"
+            android:label="NaviBeeHereMapService">
             <intent-filter>
                 <action android:name="au.edu.unimelb.eng.navibee.hereService" />
             </intent-filter>
@@ -144,6 +144,11 @@
         <activity
             android:name=".navigation.NavigationActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".navigation.TransitNavigationActivity" />
+        <activity android:name=".navigation.NavigationSelectorActivity"
+            android:theme="@style/AppTheme.Translucent" />
+
+
         <activity
             android:name=".social.ChatActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -163,7 +168,6 @@
         <activity
             android:name=".social.ChatImageViewActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".social.VoiceCallActivity" />
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -172,7 +176,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".navigation.TransitNavigationActivity"></activity>
     </application>
 
 </manifest>

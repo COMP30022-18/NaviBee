@@ -186,6 +186,8 @@
     <string name="navigation_destinations_header_recommended_places">Recommended places</string>
 
     <string name="landing_welcome_line">Hi, %s!\nHow can I help you today?</string>
+    <string name="navigation_your_location">Your location</string>
+    <string name="navigation_default_destination">Destination</string>
 
     <!-- Strings related to Settings -->
     <string name="pref_section_title_navigation">Navigation</string>
