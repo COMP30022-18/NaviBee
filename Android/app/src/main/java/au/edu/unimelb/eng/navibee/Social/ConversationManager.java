@@ -53,6 +53,11 @@ public class ConversationManager {
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         db = FirebaseFirestore.getInstance();
 
+        listenPrivateConv();
+        listenGroupConv();
+    }
+
+    private void listenPrivateConv() {
         // private conversation (friend list)
         db.collection("conversations")
                 .whereEqualTo("users."+uid, true)
@@ -72,7 +77,7 @@ public class ConversationManager {
                                 Timestamp timestamp =  ((Map<String, Timestamp>) dc.getDocument().get("readTimestamps")).get(uid);
 
                                 // load new conversation
-                                Conversation conv = new Conversation(convId, uid, timestamp.toDate(), true);
+                                Conversation conv = new PrivateConversation(convId, timestamp.toDate(), friendUid);
 
                                 uidToConvId.put(friendUid, convId);
                                 convIdMap.put(convId, conv);
@@ -101,6 +106,45 @@ public class ConversationManager {
                 });
     }
 
+    private void listenGroupConv() {
+        // private conversation (friend list)
+        db.collection("conversations")
+                .whereEqualTo("users."+uid, true)
+                .whereEqualTo("type", "group")
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        Log.w(TAG, "listen:error", e);
+                        return;
+                    }
+
+                    for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                        String convId = dc.getDocument().getId();
+                        switch (dc.getType()) {
+                            case ADDED:
+                                // read message timestamp
+                                Timestamp timestamp =  ((Map<String, Timestamp>) dc.getDocument().get("readTimestamps")).get(uid);
+
+                                // load new conversation
+                                Conversation conv = new GroupConversation(convId, timestamp.toDate(),
+                                        (String) dc.getDocument().get("name"), (String) dc.getDocument().get("icon"));
+
+                                convIdMap.put(convId, conv);
+                                break;
+
+                            case MODIFIED:
+                                break;
+
+                            case REMOVED:
+                                convIdMap.remove(dc.getDocument().getId());
+                                break;
+                        }
+                    }
+
+//                    Intent intent = new Intent(BROADCAST_FRIEND_UPDATED);
+//                    NaviBeeApplication.getInstance().sendBroadcast(intent);
+                });
+    }
+
     private static String getOtherUserId(Object map, String myUid) {
         for (String key: ((Map<String, Boolean>) map).keySet()) {
             if(!key.equals(myUid)) {
@@ -126,15 +170,15 @@ public class ConversationManager {
         return new ArrayList<>(friendList);
     }
 
-    public ArrayList<Conversation> getAllInprivateConversation(){
-        ArrayList<Conversation> inprivateConversation = new ArrayList<>();
-        for (Conversation conv:convIdMap.values()){
-            if (!conv.isPrivate()){
-                inprivateConversation.add(conv);
-            }
-        }
-        return inprivateConversation;
-    }
+//    public ArrayList<Conversation> getAllInprivateConversation(){
+//        ArrayList<Conversation> inprivateConversation = new ArrayList<>();
+//        for (Conversation conv:convIdMap.values()){
+//            if (!conv.isPrivate()){
+//                inprivateConversation.add(conv);
+//            }
+//        }
+//        return inprivateConversation;
+//    }
 
     public void updateConvInfoForContactList(ArrayList<FriendActivity.ContactItem> list) {
         for (FriendActivity.ContactItem cp: list) {
