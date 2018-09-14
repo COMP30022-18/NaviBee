@@ -47,15 +47,6 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-        <meta-data
-            android:name="com.here.android.maps.appid"
-            android:value="@string/HERE_APP_ID" />
-        <meta-data
-            android:name="com.here.android.maps.apptoken"
-            android:value="@string/HERE_APP_CODE" />
-        <meta-data
-            android:name="com.here.android.maps.license.key"
-            android:value="@string/HERE_LICENSE_KEY" />
 
         <!-- Providers -->
 

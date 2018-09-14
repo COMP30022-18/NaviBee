@@ -12,13 +12,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
-import com.here.android.mpa.common.*
-import com.here.android.mpa.mapping.MapRoute
-import com.here.android.mpa.routing.*
+import com.here.android.mpa.common.MapEngine
+import com.here.android.mpa.routing.CoreRouter
+import com.here.android.mpa.routing.Route
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.scrollView
 import org.jetbrains.anko.textView
-import timber.log.Timber
-import java.io.File
 
 
 class TransitNavigationActivity : AppCompatActivity() {
@@ -61,133 +60,35 @@ class TransitNavigationActivity : AppCompatActivity() {
     }
 }
 
-class TransitNavigationViewModel(private val context: Application):
+private class TransitNavigationViewModel(private val context: Application):
         AndroidViewModel(context) {
 
     private val mapEngine = MapEngine.getInstance()
     private lateinit var router: CoreRouter
 
     val debugText = MutableLiveData<String>()
-    val routeInfo = MutableLiveData<Route>()
-
-    init {
-        val appContext = ApplicationContext(context)
-        if (!MapEngine.isInitialized()) {
-            MapSettings.setIsolatedDiskCacheRootPath(
-                context.cacheDir.absolutePath + File.separator + ".here-maps",
-                "au.edu.unimelb.eng.navibee.hereService"
-            )
-            mapEngine.init(appContext) { error ->
-                if (error != OnEngineInitListener.Error.NONE)
-                    Timber.e(error.throwable, "Error while init here map engine: $error, ${error.details}")
-                else {
-                    router = CoreRouter()
-                    getRoute()
-                }
-            }
-        }
-
-    }
+    val routeInfo = MutableLiveData<Response?>()
+    val viewData = MutableLiveData<List<TransitRouteRVData>>()
 
     fun getRoute() {
-        if (MapEngine.isInitialized()) {
-            router.calculateRoute(
-                    RoutePlan().apply {
-                        routeOptions = RouteOptions().apply {
-                            transportMode = RouteOptions.TransportMode.PUBLIC_TRANSPORT
-                            routeType = RouteOptions.Type.BALANCED
-                        }
+        val originLat = -37.799149f
+        val originLon = 144.994426f
+        val destLat = -37.83640f
+        val destLon = 144.92214f
 
-                        addWaypoint(RouteWaypoint(GeoCoordinate(-37.799149, 144.994426)))
-                        addWaypoint(RouteWaypoint(GeoCoordinate(-37.83640, 144.92214)))
-                    },
-                    routeListener
-            )
-        }
-    }
-
-    private val routeListener = object: CoreRouter.Listener {
-        override fun onCalculateRouteFinished(routeResult: MutableList<RouteResult>, error: RoutingError) {
-            if (error == RoutingError.NONE) {
-                val transitRoute = routeResult[0]
-                Timber.v("Route elements: ${transitRoute.route.routeElements}")
-                if (transitRoute.route != null) {
-                    routeInfo.postValue(transitRoute.route)
-                }
-                val debugMessages = mutableListOf<String>()
-
-                for (routeElement in transitRoute.route.routeElements.elements) {
-                    if (routeElement.roadElement != null) {
-                        val rel = routeElement.roadElement
-                        debugMessages.add("Road: ${rel.roadName} (${rel.routeName})")
-                    } else if (routeElement.transitElement != null) {
-                        val tel = routeElement.transitElement
-                        debugMessages.add("Transit: ${tel.departureStop.name} - ${tel.arrivalStop.name}\n" +
-                                "    Time: ${tel.departureTime.time} - ${tel.arrivalTime.time}\n" +
-                                "    Type/Duration: ${tel.transitType.name}/${tel.duration} (sys: ${tel.systemOfficialName}/${tel.systemInformalName}/${tel.systemShortName})\n" +
-                                "    Line name: ${tel.lineName}")
-                        if (tel.hasPrimaryLineColor())
-                            debugMessages.add("   Primary color: ${tel.primaryLineColor}")
-
-                        if (tel.hasSecondaryLineColor())
-                            debugMessages.add("   Secondary color: ${tel.secondaryLineColor}")
+        launch {
+            getTransitDirections(originLat, originLon, destLat, destLon).let {
+                routeInfo.postValue(it)
+                val viewList = mutableListOf<TransitRouteRVData>()
+                it?.res?.connections?.connections?.let { connections ->
+                    for (con in connections) {
                     }
                 }
-
-                debugMessages.add("-------")
-
-                for (maneuver in transitRoute.route.maneuvers) {
-                    debugMessages.add("Maneuver: ${maneuver.action.name} - ${maneuver.roadName} ${maneuver.roadNumber}\n" +
-                            "    Next: ${maneuver.nextRoadName} #${maneuver.nextRoadNumber}\n" +
-                            "    Signpost: ${maneuver.signpost?.exitText} #${maneuver.signpost?.exitNumber}\n" +
-                            "    Turn/Action: ${maneuver.turn?.name}, ${maneuver.icon.name}")
-                    for (subElem in maneuver.routeElements) {
-                        if (subElem.roadElement != null) {
-                            val rel = subElem.roadElement
-                            debugMessages.add("    | Road: ${rel.roadName} (${rel.routeName})")
-                        } else if (subElem.transitElement != null) {
-                            val tel = subElem.transitElement
-                            debugMessages.add("    | Transit: ${tel.departureStop.name} - ${tel.arrivalStop.name}\n" +
-                                    "    |     Time: ${tel.departureTime.time} - ${tel.arrivalTime.time}\n" +
-                                    "    |     Type/Duration: ${tel.transitType.name}/${tel.duration} (sys: ${tel.systemOfficialName}/${tel.systemInformalName}/${tel.systemShortName})\n" +
-                                    "    |     Line name: ${tel.lineName}")
-                            if (tel.hasPrimaryLineColor())
-                                debugMessages.add("    |    Primary color: ${Integer.toHexString(tel.primaryLineColor)}")
-
-                            if (tel.hasSecondaryLineColor())
-                                debugMessages.add("    |    Secondary color: ${Integer.toHexString(tel.secondaryLineColor)}")
-                        }
-                    }
-                }
-
-                // Routing zones are not supported for PUBLIC_TRANSPORT routes
-//                for (zone in transitRoute.route.routingZones) {
-//                    debugMessages.add("Zone: ${zone.name} (${zone.type})")
-//                }
-
-                for (wayPoint in transitRoute.route.routeWaypoints) {
-                    debugMessages.add("Way point: ${wayPoint.identifier} ${wayPoint.waypointDirection.name} ${wayPoint.waypointType.name}\n" +
-                            "    Road side: ${wayPoint.roadInfo.roadSide.name}")
-                }
-
-                debugText.postValue(debugMessages.joinToString("\n"))
-
-                val mapRoute = MapRoute(transitRoute.route)
-                // map.addMapObject(mapRoute)
-
-                val geoBoundingBox = transitRoute.route.boundingBox
-                // map.zoomTo(geoBoundingBox, Map.Animation.NONE, Map.MOVE_PRESERVE_ORIENTATION)
-
-            } else {
-                Timber.e("Error occurred while retrieving route: $error")
             }
-        }
 
-        override fun onProgress(percentage: Int) {
-            Timber.v("In progress of loading transit route $percentage")
         }
-
     }
+
 }
 
 private class TransitRouteRVAdapter(private val listEntries: MutableList<TransitRouteRVData>):
