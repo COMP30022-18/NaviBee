@@ -256,6 +256,7 @@ public class FriendActivity extends AppCompatActivity {
     private FriendAdapter contactListAdapter;
     private ChatsAdapter chatsListAdapter;
     private Button addFriendButton;
+    private Button createGroupChatButton;
     private ListView friendLists;
     private ListView recentChats;
 
@@ -268,11 +269,13 @@ public class FriendActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.switch_friend_list:
                     recentChats.setVisibility(View.INVISIBLE);
+                    createGroupChatButton.setVisibility(View.INVISIBLE);
                     friendLists.setVisibility(View.VISIBLE);
                     addFriendButton.setVisibility(View.VISIBLE);
                     return true;
                 case R.id.switch_recent_chat:
                     recentChats.setVisibility(View.VISIBLE);
+                    createGroupChatButton.setVisibility(View.VISIBLE);
                     friendLists.setVisibility(View.INVISIBLE);
                     addFriendButton.setVisibility(View.INVISIBLE);
                     return true;
@@ -299,6 +302,7 @@ public class FriendActivity extends AppCompatActivity {
         recentChats.setAdapter(chatsListAdapter);
         addFriendButton = (Button) findViewById(R.id.addFriendButton);
         addFriendButton.setVisibility(View.INVISIBLE);
+        createGroupChatButton = (Button) findViewById(R.id.createGroupChatButton);
         recentChats.setVisibility(View.VISIBLE);
         friendLists.setVisibility(View.INVISIBLE);
 
@@ -374,6 +378,9 @@ public class FriendActivity extends AppCompatActivity {
         switch (view.getId()) {
             case R.id.addFriendButton:
                 startActivity(new Intent(this,  AddFriendQRActivity.class));
+                break;
+            case R.id.createGroupChatButton:
+                startActivity(new Intent(this, CreateGroupChatActivity.class));
                 break;
         }
     }
