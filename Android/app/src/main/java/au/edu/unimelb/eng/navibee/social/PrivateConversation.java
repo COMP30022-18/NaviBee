@@ -10,8 +10,8 @@ public class PrivateConversation extends Conversation {
 
     private String targetUid;
 
-    public PrivateConversation(String id, Date readTimestamp, String targetUid) {
-        super(id, readTimestamp);
+    public PrivateConversation(String id, Date readTimestamp, Date createTimestamp, String targetUid) {
+        super(id, readTimestamp, createTimestamp);
         this.targetUid = targetUid;
     }
 

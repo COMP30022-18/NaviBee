@@ -37,11 +37,13 @@ public abstract class Conversation {
     private ArrayList<Message> messages = new ArrayList<>();
     private int unreadMsgCount = 0;
     private Date readTimestamp;
+    private Date createTimestamp;
 
 
-    public Conversation(String id, Date readTimestamp) {
+    public Conversation(String id, Date readTimestamp, Date createTimestamp) {
         conversationId = id;
         this.readTimestamp = readTimestamp;
+        this.createTimestamp = createTimestamp;
         this.uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         db = FirebaseFirestore.getInstance();
@@ -50,6 +52,10 @@ public abstract class Conversation {
 
     public String getConvId() {
         return conversationId;
+    }
+
+    public Date getCreateTimestamp() {
+        return createTimestamp;
     }
 
     private void listen() {

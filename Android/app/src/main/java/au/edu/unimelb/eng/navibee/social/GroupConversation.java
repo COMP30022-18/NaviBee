@@ -7,8 +7,8 @@ public class GroupConversation extends Conversation {
     private String name;
     private String icon;
 
-    public GroupConversation(String id, Date readTimestamp, String name, String icon) {
-        super(id, readTimestamp);
+    public GroupConversation(String id, Date readTimestamp, Date createTimestamp, String name, String icon) {
+        super(id, readTimestamp, createTimestamp);
         this.name = name;
         this.icon = icon;
     }
