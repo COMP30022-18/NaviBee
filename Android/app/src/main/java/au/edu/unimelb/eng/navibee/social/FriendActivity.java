@@ -62,6 +62,14 @@ public class FriendActivity extends AppCompatActivity {
             return DateManager.DateformatTime(conv.getMessage(conv.getMessageCount()-1).getTime_());
         }
 
+        public Date getTimeForSort() {
+            if (hasMessage()) {
+                return conv.getMessage(conv.getMessageCount()-1).getTime_();
+            } else {
+                return conv.getCreateTimestamp();
+            }
+        }
+
         public void displayNameAndIcon(TextView textView, ImageView imageView) {
             if (conv instanceof PrivateConversation) {
                 UserInfoManager.getInstance().getUserInfo(((PrivateConversation) conv).getTargetUid(), userInfo -> {
@@ -312,6 +320,7 @@ public class FriendActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             contactListAdapter.notifyDataSetChanged();
+            sortChatsList();
             chatsListAdapter.notifyDataSetChanged();
         }
     };
@@ -334,7 +343,12 @@ public class FriendActivity extends AppCompatActivity {
         for (Conversation conv : cm.getConversations()){
             chatsList.add(new ContactItem(conv));
         }
+        sortChatsList();
         chatsListAdapter.notifyDataSetChanged();
+    }
+
+    private void sortChatsList() {
+        chatsList.sort((p1, p2) -> p2.getTimeForSort().compareTo(p1.getTimeForSort()));
     }
 
     public void onClick(View view) {
