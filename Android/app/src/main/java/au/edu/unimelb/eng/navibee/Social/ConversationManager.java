@@ -76,7 +76,7 @@ public class ConversationManager {
                                 // read message timestamp
                                 Timestamp timestamp =  ((Map<String, Timestamp>) dc.getDocument().get("readTimestamps")).get(uid);
 
-                                Timestamp createTimestamp = dc.getDocument().get("createTimestamp");
+                                Timestamp createTimestamp = (Timestamp) dc.getDocument().get("createTimestamp");
 
                                 // load new conversation
                                 Conversation conv = new PrivateConversation(convId, timestamp.toDate(), createTimestamp.toDate(), friendUid);
@@ -126,7 +126,7 @@ public class ConversationManager {
                                 // read message timestamp
                                 Timestamp timestamp =  ((Map<String, Timestamp>) dc.getDocument().get("readTimestamps")).get(uid);
 
-                                Timestamp createTimestamp = dc.getDocument().get("createTimestamp");
+                                Timestamp createTimestamp = (Timestamp) dc.getDocument().get("createTimestamp");
 
                                 // load new conversation
                                 Conversation conv = new GroupConversation(convId, timestamp.toDate(), createTimestamp.toDate(),
