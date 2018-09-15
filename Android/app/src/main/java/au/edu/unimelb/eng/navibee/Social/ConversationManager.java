@@ -173,12 +173,22 @@ public class ConversationManager {
 //    public ArrayList<Conversation> getAllInprivateConversation(){
 //        ArrayList<Conversation> inprivateConversation = new ArrayList<>();
 //        for (Conversation conv:convIdMap.values()){
-//            if (!conv.isPrivate()){
+//            if (conv instanceof GroupConversation){
 //                inprivateConversation.add(conv);
 //            }
 //        }
 //        return inprivateConversation;
 //    }
+
+    public ArrayList<String> getAllInprivateConversationId(){
+        ArrayList<String> inprivateConversationId = new ArrayList<>();
+        for (String convId:convIdMap.keySet()){
+            if (convIdMap.get(convId) instanceof GroupConversation){
+                inprivateConversationId.add(convId);
+            }
+        }
+        return inprivateConversationId;
+    }
 
     public void updateConvInfoForContactList(ArrayList<FriendActivity.ContactItem> list) {
         for (FriendActivity.ContactItem cp: list) {

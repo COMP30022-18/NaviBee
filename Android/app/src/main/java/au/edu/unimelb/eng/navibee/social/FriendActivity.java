@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -20,6 +22,7 @@ import android.widget.TextView;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
+import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -39,22 +42,25 @@ public class FriendActivity extends AppCompatActivity {
         private Boolean hasLastMessage;
 
 
-        public ContactItem(String convId, Boolean isPrivate, String extraInfo) {
-            this.isPrivate = isPrivate;
-            if (isPrivate){
-                this.uid = extraInfo;
-            }
-            else{
-                this.chatName = extraInfo;
-            }
-            this.convId = convId;
+        public ContactItem(String convId, String uid) {
             this.isPrivate = true;
-
+            this.uid = uid;
+            this.convId = convId;
             this.unreadMessage = 0;
             Date date = new Date();
             setLastMessageTime(date);
             hasLastMessage = false;
         }
+        public ContactItem(String convId){
+            this.isPrivate = false;
+            this.convId = convId;
+            this.unreadMessage = 0;
+            this.chatName = ((GroupConversation) ConversationManager.getInstance().getConversation(convId)).getName();
+            Date date = new Date();
+            setLastMessageTime(date);
+            hasLastMessage = false;
+        }
+
         public boolean isPrivate(){ return this.isPrivate; }
 
         public String getConvId() {
@@ -70,6 +76,7 @@ public class FriendActivity extends AppCompatActivity {
         public int getUnreadMessage(){
             return this.unreadMessage;
         }
+
         public void setLastMessage(String message){
             lastMessage = message;
             hasLastMessage = true;
@@ -328,12 +335,23 @@ public class FriendActivity extends AppCompatActivity {
 
             }
         });
+        recentChats.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int pos, long l) {
+                //using switch case, to check the condition.
+
+                Intent intent = new Intent(getBaseContext(), ChatActivity.class);
+                intent.putExtra("CONV_ID", chatsListAdapter.getItem(pos).getConvId());
+                startActivity(intent);
+            }
+        });
     }
 
     BroadcastReceiver br = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             loadContactList();
+            loadChatsList();
         }
     };
 
@@ -342,6 +360,8 @@ public class FriendActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             ConversationManager.getInstance().updateConvInfoForContactList(contactList);
             contactListAdapter.notifyDataSetChanged();
+            ConversationManager.getInstance().updateConvInfoForContactList(chatsList);
+            chatsListAdapter.notifyDataSetChanged();
         }
     };
 
@@ -350,7 +370,7 @@ public class FriendActivity extends AppCompatActivity {
         ArrayList<String> friendList = cm.getFriendList();
 
         for (String friendUid: friendList) {
-            contactList.add(new ContactItem(cm.getPrivateConvId(friendUid), true, friendUid));
+            contactList.add(new ContactItem(cm.getPrivateConvId(friendUid), friendUid));
         }
 
         cm.updateConvInfoForContactList(contactList);
@@ -363,15 +383,15 @@ public class FriendActivity extends AppCompatActivity {
 
         for (String friendUid: friendList) {
             if (cm.getPrivateConversation(friendUid).getMessageCount()>0) {
-                chatsList.add(new ContactItem(cm.getPrivateConvId(friendUid), true, friendUid));
+                chatsList.add(new ContactItem(cm.getPrivateConvId(friendUid), friendUid));
             }
+        }
+        ArrayList<String> groupConvId = cm.getAllInprivateConversationId();
+        for (String groupId:groupConvId){
+            chatsList.add(new ContactItem(groupId));
         }
         cm.updateConvInfoForContactList(chatsList);
         chatsListAdapter.notifyDataSetChanged();
-        ///////
-        //////
-        /////
-        ////
     }
 
     public void onClick(View view) {

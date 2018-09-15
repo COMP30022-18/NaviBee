@@ -46,7 +46,7 @@
         app:layout_constraintBottom_toTopOf="@id/friend_activity_navbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/contactListView" />
+        app:layout_constraintTop_toBottomOf="@+id/recentChatsListView" />
 
     <ListView
         android:id="@+id/contactListView"
@@ -63,7 +63,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@id/addFriendButton"
+        app:layout_constraintBottom_toTopOf="@id/createGroupChatButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

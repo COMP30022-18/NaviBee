@@ -13,6 +13,14 @@ public class GroupConversation extends Conversation {
         this.icon = icon;
     }
 
+    public String getName(){
+        return this.name;
+    }
+
+    public String getIcon(){
+        return this.icon;
+    }
+
     @Override
     protected void newUnreadMsg(Message msg) {
     }

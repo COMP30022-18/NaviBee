@@ -45,7 +45,6 @@ public abstract class Conversation {
         this.uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         db = FirebaseFirestore.getInstance();
-
         listen();
     }
 

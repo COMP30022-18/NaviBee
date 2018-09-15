@@ -144,20 +144,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity
-            android:name=".EventPicFullscreenActivity">
-        </activity>
-        <activity
-            android:name=".EventDetailActivity">
-        </activity>
+        <activity android:name=".EventPicFullscreenActivity"></activity>
+        <activity android:name=".EventDetailActivity"></activity>
         <activity
             android:name=".EventsActivity"
-            android:label="@string/landing_events">
-        </activity>
+            android:label="@string/landing_events"></activity>
         <activity
             android:name=".social.VoiceCallActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".social.CreateGroupChatActivity"></activity>
     </application>
 
 </manifest>
