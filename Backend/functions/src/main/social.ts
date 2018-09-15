@@ -13,14 +13,6 @@ export const newMessageNotification = functions.firestore
         // get sender and receiver
         const sender = doc.sender;
         const convDoc = (await db.collection('conversations').doc(convID).get()).data();
-        let receiver = "";
-        for (let key in convDoc.users) {
-            // do something with key|value
-            if (key!=sender) {
-                receiver = key;
-            }
-        }
-        // console.log("receiver: " + receiver);
 
         // get sender name
         const senderDoc = (await db.collection('users').doc(sender).get()).data();
@@ -52,18 +44,25 @@ export const newMessageNotification = functions.firestore
             }
         }
 
-        // find all tokens and send notification
-        let tokens = await db.collection('fcmTokens')
-                        .where('uid', '==', receiver).get();
+        for (let key in convDoc.users) {
+            // for all users of this conversation
+            if (key!=sender) {
+                let receiver = key;
+                
+                // find all tokens and send notification
+                let tokens = await db.collection('fcmTokens')
+                                .where('uid', '==', receiver).get();
 
-        tokens.forEach( tokenDoc => {
-            let token = tokenDoc.id;
-            try {
-                msg.send({token: token, android: android});
-            } catch(Error) {
-                // token is invalid
+                tokens.forEach( tokenDoc => {
+                    let token = tokenDoc.id;
+                    try {
+                        msg.send({token: token, android: android});
+                    } catch(Error) {
+                        // token is invalid
+                    }
+                });
             }
-        });
+        }
 
     });
 
