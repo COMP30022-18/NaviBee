@@ -166,61 +166,12 @@ public class ConversationManager {
         return (PrivateConversation) getConversation(getPrivateConvId(userId));
     }
 
+    public ArrayList<Conversation> getConversations() {
+        return new ArrayList<>(convIdMap.values());
+    }
+
     public ArrayList<String> getFriendList() {
         return new ArrayList<>(friendList);
-    }
-
-//    public ArrayList<Conversation> getAllInprivateConversation(){
-//        ArrayList<Conversation> inprivateConversation = new ArrayList<>();
-//        for (Conversation conv:convIdMap.values()){
-//            if (conv instanceof GroupConversation){
-//                inprivateConversation.add(conv);
-//            }
-//        }
-//        return inprivateConversation;
-//    }
-
-    public ArrayList<String> getAllInprivateConversationId(){
-        ArrayList<String> inprivateConversationId = new ArrayList<>();
-        for (String convId:convIdMap.keySet()){
-            if (convIdMap.get(convId) instanceof GroupConversation){
-                inprivateConversationId.add(convId);
-            }
-        }
-        return inprivateConversationId;
-    }
-
-    public void updateConvInfoForContactList(ArrayList<FriendActivity.ContactItem> list) {
-        for (FriendActivity.ContactItem cp: list) {
-            Conversation conv = getConversation(cp.getConvId());
-            if (conv.getMessageCount()>0) {
-                Conversation.Message msg = conv.getMessage(conv.getMessageCount()-1);
-                String lastMsgText = "";
-                switch (msg.getType()) {
-                    case "text":
-                        lastMsgText = msg.getData();
-                        break;
-                    case "image":
-                        lastMsgText = "[Photo]";
-                        break;
-                    case "voicecall":
-                        lastMsgText = "[Voice Call]";
-                        break;
-                    case "location":
-                        lastMsgText = "[Location]";
-                        break;
-                }
-
-                lastMsgText = lastMsgText.substring(0, Math.min(lastMsgText.length(), 50));
-
-                cp.setLastMessage(lastMsgText);
-                cp.setLastMessageTime(msg.getTime_());
-
-                cp.setUnreadMessage(conv.getUnreadMsgCount());
-            } else {
-                cp.setUnreadMessage(0);
-            }
-        }
     }
 
 

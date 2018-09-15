@@ -32,77 +32,48 @@ import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
 public class FriendActivity extends AppCompatActivity {
 
     public static class ContactItem {
-        private String uid; // no need for group chat
-        private String chatName; //no need for private chat
-        private String convId;
-        private boolean isPrivate;
-        private int unreadMessage;
-        private String lastMessageTime;
-        private String lastMessage;
-        private Boolean hasLastMessage;
+        private Conversation conv;
 
-
-        public ContactItem(String convId, String uid) {
-            this.isPrivate = true;
-            this.uid = uid;
-            this.convId = convId;
-            this.unreadMessage = 0;
-            Date date = new Date();
-            setLastMessageTime(date);
-            hasLastMessage = false;
-        }
-        public ContactItem(String convId){
-            this.isPrivate = false;
-            this.convId = convId;
-            this.unreadMessage = 0;
-            this.chatName = ((GroupConversation) ConversationManager.getInstance().getConversation(convId)).getName();
-            Date date = new Date();
-            setLastMessageTime(date);
-            hasLastMessage = false;
+        public ContactItem(Conversation conv) {
+            this.conv = conv;
         }
 
-        public boolean isPrivate(){ return this.isPrivate; }
-
-        public String getConvId() {
-            return convId;
+        public Conversation getConv() {
+            return conv;
         }
 
-        public String getUid(){
-            return this.uid;
-        }
-
-        public String getChatName() {return this.chatName; }
 
         public int getUnreadMessage(){
-            return this.unreadMessage;
+            return conv.getUnreadMsgCount();
         }
 
-        public void setLastMessage(String message){
-            lastMessage = message;
-            hasLastMessage = true;
-        }
-        public String getLastMessage(){
-            return this.lastMessage;
-        }
-        public void noMessage(){
-            hasLastMessage = false;
+
+        public String getLastMessage() {
+            if (!hasMessage()) return "";
+            return conv.getMessage(conv.getMessageCount()-1).getSummary();
         }
 
         public Boolean hasMessage() {
-            return hasLastMessage;
+            return conv.getMessageCount()>0;
         }
 
         public String getLastMessageTime (){
-            return this.lastMessageTime;
+            if (!hasMessage()) return "";
+            return DateManager.DateformatTime(conv.getMessage(conv.getMessageCount()-1).getTime_());
         }
 
-        public void setUnreadMessage(int i){
-            this.unreadMessage = i;
+        public void displayNameAndIcon(TextView textView, ImageView imageView) {
+            if (conv instanceof PrivateConversation) {
+                UserInfoManager.getInstance().getUserInfo(((PrivateConversation) conv).getTargetUid(), userInfo -> {
+                    textView.setText(userInfo.getName());
+                    NetworkImageHelper.loadImage(imageView, userInfo.getPhotoUrl());
+                });
+            } else {
+                textView.setText(((GroupConversation) conv).getName());
+                imageView.setImageResource(R.drawable.ic_navibee_color);
+            }
         }
 
-        public void setLastMessageTime(Date time){
-            this.lastMessageTime = DateManager.DateformatTime(time);
-        }
 
     }
 
@@ -154,11 +125,7 @@ public class FriendActivity extends AppCompatActivity {
             else{
                 ContactItem tempPerson = contactList.get(position);
 
-                // set name and avatar
-                UserInfoManager.getInstance().getUserInfo(tempPerson.getUid(), userInfo -> {
-                    holder.text.setText(userInfo.getName());
-                    NetworkImageHelper.loadImage(holder.image, userInfo.getPhotoUrl());
-                });
+                tempPerson.displayNameAndIcon(holder.text, holder.image);
 
 
                 holder.unread.setText(Integer.toString(tempPerson.getUnreadMessage()));
@@ -168,6 +135,7 @@ public class FriendActivity extends AppCompatActivity {
                 else{
                     holder.unread.setVisibility(View.VISIBLE);
                 }
+
                 if (tempPerson.hasMessage()){
                     holder.lastMessage.setText(tempPerson.getLastMessage());
                     holder.lastTime.setText(tempPerson.getLastMessageTime());
@@ -223,16 +191,7 @@ public class FriendActivity extends AppCompatActivity {
             else{
                 ContactItem tempChat = chatsList.get(position);
 
-                if (tempChat.isPrivate()){
-                    UserInfoManager.getInstance().getUserInfo(tempChat.getUid(), userInfo -> {
-                        holder.text.setText(userInfo.getName());
-                        NetworkImageHelper.loadImage(holder.image, userInfo.getPhotoUrl());
-                    });
-                }
-                else {
-                    holder.image.setImageResource(R.drawable.ic_navibee_color);
-                    holder.text.setText(tempChat.getChatName());
-                }
+                tempChat.displayNameAndIcon(holder.text, holder.image);
 
 
                 holder.unread.setText(Integer.toString(tempChat.getUnreadMessage()));
@@ -324,26 +283,20 @@ public class FriendActivity extends AppCompatActivity {
 
         registerReceiver(brMsgReadState, new IntentFilter(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE));
 
-        friendLists.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int pos, long l) {
-                //using switch case, to check the condition.
+        friendLists.setOnItemClickListener((parent, view, pos, l) -> {
+            //using switch case, to check the condition.
 
-                Intent intent = new Intent(getBaseContext(), ChatActivity.class);
-                intent.putExtra("CONV_ID", contactListAdapter.getItem(pos).getConvId());
-                startActivity(intent);
+            Intent intent = new Intent(getBaseContext(), ChatActivity.class);
+            intent.putExtra("CONV_ID", contactListAdapter.getItem(pos).getConv().getConvId());
+            startActivity(intent);
 
-            }
         });
-        recentChats.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int pos, long l) {
-                //using switch case, to check the condition.
+        recentChats.setOnItemClickListener((parent, view, pos, l) -> {
+            //using switch case, to check the condition.
 
-                Intent intent = new Intent(getBaseContext(), ChatActivity.class);
-                intent.putExtra("CONV_ID", chatsListAdapter.getItem(pos).getConvId());
-                startActivity(intent);
-            }
+            Intent intent = new Intent(getBaseContext(), ChatActivity.class);
+            intent.putExtra("CONV_ID", chatsListAdapter.getItem(pos).getConv().getConvId());
+            startActivity(intent);
         });
     }
 
@@ -358,9 +311,7 @@ public class FriendActivity extends AppCompatActivity {
     BroadcastReceiver brMsgReadState = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ConversationManager.getInstance().updateConvInfoForContactList(contactList);
             contactListAdapter.notifyDataSetChanged();
-            ConversationManager.getInstance().updateConvInfoForContactList(chatsList);
             chatsListAdapter.notifyDataSetChanged();
         }
     };
@@ -370,27 +321,19 @@ public class FriendActivity extends AppCompatActivity {
         ArrayList<String> friendList = cm.getFriendList();
 
         for (String friendUid: friendList) {
-            contactList.add(new ContactItem(cm.getPrivateConvId(friendUid), friendUid));
+            Conversation conv = cm.getConversation(cm.getPrivateConvId(friendUid));
+            contactList.add(new ContactItem(conv));
         }
 
-        cm.updateConvInfoForContactList(contactList);
         contactListAdapter.notifyDataSetChanged();
     }
 
     private void loadChatsList(){
         chatsList.clear();
-        ArrayList<String> friendList = cm.getFriendList();
 
-        for (String friendUid: friendList) {
-            if (cm.getPrivateConversation(friendUid).getMessageCount()>0) {
-                chatsList.add(new ContactItem(cm.getPrivateConvId(friendUid), friendUid));
-            }
+        for (Conversation conv : cm.getConversations()){
+            chatsList.add(new ContactItem(conv));
         }
-        ArrayList<String> groupConvId = cm.getAllInprivateConversationId();
-        for (String groupId:groupConvId){
-            chatsList.add(new ContactItem(groupId));
-        }
-        cm.updateConvInfoForContactList(chatsList);
         chatsListAdapter.notifyDataSetChanged();
     }
 

@@ -199,6 +199,27 @@ public abstract class Conversation {
         public String getType() {
             return type;
         }
+
+        @Exclude
+        public String getSummary() {
+            String text = "";
+            switch (getType()) {
+                case "text":
+                    text = getData();
+                    break;
+                case "image":
+                    text = "[Photo]";
+                    break;
+                case "voicecall":
+                    text = "[Voice Call]";
+                    break;
+                case "location":
+                    text = "[Location]";
+                    break;
+            }
+
+            return text.substring(0, Math.min(text.length(), 50));
+        }
     }
 
 }
