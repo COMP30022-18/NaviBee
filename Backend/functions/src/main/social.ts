@@ -48,7 +48,7 @@ export const newMessageNotification = functions.firestore
             // for all users of this conversation
             if (key!=sender) {
                 let receiver = key;
-                
+
                 // find all tokens and send notification
                 let tokens = await db.collection('fcmTokens')
                                 .where('uid', '==', receiver).get();
@@ -105,6 +105,7 @@ export const addFriend = functions.https.onCall(
         conv['readTimestamps'] = {};
         conv['readTimestamps'][uid] = new Date();
         conv['readTimestamps'][targetUid] = new Date();
+        conv['createTimestamp'] = new Date();
         db.collection('conversations').add(conv);
 
         return {code: 0};
@@ -128,6 +129,7 @@ export const createGroupChat = functions.https.onCall(
         conv['readTimestamps'] = {};
         conv['users'][uid] = true;
         conv['readTimestamps'][uid] = new Date();
+        conv['createTimestamp'] = new Date();
         for (let entry of data.users) {
             conv['users'][entry] = true;
             conv['readTimestamps'][entry] = new Date();
