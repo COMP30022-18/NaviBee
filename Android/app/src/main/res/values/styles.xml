@@ -179,11 +179,6 @@
         <item name="android:background">@color/dividerColor</item>
     </style>
 
-    <style name="AppTheme.OverflowMenuAnimation">
-        <item name="android:windowEnterAnimation">@anim/menu_open_animation</item>
-        <item name="android:windowExitAnimation">@anim/menu_close_animation</item>
-    </style>
-
     <!-- Navigation styles -->
     <style name="AppTheme.Navigation" />
 

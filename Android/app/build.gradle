@@ -101,8 +101,6 @@ dependencies {
     implementation 'net.time4j:time4j-android:3.44.3-2018e'
     implementation 'com.github.chrisbanes:PhotoView:2.0.0'
     kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.6.0'
-    implementation(name: 'HERE-sdk', ext: 'aar')
-    implementation files('libs/HERE-sdk-javadoc.jar')
 
     testImplementation "org.mockito:mockito-core:2.22.0"
 }
