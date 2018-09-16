@@ -327,13 +327,13 @@ private class TransitRouteRVAdapter(private val listEntries: MutableList<Transit
                     TransportMode.PRIVATE_BUS,
                     TransportMode.BUS_RAPID,
                     TransportMode.BUS -> R.drawable.ic_directions_bus_black80_24dp
-                    TransportMode.MONORAIL,
-                    TransportMode.LIGHT_RAIL -> R.drawable.ic_directions_railway_black80_24dp
+                    TransportMode.MONORAIL -> R.drawable.ic_directions_railway_black80_24dp
                     TransportMode.HIGH_SPEED_TRAIN,
                     TransportMode.INTERCITY_TRAIN,
                     TransportMode.INTER_REGIONAL_TRAIN,
                     TransportMode.REGIONAL_TRAIN -> R.drawable.ic_train_black80_24dp
-                    TransportMode.CITY_TRAIN -> R.drawable.ic_tram_black80_24dp
+                    TransportMode.CITY_TRAIN,
+                    TransportMode.LIGHT_RAIL -> R.drawable.ic_tram_black80_24dp
                     TransportMode.SUBWAY -> R.drawable.ic_directions_transit_black80_24dp
                     TransportMode.FERRY -> R.drawable.ic_directions_boat_black80_24dp
                     // TODO: Inclined, aerial, flight, walk
