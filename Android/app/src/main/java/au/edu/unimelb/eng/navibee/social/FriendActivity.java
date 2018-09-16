@@ -20,17 +20,81 @@ import android.widget.AdapterView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
 
 public class FriendActivity extends AppCompatActivity {
+    // TODO magic string
+
+    public static class ContactItem {
+        private String uid; // no need for group chat
+        private String convId;
+//        private boolean isPrivate;
+        private int unreadMessage;
+        private String lastMessageTime;
+        private String lastMessage;
+        private Boolean hasLastMessage;
+
+
+        public ContactItem(String convId, String uid) {
+            this.uid = uid;
+            this.convId = convId;
+//            this.isPrivate = isPrivate;
+
+            this.unreadMessage = 0;
+            Date date = new Date();
+            setLastMessageTime(date);
+            hasLastMessage = false;
+        }
+
+        public String getConvId() {
+            return convId;
+        }
+
+        public String getUid(){
+            return this.uid;
+        }
+
+        public int getUnreadMessage(){
+            return this.unreadMessage;
+        }
+        public void setLastMessage(String message){
+            lastMessage = message;
+            hasLastMessage = true;
+        }
+        public String getLastMessage(){
+            return this.lastMessage;
+        }
+        public void noMessage(){
+            hasLastMessage = false;
+        }
+
+        public Boolean hasMessage() {
+            return hasLastMessage;
+        }
+
+        public String getLastMessageTime (){
+            return this.lastMessageTime;
+        }
+
+        public void setUnreadMessage(int i){
+            this.unreadMessage = i;
+        }
+
+        public void setLastMessageTime(Date time){
+            this.lastMessageTime = DateManager.DateformatTime(time);
+        }
+
+    }
 
     public static class FriendAdapter extends BaseAdapter {
-        private ArrayList<FriendManager.ContactPerson> contactList;
+        private ArrayList<ContactItem> contactList;
+
         private LayoutInflater l_Inflater;
 
-        public FriendAdapter(Context context, ArrayList<FriendManager.ContactPerson> contactList){
+        public FriendAdapter(Context context, ArrayList<ContactItem> contactList){
             this.contactList = contactList;
             l_Inflater = LayoutInflater.from(context);
         }
@@ -38,7 +102,7 @@ public class FriendActivity extends AppCompatActivity {
         public int getCount(){
             return contactList.size();
         }
-        public FriendManager.ContactPerson getItem(int position){
+        public ContactItem getItem(int position){
             return contactList.get(position);
         }
         public long getItemId(int position){
@@ -63,9 +127,15 @@ public class FriendActivity extends AppCompatActivity {
                 holder.text.setText("No Data");
             }
             else{
-                FriendManager.ContactPerson tempPerson = contactList.get(position);
-                holder.text.setText(tempPerson.getName());
-                NetworkImageHelper.loadImage(holder.image, tempPerson.getUrl());
+                ContactItem tempPerson = contactList.get(position);
+
+                // set name and avatar
+                UserInfoManager.getInstance().getUserInfo(tempPerson.getUid(), userInfo -> {
+                    holder.text.setText(userInfo.getName());
+                    NetworkImageHelper.loadImage(holder.image, userInfo.getPhotoUrl());
+                });
+
+
                 holder.unread.setText(Integer.toString(tempPerson.getUnreadMessage()));
                 if (tempPerson.getUnreadMessage() == 0){
                     holder.unread.setVisibility(View.INVISIBLE);
@@ -96,7 +166,7 @@ public class FriendActivity extends AppCompatActivity {
         }
     }
 
-    ArrayList<FriendManager.ContactPerson> contactList = new ArrayList<FriendManager.ContactPerson>();
+    ArrayList<ContactItem> contactList = new ArrayList<ContactItem>();
     FriendAdapter contactListAdapter;
 
 
@@ -137,7 +207,7 @@ public class FriendActivity extends AppCompatActivity {
 
         loadContactList();
 
-        IntentFilter intFilt = new IntentFilter(FriendManager.BROADCAST_FRIEND_UPDATED);
+        IntentFilter intFilt = new IntentFilter(ConversationManager.BROADCAST_FRIEND_UPDATED);
         registerReceiver(br, intFilt);
 
         registerReceiver(brMsgReadState, new IntentFilter(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE));
@@ -147,17 +217,9 @@ public class FriendActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int pos, long l) {
                 //using switch case, to check the condition.
 
-                String targetUID= contactListAdapter.getItem(pos).getUid();
-
-                if (!ConversationManager.getInstance().isConversationExists(targetUID)) {
-                    Toast.makeText(FriendActivity.this, "ERROR: conversation not exists", Toast.LENGTH_LONG).show();
-
-                } else {
-                    Intent intent = new Intent(getBaseContext(), ChatActivity.class);
-                    intent.putExtra("TARGET_USER_ID", targetUID);
-                    startActivity(intent);
-                }
-
+                Intent intent = new Intent(getBaseContext(), ChatActivity.class);
+                intent.putExtra("CONV_ID", contactListAdapter.getItem(pos).getConvId());
+                startActivity(intent);
 
             }
         });
@@ -179,9 +241,16 @@ public class FriendActivity extends AppCompatActivity {
     };
 
     private void loadContactList() {
+        ConversationManager cm = ConversationManager.getInstance();
 
-        FriendManager.getInstance().fetchContactPersonList(contactList);
-        ConversationManager.getInstance().updateConvInfoForContactList(contactList);
+        contactList.clear();
+        ArrayList<String> friendList = cm.getFriendList();
+
+        for (String friendUid: friendList) {
+            contactList.add(new ContactItem(cm.getPrivateConvId(friendUid), friendUid));
+        }
+
+        cm.updateConvInfoForContactList(contactList);
         contactListAdapter.notifyDataSetChanged();
     }
 

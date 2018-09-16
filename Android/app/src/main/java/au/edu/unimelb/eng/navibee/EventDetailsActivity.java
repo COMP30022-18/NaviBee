@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -12,30 +13,32 @@ import android.widget.TextView;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.functions.FirebaseFunctions;
-import com.google.firebase.functions.HttpsCallableResult;
 import com.synnapps.carouselview.CarouselView;
 import com.synnapps.carouselview.ImageListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import au.edu.unimelb.eng.navibee.social.UserInfoManager;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVIndefiniteProgressBar;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVTextPrimarySecondaryStatic;
+import au.edu.unimelb.eng.navibee.utils.SimpleRVTextSecondaryPrimaryStatic;
+import au.edu.unimelb.eng.navibee.utils.SimpleRVUserChips;
 import au.edu.unimelb.eng.navibee.utils.SimpleRecyclerViewAdaptor;
 import au.edu.unimelb.eng.navibee.utils.SimpleRecyclerViewItem;
 
@@ -53,7 +56,7 @@ public class EventDetailsActivity extends AppCompatActivity {
     private CarouselView carouselView;
 
     private EventActivity.EventItem eventItem;
-    private Map<String, String> result;
+    private Map<String, HashMap<String, String>> result;
 
     private int titleRowHeight = -1;
     private int primaryColor;
@@ -81,12 +84,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         View toolbarPadding = (View) findViewById(R.id.event_details_toolbar_padding);
         TextView fabText = (TextView) findViewById(R.id.event_details_fab_text);
 
-        // Get primary color
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            primaryColor = getResources().getColor(R.color.colorPrimary, null);
-        } else {
-            primaryColor = getResources().getColor(R.color.colorPrimary);
-        }
+        primaryColor = primaryColor = ContextCompat.getColor(this, R.color.colorPrimary);
 
         // Action Bar
         setSupportActionBar(toolbar);
@@ -150,7 +148,6 @@ public class EventDetailsActivity extends AppCompatActivity {
 //                imageView.setImageResource(R.drawable.navibee_placeholder);
                 imageView.setImageDrawable(getResources().getDrawable(R.drawable.navibee_placeholder));
 
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     imageView.setImageDrawable(getResources().getDrawable(R.drawable.navibee_placeholder, null));
                 } else {
@@ -171,12 +168,8 @@ public class EventDetailsActivity extends AppCompatActivity {
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View view, int i) {
-                if (listItems.size() > 0 && (listItems.get(0) instanceof SimpleRVTextPrimarySecondaryStatic)) {
-                    if (i == BottomSheetBehavior.STATE_DRAGGING && titleRowHeight == -1) {
-                        if (viewManager.findViewByPosition(0) != null) {
-                            titleRowHeight = viewManager.findViewByPosition(0).getHeight();
-                        }
-                    }
+                if (i == BottomSheetBehavior.STATE_DRAGGING) {
+                    updateTitleRowHeight(listItems);
                 }
             }
 
@@ -198,6 +191,13 @@ public class EventDetailsActivity extends AppCompatActivity {
             }
         });
 
+        recyclerView.getViewTreeObserver().addOnDrawListener(new ViewTreeObserver.OnDrawListener() {
+            @Override
+            public void onDraw() {
+                updateTitleRowHeight(listItems);
+            }
+        });
+
         // Get event data
         db.collection("events").document(eid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
@@ -212,67 +212,87 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     private void getEventInfo() {
         ArrayList<String> uidList = new ArrayList<>();
-
-        uidList.add(eventItem.getHolder());
         uidList.addAll(eventItem.getUsers().keySet());
 
-        Map<String, Object> data = new HashMap<>();
-        data.put("uidList", uidList);
+        // get the user information
+        UserInfoManager.getInstance().getUserInfo(uidList, stringUserInfoMap -> {
+            updateEventInfo();
 
-        FirebaseFunctions mFunctions = FirebaseFunctions.getInstance();
+            String holder = stringUserInfoMap.get(eventItem.getHolder()).getName();
+            ArrayList<String> participants = new ArrayList<>();
+//            ArrayList<String> photos = new ArrayList<>();
 
-        mFunctions
-            .getHttpsCallable("getNamesFromUidList")
-            .call(data)
-            .addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
-                @Override
-                public void onSuccess(HttpsCallableResult httpsCallableResult) {
-                    result = (Map<String, String>) httpsCallableResult.getData();
+            for (int i = 0; i < uidList.size(); i++) {
+                participants.add(stringUserInfoMap.get(uidList.get(i)).getName());
+            }
 
-                    listItems.clear();
+            // Event organiser
+            if (eventItem.getHolder() != null) {
+                listItems.add(new SimpleRVTextSecondaryPrimaryStatic(
+                        holder,
+                        getResources().getString(R.string.event_details_organiser)
+                ));
+            }
 
-                    if (eventItem.getName() != null && eventItem.getTime_() != null) {
-                        listItems.add(new SimpleRVTextPrimarySecondaryStatic(
-                                eventItem.getName(),
-                                new SimpleDateFormat(getResources().getString(R.string.date_format)).format(eventItem.getTime_())
-                        ));
-                    }
+            ArrayList<Chip> chipList = new ArrayList<>();
 
-                    if (eventItem.getLocation() != null) {
-                        listItems.add(new SimpleRVTextPrimarySecondaryStatic(
-                                getResources().getString(R.string.event_details_location),
-                                eventItem.getLocation()
-                        ));
-                    }
+            for (String participant : participants) {
+                Chip chip = (Chip) getLayoutInflater().inflate(R.layout.chip_user_profile, null);
+                chip.setText(participant);
+                // TODO use profile picture instead
+                chip.setChipIconResource(R.drawable.ic_people_black_24dp);
 
-                    String holder = null;
-                    HashSet<String> participants = new HashSet<>();
+                chipList.add(chip);
+            }
 
-                    for (Map.Entry<String, String> entry : result.entrySet()) {
-                        if (entry.getKey().equals(eventItem.getHolder())) {
-                            holder = entry.getValue();
-                        } else {
-                            participants.add(entry.getValue());
-                        }
-                    }
+            // Event participants
+            if (eventItem.getUsers() != null) {
+                listItems.add(new SimpleRVUserChips(
+                        getResources().getString(R.string.event_details_participants),
+                        chipList
+                ));
+            }
 
-                    if (eventItem.getHolder() != null) {
-                        listItems.add(new SimpleRVTextPrimarySecondaryStatic(
-                                getResources().getString(R.string.event_details_organiser),
-                                holder
-                        ));
-                    }
+            viewAdapter.notifyDataSetChanged();
 
-                    if (eventItem.getUsers() != null) {
-                        listItems.add(new SimpleRVTextPrimarySecondaryStatic(
-                                getResources().getString(R.string.event_details_participants),
-                                participants.toString()
-                        ));
-                    }
+        });
+    }
 
-                    viewAdapter.notifyDataSetChanged();
+    private void updateEventInfo() {
+        listItems.clear();
+
+        // Event name && time
+        if (eventItem.getName() != null && eventItem.getTime_() != null) {
+            // Set support action bar title
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(eventItem.getName());
+            }
+
+            listItems.add(new SimpleRVTextPrimarySecondaryStatic(
+                    eventItem.getName(),
+                    new SimpleDateFormat(getResources().getString(R.string.date_format)).format(eventItem.getTime_())
+            ));
+        }
+
+        // Event location
+        if (eventItem.getLocation() != null) {
+            listItems.add(new SimpleRVTextSecondaryPrimaryStatic(
+                    eventItem.getLocation(),
+                    getResources().getString(R.string.event_details_location)
+            ));
+        }
+    }
+
+    private void updateTitleRowHeight(ArrayList<SimpleRecyclerViewItem> listItems) {
+        if (viewManager.getItemCount() > 0 && (listItems.get(0) instanceof SimpleRVTextPrimarySecondaryStatic)) {
+            if (titleRowHeight == -1) {
+                if (viewManager.findViewByPosition(0) != null) {
+                    titleRowHeight = viewManager.findViewByPosition(0).getHeight();
+                } else {
+                    titleRowHeight = -1;
                 }
-            });
+            }
+        }
     }
 
     private void setViewHeightPercent(View view, float percentage, int min, int max) {

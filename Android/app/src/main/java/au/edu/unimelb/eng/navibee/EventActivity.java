@@ -102,7 +102,7 @@ public class EventActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.event_list);
+        setContentView(R.layout.activity_event_list);
 
         userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         db = FirebaseFirestore.getInstance();
@@ -169,7 +169,6 @@ public class EventActivity extends AppCompatActivity {
         eventList.addAll(holdingList);
         eventList.addAll(joinedList);
         eventList.addAll(recommendList);
-
     }
 
     private void finalizeEventList(){
@@ -193,7 +192,7 @@ public class EventActivity extends AppCompatActivity {
                 else {
                     relationship = "passerby";
                 }
-                Intent intent = new Intent(EventActivity.this, EventDetailsActivity.class);
+                Intent intent = new Intent(EventActivity.this, EventDetailActivity.class);
                 intent.putExtra("eventId", eventList.get(pos).getEventId());
                 intent.putExtra("relationship", relationship);
                 startActivity(intent);
@@ -242,7 +241,7 @@ public class EventActivity extends AppCompatActivity {
                 name.setText((String) eventList.get(position).getName());
 
                 TextView summary = (TextView) view.findViewById(R.id.event_summary);
-                String summaryText = new SimpleDateFormat("EEE, MMM d, HH:mm").format(eventList.get(position).getTime_());
+                String summaryText = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss").format(eventList.get(position).getTime_());
                 summary.setText((String) summaryText);
 
                 ImageView image = (ImageView) view.findViewById(R.id.event_image);

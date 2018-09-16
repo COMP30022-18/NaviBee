@@ -39,7 +39,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:maxWidth="165dp"
-                android:text="Zijun Chen"
+                tools:text="Zijun Chen"
                 android:textSize="30sp" />
 
             <TextView

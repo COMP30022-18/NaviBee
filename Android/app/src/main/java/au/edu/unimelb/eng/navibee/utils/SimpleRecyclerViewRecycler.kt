@@ -5,12 +5,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import au.edu.unimelb.eng.navibee.R
+import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.recycler_view_attributions.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_ratings.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_primary_secondary_clickable.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_primary_secondary_static.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_secondary_primary_clickable.view.*
 import kotlinx.android.synthetic.main.recycler_view_item_text_secondary_primary_static.view.*
+import kotlinx.android.synthetic.main.recycler_view_item_user_chips.view.*
 
 class SimpleRecyclerViewAdaptor(private val data: List<SimpleRecyclerViewItem>) :
         androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
@@ -23,6 +25,7 @@ class SimpleRecyclerViewAdaptor(private val data: List<SimpleRecyclerViewItem>) 
             5 -> R.layout.recycler_view_item_text_secondary_primary_static
             6 -> R.layout.recycler_view_attributions
             7 -> R.layout.recycler_view_item_ratings
+            8 -> R.layout.recycler_view_item_user_chips
             else -> R.layout.recycler_view_indefinite_progress
         }
         return SimpleRVViewHolder(LayoutInflater.from(parent.context)
@@ -38,6 +41,7 @@ class SimpleRecyclerViewAdaptor(private val data: List<SimpleRecyclerViewItem>) 
             is SimpleRVTextSecondaryPrimaryStatic -> 5
             is SimpleRVAttributions -> 6
             is SimpleRVRatings -> 7
+            is SimpleRVUserChips -> 8
             else -> 0
         }
     }
@@ -83,6 +87,12 @@ class SimpleRecyclerViewAdaptor(private val data: List<SimpleRecyclerViewItem>) 
                 stars.rating = data.rating
                 stars.stepSize = data.step
             }
+            is SimpleRVUserChips -> {
+                holder.itemView.general_recycler_view_user_chip_secondary.text = data.title
+                holder.itemView.general_recycler_view_user_chip_chipgroup.apply {
+                    data.chips.forEach { addView(it) }
+                }
+            }
         }
     }
 }
@@ -108,7 +118,13 @@ data class SimpleRVTextSecondaryPrimaryStatic(
         val primary: CharSequence,
         val secondary: CharSequence
 ): SimpleRecyclerViewItem()
-data class SimpleRVAttributions(val attributes: CharSequence): SimpleRecyclerViewItem()
+data class SimpleRVAttributions(
+        val attributes: CharSequence
+): SimpleRecyclerViewItem()
+data class SimpleRVUserChips(
+        val title: CharSequence,
+        val chips: ArrayList<Chip>
+): SimpleRecyclerViewItem()
 data class SimpleRVRatings(
         val title: CharSequence,
         val rating: Float,
