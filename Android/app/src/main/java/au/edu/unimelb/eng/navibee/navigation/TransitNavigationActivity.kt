@@ -139,8 +139,8 @@ class TransitNavigationActivity : AppCompatActivity() {
                     type = sec.mode,
                     color = routeColor,
                     foregroundColor = textColor,
-                    routes = routes.filterNotNull().distinct(),
-                    terminusStations = terminals.filterNotNull().distinct()
+                    routes = routes.asSequence().filterNotNull().distinct().toList(),
+                    terminusStations = terminals.asSequence().filterNotNull().distinct().toList()
                 ))
 
                 if (sec.journey.stops?.size ?: 0 > 2) {
@@ -322,7 +322,6 @@ private class TransitRouteRVAdapter(private val listEntries: MutableList<Transit
                 view.navigation_transit_navigation_rv_trip_segment_origin_route.chipBackgroundColor =
                     defaultTint(data.color)
                 view.navigation_transit_navigation_rv_trip_segment_origin_terminal.text =
-                    //  resources.getString(R.string.navigation_transit_bound_for, data.terminusStations.joinToString(" / "))
                     data.terminusStations.joinToString(" / ")
                 view.navigation_transit_navigation_rv_trip_segment_origin_icon.setImageResource(when (data.type) {
                     TransportMode.PRIVATE_BUS,
