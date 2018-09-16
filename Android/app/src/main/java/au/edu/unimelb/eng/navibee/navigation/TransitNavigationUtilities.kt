@@ -1,25 +1,27 @@
 package au.edu.unimelb.eng.navibee.navigation
 
-import android.graphics.Color
 import au.edu.unimelb.eng.navibee.BuildConfig
 import com.google.gson.internal.bind.util.ISO8601Utils
 import com.squareup.moshi.*
-import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import net.time4j.Duration
+import net.time4j.IsoUnit
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.threeten.bp.Duration
 import java.io.IOException
+import java.text.ParsePosition
 import java.util.*
+
+
 
 private val moshiAdapter: JsonAdapter<Response> =
         Moshi.Builder()
                 .add(KotlinJsonAdapterFactory())
-                .add(Rfc3339DateJsonAdapter())
+                .add(ColorAdapter())
+                .add(HereRfc3339DateJsonAdapter())
                 .add(ISO8601DurationAdapter())
                 .add(TransportModeAdapter())
-                .add(ColorAdapter())
                 .add(BooleanAdapter())
                 .add(RPriceAdapter())
                 .build().adapter(Response::class.java)
@@ -32,14 +34,14 @@ fun parseResponseJson(json: String?): Response? =
 fun getTransitDirections(originLat: Float, originLon: Float,
                         destLat: Float, destLon: Float,
                         time: Date = Date()): Response? {
-    val dateString = ISO8601Utils.format(time)
+    val dateString = ISO8601Utils.format(time).dropLast(1)
     val response = httpClient.newCall(
         Request.Builder()
             .url(
                 HttpUrl.Builder()
                     .scheme("https")
                     .host("transit.api.here.com")
-                    .encodedPath("v3/route.json")
+                    .encodedPath("/v3/route.json")
                     .addQueryParameter("app_id", BuildConfig.HERE_APP_ID)
                     .addQueryParameter("app_code", BuildConfig.HERE_APP_CODE)
                     .addQueryParameter("routing", "all")
@@ -54,11 +56,16 @@ fun getTransitDirections(originLat: Float, originLon: Float,
             .build()
     ).execute()
 
-    return parseResponseJson(response.body()?.string())
+    val json = response.body()?.string()
+
+//    Timber.v("Response: $json")
+
+    return parseResponseJson(json)
 }
 
 @JsonClass(generateAdapter = true)
 data class Response(
+    @Json(name = "Res")
     val res: Result
 )
 
@@ -123,15 +130,15 @@ data class Dep(
     @Json(name = "RT")
     val rt: RT?,
     @Json(name = "Stn")
-    val stn: Stn?,
+    val station: Stn?,
     @Json(name = "Addr")
-    val addr: Addr?,
+    val address: Addr?,
     @Json(name = "Transport")
     val transport: Transport?,
     @Json(name = "AP")
     val ap: AP?,
     @Json(name = "Freq")
-    val freq: Freq?,
+    val frequency: Freq?,
     @Json(name = "Activities")
     val activities: Activities?
 )
@@ -152,7 +159,7 @@ data class Stn(
     val street: String?,
     val number: String?,
     val distance: Int?,
-    val duration: Duration?,
+    val duration: Duration<IsoUnit>?,
     @Json(name = "has_board")
     val hasBoard: Int?,
     @Json(name = "Transports")
@@ -195,9 +202,9 @@ data class Transport(
      * usually specified as the destination station. */
     val dir: String?,
     @Json(name = "At")
-    val ats: List<At>,
+    val at: At?,
     @Json(name = "Link")
-    val links: List<Link>
+    val links: List<Link>?
 )
 
 /**
@@ -233,11 +240,11 @@ data class At(
     val escalator: Boolean?,
     val elevator: Boolean?,
     val blindGuide: Boolean?,
-    val color: ColorInt?,
-    val textColor: ColorInt?,
-    val outlineColor: ColorInt?,
-    val phone: String,
-    val email: String,
+    @HexColor val color: Int?,
+    @HexColor val textColor: Int?,
+    @HexColor val outlineColor: Int?,
+    val phone: String?,
+    val email: String?,
     val tweetId: String?,
     val tweetTime: Date?,
     val tweetFullName: String?,
@@ -325,7 +332,7 @@ data class Operators(
 @JsonClass(generateAdapter = true)
 data class Act(
     val type: ActivityType,
-    val duration: Duration
+    val duration: Duration<IsoUnit>
 )
 
 @JsonClass(generateAdapter = true)
@@ -338,9 +345,9 @@ data class Op(
     val fare: Boolean?,
     val modes: String?,
     @Json(name = "At")
-    val ats: List<At>,
+    val ats: List<At>?,
     @Json(name = "Link")
-    val links: List<Link>
+    val links: List<Link>?
 )
 
 @JsonClass(generateAdapter = true)
@@ -418,13 +425,13 @@ data class Connections(
     @Json(name = "Operators")
     val operators: Operators,
     @Json(name = "Attributions")
-    val attributions: Attributions
+    val attributions: Attributions?
 )
 
 @JsonClass(generateAdapter = true)
 data class Connection(
     val id: String,
-    val duration: Duration,
+    val duration: Duration<IsoUnit>,
     val transfers: Int,
     val ridable: Boolean?,
     @Json(name = "has_alt")
@@ -468,7 +475,7 @@ data class Sections(
 data class Sec(
     val uncertainty: Int?,
     val id: String?,
-    val mode: Int,
+    val mode: TransportMode,
     val context: String?,
     @Json(name = "Dep")
     val dep: Dep,
@@ -482,11 +489,11 @@ data class Sec(
 
 @JsonClass(generateAdapter = true)
 data class Journey(
-    val duration: Duration,
+    val duration: Duration<IsoUnit>,
     val intermediate: Int?,
     val distance: Int?,
     @Json(name = "Stop")
-    val stops: List<Stop>
+    val stops: List<Stop>?
 )
 
 @JsonClass(generateAdapter = true)
@@ -543,7 +550,7 @@ data class Maneuvers(
 data class Maneuver(
     val direction: String,
     val action: String,
-    val duration: Duration,
+    val duration: Duration<IsoUnit>,
     @Json(name = "next_road")
     val nextRoad: String?,
     @Json(name = "next_number")
@@ -551,9 +558,9 @@ data class Maneuver(
     val distance: Int?,
     val traffic: Float?,
     @Json(name = "Instruction")
-    val instruction: String,
+    val instruction: String?,
     @Json(name = "Graph")
-    val graph: String
+    val graph: String?
 )
 
 @JsonClass(generateAdapter = true)
@@ -695,7 +702,7 @@ data class Isochrone(
     val x: Float,
     val y: Float,
     @Json(name = "max_dur")
-    val maxDuration: Duration,
+    val maxDuration: Duration<IsoUnit>,
     @Json(name = "max_change")
     val maxChange: Int,
     val time: Date,
@@ -706,7 +713,7 @@ data class Isochrone(
 
 @JsonClass(generateAdapter = true)
 data class IsoDest(
-    val duration: Duration,
+    val duration: Duration<IsoUnit>,
     @Json(name = "Stn")
     val stns: List<Stn>?
 )
@@ -745,7 +752,7 @@ data class PathSeg(
     val id: String,
     val from: String,
     val to: String,
-    val duration: Duration?,
+    val duration: Duration<IsoUnit>?,
     @Json(name = "Graph")
     val graph: String?
 )
@@ -756,7 +763,7 @@ data class RefPathSeg(
     @Json(name = "seg_id")
     val segId: String,
     val reverse: Boolean?,
-    val duration: Duration?
+    val duration: Duration<IsoUnit>?
 )
 
 @JsonClass(generateAdapter = true)
@@ -831,53 +838,44 @@ enum class AlertSeverity {
     HIGH // High severity disruption
 }
 
-class ISO8601DurationAdapter: JsonAdapter<Duration>(){
-    override fun fromJson(reader: JsonReader): Duration? {
-        return Duration.parse(reader.nextString())
+class ISO8601DurationAdapter: JsonAdapter<Duration<IsoUnit>>(){
+    @FromJson override fun fromJson(reader: JsonReader): Duration<IsoUnit>? {
+        return Duration.parsePeriod(reader.nextString())
     }
 
-    override fun toJson(writer: JsonWriter, value: Duration?) {
+    @ToJson override fun toJson(writer: JsonWriter, value: Duration<IsoUnit>?) {
         writer.value(value.toString())
     }
 }
 
 class TransportModeAdapter: JsonAdapter<TransportMode>(){
-    override fun fromJson(reader: JsonReader): TransportMode? {
+    @FromJson override fun fromJson(reader: JsonReader): TransportMode? {
         return TransportMode.getMode(reader.nextInt())
     }
 
-    override fun toJson(writer: JsonWriter, value: TransportMode?) {
+    @ToJson override fun toJson(writer: JsonWriter, value: TransportMode?) {
         writer.value(value?.value)
     }
 }
 
-data class ColorInt(val color: Int) {
-    override fun toString(): String =
-        "#" + Integer.toHexString(color)
-}
-
-class ColorAdapter: JsonAdapter<ColorInt>(){
-    override fun fromJson(reader: JsonReader): ColorInt? {
-        return ColorInt(Color.parseColor(reader.nextString()))
-    }
-
-    override fun toJson(writer: JsonWriter, value: ColorInt?) {
-        writer.value(value.toString())
-    }
-}
+@Target(AnnotationTarget.TYPE, AnnotationTarget.VALUE_PARAMETER,
+    AnnotationTarget.PROPERTY, AnnotationTarget.FIELD, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@JsonQualifier
+annotation class HexColor
 
 class BooleanAdapter: JsonAdapter<Boolean>(){
-    override fun fromJson(reader: JsonReader): Boolean? {
+    @FromJson override fun fromJson(reader: JsonReader): Boolean? {
         return reader.nextInt() != 0
     }
 
-    override fun toJson(writer: JsonWriter, value: Boolean?) {
+    @ToJson override fun toJson(writer: JsonWriter, value: Boolean?) {
         writer.value(if (value == true) 1 else 0)
     }
 }
 
 class RPriceAdapter: JsonAdapter<RPrice>(){
-    override fun fromJson(reader: JsonReader): RPrice? {
+    @FromJson override fun fromJson(reader: JsonReader): RPrice? {
         return try {
             RPrice(price = reader.nextDouble().toFloat())
         } catch (e: IOException) {
@@ -885,7 +883,7 @@ class RPriceAdapter: JsonAdapter<RPrice>(){
         }
     }
 
-    override fun toJson(writer: JsonWriter, value: RPrice?) {
+    @ToJson override fun toJson(writer: JsonWriter, value: RPrice?) {
         if (value?.price != null) {
             writer.value(value.price)
         } else if (value?.priceRange != null) {
@@ -893,6 +891,23 @@ class RPriceAdapter: JsonAdapter<RPrice>(){
         }
     }
 }
+
+private class HereRfc3339DateJsonAdapter : JsonAdapter<Date>() {
+
+    @FromJson
+    override fun fromJson(reader: JsonReader): Date {
+        val string = reader.nextString()
+
+        return ISO8601Utils.parse("${string}Z", ParsePosition(0))
+    }
+
+    @ToJson
+    override fun toJson(writer: JsonWriter, value: Date?) {
+        val string = ISO8601Utils.format(value!!)
+        writer.value(string.dropLast(1))
+    }
+}
+
 
 enum class TransportMode (val value: Int) {
     HIGH_SPEED_TRAIN(0),

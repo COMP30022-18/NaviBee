@@ -4,6 +4,7 @@ import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import au.edu.unimelb.eng.navibee.R
 import au.edu.unimelb.eng.navibee.utils.DownloadImageToImageViewAsyncTask
 import au.edu.unimelb.eng.navibee.utils.SimpleRVViewHolder
@@ -16,9 +17,9 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 
 class DestinationsRVAdaptor(private val data: ArrayList<DestinationRVItem>) :
-        androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
+        RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layout = when (viewType) {
             1 -> R.layout.recycler_view_destination_list_divider
             2 -> R.layout.recycler_view_destination_list_entry
@@ -46,7 +47,7 @@ class DestinationsRVAdaptor(private val data: ArrayList<DestinationRVItem>) :
 
     override fun getItemCount() = data.size
 
-    override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val data = data[position]
         when (data) {
             is DestinationRVDivider -> {

@@ -23,8 +23,8 @@ class DestinationsActivity : AppCompatActivity(){
     // Recycler view
     private lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
     private lateinit var viewAdapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>
-
     private lateinit var viewManager: androidx.recyclerview.widget.RecyclerView.LayoutManager
+
     private lateinit var viewModel: DestinationSuggestionModel
 
     private val destinations = ArrayList<DestinationRVItem>()

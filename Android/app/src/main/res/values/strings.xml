@@ -189,6 +189,14 @@
     <string name="navigation_your_location">Your location</string>
     <string name="navigation_default_destination">Destination</string>
 
+    <string name="navigation_transit_walking">Walking (%s)</string>
+    <string name="navigation_transit_bound_for">Bound for %s</string>
+
+    <plurals name="navigation_transit_segment_length">
+        <item quantity="one">Ride %1$d stop (%2$s)</item>
+        <item quantity="other">Ride %1$d stops (%2$s)</item>
+    </plurals>
+
     <!-- Strings related to Settings -->
     <string name="pref_section_title_navigation">Navigation</string>
 

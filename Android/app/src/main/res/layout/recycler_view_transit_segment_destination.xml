@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation.transit_navigation.rv.trip_segment_destination"
+    style="@style/AppTheme.List.TransitRow"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/navigation.transit_navigation.rv.trip_segment_destination.bar"
+        android:layout_width="@dimen/transit_navigation_route_bar_width"
+        android:layout_height="0dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/transit_navigation_route_bar_bottom"
+        android:tint="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/navigation.transit_navigation.rv.trip_segment_destination.dot"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginBottom="2dp"
+        android:src="@drawable/shape_circle"
+        android:tint="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/navigation.transit_navigation.rv.trip_segment_destination.bar"
+        app:layout_constraintEnd_toEndOf="@+id/navigation.transit_navigation.rv.trip_segment_destination.bar"
+        app:layout_constraintStart_toStartOf="@+id/navigation.transit_navigation.rv.trip_segment_destination.bar" />
+
+    <TextView
+        android:id="@+id/navigation.transit_navigation.rv.trip_segment_destination.name"
+        style="@style/AppTheme.List.TransitPrimaryText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Bus stop 5" />
+</androidx.constraintlayout.widget.ConstraintLayout>
