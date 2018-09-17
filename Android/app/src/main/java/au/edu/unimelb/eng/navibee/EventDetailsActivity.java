@@ -1,16 +1,22 @@
 package au.edu.unimelb.eng.navibee;
 
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.chip.Chip;
@@ -18,6 +24,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.synnapps.carouselview.CarouselView;
 import com.synnapps.carouselview.ImageListener;
@@ -28,6 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -47,6 +55,7 @@ public class EventDetailsActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String uid;
     private String eid;
+    private String relationship;
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter viewAdapter;
@@ -55,11 +64,26 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     private CarouselView carouselView;
 
-    private EventActivity.EventItem eventItem;
+    private EventsActivity.EventItem eventItem;
     private Map<String, HashMap<String, String>> result;
 
     private int titleRowHeight = -1;
     private int primaryColor;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (relationship.equals("holder")) {
+            menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Edit the Event");
+            menu.add(Menu.NONE, Menu.FIRST + 1, 1, "Delete the Event");
+        } else if (relationship.equals("participant")) {
+            menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Quit the Event");
+        } else {
+            menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Join the Event");
+            menu.add(Menu.NONE, Menu.FIRST + 1, 1, "Follow the Event");
+        }
+        getMenuInflater().inflate(R.menu.menu_event_detial, menu);
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +93,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         eid = getIntent().getStringExtra("eventId");
+        relationship = getIntent().getStringExtra("relationship");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.event_details_fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -89,7 +114,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         // Action Bar
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowTitleEnabled(true);
         }
 
@@ -202,7 +227,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         db.collection("events").document(eid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                eventItem = documentSnapshot.toObject(EventActivity.EventItem.class);
+                eventItem = documentSnapshot.toObject(EventsActivity.EventItem.class);
 
                 getEventInfo();
             }
@@ -307,5 +332,129 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     private int colorRGBA(int red, int green, int blue, float alpha) {
         return (int) (alpha * 255) << 24 | (red << 16) | (green << 8) | blue;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (relationship.equals("holder")) {
+            switch (item.getItemId()) {
+                case Menu.FIRST + 0:
+                    Toast.makeText(this, "Edit is clicked", Toast.LENGTH_SHORT).show();
+                    break;
+                case Menu.FIRST + 1:
+                    Toast.makeText(this, "Delete is clicked", Toast.LENGTH_SHORT).show();
+                    deleteEvent();
+                    break;
+                default:
+                    break;
+            }
+        } else if (relationship.equals("participant")) {
+            switch (item.getItemId()) {
+                case Menu.FIRST + 0:
+                    Toast.makeText(this, "Quit is clicked", Toast.LENGTH_SHORT).show();
+                    quitEvent();
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            switch (item.getItemId()) {
+                case Menu.FIRST + 0:
+                    Toast.makeText(this, "Join is clicked", Toast.LENGTH_SHORT).show();
+                    joinEvent();
+                    break;
+                case Menu.FIRST + 1:
+                    Toast.makeText(this, "Follow is clicked", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    break;
+            }
+        }
+        return true;
+    }
+
+    private void quitEvent() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("Alert");
+        dialog.setMessage("Are you sure you want to QUIT this event?");
+        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialoginterface, int i) {
+                dialoginterface.cancel();
+            }
+        });
+        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialoginterface, int i) {
+                Map<String, Object> updates = new HashMap<>();
+                updates.put("users." + uid, FieldValue.delete());
+                db.collection("events").document(eid).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            // Task completed successfully
+                            finish();
+                        } else {
+                            // Task failed with an exception
+                        }
+                    }
+                });
+            }
+        });
+        dialog.show();
+    }
+
+    private void deleteEvent() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("Alert");
+        dialog.setMessage("Are you sure you want to DELETE this event?");
+        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialoginterface, int i) {
+                dialoginterface.cancel();
+            }
+        });
+        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialoginterface, int i) {
+                db.collection("events").document(eid).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            // Task completed successfully
+                            finish();
+                        } else {
+                            // Task failed with an exception
+                        }
+                    }
+                });
+            }
+        });
+        dialog.show();
+    }
+
+    private void joinEvent() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("Alert");
+        dialog.setMessage("Are you sure you want to JOIN this event?");
+        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialoginterface, int i) {
+                dialoginterface.cancel();
+            }
+        });
+        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialoginterface, int i) {
+                Map<String, Object> updates = new HashMap<>();
+                updates.put("users." + uid, true);
+                db.collection("events").document(eid).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            // Task completed successfully
+                            finish();
+                        } else {
+                            // Task failed with an exception
+                        }
+                    }
+                });
+            }
+        });
+        dialog.show();
     }
 }

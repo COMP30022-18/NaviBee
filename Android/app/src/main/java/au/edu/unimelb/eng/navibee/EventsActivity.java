@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -89,6 +90,7 @@ public class EventsActivity extends AppCompatActivity {
 
         public Timestamp getTime() { return time; }
 
+        @Exclude
         public Date getTime_() { return time.toDate(); }
     }
 
@@ -200,8 +202,20 @@ public class EventsActivity extends AppCompatActivity {
                     i.getName(),
                     i.getLocation(),
                     view -> {
+                        String relationship;
+                        if(i.getHolder().equals(uid)) {
+                            relationship = "holder";
+                        }
+                        else if(i.getUsers().keySet().contains(uid)){
+                            relationship = "participant";
+                        }
+                        else {
+                            relationship = "passerby";
+                        }
+
                         Intent intent = new Intent(EventsActivity.this, EventDetailsActivity.class);
                         intent.putExtra("eventId", i.getEventId());
+                        intent.putExtra("relationship", relationship);
                         startActivity(intent);
                     }
             ));

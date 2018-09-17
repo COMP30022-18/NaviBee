@@ -148,9 +148,6 @@
             android:name=".EventPicFullscreenActivity">
         </activity>
         <activity
-            android:name=".EventDetailActivity">
-        </activity>
-        <activity
             android:name=".EventsActivity"
             android:label="@string/landing_events">
         </activity>

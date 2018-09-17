@@ -41,6 +41,8 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.vansuita.pickimage.bean.PickResult;
@@ -67,6 +69,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     private ArrayList<Bitmap> pics;
     private GridView picsView;
     private Bitmap addIcon;
+    private ChipGroup chipgroup;
 
     public static class TimePickerFragment extends DialogFragment {
 
@@ -111,6 +114,9 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         time_button.setText("Pick Time");
         Button date_button = (Button)findViewById(R.id.eventPickDate);
         date_button.setText("Pick Date");
+
+        chipgroup = (ChipGroup) findViewById(R.id.eventFriendChips);
+        addEditChip2Group();
 
         addIcon = createImage(50, 50, R.color.landing_red);
 
@@ -241,7 +247,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         newFragment.show(getSupportFragmentManager(), "timePicker");
     }
 
-    public void onInviteFriendClicked(View v) {
+    public void onInviteFriendClicked() {
         Intent intent = new Intent(this, EventSelectFriendsActivity.class);
         intent.putStringArrayListExtra("selectedUid", selectedUidList);
         startActivityForResult(intent, 1);
@@ -249,15 +255,16 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
+        // select friend feedback
         if (requestCode == 1) {
             if(resultCode == RESULT_OK) {
                 selectedUidList = intent.getStringArrayListExtra("selectedUid");
-                //TextView participantsView = (TextView)findViewById(R.id.textView8);
-                //participantsView.setText(selectedUidList.toString());
-
+                selectedNameList = intent.getStringArrayListExtra("selectedName");
                 // show chips result
+                setChipGroupView(selectedUidList, selectedNameList);
             }
         }
+        // fullscreen picture feedback
         if (requestCode == 2) {
             if(resultCode == RESULT_OK) {
                 Boolean isDeleted = intent.getBooleanExtra("isDeleted", false);
@@ -268,6 +275,54 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
                 }
             }
         }
+    }
+
+    private void setChipGroupView(ArrayList<String> selectedUidList, ArrayList<String> selectedNameList){
+        //ArrayList<Chip> chipList = new ArrayList<>();
+        chipgroup.removeAllViews();
+
+        for(String name: selectedNameList){
+            Chip chip = new Chip(this);
+            chip.setText(name);
+
+            chip.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(((Chip)view).isCloseIconVisible()){
+                        ((Chip)view).setCloseIconVisible(false);
+                    }
+                    else{
+                        ((Chip)view).setCloseIconVisible(true);
+                    }
+                }
+            });
+
+            chip.setOnCloseIconClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // need to delete from selected list
+                    String dName = (String)((Chip)view).getChipText();
+                    selectedUidList.remove(selectedNameList.indexOf(dName));
+                    selectedNameList.remove(dName);
+                    chipgroup.removeView(view);
+                }
+            });
+
+            chipgroup.addView(chip);
+        }
+        addEditChip2Group();
+    }
+
+    private void addEditChip2Group(){
+        Chip chip = new Chip(this);
+        chip.setText("+");
+        chip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               onInviteFriendClicked();
+            }
+        });
+        chipgroup.addView(chip);
     }
 
     public void finishedEditEvent() {
@@ -299,7 +354,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         }
         users.put(holder, true);
 
-        EventActivity.EventItem newEvent = new EventActivity.EventItem(name, holder, location, eventDate, users);
+        EventsActivity.EventItem newEvent = new EventsActivity.EventItem(name, holder, location, eventDate, users);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("events").document(UUID.randomUUID().toString()).set(newEvent).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -366,5 +421,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         canvas.drawRect(0F, 0F, (float) width, (float) height, paint);
         return bitmap;
     }
+
+
 
 }
