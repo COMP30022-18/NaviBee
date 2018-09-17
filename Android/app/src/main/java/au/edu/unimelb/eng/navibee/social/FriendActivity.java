@@ -118,11 +118,8 @@ public class FriendActivity extends AppCompatActivity {
             if (convertView == null) {
                 convertView = l_Inflater.inflate(R.layout.friend_item, null);
                 holder = new ViewHolder();
-                holder.image = (ImageView) convertView.findViewById(R.id.friend_icon);
-                holder.text = (TextView) convertView.findViewById(R.id.friend_name);
-                holder.lastTime = (TextView) convertView.findViewById(R.id.time);
-                holder.unread = (TextView) convertView.findViewById(R.id.unread);
-                holder.lastMessage = (TextView) convertView.findViewById(R.id.last_message);
+                holder.image = (ImageView) convertView.findViewById(R.id.friend_item_icon);
+                holder.text = (TextView) convertView.findViewById(R.id.friend_item_name);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
@@ -134,25 +131,6 @@ public class FriendActivity extends AppCompatActivity {
                 ContactItem tempPerson = contactList.get(position);
 
                 tempPerson.displayNameAndIcon(holder.text, holder.image);
-
-
-                holder.unread.setText(Integer.toString(tempPerson.getUnreadMessage()));
-                if (tempPerson.getUnreadMessage() == 0){
-                    holder.unread.setVisibility(View.INVISIBLE);
-                }
-                else{
-                    holder.unread.setVisibility(View.VISIBLE);
-                }
-
-                if (tempPerson.hasMessage()){
-                    holder.lastMessage.setText(tempPerson.getLastMessage());
-                    holder.lastTime.setText(tempPerson.getLastMessageTime());
-                }
-                else{
-                    holder.lastMessage.setText("");
-                    holder.lastTime.setText("");
-                }
-
             }
 
             return convertView;
@@ -182,13 +160,13 @@ public class FriendActivity extends AppCompatActivity {
         public View getView(int position, View convertView, ViewGroup parent){
             ViewHolder holder;
             if (convertView == null) {
-                convertView = l_Inflater.inflate(R.layout.friend_item, null);
+                convertView = l_Inflater.inflate(R.layout.chat_list_item, null);
                 holder = new ViewHolder();
-                holder.image = (ImageView) convertView.findViewById(R.id.friend_icon);
-                holder.text = (TextView) convertView.findViewById(R.id.friend_name);
-                holder.lastTime = (TextView) convertView.findViewById(R.id.time);
-                holder.unread = (TextView) convertView.findViewById(R.id.unread);
-                holder.lastMessage = (TextView) convertView.findViewById(R.id.last_message);
+                holder.image = (ImageView) convertView.findViewById(R.id.chat_list_item_icon);
+                holder.text = (TextView) convertView.findViewById(R.id.chat_list_item_name);
+                holder.lastTime = (TextView) convertView.findViewById(R.id.chat_list_item_time);
+                holder.unread = (TextView) convertView.findViewById(R.id.chat_list_item_unread);
+                holder.lastMessage = (TextView) convertView.findViewById(R.id.chat_list_item_last_message);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
@@ -294,8 +272,10 @@ public class FriendActivity extends AppCompatActivity {
         friendLists.setOnItemClickListener((parent, view, pos, l) -> {
             //using switch case, to check the condition.
 
-            Intent intent = new Intent(getBaseContext(), ChatActivity.class);
-            intent.putExtra("CONV_ID", contactListAdapter.getItem(pos).getConv().getConvId());
+            Intent intent = new Intent(getBaseContext(), FriendDetail.class);
+            PrivateConversation tempConv = (PrivateConversation) contactListAdapter.getItem(pos).getConv();
+            intent.putExtra("CONV_ID", tempConv.getConvId());
+            intent.putExtra("FRIEND_ID", tempConv.getTargetUid());
             startActivity(intent);
 
         });
