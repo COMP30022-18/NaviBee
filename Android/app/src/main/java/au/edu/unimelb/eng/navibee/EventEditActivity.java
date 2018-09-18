@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AppCompatActivity;
@@ -65,11 +66,12 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
     private ArrayList<String> selectedUidList;
     private ArrayList<String> selectedNameList;
-    private Date eventDate;
     private Map<String, Integer> dateMap;
     private ArrayList<Bitmap> pics;
     private GridView picsView;
     private EditText nameView;
+    private Button timeButton;
+    private Button dateButton;
     private Bitmap addIcon;
     private ChipGroup chipgroup;
     private final int MAX_NUM_OF_PHOTOS = 6;
@@ -112,30 +114,29 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         setContentView(R.layout.event_edit_new);
 
         nameView = findViewById(R.id.eventName);
-
-
-
-
-
-        dateMap = new HashMap<>();
-
-        Button time_button = (Button)findViewById(R.id.eventPickTime);
-        time_button.setText("Pick Time");
-        Button date_button = (Button)findViewById(R.id.eventPickDate);
-        date_button.setText("Pick Date");
-
+        timeButton = (Button)findViewById(R.id.eventPickTime);
+        dateButton = (Button)findViewById(R.id.eventPickDate);
         chipgroup = (ChipGroup) findViewById(R.id.eventFriendChips);
+        picsView = (GridView) findViewById(R.id.eventPics);
+
+        loadData();
+    }
+
+    private void loadData(){
+        Intent intent = getIntent();
+        Boolean isEdit = intent.getBooleanExtra("isEdit", false);
+        // init date map
+        dateMap = new HashMap<>();
+        // init date and time button
+        timeButton.setText("Pick Time");
+        dateButton.setText("Pick Date");
+        // init chipGroup
         addEditChip2Group();
-
+        // init pics gridView
         addIcon = createImage(50, 50, R.color.landing_red);
-
         pics = new ArrayList<>();
         pics.add(addIcon);
-
-        picsView = (GridView) findViewById(R.id.eventPics);
         picsView.setNumColumns(3);
-        picsUpdate();
-
         picsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
@@ -150,20 +151,23 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
                 picsUpdate();
             }
         });
-
-        loadData();
-    }
-
-    private void loadData(){
-        Intent intent = getIntent();
-        Boolean isEdit = intent.getBooleanExtra("isEdit", false);
-
-
+        picsUpdate();
 
         // load data from previous event if this is not creation activity
         if(isEdit){
-            // init name
+            // load name
             nameView.setText(intent.getStringExtra("eventName"));
+            // load participants
+            selectedUidList = intent.getStringArrayListExtra("selectedUidList");
+            selectedNameList = intent.getStringArrayListExtra("selectedNameList");
+            setChipGroupView(selectedUidList, selectedNameList);
+            // load time and date
+            Date oldDate = new Date();
+            oldDate.setTime(intent.getLongExtra("eventTime", -1));
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(oldDate);
+            setEventTime(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE));
+            setEventDate(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH),cal.get(Calendar.DAY_OF_MONTH));
         }
     }
 
@@ -235,23 +239,40 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
     @Override
     public void onTimeSet(TimePicker view, int hour, int minute) {
+        setEventTime(hour, minute);
+    }
+
+    private void setEventTime(int hour, int minute){
         dateMap.put("hour", hour);
         dateMap.put("minute", minute);
-        Button time_button = (Button)findViewById(R.id.eventPickTime);
-        Date time = new Date(0, 0, 0, hour, minute);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        Date time = calendar.getTime();
+
         String timeString = new SimpleDateFormat("HH:mm").format(time);
-        time_button.setText(timeString);
+        timeButton.setText(timeString);
     }
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
+        setEventDate(year, month, day);
+    }
+
+    private void setEventDate(int year, int month, int day){
         dateMap.put("year", year);
         dateMap.put("month", month);
         dateMap.put("day", day);
-        Date date = new Date(year, month, day);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        Date date = calendar.getTime();
+
         String dateString = new SimpleDateFormat("EEE, MMM d").format(date);
-        Button date_button = (Button)findViewById(R.id.eventPickDate);
-        date_button.setText(dateString);
+        dateButton.setText(dateString);
     }
 
     public void showDatePickerDialog(View v) {
@@ -351,19 +372,13 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
         String location = "Test Location";
 
-        if(dateMap.isEmpty()){
-            eventDate = new Date();
-        }
-        else{
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.YEAR, dateMap.get("year"));
-            calendar.set(Calendar.MONTH, dateMap.get("month"));
-            calendar.set(Calendar.DAY_OF_MONTH, dateMap.get("day"));
-            calendar.set(Calendar.HOUR, dateMap.get("hour"));
-            calendar.set(Calendar.MINUTE, dateMap.get("minute"));
-            Date date = calendar.getTime();
-            eventDate = date;
-        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, dateMap.get("year"));
+        calendar.set(Calendar.MONTH, dateMap.get("month"));
+        calendar.set(Calendar.DAY_OF_MONTH, dateMap.get("day"));
+        calendar.set(Calendar.HOUR_OF_DAY, dateMap.get("hour"));
+        calendar.set(Calendar.MINUTE, dateMap.get("minute"));
+        Date eventDate = calendar.getTime();
 
         Map<String, Boolean> users = new HashMap<>();
         for(String user: selectedUidList) {
@@ -377,13 +392,32 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         db.collection("events").document(UUID.randomUUID().toString()).set(newEvent).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                finish();
+                // if need to delete the old event
+                if(getIntent().getBooleanExtra("isEdit", false)){
+                    // delete old event
+                    db.collection("events").document(getIntent().getStringExtra("eventId")).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                // Task completed successfully
+                                finish();
+                            } else {
+                                // Task failed with an exception
+                            }
+                        }
+                    });
+                }
+                // it is the creation
+                else{
+                    finish();
+                }
             }
         });
     }
 
     public void onPublishClicked(View v) {
 
+        // check if any friends selected
         if(selectedUidList == null || selectedUidList.size() == 0) {
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
             dialog.setMessage("You haven't invite any friends");
@@ -400,6 +434,19 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
                 }});
             dialog.show();
         }
+
+        // check if date and time selected
+        if(dateMap.size() < 5){
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+            dialog.setMessage("You haven't complete event time");
+            dialog.setPositiveButton("Oops! Forgot", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialoginterface, int i) {
+                    dialoginterface.cancel();
+                }});
+            dialog.show();
+        }
+
+        // ready to finish
         else{
             finishedEditEvent();
         }

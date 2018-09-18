@@ -482,24 +482,26 @@ public class EventDetailsActivity extends AppCompatActivity {
                 // collect event info and start edit event activity
                 Intent intent = new Intent(EventDetailsActivity.this, EventEditActivity.class);
                 intent.putExtra("isEdit", true);
+                // pass event name
                 intent.putExtra("eventName", eventItem.getName());
+                // pass selectedUidList and selectedNameList
+                ArrayList<String> selectedUidList = new ArrayList<>();
+                ArrayList<String> selectedNameList = new ArrayList<>();
+                for(String uid: eventItem.getUsers().keySet()){
+                    if(!uid.equals(eventItem.getHolder())){
+                        selectedUidList.add(uid);
+                        selectedNameList.add(userMap.get(uid));
+                    }
+                }
+                intent.putExtra("selectedUidList", selectedUidList);
+                intent.putExtra("selectedNameList", selectedNameList);
+                // pass date
+                intent.putExtra("eventTime", eventItem.getTime_().getTime());
+                // pass eventId
+                intent.putExtra("eventId", eid);
 
                 startActivity(intent);
-
                 finish();
-
-                // delete old event
-//                db.collection("events").document(eid).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Void> task) {
-//                        if (task.isSuccessful()) {
-//                            // Task completed successfully
-//                            finish();
-//                        } else {
-//                            // Task failed with an exception
-//                        }
-//                    }
-//                });
             }
         });
         dialog.show();
