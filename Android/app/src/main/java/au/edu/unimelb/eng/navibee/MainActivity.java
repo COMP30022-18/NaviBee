@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.ListPopupWindow;
 import android.widget.TextView;
 
+import com.google.android.gms.auth.api.credentials.Credentials;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.button.MaterialButton;
@@ -35,7 +36,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import au.edu.unimelb.eng.navibee.navigation.DestinationsActivity;
 import au.edu.unimelb.eng.navibee.social.ConversationManager;
 import au.edu.unimelb.eng.navibee.social.FriendActivity;
-import au.edu.unimelb.eng.navibee.social.ConversationManager;
 import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
 import timber.log.Timber;
 
@@ -202,7 +202,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
+
         GoogleSignIn.getClient(this, gso).signOut();
+
+        Credentials.getClient(this).disableAutoSignIn();
 
         // reset token to prevent further messages
         try {
