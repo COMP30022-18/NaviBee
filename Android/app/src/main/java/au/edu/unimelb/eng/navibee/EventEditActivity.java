@@ -70,6 +70,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     private GridView picsView;
     private Bitmap addIcon;
     private ChipGroup chipgroup;
+    private final int MAX_NUM_OF_PHOTOS = 6;
 
     public static class TimePickerFragment extends DialogFragment {
 
@@ -132,19 +133,27 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
                                     int position, long id) {
                 Toast.makeText(getApplicationContext(), "" + position,
                         Toast.LENGTH_SHORT).show();
-                if(pics.size() <= 9){
-                    if(position == (pics.size()-1)){
-                        selectPics();
-                    }
-                    else{
-                        // preview pics or edit it
-                        startPicFullscreen(position);
-                    }
+                if(pics.get(position).equals(addIcon)){
+                    selectPics();
                 }
                 else{
-                    // preview pics or edit it
                     startPicFullscreen(position);
                 }
+
+
+//                if(pics.size() <= MAX_NUM_OF_PHOTOS){
+//                    if(position == (pics.size()-1)){
+//                        selectPics();
+//                    }
+//                    else{
+//                        // preview pics or edit it
+//                        startPicFullscreen(position);
+//                    }
+//                }
+//                else{
+//                    // preview pics or edit it
+//                    startPicFullscreen(position);
+//                }
                 picsUpdate();
             }
         });
@@ -164,7 +173,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
     private void picsUpdate(){
         Bitmap lastPic = pics.get(pics.size()-1);
-        if(pics.size() > 9){
+        if(pics.size() > MAX_NUM_OF_PHOTOS){
             if(lastPic.equals(addIcon)){
                 pics.remove(lastPic);
             }
@@ -315,7 +324,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
     private void addEditChip2Group(){
         Chip chip = new Chip(this);
-        chip.setText("+");
+        chip.setText("Add Friend");
         chip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
