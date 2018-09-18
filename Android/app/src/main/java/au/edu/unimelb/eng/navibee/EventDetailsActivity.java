@@ -66,7 +66,9 @@ public class EventDetailsActivity extends AppCompatActivity {
     private CarouselView carouselView;
 
     private EventsActivity.EventItem eventItem;
-    private Map<String, HashMap<String, String>> result;
+//    private Map<String, HashMap<String, String>> result;
+
+    private Map<String, String> userMap;
 
     private int titleRowHeight = -1;
     private int primaryColor;
@@ -248,8 +250,14 @@ public class EventDetailsActivity extends AppCompatActivity {
             ArrayList<String> participants = new ArrayList<>();
 //            ArrayList<String> photos = new ArrayList<>();
 
+            userMap = new HashMap<>();
+
             for (int i = 0; i < uidList.size(); i++) {
-                participants.add(stringUserInfoMap.get(uidList.get(i)).getName());
+                String userName = stringUserInfoMap.get(uidList.get(i)).getName();
+                participants.add(userName);
+
+                // Store user id and name into map
+                userMap.put(uidList.get(i), userName);
             }
 
             // Event organiser
