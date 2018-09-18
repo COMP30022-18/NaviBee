@@ -1,6 +1,7 @@
 package au.edu.unimelb.eng.navibee;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -340,6 +341,7 @@ public class EventDetailsActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case Menu.FIRST + 0:
                     Toast.makeText(this, "Edit is clicked", Toast.LENGTH_SHORT).show();
+                    editEvent();
                     break;
                 case Menu.FIRST + 1:
                     Toast.makeText(this, "Delete is clicked", Toast.LENGTH_SHORT).show();
@@ -457,4 +459,42 @@ public class EventDetailsActivity extends AppCompatActivity {
         });
         dialog.show();
     }
+
+    private void editEvent() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("Alert");
+        dialog.setMessage("Are you sure you want to EDIT this event?");
+        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialoginterface, int i) {
+                dialoginterface.cancel();
+            }
+        });
+        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialoginterface, int i) {
+                // collect event info and start edit event activity
+                Intent intent = new Intent(EventDetailsActivity.this, EventEditActivity.class);
+                intent.putExtra("isEdit", true);
+                intent.putExtra("eventName", eventItem.getName());
+
+                startActivity(intent);
+
+                finish();
+
+                // delete old event
+//                db.collection("events").document(eid).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                        if (task.isSuccessful()) {
+//                            // Task completed successfully
+//                            finish();
+//                        } else {
+//                            // Task failed with an exception
+//                        }
+//                    }
+//                });
+            }
+        });
+        dialog.show();
+    }
+
 }

@@ -20,6 +20,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.hardware.camera2.params.BlackLevelPattern;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
@@ -68,6 +69,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     private Map<String, Integer> dateMap;
     private ArrayList<Bitmap> pics;
     private GridView picsView;
+    private EditText nameView;
     private Bitmap addIcon;
     private ChipGroup chipgroup;
     private final int MAX_NUM_OF_PHOTOS = 6;
@@ -109,6 +111,12 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.event_edit_new);
 
+        nameView = findViewById(R.id.eventName);
+
+
+
+
+
         dateMap = new HashMap<>();
 
         Button time_button = (Button)findViewById(R.id.eventPickTime);
@@ -139,24 +147,24 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
                 else{
                     startPicFullscreen(position);
                 }
-
-
-//                if(pics.size() <= MAX_NUM_OF_PHOTOS){
-//                    if(position == (pics.size()-1)){
-//                        selectPics();
-//                    }
-//                    else{
-//                        // preview pics or edit it
-//                        startPicFullscreen(position);
-//                    }
-//                }
-//                else{
-//                    // preview pics or edit it
-//                    startPicFullscreen(position);
-//                }
                 picsUpdate();
             }
         });
+
+        loadData();
+    }
+
+    private void loadData(){
+        Intent intent = getIntent();
+        Boolean isEdit = intent.getBooleanExtra("isEdit", false);
+
+
+
+        // load data from previous event if this is not creation activity
+        if(isEdit){
+            // init name
+            nameView.setText(intent.getStringExtra("eventName"));
+        }
     }
 
     private void startPicFullscreen(int position){
