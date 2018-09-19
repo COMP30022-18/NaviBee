@@ -6,35 +6,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        tools:layout_editor_absoluteX="170dp"
-        tools:layout_editor_absoluteY="-2dp">
-
         <ImageView
             android:id="@+id/friend_detail_icon"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            app:srcCompat="@drawable/navibee_placeholder"
-            android:paddingHorizontal="5dp"/>
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.2"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            app:srcCompat="@drawable/navibee_placeholder" />
 
 
 
         <TextView
             android:id="@+id/friend_detail_name"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/friend_detail_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.05"
             android:layout_marginLeft="8dp"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:ellipsize="end"
             android:maxLines="1"
-            android:maxWidth="165dp"
             tools:text="Friend Name"
-            android:textSize="30sp" />
+            android:textSize="36sp" />
 
-    </LinearLayout>
 
     <Button
         android:id="@+id/activity_friend_detail_sendMessage_button"
@@ -47,9 +47,9 @@
         android:onClick="onClick"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/friend_detail_name"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="0.84"/>
+        app:layout_constraintVertical_bias="0.6"/>
     <Button
         android:id="@+id/activity_friend_detail_deleteFriend_button"
         android:layout_marginHorizontal="8dp"
@@ -61,8 +61,8 @@
         android:onClick="onClick"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/activity_friend_detail_sendMessage_button"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="0.96"/>
+        app:layout_constraintVertical_bias="0.4"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
