@@ -3,7 +3,6 @@ package au.edu.unimelb.eng.navibee.social;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 
@@ -276,7 +275,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 Gson gson = new Gson();
                 double[] coord = gson.fromJson(msg.getData(), double[].class);
 
-                Intent intent = new Intent(chatActivity.getBaseContext(), NavigationSelectorActivity.class);
+                Intent intent = new Intent(chatActivity.getBaseContext(), LocationDisplayActivity.class);
                 intent.putExtra(NavigationSelectorActivity.EXTRA_LATITUDE, coord[0]);
                 intent.putExtra(NavigationSelectorActivity.EXTRA_LONGITUDE, coord[1]);
 
