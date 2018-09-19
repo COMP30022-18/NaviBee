@@ -1,116 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <EditText
-        android:id="@+id/eventName"
+        <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Name"
-        android:layout_margin="4dp"/>
+        android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/eventParticipants"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:orientation="horizontal">
+            <EditText
+                android:id="@+id/eventName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:ems="10"
+                android:hint="Event Name"
+                android:inputType="textPersonName"
+                android:textSize="48dp" />
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/eventFriendChips"
-            android:layout_width="269dp"
-            android:layout_height="match_parent"
-            android:layout_margin="4dp"/>
+            <TextView
+                android:id="@+id/eventParticipantsName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:text="Friends"
+                android:textSize="32dp" />
 
-        <Button
-            android:id="@+id/eventSelectButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="onInviteFriendClicked"
-            android:text="Button"
-            android:layout_margin="4dp"/>
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/eventFriendChips"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp" />
+
+            <TextView
+                android:id="@+id/eventLocationName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:text="Location"
+                android:textSize="32dp" />
+
+            <LinearLayout
+                android:id="@+id/eventLocationSelection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/button12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_margin="4dp"
+                    android:layout_weight="1"
+                    android:padding="4dp"
+                    android:paddingLeft="4dp"
+                    android:paddingEnd="4dp"
+                    android:paddingBottom="4dp"
+                    android:text="Button"
+                    android:textSize="16dp" />
+
+                <Button
+                    android:id="@+id/button13"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_margin="4dp"
+                    android:layout_weight="1"
+                    android:text="Button"
+                    android:textSize="16dp" />
+
+                <Button
+                    android:id="@+id/button14"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_margin="4dp"
+                    android:layout_weight="1"
+                    android:text="Button"
+                    android:textSize="16dp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/eventTimeName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:text="Time"
+                android:textSize="32dp" />
+
+            <LinearLayout
+                android:id="@+id/eventTimeLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/eventPickDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_margin="4dp"
+                    android:layout_weight="1"
+                    android:onClick="showDatePickerDialog"
+                    android:text="Button"
+                    android:textSize="16sp" />
+
+                <Button
+                    android:id="@+id/eventPickTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_margin="4dp"
+                    android:layout_weight="1"
+                    android:onClick="showTimePickerDialog"
+                    android:text="Button"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/eventPicsName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:text="Photos"
+                android:textSize="32dp" />
+
+            <GridView
+                android:id="@+id/eventPics"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:layout_margin="4dp"
+                android:horizontalSpacing="4dp"
+                android:verticalSpacing="4dp" />
+
+            <Button
+                android:id="@+id/eventPublish"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:onClick="onPublishClicked"
+                android:text="Publish" />
+
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/eventLocationName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        android:layout_margin="4dp"/>
-
-    <LinearLayout
-        android:id="@+id/eventLocationSelection"
-        android:layout_width="match_parent"
-        android:layout_height="54dp"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/button12"
-            android:layout_width="117dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="4dp"
-            android:layout_weight="1"
-            android:text="Button" />
-
-        <Button
-            android:id="@+id/button13"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Button"
-            android:layout_margin="4dp"/>
-
-        <Button
-            android:id="@+id/button14"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Button"
-            android:layout_margin="4dp"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/eventTimeLayout"
-        android:layout_width="match_parent"
-        android:layout_height="61dp"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/eventPickDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="showDatePickerDialog"
-            android:text="Button"
-            android:layout_margin="4dp"/>
-
-        <Button
-            android:id="@+id/eventPickTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="showTimePickerDialog"
-            android:text="Button"
-            android:layout_margin="4dp"/>
-    </LinearLayout>
-
-    <GridView
-        android:id="@+id/eventPics"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:horizontalSpacing="4dp"
-        android:verticalSpacing="4dp" />
-
-    <Button
-        android:id="@+id/eventPublish"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:onClick="onPublishClicked"
-        android:text="Button" />
-
-</LinearLayout>
+</ScrollView>

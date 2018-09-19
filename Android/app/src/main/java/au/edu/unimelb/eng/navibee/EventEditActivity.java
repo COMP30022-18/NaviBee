@@ -7,11 +7,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 import au.edu.unimelb.eng.navibee.social.ChatActivity;
+import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -20,6 +22,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.hardware.camera2.params.BlackLevelPattern;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
@@ -41,8 +45,11 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.UploadTask;
 import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
@@ -63,11 +70,17 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
     private ArrayList<String> selectedUidList;
     private ArrayList<String> selectedNameList;
-    private Date eventDate;
     private Map<String, Integer> dateMap;
     private ArrayList<Bitmap> pics;
+    private ArrayList<Uri> picsUri;
+    private ArrayList<String> picsStoragePath = new ArrayList<>();
     private GridView picsView;
+    private EditText nameView;
+    private Button timeButton;
+    private Button dateButton;
     private Bitmap addIcon;
+    private ChipGroup chipgroup;
+    private final int MAX_NUM_OF_PHOTOS = 6;
 
     public static class TimePickerFragment extends DialogFragment {
 
@@ -106,43 +119,64 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.event_edit_new);
 
-        dateMap = new HashMap<>();
-
-        Button time_button = (Button)findViewById(R.id.eventPickTime);
-        time_button.setText("Pick Time");
-        Button date_button = (Button)findViewById(R.id.eventPickDate);
-        date_button.setText("Pick Date");
-
-        addIcon = createImage(50, 50, R.color.landing_red);
-
-        pics = new ArrayList<>();
-        pics.add(addIcon);
-
+        nameView = findViewById(R.id.eventName);
+        timeButton = (Button)findViewById(R.id.eventPickTime);
+        dateButton = (Button)findViewById(R.id.eventPickDate);
+        chipgroup = (ChipGroup) findViewById(R.id.eventFriendChips);
         picsView = (GridView) findViewById(R.id.eventPics);
-        picsView.setNumColumns(3);
-        picsUpdate();
 
+        loadData();
+    }
+
+    private void loadData(){
+        Intent intent = getIntent();
+        Boolean isEdit = intent.getBooleanExtra("isEdit", false);
+        // init date map
+        dateMap = new HashMap<>();
+        // init date and time button
+        timeButton.setText("Pick Time");
+        dateButton.setText("Pick Date");
+        // init chipGroup
+        addEditChip2Group();
+        // init pics gridView
+        Drawable addDrawable = getResources().getDrawable(R.drawable.ic_add_black_100dp);
+        addIcon = drawableToBitmap(addDrawable);
+        pics = new ArrayList<>();
+        picsUri = new ArrayList<>();
+        pics.add(addIcon);
+        picsView.setNumColumns(3);
         picsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 Toast.makeText(getApplicationContext(), "" + position,
                         Toast.LENGTH_SHORT).show();
-                if(pics.size() <= 9){
-                    if(position == (pics.size()-1)){
-                        selectPics();
-                    }
-                    else{
-                        // preview pics or edit it
-                        startPicFullscreen(position);
-                    }
+                if(pics.get(position).equals(addIcon)){
+                    selectPics();
                 }
                 else{
-                    // preview pics or edit it
                     startPicFullscreen(position);
                 }
                 picsUpdate();
             }
         });
+        picsUpdate();
+
+        // load data from previous event if this is not creation activity
+        if(isEdit){
+            // load name
+            nameView.setText(intent.getStringExtra("eventName"));
+            // load participants
+            selectedUidList = intent.getStringArrayListExtra("selectedUidList");
+            selectedNameList = intent.getStringArrayListExtra("selectedNameList");
+            setChipGroupView(selectedUidList, selectedNameList);
+            // load time and date
+            Date oldDate = new Date();
+            oldDate.setTime(intent.getLongExtra("eventTime", -1));
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(oldDate);
+            setEventTime(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE));
+            setEventDate(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH),cal.get(Calendar.DAY_OF_MONTH));
+        }
     }
 
     private void startPicFullscreen(int position){
@@ -159,7 +193,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
     private void picsUpdate(){
         Bitmap lastPic = pics.get(pics.size()-1);
-        if(pics.size() > 9){
+        if(pics.size() > MAX_NUM_OF_PHOTOS){
             if(lastPic.equals(addIcon)){
                 pics.remove(lastPic);
             }
@@ -213,23 +247,40 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
     @Override
     public void onTimeSet(TimePicker view, int hour, int minute) {
+        setEventTime(hour, minute);
+    }
+
+    private void setEventTime(int hour, int minute){
         dateMap.put("hour", hour);
         dateMap.put("minute", minute);
-        Button time_button = (Button)findViewById(R.id.eventPickTime);
-        Date time = new Date(0, 0, 0, hour, minute);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        Date time = calendar.getTime();
+
         String timeString = new SimpleDateFormat("HH:mm").format(time);
-        time_button.setText(timeString);
+        timeButton.setText(timeString);
     }
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
+        setEventDate(year, month, day);
+    }
+
+    private void setEventDate(int year, int month, int day){
         dateMap.put("year", year);
         dateMap.put("month", month);
         dateMap.put("day", day);
-        Date date = new Date(year, month, day);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        Date date = calendar.getTime();
+
         String dateString = new SimpleDateFormat("EEE, MMM d").format(date);
-        Button date_button = (Button)findViewById(R.id.eventPickDate);
-        date_button.setText(dateString);
+        dateButton.setText(dateString);
     }
 
     public void showDatePickerDialog(View v) {
@@ -242,7 +293,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         newFragment.show(getSupportFragmentManager(), "timePicker");
     }
 
-    public void onInviteFriendClicked(View v) {
+    public void onInviteFriendClicked() {
         Intent intent = new Intent(this, EventSelectFriendsActivity.class);
         intent.putStringArrayListExtra("selectedUid", selectedUidList);
         startActivityForResult(intent, 1);
@@ -250,49 +301,92 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
+        // select friend feedback
         if (requestCode == 1) {
             if(resultCode == RESULT_OK) {
                 selectedUidList = intent.getStringArrayListExtra("selectedUid");
-                //TextView participantsView = (TextView)findViewById(R.id.textView8);
-                //participantsView.setText(selectedUidList.toString());
-
+                selectedNameList = intent.getStringArrayListExtra("selectedName");
                 // show chips result
+                setChipGroupView(selectedUidList, selectedNameList);
             }
         }
+        // fullscreen picture feedback
         if (requestCode == 2) {
             if(resultCode == RESULT_OK) {
                 Boolean isDeleted = intent.getBooleanExtra("isDeleted", false);
                 int position = intent.getIntExtra("position", -1);
                 if(isDeleted){
                     pics.remove(position);
+                    picsUri.remove(position);
                     picsUpdate();
                 }
             }
         }
     }
 
-    public void finishedEditEvent() {
+    private void setChipGroupView(ArrayList<String> selectedUidList, ArrayList<String> selectedNameList){
+        //ArrayList<Chip> chipList = new ArrayList<>();
+        chipgroup.removeAllViews();
 
-        EditText editText = (EditText) findViewById(R.id.eventName);
-        String name = editText.getText().toString();
+        for(String name: selectedNameList){
+            Chip chip = new Chip(this);
+            chip.setText(name);
+
+            chip.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(((Chip)view).isCloseIconVisible()){
+                        ((Chip)view).setCloseIconVisible(false);
+                    }
+                    else{
+                        ((Chip)view).setCloseIconVisible(true);
+                    }
+                }
+            });
+
+            chip.setOnCloseIconClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // need to delete from selected list
+                    String dName = (String)((Chip)view).getChipText();
+                    selectedUidList.remove(selectedNameList.indexOf(dName));
+                    selectedNameList.remove(dName);
+                    chipgroup.removeView(view);
+                }
+            });
+
+            chipgroup.addView(chip);
+        }
+        addEditChip2Group();
+    }
+
+    private void addEditChip2Group(){
+        Chip chip = new Chip(this);
+        chip.setText("Add Friend");
+        chip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               onInviteFriendClicked();
+            }
+        });
+        chipgroup.addView(chip);
+    }
+
+    public void uploadAll() {
+
+        String name = nameView.getText().toString();
 
         String holder = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         String location = "Test Location";
 
-        if(dateMap.isEmpty()){
-            eventDate = new Date();
-        }
-        else{
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.YEAR, dateMap.get("year"));
-            calendar.set(Calendar.MONTH, dateMap.get("month"));
-            calendar.set(Calendar.DAY_OF_MONTH, dateMap.get("day"));
-            calendar.set(Calendar.HOUR, dateMap.get("hour"));
-            calendar.set(Calendar.MINUTE, dateMap.get("minute"));
-            Date date = calendar.getTime();
-            eventDate = date;
-        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, dateMap.get("year"));
+        calendar.set(Calendar.MONTH, dateMap.get("month"));
+        calendar.set(Calendar.DAY_OF_MONTH, dateMap.get("day"));
+        calendar.set(Calendar.HOUR_OF_DAY, dateMap.get("hour"));
+        calendar.set(Calendar.MINUTE, dateMap.get("minute"));
+        Date eventDate = calendar.getTime();
 
         Map<String, Boolean> users = new HashMap<>();
         for(String user: selectedUidList) {
@@ -300,35 +394,96 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         }
         users.put(holder, true);
 
-        EventActivity.EventItem newEvent = new EventActivity.EventItem(name, holder, location, eventDate, users);
+        EventsActivity.EventItem newEvent = new EventsActivity.EventItem(name, holder, location, eventDate, users, picsStoragePath);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("events").document(UUID.randomUUID().toString()).set(newEvent).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                finish();
+                // if need to delete the old event
+                if(getIntent().getBooleanExtra("isEdit", false)){
+                    // delete old event
+                    db.collection("events").document(getIntent().getStringExtra("eventId")).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                // Task completed successfully
+                                finish();
+                            } else {
+                                // Task failed with an exception
+                            }
+                        }
+                    });
+                }
+                // it is the creation
+                else{
+                    finish();
+                }
             }
         });
     }
 
+    private void finishedEditEvent() {
+        if (!picsUri.isEmpty()) {
+            Uri uri = picsUri.get(0);
+            picsUri.remove(0);
+
+            try {
+                UploadTask task = FirebaseStorageHelper.uploadImage(uri, null, "event", 80);
+                task.addOnCompleteListener(taskResult -> {
+                    if (taskResult.isSuccessful()) {
+                        picsStoragePath.add(taskResult.getResult().getMetadata().getPath());
+                        finishedEditEvent();
+                    } else {
+                        // fail
+                    }
+                });
+            } catch (Exception e) {
+                // fail
+
+            }
+
+        } else {
+            // complete
+            uploadAll();
+        }
+    }
+
     public void onPublishClicked(View v) {
 
+        // check if name has entered
+        if(nameView.getText().toString().length() == 0){
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+            dialog.setMessage("You haven't complete event name");
+            dialog.setPositiveButton("Oops! Forgot", (dialoginterface, i) -> dialoginterface.cancel());
+            dialog.show();
+        }
+
+        // check if any friends selected
         if(selectedUidList == null || selectedUidList.size() == 0) {
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
             dialog.setMessage("You haven't invite any friends");
-            dialog.setNegativeButton("I don't have friends", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialoginterface, int i) {
-                    dialoginterface.cancel();
-                    selectedUidList = new ArrayList<>();
-                    finishedEditEvent();
-                }});
-            dialog.setPositiveButton("Oops! Forgot", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialoginterface, int i) {
-                    Intent intent = new Intent(EventEditActivity.this, EventSelectFriendsActivity.class);
-                    startActivityForResult(intent, 1);
-                }});
+            dialog.setNegativeButton("I don't have friends", (dialoginterface, i) -> {
+                dialoginterface.cancel();
+                selectedUidList = new ArrayList<>();
+                finishedEditEvent();
+            });
+            dialog.setPositiveButton("Oops! Forgot", (dialoginterface, i) -> {
+                Intent intent = new Intent(EventEditActivity.this, EventSelectFriendsActivity.class);
+                startActivityForResult(intent, 1);
+            });
             dialog.show();
         }
+
+        // check if date and time selected
+        if(dateMap.size() < 5){
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+            dialog.setMessage("You haven't complete event time");
+            dialog.setPositiveButton("Oops! Forgot", (dialoginterface, i) -> dialoginterface.cancel());
+            dialog.show();
+        }
+
+        // ready to finish
         else{
             finishedEditEvent();
         }
@@ -341,31 +496,36 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     @Override
     public void onPickResult(PickResult r) {
         if (r.getError() == null) {
-            //If you want the Uri.
-            //Mandatory to refresh image from Uri.
-            //getImageView().setImageURI(null);
 
-            //Setting the real returned image.
-            //getImageView().setImageURI(r.getUri());
-
-            //If you want the Bitmap.
             pics.add(0, r.getBitmap());
+            picsUri.add(r.getUri());
+
             picsUpdate();
-            //Image path
-            //r.getPath();
+
         } else {
             //Handle possible errors
             Toast.makeText(this, r.getError().getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
-    public static Bitmap createImage(int width, int height, int color) {
+    public static Bitmap drawableToBitmap (Drawable drawable) {
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable)drawable).getBitmap();
+        }
+
+        int width = drawable.getIntrinsicWidth();
+        width = width > 0 ? width : 1;
+        int height = drawable.getIntrinsicHeight();
+        height = height > 0 ? height : 1;
+
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        Paint paint = new Paint();
-        paint.setColor(color);
-        canvas.drawRect(0F, 0F, (float) width, (float) height, paint);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
         return bitmap;
     }
+
+
 
 }
