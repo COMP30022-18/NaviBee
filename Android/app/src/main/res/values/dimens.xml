@@ -10,4 +10,7 @@
 
     <!-- Collapsing action bar -->
     <dimen name="collapsing_action_bar_height">300dp</dimen>
+
+    <!-- Transit navigation -->
+    <dimen name="transit_navigation_route_bar_width">20dp</dimen>
 </resources>

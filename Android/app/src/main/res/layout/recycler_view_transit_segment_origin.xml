@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation.transit_navigation.rv.trip_segment_origin"
+    style="@style/AppTheme.List.TransitRow"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/navigation.transit_navigation.rv.trip_segment_origin.icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:backgroundTint="@color/white"
+        app:elevation="2dp"
+        app:fabCustomSize="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/navigation.transit_navigation.rv.trip_segment_origin.name"
+        app:maxImageSize="16dp"
+        app:srcCompat="@drawable/ic_directions_transit_black80_24dp" />
+
+    <ImageView
+        android:id="@+id/navigation.transit_navigation.rv.trip_segment_origin.bar"
+        android:layout_width="@dimen/transit_navigation_route_bar_width"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/transit_navigation_route_bar_top"
+        android:tint="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/navigation.transit_navigation.rv.trip_segment_origin.icon"
+        app:layout_constraintStart_toStartOf="@+id/navigation.transit_navigation.rv.trip_segment_origin.icon"
+        app:layout_constraintTop_toTopOf="@+id/navigation.transit_navigation.rv.trip_segment_origin.icon" />
+
+    <TextView
+        android:id="@+id/navigation.transit_navigation.rv.trip_segment_origin.name"
+        style="@style/AppTheme.List.TransitPrimaryText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Bus stop 0" />
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/navigation.transit_navigation.rv.trip_segment_origin.route"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/navigation.transit_navigation.rv.trip_segment_origin.name"
+        app:layout_constraintTop_toBottomOf="@+id/navigation.transit_navigation.rv.trip_segment_origin.name"
+        tools:text="Route 1" />
+
+    <TextView
+        android:id="@+id/navigation.transit_navigation.rv.trip_segment_origin.terminal"
+        style="@style/AppTheme.List.TransitSecondaryText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:scrollHorizontally="true"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintBottom_toBottomOf="@+id/navigation.transit_navigation.rv.trip_segment_origin.route"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/navigation.transit_navigation.rv.trip_segment_origin.route"
+        app:layout_constraintTop_toTopOf="@+id/navigation.transit_navigation.rv.trip_segment_origin.route"
+        tools:text="Stop -1 to Stop 255" />
+</androidx.constraintlayout.widget.ConstraintLayout>

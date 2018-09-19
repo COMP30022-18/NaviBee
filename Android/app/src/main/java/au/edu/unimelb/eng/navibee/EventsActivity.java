@@ -4,11 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import au.edu.unimelb.eng.navibee.navigation.EventRVDivider;
-import au.edu.unimelb.eng.navibee.navigation.EventRVEntry;
-import au.edu.unimelb.eng.navibee.navigation.EventRVIndefiniteProgressBar;
-import au.edu.unimelb.eng.navibee.navigation.EventRVItem;
-import au.edu.unimelb.eng.navibee.navigation.EventsRVAdaptor;
+import au.edu.unimelb.eng.navibee.utils.EventRVDivider;
+import au.edu.unimelb.eng.navibee.utils.EventRVEntry;
+import au.edu.unimelb.eng.navibee.utils.EventRVIndefiniteProgressBar;
+import au.edu.unimelb.eng.navibee.utils.EventRVItem;
+import au.edu.unimelb.eng.navibee.utils.EventsRVAdaptor;
 
 import android.content.Intent;
 import android.os.Bundle;

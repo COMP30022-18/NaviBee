@@ -26,20 +26,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SosActivity extends AppCompatActivity {
+    // TODO magic string
 
     private static final int REQUEST_CODE = 1;
-
-//    private FirebaseFirestore db;
-//    private String uid;
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sos);
-
-//        db = FirebaseFirestore.getInstance();
-//        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         TextView phoneText = findViewById(R.id.sos_phone_number);
 
@@ -51,36 +46,6 @@ public class SosActivity extends AppCompatActivity {
         checkPhoneCallPermission();
 
         makePhoneCall(phoneText);
-
-//        db.collection("users").document(uid).get().addOnCompleteListener(task -> {
-//            if (task.isSuccessful()) {
-//                DocumentSnapshot document = task.getResult();
-//
-//                // check emergency field exists
-//                if (document.contains("emergency")) {
-//                    String emergency = document.getString("emergency");
-//
-//                    // check field is empty string
-//                    if (emergency.isEmpty()) {
-//                        goSettingActivity();
-//                    } else {
-//                        phoneText.setText(emergency);
-//                    }
-//
-//                } else {
-//                    // merge data to avoid overwriting
-//                    Map<String, Object> data = new HashMap<>();
-//                    data.put("emergency", "");
-//                    db.collection("users").document(uid).set(data, SetOptions.merge());
-//
-////                    goSettingActivity();
-//                    checkPhoneCallPermission();
-//                }
-//
-//            } else {
-//                Toast.makeText(SosActivity.this, "Load data fails", Toast.LENGTH_LONG).show();
-//            }
-//        });
 
     }
 

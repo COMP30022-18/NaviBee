@@ -103,8 +103,6 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
             setHasFixedSize(true)
             layoutManager = viewManager
             adapter = viewAdapter
-//            addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(
-//                    context, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
         }
 
         // Setup location service
@@ -156,8 +154,8 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
                             attributions.addAll(item.photos[0].htmlAttributions)
                         }
                         destinations.add(DestinationRVEntry(
-                                name = item.name,
-                                location = item.vicinity,
+                                name = item.name ?: "",
+                                location = item.vicinity ?: "",
                                 googlePlaceId = item.placeId,
                                 googlePhotoReference = photoReference,
                                 onClick = View.OnClickListener { _ ->

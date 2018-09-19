@@ -7,18 +7,22 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
+import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -26,66 +30,68 @@ import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
 
 public class FriendActivity extends AppCompatActivity {
+    // TODO magic string
 
     public static class ContactItem {
-        private String uid; // no need for group chat
-        private String convId;
-//        private boolean isPrivate;
-        private int unreadMessage;
-        private String lastMessageTime;
-        private String lastMessage;
-        private Boolean hasLastMessage;
+        private Conversation conv;
 
-
-        public ContactItem(String convId, String uid) {
-            this.uid = uid;
-            this.convId = convId;
-//            this.isPrivate = isPrivate;
-
-            this.unreadMessage = 0;
-            Date date = new Date();
-            setLastMessageTime(date);
-            hasLastMessage = false;
+        public ContactItem(Conversation conv) {
+            this.conv = conv;
         }
 
-        public String getConvId() {
-            return convId;
+        public Conversation getConv() {
+            return conv;
         }
 
-        public String getUid(){
-            return this.uid;
-        }
 
         public int getUnreadMessage(){
-            return this.unreadMessage;
+            return conv.getUnreadMsgCount();
         }
-        public void setLastMessage(String message){
-            lastMessage = message;
-            hasLastMessage = true;
-        }
-        public String getLastMessage(){
-            return this.lastMessage;
-        }
-        public void noMessage(){
-            hasLastMessage = false;
+
+
+        public String getLastMessage() {
+            if (!hasMessage()) return "";
+            return conv.getMessage(conv.getMessageCount()-1).getSummary();
         }
 
         public Boolean hasMessage() {
-            return hasLastMessage;
+            return conv.getMessageCount()>0;
         }
 
         public String getLastMessageTime (){
-            return this.lastMessageTime;
+            if (!hasMessage()) return "";
+            return DateManager.DateformatTime(conv.getMessage(conv.getMessageCount()-1).getTime_());
         }
 
-        public void setUnreadMessage(int i){
-            this.unreadMessage = i;
+        public Date getTimeForSort() {
+            if (hasMessage()) {
+                return conv.getMessage(conv.getMessageCount()-1).getTime_();
+            } else {
+                return conv.getCreateTimestamp();
+            }
         }
 
-        public void setLastMessageTime(Date time){
-            this.lastMessageTime = DateManager.DateformatTime(time);
+        public void displayNameAndIcon(TextView textView, ImageView imageView) {
+            if (conv instanceof PrivateConversation) {
+                UserInfoManager.getInstance().getUserInfo(((PrivateConversation) conv).getTargetUid(), userInfo -> {
+                    textView.setText(userInfo.getName());
+                    NetworkImageHelper.loadImage(imageView, userInfo.getPhotoUrl());
+                });
+            } else {
+                textView.setText(((GroupConversation) conv).getName());
+                imageView.setImageResource(R.drawable.ic_navibee_color);
+            }
         }
 
+
+    }
+
+    public static class ViewHolder {
+        public ImageView image;
+        public TextView text;
+        public TextView unread;
+        public TextView lastTime;
+        public TextView lastMessage;
     }
 
     public static class FriendAdapter extends BaseAdapter {
@@ -113,11 +119,8 @@ public class FriendActivity extends AppCompatActivity {
             if (convertView == null) {
                 convertView = l_Inflater.inflate(R.layout.friend_item, null);
                 holder = new ViewHolder();
-                holder.image = (ImageView) convertView.findViewById(R.id.friend_icon);
-                holder.text = (TextView) convertView.findViewById(R.id.friend_name);
-                holder.lastTime = (TextView) convertView.findViewById(R.id.time);
-                holder.unread = (TextView) convertView.findViewById(R.id.unread);
-                holder.lastMessage = (TextView) convertView.findViewById(R.id.last_message);
+                holder.image = (ImageView) convertView.findViewById(R.id.friend_item_icon);
+                holder.text = (TextView) convertView.findViewById(R.id.friend_item_name);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
@@ -128,23 +131,66 @@ public class FriendActivity extends AppCompatActivity {
             else{
                 ContactItem tempPerson = contactList.get(position);
 
-                // set name and avatar
-                UserInfoManager.getInstance().getUserInfo(tempPerson.getUid(), userInfo -> {
-                    holder.text.setText(userInfo.getName());
-                    NetworkImageHelper.loadImage(holder.image, userInfo.getPhotoUrl());
-                });
+                tempPerson.displayNameAndIcon(holder.text, holder.image);
+            }
+
+            return convertView;
+        }
+    }
+
+    public static class ChatsAdapter extends BaseAdapter {
+        private ArrayList<ContactItem> chatsList;
+
+        private LayoutInflater l_Inflater;
+
+        public ChatsAdapter(Context context, ArrayList<ContactItem> chatsList){
+            this.chatsList = chatsList;
+            l_Inflater = LayoutInflater.from(context);
+        }
+
+        public int getCount(){
+            return chatsList.size();
+        }
+        public ContactItem getItem(int position){
+            return chatsList.get(position);
+        }
+        public long getItemId(int position){
+            return position;
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent){
+            ViewHolder holder;
+            if (convertView == null) {
+                convertView = l_Inflater.inflate(R.layout.chat_list_item, null);
+                holder = new ViewHolder();
+                holder.image = (ImageView) convertView.findViewById(R.id.chat_list_item_icon);
+                holder.text = (TextView) convertView.findViewById(R.id.chat_list_item_name);
+                holder.lastTime = (TextView) convertView.findViewById(R.id.chat_list_item_time);
+                holder.unread = (TextView) convertView.findViewById(R.id.chat_list_item_unread);
+                holder.lastMessage = (TextView) convertView.findViewById(R.id.chat_list_item_last_message);
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+            if (chatsList.size() <= 0){
+                holder.text.setText("No Data");
+            }
+            else{
+                ContactItem tempChat = chatsList.get(position);
+
+                tempChat.displayNameAndIcon(holder.text, holder.image);
 
 
-                holder.unread.setText(Integer.toString(tempPerson.getUnreadMessage()));
-                if (tempPerson.getUnreadMessage() == 0){
+                holder.unread.setText(Integer.toString(tempChat.getUnreadMessage()));
+                if (tempChat.getUnreadMessage() == 0){
                     holder.unread.setVisibility(View.INVISIBLE);
                 }
                 else{
                     holder.unread.setVisibility(View.VISIBLE);
                 }
-                if (tempPerson.hasMessage()){
-                    holder.lastMessage.setText(tempPerson.getLastMessage());
-                    holder.lastTime.setText(tempPerson.getLastMessageTime());
+                if (tempChat.hasMessage()){
+                    holder.lastMessage.setText(tempChat.getLastMessage());
+                    holder.lastTime.setText(tempChat.getLastMessageTime());
                 }
                 else{
                     holder.lastMessage.setText("");
@@ -155,18 +201,17 @@ public class FriendActivity extends AppCompatActivity {
 
             return convertView;
         }
-
-        public static class ViewHolder {
-            public ImageView image;
-            public TextView text;
-            public TextView unread;
-            public TextView lastTime;
-            public TextView lastMessage;
-        }
     }
 
-    ArrayList<ContactItem> contactList = new ArrayList<ContactItem>();
-    FriendAdapter contactListAdapter;
+    private ConversationManager cm = ConversationManager.getInstance();
+    private ArrayList<ContactItem> contactList = new ArrayList<ContactItem>();
+    private ArrayList<ContactItem> chatsList = new ArrayList<ContactItem>();
+    private FriendAdapter contactListAdapter;
+    private ChatsAdapter chatsListAdapter;
+    private Button addFriendButton;
+    private Button createGroupChatButton;
+    private ListView friendLists;
+    private ListView recentChats;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -175,14 +220,17 @@ public class FriendActivity extends AppCompatActivity {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.navigation_home:
-//                    mTextMessage.setText(R.string.title_home);
+                case R.id.switch_friend_list:
+                    recentChats.setVisibility(View.INVISIBLE);
+                    createGroupChatButton.setVisibility(View.INVISIBLE);
+                    friendLists.setVisibility(View.VISIBLE);
+                    addFriendButton.setVisibility(View.VISIBLE);
                     return true;
-                case R.id.navigation_dashboard:
-//                    mTextMessage.setText(R.string.title_dashboard);
-                    return true;
-                case R.id.navigation_notifications:
-//                    mTextMessage.setText(R.string.title_notifications);
+                case R.id.switch_recent_chat:
+                    recentChats.setVisibility(View.VISIBLE);
+                    createGroupChatButton.setVisibility(View.VISIBLE);
+                    friendLists.setVisibility(View.INVISIBLE);
+                    addFriendButton.setVisibility(View.INVISIBLE);
                     return true;
             }
             return false;
@@ -195,15 +243,26 @@ public class FriendActivity extends AppCompatActivity {
         setContentView(R.layout.friend_list);
 
 //        mTextMessage = (TextView) findViewById(R.id.message);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.friend_activity_navbar);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         contactListAdapter = new FriendAdapter(this, contactList);
+        chatsListAdapter = new ChatsAdapter(this, chatsList);
 
-        ListView listView = (ListView) findViewById(R.id.contactListView);
-        listView.setAdapter(contactListAdapter);
+        friendLists = (ListView) findViewById(R.id.contactListView);
+        friendLists.setAdapter(contactListAdapter);
+        recentChats = (ListView) findViewById(R.id.recentChatsListView);
+        recentChats.setAdapter(chatsListAdapter);
+        addFriendButton = (Button) findViewById(R.id.addFriendButton);
+        addFriendButton.setVisibility(View.INVISIBLE);
+        createGroupChatButton = (Button) findViewById(R.id.createGroupChatButton);
+        recentChats.setVisibility(View.VISIBLE);
+        friendLists.setVisibility(View.INVISIBLE);
 
 
+
+
+        loadChatsList();
         loadContactList();
 
         IntentFilter intFilt = new IntentFilter(ConversationManager.BROADCAST_FRIEND_UPDATED);
@@ -211,16 +270,22 @@ public class FriendActivity extends AppCompatActivity {
 
         registerReceiver(brMsgReadState, new IntentFilter(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE));
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int pos, long l) {
-                //using switch case, to check the condition.
+        friendLists.setOnItemClickListener((parent, view, pos, l) -> {
+            //using switch case, to check the condition.
 
-                Intent intent = new Intent(getBaseContext(), ChatActivity.class);
-                intent.putExtra("CONV_ID", contactListAdapter.getItem(pos).getConvId());
-                startActivity(intent);
+            Intent intent = new Intent(getBaseContext(), FriendDetail.class);
+            PrivateConversation tempConv = (PrivateConversation) contactListAdapter.getItem(pos).getConv();
+            intent.putExtra("CONV_ID", tempConv.getConvId());
+            intent.putExtra("FRIEND_ID", tempConv.getTargetUid());
+            startActivity(intent);
 
-            }
+        });
+        recentChats.setOnItemClickListener((parent, view, pos, l) -> {
+            //using switch case, to check the condition.
+
+            Intent intent = new Intent(getBaseContext(), ChatActivity.class);
+            intent.putExtra("CONV_ID", chatsListAdapter.getItem(pos).getConv().getConvId());
+            startActivity(intent);
         });
     }
 
@@ -228,35 +293,52 @@ public class FriendActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             loadContactList();
+            loadChatsList();
         }
     };
 
     BroadcastReceiver brMsgReadState = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ConversationManager.getInstance().updateConvInfoForContactList(contactList);
             contactListAdapter.notifyDataSetChanged();
+            sortChatsList();
+            chatsListAdapter.notifyDataSetChanged();
         }
     };
 
     private void loadContactList() {
-        ConversationManager cm = ConversationManager.getInstance();
-
         contactList.clear();
         ArrayList<String> friendList = cm.getFriendList();
 
         for (String friendUid: friendList) {
-            contactList.add(new ContactItem(cm.getPrivateConvId(friendUid), friendUid));
+            Conversation conv = cm.getConversation(cm.getPrivateConvId(friendUid));
+            contactList.add(new ContactItem(conv));
         }
 
-        cm.updateConvInfoForContactList(contactList);
         contactListAdapter.notifyDataSetChanged();
+    }
+
+    private void loadChatsList(){
+        chatsList.clear();
+
+        for (Conversation conv : cm.getConversations()){
+            chatsList.add(new ContactItem(conv));
+        }
+        sortChatsList();
+        chatsListAdapter.notifyDataSetChanged();
+    }
+
+    private void sortChatsList() {
+        chatsList.sort((p1, p2) -> p2.getTimeForSort().compareTo(p1.getTimeForSort()));
     }
 
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.addFriendButton:
                 startActivity(new Intent(this,  AddFriendQRActivity.class));
+                break;
+            case R.id.createGroupChatButton:
+                startActivity(new Intent(this, CreateGroupChatActivity.class));
                 break;
         }
     }

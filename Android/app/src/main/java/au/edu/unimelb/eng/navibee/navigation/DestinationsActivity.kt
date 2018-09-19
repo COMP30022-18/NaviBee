@@ -23,8 +23,8 @@ class DestinationsActivity : AppCompatActivity(){
     // Recycler view
     private lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
     private lateinit var viewAdapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>
-
     private lateinit var viewManager: androidx.recyclerview.widget.RecyclerView.LayoutManager
+
     private lateinit var viewModel: DestinationSuggestionModel
 
     private val destinations = ArrayList<DestinationRVItem>()
@@ -61,17 +61,20 @@ class DestinationsActivity : AppCompatActivity(){
 
     private fun updateRecyclerView() {
         launch(UI){
-
             destinations.clear()
-            destinations.add(DestinationRVButton("Say a place",
+            destinations.add(DestinationRVButton(resources.getString(R.string.action_navigation_say_a_place),
                     R.drawable.ic_keyboard_voice_black_24dp,
                     View.OnClickListener {
                         startVoiceSearch()
                     })
             )
+            destinations.add(DestinationRVEntry("Transit navigation", "For debug use",
+                    onClick = View.OnClickListener {
+                        startActivity<TransitNavigationActivity>()
+                    }))
             viewModel.searchHistory.value?.run {
                 if (this.isNotEmpty())
-                    destinations.add(DestinationRVDivider("Recent destinations"))
+                    destinations.add(DestinationRVDivider(resources.getString(R.string.navigation_destinations_header_recent_destinations)))
                 for (i in this) {
                     destinations.add(DestinationRVEntry(
                             name = i.name,
@@ -87,7 +90,7 @@ class DestinationsActivity : AppCompatActivity(){
             }
 
             // TODO: Populate the list of destination suggestions with real data
-            destinations.add(DestinationRVDivider("Recommended place"))
+            destinations.add(DestinationRVDivider(resources.getString(R.string.navigation_destinations_header_recommended_places)))
             destinations.add(DestinationRVEntry("Place 3", "Location 3",
                     onClick = View.OnClickListener {  }))
             destinations.add(DestinationRVEntry("Place 4", "Location 4",
@@ -128,10 +131,8 @@ private class DestinationSuggestionModel(private val context: Application):
     val searchHistory = MutableLiveData<List<LocationSearchHistory>>()
 
     fun getDestinationSuggestions() {
-        launch {
-            if (searchHistory.value != null)
-                searchHistory.postValue(getRecentSearchQueries(context))
-        }
+        if (searchHistory.value != null)
+            searchHistory.postValue(getRecentSearchQueries(context))
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
