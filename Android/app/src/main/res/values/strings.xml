@@ -185,8 +185,21 @@
     <string name="action_always">Always</string>
     <string name="title_activity_settings">Settings</string>
     <string name="prompt_first_time_always_preferred_mean_of_transport">You can change your preferred mean of transport afterwards in the settings.</string>
+    <string name="action_navigation_say_a_place">Say a place</string>
+    <string name="navigation_destinations_header_recent_destinations">Recent destinations</string>
+    <string name="navigation_destinations_header_recommended_places">Recommended places</string>
 
     <string name="landing_welcome_line">Hi, %s!\nHow can I help you today?</string>
+    <string name="navigation_your_location">Your location</string>
+    <string name="navigation_default_destination">Destination</string>
+
+    <string name="navigation_transit_walking">Walking (%s)</string>
+    <string name="navigation_transit_bound_for">Bound for %s</string>
+
+    <plurals name="navigation_transit_segment_length">
+        <item quantity="one">Ride %1$d stop (%2$s)</item>
+        <item quantity="other">Ride %1$d stops (%2$s)</item>
+    </plurals>
 
     <!-- Strings related to Settings -->
     <string name="pref_section_title_navigation">Navigation</string>

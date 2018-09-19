@@ -132,4 +132,4 @@ data class SimpleRVRatings(
         val maxRating: Int
 ): SimpleRecyclerViewItem()
 class SimpleRVViewHolder(view: View) :
-        androidx.recyclerview.widget.RecyclerView.ViewHolder(view)
+        RecyclerView.ViewHolder(view)

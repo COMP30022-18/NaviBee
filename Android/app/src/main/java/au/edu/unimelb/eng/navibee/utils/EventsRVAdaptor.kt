@@ -1,10 +1,9 @@
-package au.edu.unimelb.eng.navibee.navigation
+package au.edu.unimelb.eng.navibee.utils
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import au.edu.unimelb.eng.navibee.R
-import au.edu.unimelb.eng.navibee.utils.SimpleRVViewHolder
 import kotlinx.android.synthetic.main.recycler_view_error_message.view.*
 import kotlinx.android.synthetic.main.recycler_view_event_list_divider.view.*
 import kotlinx.android.synthetic.main.recycler_view_event_list_entry.view.*

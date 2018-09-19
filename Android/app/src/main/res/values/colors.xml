@@ -9,6 +9,9 @@
     <color name="colorLightTextPrimary">#ff000000</color>
     <color name="colorLightTextSecondary">#a6000000</color>
 
+    <color name="iconTintOnLightBackground">#a6000000</color>
+    <color name="iconTintOnLightBackgroundSecondary">#20000000</color>
+
     <color name="transparentBlack">#00000000</color>
     <color name="transparentWhite">#00ffffff</color>
 

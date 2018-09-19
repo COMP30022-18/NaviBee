@@ -28,6 +28,17 @@
             android:name="org.apache.http.legacy"
             android:required="false" />
 
+        <!-- Services -->
+
+        <service
+            android:name="com.here.android.mpa.service.MapService"
+            android:exported="false"
+            android:label="NaviBeeHereMapService">
+            <intent-filter>
+                <action android:name="au.edu.unimelb.eng.navibee.hereService" />
+            </intent-filter>
+        </service>
+
         <!-- Metadata -->
 
         <meta-data
@@ -117,6 +128,11 @@
         <activity
             android:name=".navigation.NavigationActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".navigation.TransitNavigationActivity" />
+        <activity android:name=".navigation.NavigationSelectorActivity"
+            android:theme="@style/AppTheme.Translucent" />
+
+
         <activity
             android:name=".social.ChatActivity"
             android:theme="@style/AppTheme.NoActionBar" />

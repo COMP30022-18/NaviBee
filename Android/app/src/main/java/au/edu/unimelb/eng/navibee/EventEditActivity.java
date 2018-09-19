@@ -59,6 +59,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class EventEditActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener, IPickResult {
+    // TODO magic string
 
     private ArrayList<String> selectedUidList;
     private ArrayList<String> selectedNameList;
