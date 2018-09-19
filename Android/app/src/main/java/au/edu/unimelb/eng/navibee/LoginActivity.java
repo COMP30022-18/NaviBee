@@ -99,6 +99,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             } else {
                 Timber.e("Credential Read: NOT OK");
             }
+            checkSignIn();
         }
     }
 
@@ -112,7 +113,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         // Sign in success, update UI with the signed-in user's information
 //                            Log.d(TAG, "signInWithCredential:success");
                         storeCredentialToSmartLock(acct);
-                        checkSignIn();
                     } else {
                         // TODO: If sign in fails, display a message to the user.
                         Toast.makeText(LoginActivity.this, "Sign in fails", Toast.LENGTH_LONG).show();
@@ -129,7 +129,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .setProfilePictureUri(acct.getPhotoUrl())
                 .build();
         mCredentialsClient.save(gsaCred).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) return;
+            if (task.isSuccessful()) {
+                checkSignIn();
+                return;
+            }
             Exception e = task.getException();
             if (e instanceof ResolvableApiException) {
                 // Try to resolve the save request. This will prompt the user if
@@ -140,6 +143,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 } catch (IntentSender.SendIntentException ex) {
                     // Could not resolve the request
                     Timber.e(ex,"Failed to send resolution.");
+                    checkSignIn();
                 }
             }
         });
@@ -149,7 +153,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         String accountType = credential.getAccountType();
         if (accountType == null) return;
         if (accountType.equals(IdentityProviders.GOOGLE)) {
-            mGoogleSignInClient.silentSignIn().addOnSuccessListener(this::firebaseAuthWithGoogle);
+
+            GoogleSignInClient client = GoogleSignIn.getClient(this,
+                    new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                            .setAccountName(credential.getId())
+                            .build());
+            client.silentSignIn().addOnCompleteListener( task -> {
+                if (task.isSuccessful() && task.getResult().getIdToken() != null) {
+                    firebaseAuthWithGoogle(task.getResult());
+                }
+            });
         }
     }
 
@@ -183,15 +196,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private boolean checkSignIn() {
         FirebaseUser user = mAuth.getCurrentUser();
-        if (user!=null) {
+        if (user != null) {
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);
             this.finish();
+            return true;
         }
         return false;
     }
-
-
-
 }

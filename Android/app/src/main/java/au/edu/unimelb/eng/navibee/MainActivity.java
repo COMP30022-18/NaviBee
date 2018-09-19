@@ -203,9 +203,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .requestEmail()
                 .build();
 
-        GoogleSignIn.getClient(this, gso).signOut();
-
-        Credentials.getClient(this).disableAutoSignIn();
+        GoogleSignIn.getClient(this, gso).signOut()
+        .continueWithTask(ignored -> Credentials.getClient(this).disableAutoSignIn())
+        .continueWith(ignored -> {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+            startActivity(intent);
+            this.finish();
+            return null;
+        });
 
         // reset token to prevent further messages
         try {
@@ -213,12 +219,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (Exception e) {
             Timber.e(e, "Error occurred while resetting tokens.");
         }
-
-
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
-        startActivity(intent);
-        this.finish();
     }
 
     private int dpToPx(int dp) {
