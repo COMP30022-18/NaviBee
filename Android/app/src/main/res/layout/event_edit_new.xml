@@ -8,15 +8,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-            <EditText
-                android:id="@+id/eventName"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:ems="10"
-                android:hint="Event Name"
-                android:inputType="textPersonName"
-                android:textSize="48dp" />
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/eventName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:ems="10"
+                    android:hint="Event Name"
+                    android:inputType="textPersonName"
+                    android:textSize="48dp"
+                    style="@style/Widget.MaterialComponents.TextInputEditText.OutlinedBox"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:id="@+id/eventParticipantsName"
