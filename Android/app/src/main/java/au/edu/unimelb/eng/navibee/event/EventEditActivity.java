@@ -1,32 +1,26 @@
-package au.edu.unimelb.eng.navibee;
+package au.edu.unimelb.eng.navibee.event;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
-import au.edu.unimelb.eng.navibee.social.ChatActivity;
+import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.hardware.camera2.params.BlackLevelPattern;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.format.DateFormat;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -36,9 +30,6 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -56,7 +47,6 @@ import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 
 import java.io.ByteArrayOutputStream;
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -139,7 +129,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         // init chipGroup
         addEditChip2Group();
         // init pics gridView
-        Drawable addDrawable = getResources().getDrawable(R.drawable.ic_add_black_100dp);
+        Drawable addDrawable = getResources().getDrawable(R.drawable.ic_add_white_50dp);
         addIcon = drawableToBitmap(addDrawable);
         pics = new ArrayList<>();
         picsUri = new ArrayList<>();

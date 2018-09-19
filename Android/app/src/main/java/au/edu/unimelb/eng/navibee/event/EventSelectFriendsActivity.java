@@ -1,13 +1,14 @@
-package au.edu.unimelb.eng.navibee;
+package au.edu.unimelb.eng.navibee.event;
 
 import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
+import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.event.EventEditActivity;
 import au.edu.unimelb.eng.navibee.social.ConversationManager;
 import au.edu.unimelb.eng.navibee.social.UserInfoManager;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
 import android.widget.ListView;

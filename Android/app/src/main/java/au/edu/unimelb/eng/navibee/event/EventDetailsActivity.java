@@ -1,4 +1,4 @@
-package au.edu.unimelb.eng.navibee;
+package au.edu.unimelb.eng.navibee.event;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,7 +27,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.synnapps.carouselview.CarouselView;
-import com.synnapps.carouselview.ImageListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,7 +41,9 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.social.UserInfoManager;
+import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVIndefiniteProgressBar;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVTextPrimarySecondaryStatic;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVTextSecondaryPrimaryStatic;
@@ -167,21 +167,12 @@ public class EventDetailsActivity extends AppCompatActivity {
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
 
         // Carousel view
-        carouselView = (CarouselView) findViewById(R.id.event_details_image_preview);
-        carouselView.setPageCount(1);
-        carouselView.setImageListener(new ImageListener() {
-            @Override
-            public void setImageForPosition(int position, ImageView imageView) {
-//                imageView.setImageBitmap();
-//                imageView.setImageResource(R.drawable.navibee_placeholder);
-                imageView.setImageDrawable(getResources().getDrawable(R.drawable.navibee_placeholder));
+        carouselView = findViewById(R.id.event_details_image_preview);
+        carouselView.setPageCount(0);
+        carouselView.setImageListener((position, imageView) -> {
+            imageView.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.navibee_placeholder));
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    imageView.setImageDrawable(getResources().getDrawable(R.drawable.navibee_placeholder, null));
-                } else {
-                    imageView.setImageDrawable(getResources().getDrawable(R.drawable.navibee_placeholder));
-                }
-            }
+            FirebaseStorageHelper.loadImage(imageView, eventItem.getImages().get(position), true);
         });
 
         // Layout adjustment
@@ -231,6 +222,9 @@ public class EventDetailsActivity extends AppCompatActivity {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 eventItem = documentSnapshot.toObject(EventsActivity.EventItem.class);
+                if (eventItem.getImages().size() != 0) {
+                    carouselView.setPageCount(eventItem.getImages().size());
+                }
 
                 getEventInfo();
             }
