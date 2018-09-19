@@ -36,10 +36,10 @@ import org.jetbrains.anko.startActivity
     private lateinit var destinationName: CharSequence
 
     companion object {
-        @JvmStatic val EXTRA_LATITUDE = "latitude"
-        @JvmStatic val EXTRA_LONGITUDE = "longitude"
-        @JvmStatic val EXTRA_ORIGIN_NAME = "origin_name"
-        @JvmStatic val EXTRA_DESTINATION_NAME = "destination_name"
+        @JvmField val EXTRA_LATITUDE = "latitude"
+        @JvmField val EXTRA_LONGITUDE = "longitude"
+        @JvmField val EXTRA_ORIGIN_NAME = "origin_name"
+        @JvmField val EXTRA_DESTINATION_NAME = "destination_name"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
