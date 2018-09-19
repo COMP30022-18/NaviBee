@@ -10,8 +10,10 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -23,90 +25,79 @@ import java.util.Date;
 import au.edu.unimelb.eng.navibee.NaviBeeApplication;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 
-public class Conversation {
+public abstract class Conversation {
 
     public static final String BROADCAST_NEW_MESSAGE = "broadcast.conversation.newmessage";
     private static final String TAG = "conv";
 
-    private final String conversationId;
-    private final String uid;
+    protected final String conversationId;
+    protected final String uid;
     private final FirebaseFirestore db;
 
     private ArrayList<Message> messages = new ArrayList<>();
     private int unreadMsgCount = 0;
     private Date readTimestamp;
+    private Date createTimestamp;
 
 
-    public Conversation(String id, String uid, Date timestamp) {
+    public Conversation(String id, Date readTimestamp, Date createTimestamp) {
         conversationId = id;
-        this.uid = uid;
-        this.readTimestamp = timestamp;
+        this.readTimestamp = readTimestamp;
+        this.createTimestamp = createTimestamp;
+        this.uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
         db = FirebaseFirestore.getInstance();
         listen();
+    }
 
+    public String getConvId() {
+        return conversationId;
+    }
+
+    public Date getCreateTimestamp() {
+        return createTimestamp;
     }
 
     private void listen() {
         db.collection("conversations").document(conversationId)
                 .collection("messages").orderBy("time")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot snapshots,
-                                        @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w(TAG, "listen:error", e);
-                            return;
-                        }
-
-                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                            switch (dc.getType()) {
-                                case ADDED:
-                                    // new message
-                                    Message msg = dc.getDocument().toObject(Message.class);
-                                    msg.setId(dc.getDocument().getId());
-                                    messages.add(msg);
-                                    if (msg.getTime_().after(readTimestamp)) {
-                                       unreadMsgCount += 1;
-
-                                        // check new voice call
-                                        if (msg.getType().equals("voicecall")) {
-                                            long dif = new Date().getTime() - msg.getTime_().getTime();
-                                            if (dif < VoiceCallActivity.VOCIECALL_EXPIRE) {
-                                                // new voice call coming
-
-                                                if (!VoiceCallActivity.isWorking()) {
-                                                    Intent intent = new Intent(NaviBeeApplication.getInstance().getApplicationContext(),
-                                                            VoiceCallActivity.class);
-                                                    intent.putExtra("INITIATOR", msg.getSender().equals(uid));
-                                                    intent.putExtra("CONV_ID", conversationId);
-                                                    intent.putExtra("MSG_ID", msg.getId());
-                                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                    NaviBeeApplication.getInstance().startActivity(intent);
-                                                } else {
-                                                    // todo: handle busy case
-                                                }
-
-                                            }
-                                        }
-                                    }
-                                    break;
-                                case MODIFIED:
-                                    //
-                                    break;
-                                case REMOVED:
-                                    //
-                                    break;
-                            }
-                        }
-
-                        Intent intent = new Intent(BROADCAST_NEW_MESSAGE);
-                        NaviBeeApplication.getInstance().sendBroadcast(intent);
-
-                        intent = new Intent(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE);
-                        NaviBeeApplication.getInstance().sendBroadcast(intent);
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        Log.w(TAG, "listen:error", e);
+                        return;
                     }
+
+                    for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                        switch (dc.getType()) {
+                            case ADDED:
+                                // new message
+                                Message msg = dc.getDocument().toObject(Message.class);
+                                msg.setId(dc.getDocument().getId());
+                                messages.add(msg);
+                                if (msg.getTime_().after(readTimestamp)) {
+                                   unreadMsgCount += 1;
+
+                                   newUnreadMsg(msg);
+                                }
+                                break;
+                            case MODIFIED:
+                                //
+                                break;
+                            case REMOVED:
+                                //
+                                break;
+                        }
+                    }
+
+                    Intent intent = new Intent(BROADCAST_NEW_MESSAGE);
+                    NaviBeeApplication.getInstance().sendBroadcast(intent);
+
+                    intent = new Intent(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE);
+                    NaviBeeApplication.getInstance().sendBroadcast(intent);
                 });
     }
+
+    protected abstract void newUnreadMsg(Message msg);
 
     public void sendMessage(String type, String data) {
         Message message = new Message(data, uid, new Date(), type);
@@ -191,6 +182,7 @@ public class Conversation {
             this.id = id;
         }
 
+        @Exclude
         public String getId() {
             return id;
         }
@@ -199,6 +191,7 @@ public class Conversation {
             return time;
         }
 
+        @Exclude
         public Date getTime_() { return time.toDate();}
 
         public String getData() {
@@ -211,6 +204,27 @@ public class Conversation {
 
         public String getType() {
             return type;
+        }
+
+        @Exclude
+        public String getSummary() {
+            String text = "";
+            switch (getType()) {
+                case "text":
+                    text = getData();
+                    break;
+                case "image":
+                    text = "[Photo]";
+                    break;
+                case "voicecall":
+                    text = "[Voice Call]";
+                    break;
+                case "location":
+                    text = "[Location]";
+                    break;
+            }
+
+            return text.substring(0, Math.min(text.length(), 50));
         }
     }
 

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteX="170dp"
+        tools:layout_editor_absoluteY="-2dp">
+
+        <ImageView
+            android:id="@+id/chat_list_item_icon"
+            android:layout_width="94dp"
+            android:layout_height="100dp"
+            app:srcCompat="@drawable/navibee_placeholder"
+            android:paddingHorizontal="5dp"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/linear_layout_left"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingLeft="5dp"
+                android:paddingVertical="5dp">
+
+                <TextView
+                    android:id="@+id/chat_list_item_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:maxWidth="165dp"
+                    tools:text="Friend Name"
+                    android:textSize="30sp" />
+
+                <TextView
+                    android:id="@+id/chat_list_item_last_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:gravity="left|center"
+                    android:maxLines="1"
+                    android:maxWidth="165dp"
+                    android:text="lastMessage"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="right"
+                android:orientation="vertical"
+                android:layout_toRightOf="@+id/linear_layout_left"
+                android:layout_alignParentRight="true"
+                android:paddingRight="5dp"
+                android:paddingVertical="5dp">
+
+                <TextView
+                    android:id="@+id/chat_list_item_unread"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/message_notification"
+                    android:minWidth="64dp"
+                    android:text="8"
+                    android:textAlignment="center"
+                    android:textColor="#ffffff"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/chat_list_item_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical|right"
+                    android:text="08/16/2018 16:39:45"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
