@@ -9,12 +9,10 @@ import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,7 +25,6 @@ import au.edu.unimelb.eng.navibee.R;
 public class VoiceCallActivity extends AppCompatActivity {
 
 
-    private static final String LOG_TAG = "VOICECALL";
     private static final int MY_PERMISSIONS_RECORD_AUDIO = 1;
 
     public static final int VOCIECALL_EXPIRE = 60 * 1000;
@@ -38,11 +35,9 @@ public class VoiceCallActivity extends AppCompatActivity {
 
     private static boolean working = false;
 
-    private RtcEngine mRtcEngine = null;
-
-    private String channelID = "testChannel";
+    private String channelID;
     private boolean isInitiator;
-    private Conversation conv;
+    private PrivateConversation conv;
     private Conversation.Message msg;
 
     private Timer timeoutTimer = new Timer();
@@ -130,7 +125,8 @@ public class VoiceCallActivity extends AppCompatActivity {
         working = true;
 
         isInitiator = getIntent().getBooleanExtra("INITIATOR", false);
-        conv = ConversationManager.getInstance().getConversation(getIntent().getStringExtra("CONV_ID"));
+        conv = (PrivateConversation) ConversationManager.getInstance()
+                        .getConversation(getIntent().getStringExtra("CONV_ID"));
         msg = conv.getMessageById(getIntent().getStringExtra("MSG_ID"));
         channelID = msg.getData();
 
@@ -177,10 +173,14 @@ public class VoiceCallActivity extends AppCompatActivity {
             }
         }.start();
 
-        String name = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-        friendName.setText(name);
-        String photourl = FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString();
-        NetworkImageHelper.loadImage(friendIcon, photourl);
+
+        String targetUid = conv.getTargetUid();
+        UserInfoManager.getInstance().getUserInfo(targetUid, userInfo -> {
+            friendName.setText(userInfo.getName());
+            NetworkImageHelper.loadImage(friendIcon, userInfo.getHighResolutionPhotoUrl());
+        });
+
+
         textViewTime.setVisibility(View.INVISIBLE);
 
         if (isInitiator) {

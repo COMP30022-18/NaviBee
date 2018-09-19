@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -38,23 +39,26 @@ public class EventsActivity extends AppCompatActivity {
         private Timestamp time;
         private Map<String, Boolean> users;
         private Boolean isTag = false;
+        private ArrayList<String> images;
 
         public EventItem(){}
 
-        public EventItem(String name, String holder, String location, Timestamp time, Map<String, Boolean> users){
+        public EventItem(String name, String holder, String location, Timestamp time, Map<String, Boolean> users, ArrayList<String> images){
             this.holder = holder;
             this.name = name;
             this.location = location;
             this.users = users;
             this.time = time;
+            this.images = images;
         }
 
-        public EventItem(String name, String holder, String location, Date time, Map<String, Boolean> users){
+        public EventItem(String name, String holder, String location, Date time, Map<String, Boolean> users, ArrayList<String> images){
             this.holder = holder;
             this.name = name;
             this.location = location;
             this.users = users;
             this.time = new Timestamp(time);
+            this.images = images;
         }
 
         public String getHolder() { return holder; }
@@ -89,6 +93,13 @@ public class EventsActivity extends AppCompatActivity {
 
         public Timestamp getTime() { return time; }
 
+        public ArrayList<String> getImages() {
+            ArrayList<String> result = new ArrayList<>();
+            result.addAll(images);
+            return result;
+        }
+
+        @Exclude
         public Date getTime_() { return time.toDate(); }
     }
 
@@ -200,8 +211,20 @@ public class EventsActivity extends AppCompatActivity {
                     i.getName(),
                     i.getLocation(),
                     view -> {
+                        String relationship;
+                        if(i.getHolder().equals(uid)) {
+                            relationship = "holder";
+                        }
+                        else if(i.getUsers().keySet().contains(uid)){
+                            relationship = "participant";
+                        }
+                        else {
+                            relationship = "passerby";
+                        }
+
                         Intent intent = new Intent(EventsActivity.this, EventDetailsActivity.class);
                         intent.putExtra("eventId", i.getEventId());
+                        intent.putExtra("relationship", relationship);
                         startActivity(intent);
                     }
             ));

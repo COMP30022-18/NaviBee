@@ -61,7 +61,7 @@ public class EventSelectFriendsActivity extends AppCompatActivity {
 
     }
 
-    private void loadData (){
+    private void loadData() {
 
         selectedFriendMap = new HashMap<>();
         // fetch friend list
@@ -84,15 +84,20 @@ public class EventSelectFriendsActivity extends AppCompatActivity {
     public void editEventDetail(View view){
         // get selected friends' uid
         ArrayList<String> selectedUidList = new ArrayList<>();
+        ArrayList<String> selectedNameList = new ArrayList<>();
         for(String uid: selectedFriendMap.keySet()){
             if(selectedFriendMap.get(uid)){
                 selectedUidList.add(uid);
+                selectedNameList.add(uid2Name(uid));
             }
         }
         // start next step
         Intent intent = new Intent(this, EventEditActivity.class);
         intent.putStringArrayListExtra("selectedUid", selectedUidList);
+        intent.putStringArrayListExtra("selectedName", selectedNameList);
         setResult(RESULT_OK, intent);
         finish();
     }
+
+    private String uid2Name(String uid){ return friendNameList.get(friendList.indexOf(uid)); }
 }

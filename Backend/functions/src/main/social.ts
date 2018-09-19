@@ -13,14 +13,6 @@ export const newMessageNotification = functions.firestore
         // get sender and receiver
         const sender = doc.sender;
         const convDoc = (await db.collection('conversations').doc(convID).get()).data();
-        let receiver = "";
-        for (let key in convDoc.users) {
-            // do something with key|value
-            if (key!=sender) {
-                receiver = key;
-            }
-        }
-        // console.log("receiver: " + receiver);
 
         // get sender name
         const senderDoc = (await db.collection('users').doc(sender).get()).data();
@@ -35,6 +27,10 @@ export const newMessageNotification = functions.firestore
             }
         } else if (doc.type == "image") {
             content = "[Photo]"
+        } else if (doc.type == "voicecall") {
+            content = "[Voice Call]"
+        } else if (doc.type == "location") {
+            content = "[Location]"
         }
 
         // android payload
@@ -48,18 +44,25 @@ export const newMessageNotification = functions.firestore
             }
         }
 
-        // find all tokens and send notification
-        let tokens = await db.collection('fcmTokens')
-                        .where('uid', '==', receiver).get();
+        for (let key in convDoc.users) {
+            // for all users of this conversation
+            if (key!=sender) {
+                let receiver = key;
 
-        tokens.forEach( tokenDoc => {
-            let token = tokenDoc.id;
-            try {
-                msg.send({token: token, android: android});
-            } catch(Error) {
-                // token is invalid
+                // find all tokens and send notification
+                let tokens = await db.collection('fcmTokens')
+                                .where('uid', '==', receiver).get();
+
+                tokens.forEach( tokenDoc => {
+                    let token = tokenDoc.id;
+                    try {
+                        msg.send({token: token, android: android});
+                    } catch(Error) {
+                        // token is invalid
+                    }
+                });
             }
-        });
+        }
 
     });
 
@@ -102,7 +105,35 @@ export const addFriend = functions.https.onCall(
         conv['readTimestamps'] = {};
         conv['readTimestamps'][uid] = new Date();
         conv['readTimestamps'][targetUid] = new Date();
+        conv['createTimestamp'] = new Date();
         db.collection('conversations').add(conv);
 
+        return {code: 0};
+    });
+
+export const createGroupChat = functions.https.onCall(
+    async (data, context) => {
+        const uid = context.auth.uid;
+
+        if (uid==null) {
+            return {code:-1, msg:"need login"};
+        }
+
+        let conv = {};
+        conv['type'] = 'group';
+        conv['creator'] = uid;
+        conv['name'] = data.name;
+        conv['icon'] = data.icon
+        // add all users
+        conv['users'] = {};
+        conv['readTimestamps'] = {};
+        conv['users'][uid] = true;
+        conv['readTimestamps'][uid] = new Date();
+        conv['createTimestamp'] = new Date();
+        for (let entry of data.users) {
+            conv['users'][entry] = true;
+            conv['readTimestamps'][entry] = new Date();
+        }
+        db.collection('conversations').add(conv);
         return {code: 0};
     });
