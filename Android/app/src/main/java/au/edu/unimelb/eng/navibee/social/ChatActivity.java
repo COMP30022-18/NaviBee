@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 
 
@@ -274,6 +275,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             } else if (msg.getType().equals("location")) {
                 Gson gson = new Gson();
                 double[] coord = gson.fromJson(msg.getData(), double[].class);
+
+                Intent intent = new Intent(chatActivity.getBaseContext(), NavigationSelectorActivity.class);
+                intent.putExtra(NavigationSelectorActivity.EXTRA_LATITUDE, coord[0]);
+                intent.putExtra(NavigationSelectorActivity.EXTRA_LONGITUDE, coord[1]);
+
+                chatActivity.startActivity(intent);
+
             }
         }
 
