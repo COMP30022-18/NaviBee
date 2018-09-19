@@ -46,8 +46,7 @@ public class LocationDisplayActivity extends AppCompatActivity implements OnMapR
     @Override
     public void onMapReady(GoogleMap googleMap) {
         LatLng location = new LatLng(lat, lon);
-        googleMap.addMarker(new MarkerOptions().position(location)
-                .title("Location"));
+        googleMap.addMarker(new MarkerOptions().position(location));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
         googleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM_LEVEL));
     }
