@@ -21,13 +21,14 @@
         android:id="@+id/displayLocation_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:clickable="true"
         android:fitsSystemWindows="true"
-        android:layout_gravity="bottom|end"
         android:focusable="true"
+        android:onClick="onFabClick"
         app:fabCustomSize="80dp"
+        app:maxImageSize="40dp"
         app:rippleColor="@color/white"
-        app:srcCompat="@drawable/ic_add_white_50dp"
-        app:maxImageSize="40dp" />
+        app:srcCompat="@drawable/ic_navigation" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

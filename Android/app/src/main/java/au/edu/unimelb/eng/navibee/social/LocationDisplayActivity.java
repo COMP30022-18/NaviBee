@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -48,6 +50,14 @@ public class LocationDisplayActivity extends AppCompatActivity implements OnMapR
                 .title("Location"));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
         googleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM_LEVEL));
+    }
+
+    public void onFabClick(final View view) {
+        Intent intent = new Intent(getBaseContext(), NavigationSelectorActivity.class);
+        intent.putExtra(NavigationSelectorActivity.EXTRA_LATITUDE, lat);
+        intent.putExtra(NavigationSelectorActivity.EXTRA_LONGITUDE, lon);
+
+        startActivity(intent);
     }
 
 
