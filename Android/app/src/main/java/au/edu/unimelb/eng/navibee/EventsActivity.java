@@ -39,23 +39,26 @@ public class EventsActivity extends AppCompatActivity {
         private Timestamp time;
         private Map<String, Boolean> users;
         private Boolean isTag = false;
+        private ArrayList<String> picsStoragePath;
 
         public EventItem(){}
 
-        public EventItem(String name, String holder, String location, Timestamp time, Map<String, Boolean> users){
+        public EventItem(String name, String holder, String location, Timestamp time, Map<String, Boolean> users, ArrayList<String> picsStoragePath){
             this.holder = holder;
             this.name = name;
             this.location = location;
             this.users = users;
             this.time = time;
+            this.picsStoragePath = picsStoragePath;
         }
 
-        public EventItem(String name, String holder, String location, Date time, Map<String, Boolean> users){
+        public EventItem(String name, String holder, String location, Date time, Map<String, Boolean> users, ArrayList<String> picsStoragePath){
             this.holder = holder;
             this.name = name;
             this.location = location;
             this.users = users;
             this.time = new Timestamp(time);
+            this.picsStoragePath = picsStoragePath;
         }
 
         public String getHolder() { return holder; }
@@ -89,6 +92,12 @@ public class EventsActivity extends AppCompatActivity {
         }
 
         public Timestamp getTime() { return time; }
+
+        public ArrayList<String> getPicsStoragePath() {
+            ArrayList<String> result = new ArrayList<>();
+            result.addAll(picsStoragePath);
+            return result;
+        }
 
         @Exclude
         public Date getTime_() { return time.toDate(); }

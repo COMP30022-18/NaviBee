@@ -13,6 +13,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 import au.edu.unimelb.eng.navibee.social.ChatActivity;
+import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -22,6 +23,7 @@ import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.camera2.params.BlackLevelPattern;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
@@ -47,6 +49,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.UploadTask;
 import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
@@ -68,6 +71,8 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     private ArrayList<String> selectedNameList;
     private Map<String, Integer> dateMap;
     private ArrayList<Bitmap> pics;
+    private ArrayList<Uri> picsUri;
+    private ArrayList<String> picsStoragePath = new ArrayList<>();
     private GridView picsView;
     private EditText nameView;
     private Button timeButton;
@@ -133,8 +138,10 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         // init chipGroup
         addEditChip2Group();
         // init pics gridView
-        addIcon = createImage(50, 50, R.color.landing_red);
+        Drawable addDrawable = getResources().getDrawable(R.drawable.ic_add_black_100dp);
+        addIcon = drawableToBitmap(addDrawable);
         pics = new ArrayList<>();
+        picsUri = new ArrayList<>();
         pics.add(addIcon);
         picsView.setNumColumns(3);
         picsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -309,6 +316,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
                 int position = intent.getIntExtra("position", -1);
                 if(isDeleted){
                     pics.remove(position);
+                    picsUri.remove(position);
                     picsUpdate();
                 }
             }
@@ -363,10 +371,9 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         chipgroup.addView(chip);
     }
 
-    public void finishedEditEvent() {
+    public void uploadAll() {
 
-        EditText editText = (EditText) findViewById(R.id.eventName);
-        String name = editText.getText().toString();
+        String name = nameView.getText().toString();
 
         String holder = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -386,7 +393,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         }
         users.put(holder, true);
 
-        EventsActivity.EventItem newEvent = new EventsActivity.EventItem(name, holder, location, eventDate, users);
+        EventsActivity.EventItem newEvent = new EventsActivity.EventItem(name, holder, location, eventDate, users, picsStoragePath);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("events").document(UUID.randomUUID().toString()).set(newEvent).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -415,23 +422,55 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         });
     }
 
+    private void finishedEditEvent() {
+        if (!picsUri.isEmpty()) {
+            Uri uri = picsUri.get(0);
+            picsUri.remove(0);
+
+            try {
+                UploadTask task = FirebaseStorageHelper.uploadImage(uri, null, "event", 80);
+                task.addOnCompleteListener(taskResult -> {
+                    if (taskResult.isSuccessful()) {
+                        picsStoragePath.add(taskResult.getResult().getMetadata().getPath());
+                        finishedEditEvent();
+                    } else {
+                        // fail
+                    }
+                });
+            } catch (Exception e) {
+                // fail
+
+            }
+
+        } else {
+            // complete
+            uploadAll();
+        }
+    }
+
     public void onPublishClicked(View v) {
+
+        // check if name has entered
+        if(nameView.getText().toString().length() == 0){
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+            dialog.setMessage("You haven't complete event name");
+            dialog.setPositiveButton("Oops! Forgot", (dialoginterface, i) -> dialoginterface.cancel());
+            dialog.show();
+        }
 
         // check if any friends selected
         if(selectedUidList == null || selectedUidList.size() == 0) {
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
             dialog.setMessage("You haven't invite any friends");
-            dialog.setNegativeButton("I don't have friends", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialoginterface, int i) {
-                    dialoginterface.cancel();
-                    selectedUidList = new ArrayList<>();
-                    finishedEditEvent();
-                }});
-            dialog.setPositiveButton("Oops! Forgot", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialoginterface, int i) {
-                    Intent intent = new Intent(EventEditActivity.this, EventSelectFriendsActivity.class);
-                    startActivityForResult(intent, 1);
-                }});
+            dialog.setNegativeButton("I don't have friends", (dialoginterface, i) -> {
+                dialoginterface.cancel();
+                selectedUidList = new ArrayList<>();
+                finishedEditEvent();
+            });
+            dialog.setPositiveButton("Oops! Forgot", (dialoginterface, i) -> {
+                Intent intent = new Intent(EventEditActivity.this, EventSelectFriendsActivity.class);
+                startActivityForResult(intent, 1);
+            });
             dialog.show();
         }
 
@@ -439,10 +478,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         if(dateMap.size() < 5){
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
             dialog.setMessage("You haven't complete event time");
-            dialog.setPositiveButton("Oops! Forgot", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialoginterface, int i) {
-                    dialoginterface.cancel();
-                }});
+            dialog.setPositiveButton("Oops! Forgot", (dialoginterface, i) -> dialoginterface.cancel());
             dialog.show();
         }
 
@@ -459,30 +495,33 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     @Override
     public void onPickResult(PickResult r) {
         if (r.getError() == null) {
-            //If you want the Uri.
-            //Mandatory to refresh image from Uri.
-            //getImageView().setImageURI(null);
 
-            //Setting the real returned image.
-            //getImageView().setImageURI(r.getUri());
-
-            //If you want the Bitmap.
             pics.add(0, r.getBitmap());
+            picsUri.add(r.getUri());
+
             picsUpdate();
-            //Image path
-            //r.getPath();
+
         } else {
             //Handle possible errors
             Toast.makeText(this, r.getError().getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
-    public static Bitmap createImage(int width, int height, int color) {
+    public static Bitmap drawableToBitmap (Drawable drawable) {
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable)drawable).getBitmap();
+        }
+
+        int width = drawable.getIntrinsicWidth();
+        width = width > 0 ? width : 1;
+        int height = drawable.getIntrinsicHeight();
+        height = height > 0 ? height : 1;
+
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        Paint paint = new Paint();
-        paint.setColor(color);
-        canvas.drawRect(0F, 0F, (float) width, (float) height, paint);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
         return bitmap;
     }
 
