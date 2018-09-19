@@ -70,7 +70,7 @@
         <activity
             android:name=".EventActivity"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".EventSelectFriendsActivity" />
+        <activity android:name=".event.EventSelectFriendsActivity" />
         <activity
             android:name=".SosActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -125,13 +125,13 @@
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="android:screenOrientation" />
-        <activity android:name=".EventEditActivity" />
+        <activity android:name=".event.EventEditActivity" />
         <activity
             android:name=".SosSettingActivity"
             android:label="@string/sos_setting" />
         <activity
-            android:name=".EventDetailsActivity"
-            android:parentActivityName=".EventsActivity"
+            android:name=".event.EventDetailsActivity"
+            android:parentActivityName=".event.EventsActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
         <activity
             android:name=".social.ChatImageViewActivity"
@@ -145,10 +145,10 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
-            android:name=".EventPicFullscreenActivity">
+            android:name=".event.EventPicFullscreenActivity">
         </activity>
         <activity
-            android:name=".EventsActivity"
+            android:name=".event.EventsActivity"
             android:label="@string/landing_events">
         </activity>
         <activity

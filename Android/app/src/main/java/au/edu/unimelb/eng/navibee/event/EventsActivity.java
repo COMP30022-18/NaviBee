@@ -1,9 +1,9 @@
-package au.edu.unimelb.eng.navibee;
+package au.edu.unimelb.eng.navibee.event;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.navigation.EventRVDivider;
 import au.edu.unimelb.eng.navibee.navigation.EventRVEntry;
 import au.edu.unimelb.eng.navibee.navigation.EventRVIndefiniteProgressBar;
@@ -95,7 +95,9 @@ public class EventsActivity extends AppCompatActivity {
 
         public ArrayList<String> getImages() {
             ArrayList<String> result = new ArrayList<>();
-            result.addAll(images);
+            if(images != null) {
+                result.addAll(images);
+            }
             return result;
         }
 
