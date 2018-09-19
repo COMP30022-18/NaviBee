@@ -139,7 +139,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         // init chipGroup
         addEditChip2Group();
         // init pics gridView
-        Drawable addDrawable = getResources().getDrawable(R.drawable.ic_add_black_100dp);
+        Drawable addDrawable = getResources().getDrawable(R.drawable.ic_add_white_50dp);
         addIcon = drawableToBitmap(addDrawable);
         pics = new ArrayList<>();
         picsUri = new ArrayList<>();
