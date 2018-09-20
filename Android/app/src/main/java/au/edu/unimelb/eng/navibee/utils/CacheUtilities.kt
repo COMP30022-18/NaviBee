@@ -29,6 +29,8 @@ import java.io.FileOutputStream
 abstract class CachedLoader(private val prefix: String = "general-cache") {
     abstract val defaultKey: String
     lateinit var job: Job
+
+    @JvmOverloads
     open fun execute(key: String? = null) {
         job = launch {
             val k = key ?: defaultKey
@@ -49,9 +51,10 @@ abstract class CachedLoader(private val prefix: String = "general-cache") {
     abstract fun loadTask(file: File)
 }
 
-abstract class ImageViewCacheLoader(val imageView: ImageView,
-                                    prefix: String = "general-cache",
-                                    val singleJob: Boolean = true):
+abstract class ImageViewCacheLoader
+    @JvmOverloads constructor(val imageView: ImageView,
+                              prefix: String = "general-cache",
+                              val singleJob: Boolean = true):
         CachedLoader(prefix) {
     private var tag: Any? = null
 
@@ -83,7 +86,8 @@ abstract class ImageViewCacheLoader(val imageView: ImageView,
     }
 }
 
-class URLImageViewCacheLoader(private val url: String, iv: ImageView,
+class URLImageViewCacheLoader
+    @JvmOverloads constructor(private val url: String, iv: ImageView,
                               prefix: String = "image-url",
                               singleJob: Boolean = true):
         ImageViewCacheLoader(iv, prefix, singleJob) {
