@@ -163,6 +163,13 @@
         <activity android:name=".social.CreateGroupChatActivity" />
         <activity android:name=".social.FriendDetail" />
         <activity android:name=".social.LocationDisplayActivity" />
+        <activity android:name=".SandboxActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
