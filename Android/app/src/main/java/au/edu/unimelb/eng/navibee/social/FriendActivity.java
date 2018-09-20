@@ -124,6 +124,7 @@ public class FriendActivity extends AppCompatActivity {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_item, parent, false);
             v.setOnClickListener(this);
             FriendViewHolder vh = new FriendViewHolder(v);
+            vh.setIsRecyclable(false);
             return vh;
         }
 
@@ -176,6 +177,7 @@ public class FriendActivity extends AppCompatActivity {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_list_item, parent, false);
             v.setOnClickListener(this);
             ChatViewHolder vh = new ChatViewHolder(v);
+            vh.setIsRecyclable(false);
             return vh;
         }
 
