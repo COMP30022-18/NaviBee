@@ -23,8 +23,9 @@ private val geoContext = GeoApiContext
 class GoogleMapsPlaceIdCacheImageLoader(private val placeId: String,
                                         iv: ImageView,
                                         maxHeight: Int,
-                                        index: Int = 0):
-        GoogleMapsPhotoReferenceCacheImageLoader("", iv, maxHeight) {
+                                        index: Int = 0,
+                                        singleJob: Boolean = true):
+        GoogleMapsPhotoReferenceCacheImageLoader("", iv, maxHeight, singleJob) {
     override val defaultKey = "$placeId-$index"
     override fun loadTask(file: File) {
         val placeDetails = PlacesApi.placeDetails(geoContext, placeId).await()
@@ -41,8 +42,9 @@ class GoogleMapsPlaceIdCacheImageLoader(private val placeId: String,
 
 open class GoogleMapsPhotoReferenceCacheImageLoader(var photoReference: String,
                                                     iv: ImageView,
-                                                    private val maxHeight: Int):
-        ImageViewCacheLoader(iv, prefix="gmpr") {
+                                                    private val maxHeight: Int,
+                                                    singleJob: Boolean = true):
+        ImageViewCacheLoader(iv, prefix="gmpr", singleJob = singleJob) {
 
     override val defaultKey = photoReference
     override fun loadTask(file: File) {

@@ -16,6 +16,7 @@ import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -121,10 +122,8 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
         bottomSheetBehavior.peekHeight = (heights * 0.382).toInt()
         recyclerView.minimumHeight = (heights * 0.382).toInt()
 
-        navigation_destinations_search_result_map.view?.apply {
-            layoutParams = layoutParams?.apply {
-                height = (heights * 0.618).toInt()
-            }
+        navigation_destinations_search_result_map.view?.updateLayoutParams {
+            height = (heights * 0.618).toInt()
         }
 
         val mapFragment = supportFragmentManager

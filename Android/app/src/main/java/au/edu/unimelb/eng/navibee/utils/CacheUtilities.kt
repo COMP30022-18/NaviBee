@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.ImageView
 import au.edu.unimelb.eng.navibee.NaviBeeApplication
 import com.google.common.io.ByteStreams
+import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import timber.log.Timber
@@ -27,8 +28,9 @@ import java.io.FileOutputStream
  */
 abstract class CachedLoader(private val prefix: String = "general-cache") {
     abstract val defaultKey: String
-    fun execute(key: String? = null) {
-        launch {
+    lateinit var job: Job
+    open fun execute(key: String? = null) {
+        job = launch {
             val k = key ?: defaultKey
             val file = File(
                 NaviBeeApplication.instance.cacheDir,
@@ -48,8 +50,24 @@ abstract class CachedLoader(private val prefix: String = "general-cache") {
 }
 
 abstract class ImageViewCacheLoader(val imageView: ImageView,
-                                    prefix: String = "general-cache"):
+                                    prefix: String = "general-cache",
+                                    val singleJob: Boolean = true):
         CachedLoader(prefix) {
+    private var tag: Any? = null
+
+    override fun execute(key: String?) {
+        if (singleJob) {
+            if (imageView.tag is Job)
+                (imageView.tag as Job).cancel()
+            else
+                tag = imageView.tag
+        }
+        super.execute(key)
+        if (singleJob) {
+            imageView.tag = job
+        }
+    }
+
     override fun postLoad(file: File) {
         try {
             imageView.visibility = View.VISIBLE
@@ -60,15 +78,17 @@ abstract class ImageViewCacheLoader(val imageView: ImageView,
         } catch (e: Exception) {
             Timber.e(e, "Failed loading image to ImageView.")
         }
+        if (singleJob)
+            imageView.tag = tag
     }
 }
 
-class URLImageViewCacheLoader(val url: String, iv: ImageView,
-                              prefix: String = "image-url"):
-        ImageViewCacheLoader(iv, prefix) {
+class URLImageViewCacheLoader(private val url: String, iv: ImageView,
+                              prefix: String = "image-url",
+                              singleJob: Boolean = true):
+        ImageViewCacheLoader(iv, prefix, singleJob) {
     override val defaultKey = url
     override fun loadTask(file: File) {
-
         try {
             val input = java.net.URL(url).openStream()
             val output = FileOutputStream(file)
