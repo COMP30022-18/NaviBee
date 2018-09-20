@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.provider.SearchRecentSuggestions
 import android.text.Html
 import android.util.DisplayMetrics
+import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -110,11 +111,19 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
         val displayMetrics = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(displayMetrics)
         val bottomSheetBehavior = BottomSheetBehavior.from(recyclerView)
-        bottomSheetBehavior.peekHeight = (displayMetrics.heightPixels * 0.382).toInt()
-        recyclerView.minimumHeight = (displayMetrics.heightPixels * 0.382).toInt()
+        val actionBarHeight = TypedValue().let {
+            if (theme.resolveAttribute(R.attr.actionBarSize, it, true))
+                TypedValue.complexToDimensionPixelSize(it.data, resources.displayMetrics)
+            else
+                0
+        }
+        val heights = displayMetrics.heightPixels - actionBarHeight
+        bottomSheetBehavior.peekHeight = (heights * 0.382).toInt()
+        recyclerView.minimumHeight = (heights * 0.382).toInt()
+
         navigation_destinations_search_result_map.view?.apply {
             layoutParams = layoutParams?.apply {
-                height = (displayMetrics.heightPixels * 0.618).toInt()
+                height = (heights * 0.618).toInt()
             }
         }
 
