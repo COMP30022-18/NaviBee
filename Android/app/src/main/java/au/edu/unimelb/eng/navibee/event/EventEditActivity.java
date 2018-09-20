@@ -1,5 +1,6 @@
 package au.edu.unimelb.eng.navibee.event;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -21,8 +22,10 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -30,6 +33,8 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -70,6 +75,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     private Button dateButton;
     private Bitmap addIcon;
     private ChipGroup chipgroup;
+    private ScrollView scrollView;
     private final int MAX_NUM_OF_PHOTOS = 6;
 
     public static class TimePickerFragment extends DialogFragment {
@@ -114,6 +120,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         dateButton = (Button)findViewById(R.id.eventPickDate);
         chipgroup = (ChipGroup) findViewById(R.id.eventFriendChips);
         picsView = (GridView) findViewById(R.id.eventPics);
+        scrollView = (ScrollView) findViewById(R.id.eventScrollView);
 
         loadData();
     }
@@ -121,6 +128,22 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     private void loadData(){
         Intent intent = getIntent();
         Boolean isEdit = intent.getBooleanExtra("isEdit", false);
+
+        scrollView.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
+        scrollView.setFocusable(true);
+        scrollView.setFocusableInTouchMode(true);
+        scrollView.setOnTouchListener((v, event) -> {
+            v.clearFocus();
+            return false;
+        });
+
+        nameView.setOnFocusChangeListener((v, hasFocus) -> {
+            if(!hasFocus) {
+                InputMethodManager imm =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+            }
+        });
+
         // init date map
         dateMap = new HashMap<>();
         // init date and time button
