@@ -541,7 +541,7 @@ data class Guidance(
 @JsonClass(generateAdapter = true)
 data class Maneuvers(
     @Json(name = "sec_ids")
-    val sedIds: String,
+    val secIds: String,
     @Json(name = "Maneuver")
     val maneuvers: List<Maneuver>?
 )
@@ -557,9 +557,7 @@ data class Maneuver(
     val nextNumber: String?,
     val distance: Int?,
     val traffic: Float?,
-    @Json(name = "Instruction")
     val instruction: String?,
-    @Json(name = "Graph")
     val graph: String?
 )
 

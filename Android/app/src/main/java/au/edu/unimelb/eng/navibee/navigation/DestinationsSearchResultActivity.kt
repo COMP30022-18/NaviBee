@@ -11,7 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.SearchRecentSuggestions
 import android.text.Html
-import android.util.TypedValue
+import android.util.DisplayMetrics
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -77,12 +77,6 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
 
     private lateinit var viewModel: DestinationSearchResultViewModel
 
-    private val actionBarHeight: Int by lazy {
-        val tv = TypedValue()
-        theme.resolveAttribute(R.attr.actionBarSize, tv, true)
-        TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation_destinations_search_result)
@@ -113,12 +107,14 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
 
         // setup collapsible view
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
         val bottomSheetBehavior = BottomSheetBehavior.from(recyclerView)
-        bottomSheetBehavior.peekHeight = (resources.displayMetrics.heightPixels * 0.382).toInt()
-        recyclerView.minimumHeight = (resources.displayMetrics.heightPixels * 0.382).toInt()
+        bottomSheetBehavior.peekHeight = (displayMetrics.heightPixels * 0.382).toInt()
+        recyclerView.minimumHeight = (displayMetrics.heightPixels * 0.382).toInt()
         navigation_destinations_search_result_map.view?.apply {
             layoutParams = layoutParams?.apply {
-                height = (resources.displayMetrics.heightPixels * 0.618).toInt()
+                height = (displayMetrics.heightPixels * 0.618).toInt()
             }
         }
 
@@ -279,8 +275,6 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        // Add a marker in Sydney, Australia,
-        // and move the map's camera to the same location.
         val lkl = lastKnownLocation
         this.googleMap = googleMap
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==

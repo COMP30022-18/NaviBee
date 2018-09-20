@@ -28,4 +28,6 @@
     <color name="rippleOnDark">#42ffffff</color>
 
     <color name="black_overlay">#66000000</color>
+
+    <color name="transitWalkingColor">#2CC3F8</color>
 </resources>
