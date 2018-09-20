@@ -148,82 +148,83 @@ public class FriendActivity extends AppCompatActivity {
 
     }
 
-    public static class ChatsAdapter extends BaseAdapter {
-        private ArrayList<ContactItem> chatsList;
+    public static class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ChatViewHolder> implements View.OnClickListener {
+        public static class ChatViewHolder extends RecyclerView.ViewHolder{
 
-        private LayoutInflater l_Inflater;
-
-        public ChatsAdapter(Context context, ArrayList<ContactItem> chatsList){
-            this.chatsList = chatsList;
-            l_Inflater = LayoutInflater.from(context);
+            public ChatViewHolder(@NonNull View itemView) {
+                super(itemView);
+            }
         }
 
-        public int getCount(){
+        private ArrayList<ContactItem> chatsList;
+        private RecyclerView mRecyclerView;
+        private FriendActivity friendActivity;
+
+
+        public ChatsAdapter(FriendActivity context, ArrayList<ContactItem> chatsList, RecyclerView mRecyclerView){
+            this.friendActivity = context;
+            this.chatsList = chatsList;
+            this.mRecyclerView = mRecyclerView;
+        }
+
+        @Override
+        public int getItemCount() {
             return chatsList.size();
         }
-        public ContactItem getItem(int position){
-            return chatsList.get(position);
-        }
-        public long getItemId(int position){
-            return position;
+
+        public ChatsAdapter.ChatViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_list_item, parent, false);
+            v.setOnClickListener(this);
+            ChatViewHolder vh = new ChatViewHolder(v);
+            return vh;
         }
 
-        public View getView(int position, View convertView, ViewGroup parent){
-            ViewHolder holder;
-            if (convertView == null) {
-                convertView = l_Inflater.inflate(R.layout.chat_list_item, null);
-                holder = new ViewHolder();
-                holder.image = (ImageView) convertView.findViewById(R.id.chat_list_item_icon);
-                holder.text = (TextView) convertView.findViewById(R.id.chat_list_item_name);
-                holder.lastTime = (TextView) convertView.findViewById(R.id.chat_list_item_time);
-                holder.unread = (TextView) convertView.findViewById(R.id.chat_list_item_unread);
-                holder.lastMessage = (TextView) convertView.findViewById(R.id.chat_list_item_last_message);
-                convertView.setTag(holder);
-            } else {
-                holder = (ViewHolder) convertView.getTag();
-            }
-            if (chatsList.size() <= 0){
-                holder.text.setText("No Data");
+        public void onBindViewHolder(ChatViewHolder holder, int position){
+            ContactItem tempChat = chatsList.get(position);
+            tempChat.displayNameAndIcon((TextView) holder.itemView.findViewById(R.id.chat_list_item_name),
+                    (ImageView) holder.itemView.findViewById(R.id.chat_list_item_icon));
+            ((TextView) holder.itemView.findViewById(R.id.chat_list_item_unread)).setText(Integer.toString(tempChat.getUnreadMessage()));
+            if (tempChat.getUnreadMessage() == 0){
+                holder.itemView.findViewById(R.id.chat_list_item_unread).setVisibility(View.INVISIBLE);
             }
             else{
-                ContactItem tempChat = chatsList.get(position);
-
-                tempChat.displayNameAndIcon(holder.text, holder.image);
-
-
-                holder.unread.setText(Integer.toString(tempChat.getUnreadMessage()));
-                if (tempChat.getUnreadMessage() == 0){
-                    holder.unread.setVisibility(View.INVISIBLE);
-                }
-                else{
-                    holder.unread.setVisibility(View.VISIBLE);
-                }
-                if (tempChat.hasMessage()){
-                    holder.lastMessage.setText(tempChat.getLastMessage());
-                    holder.lastTime.setText(tempChat.getLastMessageTime());
-                }
-                else{
-                    holder.lastMessage.setText("");
-                    holder.lastTime.setText("");
-                }
-
+                holder.itemView.findViewById(R.id.chat_list_item_unread).setVisibility(View.VISIBLE);
             }
-
-            return convertView;
+            if (tempChat.hasMessage()){
+                ((TextView) holder.itemView.findViewById(R.id.chat_list_item_last_message)).setText(tempChat.getLastMessage());
+                ((TextView) holder.itemView.findViewById(R.id.chat_list_item_time)).setText(tempChat.getLastMessageTime());
+            }
+            else{
+                ((TextView) holder.itemView.findViewById(R.id.chat_list_item_last_message)).setText("");
+                ((TextView) holder.itemView.findViewById(R.id.chat_list_item_time)).setText("");
+            }
+        }
+        @Override
+        public void onClick(final View view) {
+            int itemPosition = mRecyclerView.getChildLayoutPosition(view);
+            ContactItem tempChat = chatsList.get(itemPosition);
+            Intent intent = new Intent(friendActivity.getBaseContext(), ChatActivity.class);
+            Conversation tempConv = tempChat.getConv();
+            intent.putExtra("CONV_ID", tempConv.getConvId());
+            friendActivity.startActivity(intent);
         }
     }
 
     private ConversationManager cm = ConversationManager.getInstance();
     private ArrayList<ContactItem> contactList = new ArrayList<ContactItem>();
     private ArrayList<ContactItem> chatsList = new ArrayList<ContactItem>();
-    private FriendAdapter recyclerFriendAdapter;
-    private ChatsAdapter chatsListAdapter;
-    private Button addFriendButton;
+
+    private ChatsAdapter recyclerChatsAdapter;
     private Button createGroupChatButton;
-    private RecyclerView recyclerFriendLists;
+    private RecyclerView recyclerChatsList;
+    private RecyclerView.LayoutManager recyclerChatsManager;
+
+
+    private FriendAdapter recyclerFriendsAdapter;
+    private Button addFriendButton;
+    private RecyclerView recyclerFriendsList;
     private RecyclerView.LayoutManager recyclerFriendsManager;
 
-    private ListView recentChats;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -233,15 +234,15 @@ public class FriendActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.switch_friend_list:
-                    recentChats.setVisibility(View.INVISIBLE);
+                    recyclerChatsList.setVisibility(View.INVISIBLE);
                     createGroupChatButton.setVisibility(View.INVISIBLE);
-                    recyclerFriendLists.setVisibility(View.VISIBLE);
+                    recyclerFriendsList.setVisibility(View.VISIBLE);
                     addFriendButton.setVisibility(View.VISIBLE);
                     return true;
                 case R.id.switch_recent_chat:
-                    recentChats.setVisibility(View.VISIBLE);
+                    recyclerChatsList.setVisibility(View.VISIBLE);
                     createGroupChatButton.setVisibility(View.VISIBLE);
-                    recyclerFriendLists.setVisibility(View.INVISIBLE);
+                    recyclerFriendsList.setVisibility(View.INVISIBLE);
                     addFriendButton.setVisibility(View.INVISIBLE);
                     return true;
             }
@@ -259,25 +260,33 @@ public class FriendActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
 
-        recyclerFriendLists = (RecyclerView) findViewById(R.id.contactRecyclerView);
-        recyclerFriendLists.setHasFixedSize(true);
+        recyclerFriendsList = (RecyclerView) findViewById(R.id.contactRecyclerView);
+        recyclerFriendsList.setHasFixedSize(true);
         // use a linear layout manager
         recyclerFriendsManager = new LinearLayoutManager(this);
-        recyclerFriendLists.setLayoutManager(recyclerFriendsManager);
+        recyclerFriendsList.setLayoutManager(recyclerFriendsManager);
         // specify an adapter (see also next example)
-        recyclerFriendAdapter = new FriendAdapter(this, contactList, recyclerFriendLists);
-        recyclerFriendLists.setAdapter(recyclerFriendAdapter);
+        recyclerFriendsAdapter = new FriendAdapter(this, contactList, recyclerFriendsList);
+        recyclerFriendsList.setAdapter(recyclerFriendsAdapter);
+        recyclerFriendsList.setVisibility(View.INVISIBLE);
 
-
-
-        chatsListAdapter = new ChatsAdapter(this, chatsList);
-        recentChats = (ListView) findViewById(R.id.recentChatsListView);
-        recentChats.setAdapter(chatsListAdapter);
         addFriendButton = (Button) findViewById(R.id.addFriendButton);
         addFriendButton.setVisibility(View.INVISIBLE);
+
+
+
+        recyclerChatsList = (RecyclerView) findViewById(R.id.chatsRecyclerView);
+        recyclerChatsList.setHasFixedSize(true);
+        // use a linear layout manager
+        recyclerChatsManager = new LinearLayoutManager(this);
+        recyclerChatsList.setLayoutManager(recyclerChatsManager);
+        // specify an adapter (see also next example)
+        recyclerChatsAdapter = new ChatsAdapter(this, chatsList, recyclerChatsList);
+        recyclerChatsList.setAdapter(recyclerChatsAdapter);
+        recyclerChatsList.setVisibility(View.INVISIBLE);
+
         createGroupChatButton = (Button) findViewById(R.id.createGroupChatButton);
-        recentChats.setVisibility(View.VISIBLE);
-        recyclerFriendLists.setVisibility(View.INVISIBLE);
+        recyclerChatsList.setVisibility(View.VISIBLE);
 
 
 
@@ -289,14 +298,6 @@ public class FriendActivity extends AppCompatActivity {
         registerReceiver(br, intFilt);
 
         registerReceiver(brMsgReadState, new IntentFilter(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE));
-
-        recentChats.setOnItemClickListener((parent, view, pos, l) -> {
-            //using switch case, to check the condition.
-
-            Intent intent = new Intent(getBaseContext(), ChatActivity.class);
-            intent.putExtra("CONV_ID", chatsListAdapter.getItem(pos).getConv().getConvId());
-            startActivity(intent);
-        });
     }
 
     BroadcastReceiver br = new BroadcastReceiver() {
@@ -310,9 +311,9 @@ public class FriendActivity extends AppCompatActivity {
     BroadcastReceiver brMsgReadState = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            recyclerFriendAdapter.notifyDataSetChanged();
+            recyclerFriendsAdapter.notifyDataSetChanged();
             sortChatsList();
-            chatsListAdapter.notifyDataSetChanged();
+            recyclerChatsAdapter.notifyDataSetChanged();
         }
     };
 
@@ -325,7 +326,7 @@ public class FriendActivity extends AppCompatActivity {
             contactList.add(new ContactItem(conv));
         }
 
-        recyclerFriendAdapter.notifyDataSetChanged();
+        recyclerFriendsAdapter.notifyDataSetChanged();
     }
 
     private void loadChatsList(){
@@ -335,7 +336,7 @@ public class FriendActivity extends AppCompatActivity {
             chatsList.add(new ContactItem(conv));
         }
         sortChatsList();
-        chatsListAdapter.notifyDataSetChanged();
+        recyclerChatsAdapter.notifyDataSetChanged();
     }
 
     private void sortChatsList() {

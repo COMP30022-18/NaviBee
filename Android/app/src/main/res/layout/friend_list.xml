@@ -48,21 +48,34 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/recentChatsListView" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/contactRecyclerView"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/addFriendButton" />
-    <ListView
-        android:layout_marginTop="8dp"
-        android:id="@+id/recentChatsListView"
-        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@id/createGroupChatButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteX="170dp"
+        tools:layout_editor_absoluteY="-2dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="spread_inside"/>
+        app:layout_constraintBottom_toTopOf="@+id/addFriendButton">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/contactRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/addFriendButton" />
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteX="170dp"
+        tools:layout_editor_absoluteY="-2dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/addFriendButton">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/chatsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/createGroupChatButton" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
