@@ -11,7 +11,6 @@ import com.google.android.gms.location.places.Place
 import com.google.maps.GeoApiContext
 import com.google.maps.PlacesApi
 import kotlinx.coroutines.experimental.DefaultDispatcher
-import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.withContext
 import timber.log.Timber
@@ -47,7 +46,7 @@ open class GoogleMapsPhotoReferenceCacheImageLoader(var photoReference: String,
 
     override val defaultKey = photoReference
     override fun loadTask(file: File) {
-        launch(UI) {
+        launch {
             val image = withContext(DefaultDispatcher) { loadImage() }
             if (image != null) {
                 val outputStream = FileOutputStream(file)

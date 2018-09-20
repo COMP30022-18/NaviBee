@@ -5,6 +5,8 @@ import android.view.View
 import android.widget.ImageView
 import au.edu.unimelb.eng.navibee.NaviBeeApplication
 import com.google.common.io.ByteStreams
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
@@ -26,16 +28,18 @@ import java.io.FileOutputStream
 abstract class CachedLoader(private val prefix: String = "general-cache") {
     abstract val defaultKey: String
     fun execute(key: String? = null) {
-        val k = key ?: defaultKey
-        val file = File(
-            NaviBeeApplication.instance.cacheDir,
-            "$prefix-${sha256String(k)}"
-        )
+        launch {
+            val k = key ?: defaultKey
+            val file = File(
+                NaviBeeApplication.instance.cacheDir,
+                "$prefix-${sha256String(k)}"
+            )
 
-        if (file.exists()) {
-            postLoad(file)
-        } else {
-            loadTask(file)
+            if (file.exists()) {
+                postLoad(file)
+            } else {
+                loadTask(file)
+            }
         }
     }
 
@@ -49,7 +53,10 @@ abstract class ImageViewCacheLoader(val imageView: ImageView,
     override fun postLoad(file: File) {
         try {
             imageView.visibility = View.VISIBLE
-            imageView.setImageBitmap(BitmapFactory.decodeStream(FileInputStream(file)))
+            val bitmap = BitmapFactory.decodeStream(FileInputStream(file))
+            launch(UI) {
+                imageView.setImageBitmap(bitmap)
+            }
         } catch (e: Exception) {
             Timber.e(e, "Failed loading image to ImageView.")
         }
