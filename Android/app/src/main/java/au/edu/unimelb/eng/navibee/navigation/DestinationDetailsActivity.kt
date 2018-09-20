@@ -13,6 +13,7 @@ import android.view.WindowManager
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.*
 import au.edu.unimelb.eng.navibee.R
 import au.edu.unimelb.eng.navibee.utils.*
@@ -87,18 +88,16 @@ class DestinationDetailsActivity : AppCompatActivity() {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
                 setOnApplyWindowInsetsListener { view, insets ->
-                    view.apply {
-                        val lp = layoutParams
-                        lp.height = insets.systemWindowInsetTop
-                        layoutParams = lp
+                    view.updateLayoutParams{
+                        height = insets.systemWindowInsetTop
                     }
                     insets
                 }
             } else {
-                val lp = layoutParams
-                lp.height = getStatusBarHeight(this)
-                layoutParams = lp
-
+                val height = getStatusBarHeight(this)
+                updateLayoutParams {
+                    this.height = height
+                }
             }
         }
 
@@ -169,10 +168,8 @@ class DestinationDetailsActivity : AppCompatActivity() {
                 BottomSheetBehavior.from(recyclerView)
         bottomSheetBehavior.peekHeight = (resources.displayMetrics.heightPixels * 0.618).toInt()
         recyclerView.minimumHeight = (resources.displayMetrics.heightPixels * 0.618).toInt()
-        navigation_destinations_details_image_preview.apply {
-            val param = layoutParams
-            param.height = (resources.displayMetrics.heightPixels * 0.380).toInt()
-            layoutParams = param
+        navigation_destinations_details_image_preview.updateLayoutParams {
+            height = (resources.displayMetrics.heightPixels * 0.380).toInt()
         }
 
         bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
@@ -237,10 +234,9 @@ class DestinationDetailsActivity : AppCompatActivity() {
     }
 
     private fun setViewHeightPercent(view: View, percentage: Float, min: Int, max: Int) {
-        val height = (min + (max - min) * percentage).toInt()
-        val params = view.layoutParams
-        params.height = height
-        view.layoutParams = params
+        view.updateLayoutParams {
+            height = (min + (max - min) * percentage).toInt()
+        }
     }
 
     private fun colorA(color: Int, alpha: Float) =

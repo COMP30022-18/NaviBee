@@ -4,7 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".social.CreateGroupChatActivity">
+    tools:context=".social.CreateGroupChatActivity"
+    android:clickable="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
     <TextView
         android:id="@+id/activity_createGroupChat_text_enter_name"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -25,9 +29,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Group Name"
-        android:focusableInTouchMode="false"/>
+        android:inputType="textPersonName" />
 
     <TextView
         android:id="@+id/activity_createGroupChat_text_invite_friends"

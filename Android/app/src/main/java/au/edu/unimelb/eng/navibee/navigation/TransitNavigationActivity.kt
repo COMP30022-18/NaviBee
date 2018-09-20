@@ -1,14 +1,17 @@
 package au.edu.unimelb.eng.navibee.navigation
 
+import android.Manifest
 import android.app.Application
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.widget.ImageViewCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -18,6 +21,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import au.edu.unimelb.eng.navibee.NaviBeeApplication
 import au.edu.unimelb.eng.navibee.R
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.*
 import kotlinx.android.synthetic.main.activity_transit_navigation.*
 import kotlinx.android.synthetic.main.recycler_view_transit_destination.view.*
 import kotlinx.android.synthetic.main.recycler_view_transit_origin.view.*
@@ -35,8 +43,7 @@ import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.textColor
 import java.util.*
 
-
-class TransitNavigationActivity : AppCompatActivity() {
+class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // Recycler view
     private lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
@@ -44,21 +51,35 @@ class TransitNavigationActivity : AppCompatActivity() {
     private lateinit var viewManager: androidx.recyclerview.widget.RecyclerView.LayoutManager
 
     private lateinit var viewModel: TransitNavigationViewModel
-    private lateinit var debugTextView: TextView
 
     private var listItems = listOf<TransitRouteRVData>()
     private var renderListItems =
         mutableListOf<TransitRouteRVData>(TransitRouteRVIndefiniteProgress())
-
 
     private var originName = "Debug origin name"
     private var destinationName = "Debug destination name"
 
     private var defaultColor = 0
     private var defaultTextColor = 0
+    private var walkingLineColor = 0
+
+    private var googleMap: GoogleMap? = null
+
+    private var originLat = -37.799149
+    private var originLon = 144.994426
+    private var destLat = -37.83640
+    private var destLon = 144.92214
+
+    private val stopMarkers = mutableListOf<Marker>()
 
     companion object {
         private val NULL_LISTENER = View.OnClickListener { }
+        private val WALKING_PATTERN = listOf(Dot(), Gap(16f))
+
+        private const val LINE_WIDTH = 24f
+
+        private lateinit var MARKER_STOP: BitmapDescriptor
+        private lateinit var MARKER_TERMINUS: BitmapDescriptor
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,24 +88,37 @@ class TransitNavigationActivity : AppCompatActivity() {
 
         defaultColor = ContextCompat.getColor(this, R.color.colorPrimary)
         defaultTextColor = ContextCompat.getColor(this, R.color.colorLightTextPrimary)
+        walkingLineColor = ContextCompat.getColor(this, R.color.transitWalkingColor)
 
-        // setup recycler view
+        MARKER_STOP = BitmapDescriptorFactory.fromBitmap(
+            AppCompatResources.getDrawable(this, R.drawable.ic_navigation_transit_stop_marker)?.toBitmap())
+        MARKER_TERMINUS = BitmapDescriptorFactory.fromBitmap(
+            AppCompatResources.getDrawable(this, R.drawable.ic_navigation_transit_terminus_marker)?.toBitmap())
+
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.navigation_destinations_search_result_map) as SupportMapFragment?
+        mapFragment?.getMapAsync(this)
+
+        setupRecyclerView()
+
+        viewModel = ViewModelProviders.of(this).get(TransitNavigationViewModel::class.java)
+
+        subscribe()
+
+        viewModel.getRoute()
+    }
+
+    private fun setupRecyclerView() {
         viewManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         viewAdapter = TransitRouteRVAdapter(renderListItems)
 
         recyclerView = navigation_transit_navigation_recycler_view.apply {
-            setHasFixedSize(true)
             layoutManager = viewManager
             adapter = viewAdapter
         }
+    }
 
-        viewModel = ViewModelProviders.of(this).get(TransitNavigationViewModel::class.java)
-
-        viewModel.debugText.observe(this, Observer {
-            debugTextView.text = it
-        })
-
-
+    private fun subscribe() {
         viewModel.routeInfo.observe(this, Observer {
             it?.res?.connections?.connections?.let { connections ->
                 if (!connections.isEmpty()) {
@@ -92,15 +126,16 @@ class TransitNavigationActivity : AppCompatActivity() {
                     renderListItems.clear()
                     renderListItems.addAll(listItems)
                     viewAdapter.notifyDataSetChanged()
+                    renderMap()
                 }
             }
         })
-
-        viewModel.getRoute()
     }
 
     private fun buildRawViewList(con: Connection): List<TransitRouteRVData> {
         val viewList = mutableListOf<TransitRouteRVData>()
+
+        val segmentSummaries = mutableListOf<TransitSegments>()
 
         // Origin
         originName =
@@ -114,42 +149,60 @@ class TransitNavigationActivity : AppCompatActivity() {
             if (sec.mode == TransportMode.WALK) {
                 // Walking
                 viewList.add(TransitRouteRVWalking(sec.journey.duration))
+                segmentSummaries.add(TransitSegments(
+                    type = sec.mode,
+                    duration = sec.journey.duration
+                ))
             } else {
+                // Transit
                 if (viewList.last() is TransitRouteRVOrigin)
                     viewList.add(TransitRouteRVDivider())
-                // Transit
                 val routeColor = sec.dep.transport?.at?.color ?: defaultColor
                 val textColor = sec.dep.transport?.at?.textColor ?: defaultTextColor
 
-                val routes = mutableListOf(sec.dep.transport?.name)
-                sec.dep.frequency?.altDeps?.asSequence()
-                    ?.map { it.transport?.name }
-                    ?.filterNotNull()
-                    ?.let { routes.addAll(it) }
+                val routes = {
+                    val r = mutableListOf(sec.dep.transport?.name)
+                    sec.dep.frequency?.altDeps?.asSequence()
+                        ?.map { it.transport?.name }
+                        ?.filterNotNull()
+                        ?.let { r.addAll(it) }
+                    r.asSequence().filterNotNull().distinct().toList()
+                }()
 
-                val terminals = mutableListOf(sec.dep.transport?.dir)
-                sec.dep.frequency?.altDeps?.asSequence()
-                    ?.map { it.transport?.dir }
-                    ?.filterNotNull()
-                    ?.let { terminals.addAll(it) }
+                val terminals = {
+                    val t = mutableListOf(sec.dep.transport?.dir)
+                    sec.dep.frequency?.altDeps?.asSequence()
+                        ?.map { it.transport?.dir }
+                        ?.filterNotNull()
+                        ?.let { t.addAll(it) }
+                    t.asSequence().filterNotNull().distinct().toList()
+                }()
 
+                segmentSummaries.add(TransitSegments(
+                    type = sec.mode,
+                    duration = sec.journey.duration,
+                    routes = routes,
+                    color = routeColor,
+                    textColor = textColor
+                ))
 
                 viewList.add(TransitRouteRVOriginStation(
                     stop = sec.dep.station?.name.toString(),
                     type = sec.mode,
                     color = routeColor,
                     foregroundColor = textColor,
-                    routes = routes.asSequence().filterNotNull().distinct().toList(),
-                    terminusStations = terminals.asSequence().filterNotNull().distinct().toList()
+                    routes = routes,
+                    terminusStations = terminals
                 ))
 
                 if (sec.journey.stops?.size ?: 0 > 2) {
-                    val intermediates = sec.journey.stops?.map {
-                        TransitRouteRVIntermediateStation(
-                            color = routeColor,
-                            name = it.stn.name
-                        )
-                    }?.drop(1)?.dropLast(1) ?: emptyList()
+                    val intermediates =
+                        sec.journey.stops?.asSequence()?.map {
+                            TransitRouteRVIntermediateStation(
+                                color = routeColor,
+                                name = it.stn.name
+                            )
+                        }?.drop(1)?.toList()?.dropLast(1) ?: emptyList()
 
                     val toggle = TransitRouteRVToggle(
                         id = sec.id ?: UUID.randomUUID().toString(),
@@ -186,12 +239,16 @@ class TransitNavigationActivity : AppCompatActivity() {
             name = destinationName
         ))
 
+        viewList.add(0, TransitRouteRVSummary(
+            con.duration,
+            segmentSummaries.toList()
+        ))
+
         return viewList.toList()
     }
 
     private fun getToggleListener(data: TransitRouteRVToggle): View.OnClickListener {
         return View.OnClickListener { view ->
-            // TODO: Expand and collapse the view
             data.status = !data.status
             val toggle = view.navigation_transit_navigation_rv_trip_segment_extend_toggle_toggle
 
@@ -221,6 +278,105 @@ class TransitNavigationActivity : AppCompatActivity() {
             diffResult.dispatchUpdatesTo(viewAdapter)
         }
     }
+
+    private fun renderMap() {
+        googleMap?.let { googleMap ->
+            stopMarkers.clear()
+
+            val latLngBoundsBuilder = LatLngBounds.Builder()
+            val data = viewModel.routeInfo.value
+            val con = data?.res?.connections?.connections?.get(0) ?: return
+            val walkingManeuverIds =
+                con.sections.secs.asSequence()
+                    .filter { it -> it.mode == TransportMode.WALK }
+                    .filterNotNull()
+                    .map { it -> it.id }.toHashSet()
+
+
+            // Walking
+            data.res.guidance?.maneuvers
+                ?.filter { it.secIds.split(" ").any { id -> id in walkingManeuverIds } }
+                ?.forEach { i ->
+                i.maneuvers?.forEachIndexed { manIdx, coord ->
+                    val line = PolylineOptions()
+                        .pattern(WALKING_PATTERN)
+                        .color(walkingLineColor)
+                        .width(LINE_WIDTH)
+                    coord.graph?.split(" ")?.forEachIndexed { idx, it ->
+                        val latLng = it.split(",").map { value -> value.toDouble() }
+                        val loc = LatLng(latLng[0], latLng[1])
+                        line.add(loc)
+                        latLngBoundsBuilder.include(loc)
+                        if (manIdx == 0 && idx == 0) {
+                            googleMap.addMarker(MarkerOptions()
+                                .position(loc).anchor(0.5f, 0.5f).icon(MARKER_TERMINUS))
+                        }
+                    }
+                    googleMap.addPolyline(line)
+                }
+            }
+
+            // Transit
+            for (i in con.sections.secs) {
+                if (i.mode != TransportMode.WALK) {
+                    val line = PolylineOptions().color(i.dep.transport?.at?.color
+                        ?: defaultColor).width(LINE_WIDTH)
+                    val lastStop = (i.journey.stops?.size ?: 0) - 1
+
+                    i.journey.stops?.forEachIndexed { idx, stop ->
+                        val loc = LatLng(stop.stn.y.toDouble(), stop.stn.x.toDouble())
+                        line.add(loc)
+                        latLngBoundsBuilder.include(loc)
+                        if (idx == 0) {
+                            googleMap.addMarker(
+                                MarkerOptions()
+                                    .position(loc)
+                                    .icon(MARKER_TERMINUS)
+                                    .position(loc)
+                                    .anchor(0.5f, 0.5f))
+                        } else if (idx < lastStop) {
+                            val marker = googleMap.addMarker(
+                                 MarkerOptions()
+                                     .position(loc)
+                                     .icon(MARKER_STOP)
+                                     .position(loc)
+                                     .anchor(0.5f, 0.5f))
+                            stopMarkers.add(marker)
+                        }
+                    }
+                    googleMap.addPolyline(line)
+                }
+            }
+
+            val mapDestLat: Double =
+                con.arr.addr?.y?.toDouble() ?:
+                con.arr.stn?.y?.toDouble() ?:
+                destLat
+            val mapDestLon: Double =
+                con.arr.addr?.x?.toDouble() ?:
+                con.arr.stn?.x?.toDouble() ?:
+                destLon
+            googleMap.addMarker(MarkerOptions().position(LatLng(mapDestLat, mapDestLon)))
+
+            googleMap.animateCamera(CameraUpdateFactory
+                .newLatLngBounds(latLngBoundsBuilder.build(), 128))
+
+            googleMap.setOnCameraIdleListener {
+                stopMarkers.forEach {
+                    it.isVisible = googleMap.cameraPosition.zoom > 14
+                }
+            }
+        }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        this.googleMap = googleMap
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED) {
+            googleMap.isMyLocationEnabled = true
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(originLat, originLon)))
+        }
+    }
 }
 
 private class ToggleRVDiffCallback(private val old: List<TransitRouteRVData>,
@@ -242,7 +398,6 @@ private class ToggleRVDiffCallback(private val old: List<TransitRouteRVData>,
 private class TransitNavigationViewModel(context: Application):
         AndroidViewModel(context) {
 
-    val debugText = MutableLiveData<String>()
     val routeInfo = MutableLiveData<Response?>()
 
     fun getRoute() {
@@ -251,12 +406,12 @@ private class TransitNavigationViewModel(context: Application):
         val destLat = -37.83640f
         val destLon = 144.92214f
 
-        launch {
-            getTransitDirections(originLat, originLon, destLat, destLon).let {
-                routeInfo.postValue(it)
+        if (routeInfo.value == null)
+            launch {
+                getTransitDirections(originLat, originLon, destLat, destLon)?.let {
+                    routeInfo.postValue(it)
+                }
             }
-
-        }
     }
 
 }
@@ -277,6 +432,7 @@ private class TransitRouteRVAdapter(private val listEntries: MutableList<Transit
             is TransitRouteRVDestination -> 6
             is TransitRouteRVDivider -> 7
             is TransitRouteRVIndefiniteProgress -> 8
+            is TransitRouteRVSummary -> 9
             else -> -1
         }
 
@@ -292,6 +448,7 @@ private class TransitRouteRVAdapter(private val listEntries: MutableList<Transit
             6 -> R.layout.recycler_view_transit_destination
             7 -> R.layout.recycler_view_transit_divider
             8 -> R.layout.recycler_view_indefinite_progress
+            9 -> R.layout.recycler_view_transit_summary
             else -> 0
         }
         return TransitNavigationRVHolder(LayoutInflater.from(parent.context)
@@ -362,6 +519,9 @@ private class TransitRouteRVAdapter(private val listEntries: MutableList<Transit
             is TransitRouteRVDestination -> {
                 view.navigation_transit_navigation_rv_destination_name.text = data.name
             }
+            is TransitRouteRVSummary -> {
+                // TODO: Render summary.
+            }
         }
     }
 
@@ -375,33 +535,44 @@ private data class TransitRouteRVOrigin(
 ): TransitRouteRVData()
 private data class TransitRouteRVWalking(val duration: Duration<IsoUnit>): TransitRouteRVData()
 private data class TransitRouteRVOriginStation(
-        val stop: String,
-        val routes: List<String>,
-        val terminusStations: List<String>,
-        val color: Int,
-        val foregroundColor: Int,
-        val type: TransportMode
+    val stop: String,
+    val routes: List<String>,
+    val terminusStations: List<String>,
+    val color: Int,
+    val foregroundColor: Int,
+    val type: TransportMode
 ): TransitRouteRVData()
 private data class TransitRouteRVToggle(
-        val id: String,
-        val duration: Duration<IsoUnit>,
-        val color: Int,
-        val intermediateStations: List<TransitRouteRVIntermediateStation>,
-        var status: Boolean,
-        var onClick: View.OnClickListener
+    val id: String,
+    val duration: Duration<IsoUnit>,
+    val color: Int,
+    val intermediateStations: List<TransitRouteRVIntermediateStation>,
+    var status: Boolean,
+    var onClick: View.OnClickListener
 ): TransitRouteRVData() {
     fun isSameItem(i: Any) =
         i is TransitRouteRVToggle &&
             id == i.id
 }
 private data class TransitRouteRVIntermediateStation(
-        val name: String,
-        val color: Int
+    val name: String,
+    val color: Int
 ): TransitRouteRVData()
 private data class TransitRouteRVDestinationStation(
-        val name: String,
-        val color: Int
+    val name: String,
+    val color: Int
 ): TransitRouteRVData()
+private data class TransitRouteRVSummary(
+    val duration: Duration<IsoUnit>,
+    val segments: List<TransitSegments>
+): TransitRouteRVData()
+private data class TransitSegments(
+    val type: TransportMode,
+    val duration: Duration<IsoUnit>,
+    val routes: List<String> = listOf(),
+    val color: Int = 0,
+    val textColor: Int = 0
+)
 private data class TransitRouteRVDestination(val name: String): TransitRouteRVData()
 private class TransitRouteRVDivider: TransitRouteRVData()
 private class TransitRouteRVIndefiniteProgress: TransitRouteRVData()

@@ -11,7 +11,6 @@ import com.google.android.gms.location.places.Place
 import com.google.maps.GeoApiContext
 import com.google.maps.PlacesApi
 import kotlinx.coroutines.experimental.DefaultDispatcher
-import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.withContext
 import timber.log.Timber
@@ -24,8 +23,9 @@ private val geoContext = GeoApiContext
 class GoogleMapsPlaceIdCacheImageLoader(private val placeId: String,
                                         iv: ImageView,
                                         maxHeight: Int,
-                                        index: Int = 0):
-        GoogleMapsPhotoReferenceCacheImageLoader("", iv, maxHeight) {
+                                        index: Int = 0,
+                                        singleJob: Boolean = true):
+        GoogleMapsPhotoReferenceCacheImageLoader("", iv, maxHeight, singleJob) {
     override val defaultKey = "$placeId-$index"
     override fun loadTask(file: File) {
         val placeDetails = PlacesApi.placeDetails(geoContext, placeId).await()
@@ -42,12 +42,13 @@ class GoogleMapsPlaceIdCacheImageLoader(private val placeId: String,
 
 open class GoogleMapsPhotoReferenceCacheImageLoader(var photoReference: String,
                                                     iv: ImageView,
-                                                    private val maxHeight: Int):
-        ImageViewCacheLoader(iv, prefix="gmpr") {
+                                                    private val maxHeight: Int,
+                                                    singleJob: Boolean = true):
+        ImageViewCacheLoader(iv, prefix="gmpr", singleJob = singleJob) {
 
     override val defaultKey = photoReference
     override fun loadTask(file: File) {
-        launch(UI) {
+        launch {
             val image = withContext(DefaultDispatcher) { loadImage() }
             if (image != null) {
                 val outputStream = FileOutputStream(file)
