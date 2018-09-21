@@ -15,11 +15,11 @@ import android.util.DisplayMetrics
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.RecyclerView
 import au.edu.unimelb.eng.navibee.BuildConfig
 import au.edu.unimelb.eng.navibee.R
 import au.edu.unimelb.eng.navibee.utils.Resource
@@ -69,10 +69,12 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
     private var sendResult: Boolean = false
 
     // Recycler view
-    private lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
-    private lateinit var viewAdapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>
-    private lateinit var viewManager: androidx.recyclerview.widget.RecyclerView.LayoutManager
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var viewAdapter: RecyclerView.Adapter<*>
+    private lateinit var viewManager: RecyclerView.LayoutManager
     private val destinations = ArrayList<DestinationRVItem>()
+
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
 
     private val searchResults = ArrayList<PlacesSearchResult>()
     private var googleMap: GoogleMap? = null
@@ -111,15 +113,11 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         val displayMetrics = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(displayMetrics)
-        val bottomSheetBehavior = BottomSheetBehavior.from(recyclerView)
+        bottomSheetBehavior = BottomSheetBehavior.from(recyclerView)
         val actionBarHeight = getActionBarHeight(this)
         val heights = displayMetrics.heightPixels - actionBarHeight
         bottomSheetBehavior.peekHeight = (heights * 0.382).toInt()
         recyclerView.minimumHeight = (heights * 0.382).toInt()
-
-        navigation_destinations_search_result_map.view?.updateLayoutParams {
-            height = (heights * 0.618).toInt()
-        }
 
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.navigation_destinations_search_result_map) as SupportMapFragment?
@@ -248,38 +246,41 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
     }
 
     private fun initializeMap() {
-        val gm = googleMap
-        if (gm != null && searchResults.isNotEmpty()) {
-            val latLngBoundsBuilder = LatLngBounds.Builder()
-            for ((i, item) in searchResults.withIndex()) {
-                val coord = GmsLatLng(item.geometry.location.lat,
+        googleMap?.let { gm ->
+            if (searchResults.isNotEmpty()) {
+                val latLngBoundsBuilder = LatLngBounds.Builder()
+                for ((i, item) in searchResults.withIndex()) {
+                    val coord = GmsLatLng(item.geometry.location.lat,
                         item.geometry.location.lng)
 
-                if (i < 10)
-                    latLngBoundsBuilder.include(coord)
-                gm.addMarker(MarkerOptions().position(coord).title(item.name).let {
-                    if (i >= 10) {
-                        it.icon(BitmapDescriptorFactory.fromResource(
+                    if (i < 10)
+                        latLngBoundsBuilder.include(coord)
+                    gm.addMarker(MarkerOptions().position(coord).title(item.name).let {
+                        if (i >= 10) {
+                            it.icon(BitmapDescriptorFactory.fromResource(
                                 R.drawable.navigation_map_minor_marker))
 
-                    } else {
-                        it.icon(BitmapDescriptorFactory.fromBitmap(
+                        } else {
+                            it.icon(BitmapDescriptorFactory.fromBitmap(
                                 IconGenerator(this).run {
                                     makeIcon("${(i + 'A'.toInt()).toChar()}")
                                 }))
 
-                    }
-                })
-            }
-            gm.animateCamera(CameraUpdateFactory
+                        }
+                    })
+                }
+                gm.animateCamera(CameraUpdateFactory
                     .newLatLngBounds(latLngBoundsBuilder.build(), 128))
+            }
         }
-
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         val lkl = lastKnownLocation
         this.googleMap = googleMap
+
+        googleMap.setPadding(0, 0, 0, bottomSheetBehavior.peekHeight)
+        googleMap.uiSettings.isMapToolbarEnabled = false
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED)
