@@ -80,7 +80,6 @@ abstract class ImageViewCacheLoader
 
     override fun postLoad(file: File) {
         try {
-            imageView.visibility = View.VISIBLE
             val bitmap = BitmapFactory.decodeStream(FileInputStream(file))
             if (roundImage) {
                 val r = imageView.resources
@@ -88,10 +87,12 @@ abstract class ImageViewCacheLoader
                 drawable.setAntiAlias(true)
                 drawable.isCircular = true
                 launch(UI) {
+                    imageView.visibility = View.VISIBLE
                     imageView.setImageDrawable(drawable)
                 }
             } else {
                 launch(UI) {
+                    imageView.visibility = View.VISIBLE
                     imageView.setImageBitmap(bitmap)
                 }
             }

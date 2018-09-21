@@ -2,17 +2,25 @@ package au.edu.unimelb.eng.navibee.navigation
 
 import android.Manifest
 import android.app.Application
+import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.LinearLayout.HORIZONTAL
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.view.updateLayoutParams
 import androidx.core.widget.ImageViewCompat
+import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -21,11 +29,15 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import au.edu.unimelb.eng.navibee.NaviBeeApplication
 import au.edu.unimelb.eng.navibee.R
+import au.edu.unimelb.eng.navibee.utils.getActionBarHeight
+import au.edu.unimelb.eng.navibee.utils.retrieveTopObscureHeight
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.activity_transit_navigation.*
 import kotlinx.android.synthetic.main.recycler_view_transit_destination.view.*
 import kotlinx.android.synthetic.main.recycler_view_transit_origin.view.*
@@ -35,26 +47,31 @@ import kotlinx.android.synthetic.main.recycler_view_transit_segment_origin.view.
 import kotlinx.android.synthetic.main.recycler_view_transit_segment_toggle.view.*
 import kotlinx.android.synthetic.main.recycler_view_transit_walking.view.*
 import kotlinx.coroutines.experimental.launch
+import net.time4j.ClockUnit
 import net.time4j.Duration
 import net.time4j.IsoUnit
 import net.time4j.PrettyTime
 import net.time4j.format.TextWidth
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.textColor
+import org.jetbrains.anko.wrapContent
+import timber.log.Timber
 import java.util.*
 
 class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // Recycler view
-    private lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
-    private lateinit var viewAdapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>
-    private lateinit var viewManager: androidx.recyclerview.widget.RecyclerView.LayoutManager
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var viewAdapter: TransitRouteRVAdapter
+    private lateinit var viewManager: RecyclerView.LayoutManager
 
     private lateinit var viewModel: TransitNavigationViewModel
 
     private var listItems = listOf<TransitRouteRVData>()
     private var renderListItems =
         mutableListOf<TransitRouteRVData>(TransitRouteRVIndefiniteProgress())
+
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<NestedScrollView>
 
     private var originName = "Debug origin name"
     private var destinationName = "Debug destination name"
@@ -71,6 +88,9 @@ class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
     private var destLon = 144.92214
 
     private val stopMarkers = mutableListOf<Marker>()
+
+    private var topObscureSize = 0
+    private var statusBarSize = 0
 
     companion object {
         private val NULL_LISTENER = View.OnClickListener { }
@@ -89,6 +109,8 @@ class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
         defaultColor = ContextCompat.getColor(this, R.color.colorPrimary)
         defaultTextColor = ContextCompat.getColor(this, R.color.colorLightTextPrimary)
         walkingLineColor = ContextCompat.getColor(this, R.color.transitWalkingColor)
+
+        supportActionBar?.title = ""
 
         MARKER_STOP = BitmapDescriptorFactory.fromBitmap(
             AppCompatResources.getDrawable(this, R.drawable.ic_navigation_transit_stop_marker)?.toBitmap())
@@ -116,6 +138,41 @@ class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
             layoutManager = viewManager
             adapter = viewAdapter
         }
+
+        bottomSheetBehavior = BottomSheetBehavior.from(navigation_transit_navigation_nested_scroll_view)
+
+        recyclerView.retrieveTopObscureHeight { _, height ->
+            statusBarSize = height - getActionBarHeight(this)
+            topObscureSize = height
+        }
+
+        bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onSlide(view: View, percentage: Float) {
+                Timber.v("Percentage: $percentage")
+                recyclerView.getChildAt(0).apply {
+//                    setPaddingRelative(
+//                        paddingStart,
+//                        (percentage * statusBarSize).toInt(),
+//                        paddingEnd,
+//                        paddingBottom
+//                    )
+                    updateLayoutParams<ViewGroup.MarginLayoutParams>{
+                        topMargin = (percentage * statusBarSize).toInt()
+                    }
+
+                }
+            }
+
+            override fun onStateChanged(view: View, state: Int) {
+                Timber.v("State: $state")
+                if (state == BottomSheetBehavior.STATE_EXPANDED) {
+                    supportActionBar?.hide()
+                } else if (state == BottomSheetBehavior.STATE_COLLAPSED) {
+                    supportActionBar?.show()
+                }
+            }
+
+        })
     }
 
     private fun subscribe() {
@@ -135,7 +192,9 @@ class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun buildRawViewList(con: Connection): List<TransitRouteRVData> {
         val viewList = mutableListOf<TransitRouteRVData>()
 
-        val segmentSummaries = mutableListOf<TransitSegments>()
+        val segmentSummaries = mutableListOf<TransitSegment>()
+
+        supportActionBar?.title = viewAdapter.prettyTime.print(con.duration, TextWidth.ABBREVIATED)
 
         // Origin
         originName =
@@ -149,7 +208,7 @@ class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
             if (sec.mode == TransportMode.WALK) {
                 // Walking
                 viewList.add(TransitRouteRVWalking(sec.journey.duration))
-                segmentSummaries.add(TransitSegments(
+                segmentSummaries.add(TransitSegment(
                     type = sec.mode,
                     duration = sec.journey.duration
                 ))
@@ -178,7 +237,7 @@ class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
                     t.asSequence().filterNotNull().distinct().toList()
                 }()
 
-                segmentSummaries.add(TransitSegments(
+                segmentSummaries.add(TransitSegment(
                     type = sec.mode,
                     duration = sec.journey.duration,
                     routes = routes,
@@ -371,6 +430,8 @@ class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
+        googleMap.setPadding(0, topObscureSize, 0, bottomSheetBehavior.peekHeight)
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
             PackageManager.PERMISSION_GRANTED) {
             googleMap.isMyLocationEnabled = true
@@ -419,7 +480,7 @@ private class TransitNavigationViewModel(context: Application):
 private class TransitRouteRVAdapter(private val listEntries: MutableList<TransitRouteRVData>):
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val prettyTime = PrettyTime.of(Locale.getDefault())
+    val prettyTime = PrettyTime.of(Locale.getDefault())
 
     override fun getItemViewType(position: Int) =
         when (listEntries[position]) {
@@ -480,22 +541,8 @@ private class TransitRouteRVAdapter(private val listEntries: MutableList<Transit
                     defaultTint(data.color)
                 view.navigation_transit_navigation_rv_trip_segment_origin_terminal.text =
                     data.terminusStations.joinToString(" / ")
-                view.navigation_transit_navigation_rv_trip_segment_origin_icon.setImageResource(when (data.type) {
-                    TransportMode.PRIVATE_BUS,
-                    TransportMode.BUS_RAPID,
-                    TransportMode.BUS -> R.drawable.ic_directions_bus_black80_24dp
-                    TransportMode.MONORAIL -> R.drawable.ic_directions_railway_black80_24dp
-                    TransportMode.HIGH_SPEED_TRAIN,
-                    TransportMode.INTERCITY_TRAIN,
-                    TransportMode.INTER_REGIONAL_TRAIN,
-                    TransportMode.REGIONAL_TRAIN -> R.drawable.ic_train_black80_24dp
-                    TransportMode.CITY_TRAIN,
-                    TransportMode.LIGHT_RAIL -> R.drawable.ic_tram_black80_24dp
-                    TransportMode.SUBWAY -> R.drawable.ic_directions_transit_black80_24dp
-                    TransportMode.FERRY -> R.drawable.ic_directions_boat_black80_24dp
-                    // TODO: Inclined, aerial, flight, walk
-                    else -> R.drawable.ic_directions_transit_black80_24dp
-                })
+                view.navigation_transit_navigation_rv_trip_segment_origin_icon
+                    .setImageResource(getTransitImageResource(data.type))
             }
             is TransitRouteRVToggle -> {
                 val durationString = prettyTime.print(data.duration, TextWidth.ABBREVIATED)
@@ -520,9 +567,75 @@ private class TransitRouteRVAdapter(private val listEntries: MutableList<Transit
                 view.navigation_transit_navigation_rv_destination_name.text = data.name
             }
             is TransitRouteRVSummary -> {
-                // TODO: Render summary.
+                val linearView = view as LinearLayout
+                linearView.addView(summarySegmentChip(view.context, data.segments[0]))
+                for (i in data.segments.drop(1)) {
+                    linearView.addView(summarySeparator(view.context))
+                    linearView.addView(summarySegmentChip(view.context, i))
+                }
             }
         }
+    }
+
+    private fun summarySegmentChip(context: Context, segment: TransitSegment) = when(segment.type) {
+        TransportMode.WALK -> summaryWalking(context, segment)
+        else -> summaryTransitChip(context, segment)
+    }
+
+    private fun summaryTransitChip(context: Context,
+                                   segment: TransitSegment) = Chip(context).apply {
+        setChipIconResource(getTransitImageResource(segment.type))
+        chipBackgroundColor = defaultTint(segment.color)
+        chipIconTint = defaultTint(segment.textColor)
+
+        isClickable = false
+        isFocusable = false
+
+        setTextColor(segment.textColor)
+        var routeText = segment.routes[0]
+        if (routeText.length > 6)
+            routeText = routeText.take(4) + "…"
+        if (segment.routes.size > 1)
+            routeText += "/…"
+        text = routeText
+    }
+
+    private fun summaryWalking(context: Context,
+                               segment: TransitSegment) = LinearLayout(context).apply {
+        gravity = Gravity.BOTTOM or Gravity.START
+        orientation = HORIZONTAL
+        addView(ImageView(context).apply {
+            layoutParams = ViewGroup.LayoutParams(wrapContent, wrapContent)
+            baselineAlignBottom = true
+            setImageResource(R.drawable.ic_directions_walk_black80_24dp)
+        })
+        addView(TextView(context).apply {
+            gravity = Gravity.BOTTOM or Gravity.START
+            text = segment.duration.toClockPeriodWithDaysAs24Hours()
+                .getPartialAmount(ClockUnit.MINUTES).toString()
+        })
+    }
+
+    private fun summarySeparator(context: Context) = ImageView(context).apply {
+        this.setImageResource(R.drawable.ic_chevron_right_black80_24dp)
+    }
+
+    private fun getTransitImageResource(type: TransportMode) = when (type) {
+        TransportMode.PRIVATE_BUS,
+        TransportMode.BUS_RAPID,
+        TransportMode.BUS -> R.drawable.ic_directions_bus_black80_24dp
+        TransportMode.MONORAIL -> R.drawable.ic_directions_railway_black80_24dp
+        TransportMode.HIGH_SPEED_TRAIN,
+        TransportMode.INTERCITY_TRAIN,
+        TransportMode.INTER_REGIONAL_TRAIN,
+        TransportMode.REGIONAL_TRAIN -> R.drawable.ic_train_black80_24dp
+        TransportMode.CITY_TRAIN,
+        TransportMode.LIGHT_RAIL -> R.drawable.ic_tram_black80_24dp
+        TransportMode.SUBWAY -> R.drawable.ic_directions_transit_black80_24dp
+        TransportMode.FERRY -> R.drawable.ic_directions_boat_black80_24dp
+        TransportMode.WALK -> R.drawable.ic_directions_walk_black80_24dp
+        // TODO: Inclined, aerial, flight
+        else -> R.drawable.ic_directions_transit_black80_24dp
     }
 
     private fun defaultTint(color: Int) =
@@ -564,9 +677,9 @@ private data class TransitRouteRVDestinationStation(
 ): TransitRouteRVData()
 private data class TransitRouteRVSummary(
     val duration: Duration<IsoUnit>,
-    val segments: List<TransitSegments>
+    val segments: List<TransitSegment>
 ): TransitRouteRVData()
-private data class TransitSegments(
+private data class TransitSegment(
     val type: TransportMode,
     val duration: Duration<IsoUnit>,
     val routes: List<String> = listOf(),
