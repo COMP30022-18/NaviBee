@@ -1,7 +1,9 @@
 package au.edu.unimelb.eng.navibee.navigation
 
+import android.Manifest
 import android.app.Application
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
@@ -14,13 +16,22 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.updateLayoutParams
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import au.edu.unimelb.eng.navibee.R
 import au.edu.unimelb.eng.navibee.utils.*
 import com.google.android.gms.location.places.*
 import com.google.android.gms.location.places.internal.zzaq
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.activity_destination_details.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.delay
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.startActivity
 import java.io.File
 import java.io.FileOutputStream
@@ -40,7 +51,7 @@ val PlacePhotoMetadata.photoReference: String
  *      DestinationDetailsActivity.EXTRA_PLACE_ID:
  *          String, the place ID as specified by Google Maps
  */
-class DestinationDetailsActivity : AppCompatActivity() {
+class DestinationDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     companion object {
         const val EXTRA_PLACE_ID = "placeId"
     }
@@ -53,9 +64,16 @@ class DestinationDetailsActivity : AppCompatActivity() {
 
     private lateinit var placeId: String
 
+    private var googleMap: GoogleMap? = null
+    private var mapFragment: SupportMapFragment? = null
+    private var rawMapFragment: Fragment? = null
+
     private lateinit var viewModel: DestinationDetailsViewModel
 
     private var titleRowHeight = -1
+    private var topObscureSize = 0
+
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
 
     private val primaryColor: Int by lazy {
         ContextCompat.getColor(this, R.color.colorPrimary)
@@ -121,6 +139,9 @@ class DestinationDetailsActivity : AppCompatActivity() {
             adapter = viewAdapter
             addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(context, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
         }
+        recyclerView.retrieveTopObscureHeight { _, height ->
+            topObscureSize = height
+        }
 
         // Carousel view
         navigation_destinations_details_image_preview.pageCount = 1
@@ -131,6 +152,12 @@ class DestinationDetailsActivity : AppCompatActivity() {
         }
 
         layoutAdjustment()
+
+        // Load map view
+        rawMapFragment = supportFragmentManager
+            .findFragmentById(R.id.navigation_destinations_details_map)
+        mapFragment = rawMapFragment as SupportMapFragment?
+        supportFragmentManager.beginTransaction().hide(rawMapFragment!!).commit()
 
         viewModel.loadDetails(placeId)
         viewModel.loadImageList(placeId)
@@ -153,8 +180,12 @@ class DestinationDetailsActivity : AppCompatActivity() {
 
         viewModel.placePhotos.observe(this, Observer {
             if (it.status == Resource.Status.SUCCESS)
-                it.data?.run {
-                    navigation_destinations_details_image_preview.pageCount = count
+                it.data?.let { buffer ->
+                    navigation_destinations_details_image_preview.pageCount = buffer.count
+                    if (buffer.count == 0) {
+                        supportFragmentManager.beginTransaction().show(rawMapFragment!!).commit()
+                        mapFragment?.getMapAsync(this)
+                    }
                 }
         } )
 
@@ -164,8 +195,7 @@ class DestinationDetailsActivity : AppCompatActivity() {
     }
 
     private fun layoutAdjustment() {
-        val bottomSheetBehavior =
-                BottomSheetBehavior.from(recyclerView)
+        bottomSheetBehavior = BottomSheetBehavior.from(recyclerView)
         bottomSheetBehavior.peekHeight = (resources.displayMetrics.heightPixels * 0.618).toInt()
         recyclerView.minimumHeight = (resources.displayMetrics.heightPixels * 0.618).toInt()
         navigation_destinations_details_image_preview.updateLayoutParams {
@@ -318,6 +348,24 @@ class DestinationDetailsActivity : AppCompatActivity() {
             listItems.add(attributions)
     }
 
+    override fun onMapReady(googleMap: GoogleMap) {
+        this.googleMap = googleMap
+        googleMap.setPadding(0, topObscureSize, 0, bottomSheetBehavior.peekHeight)
+        googleMap.uiSettings.isMapToolbarEnabled = false
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED)
+            googleMap.isMyLocationEnabled = true
+
+            launch(UI) {
+                viewModel.placeDetails.value?.data?.get(0)?.run {
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(this.latLng))
+                    googleMap.addMarker(MarkerOptions().position(this.latLng))
+                    delay(100)
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(this.latLng))
+                }
+            }
+    }
 }
 
 private class DestinationDetailsViewModel(private val context: Application):
