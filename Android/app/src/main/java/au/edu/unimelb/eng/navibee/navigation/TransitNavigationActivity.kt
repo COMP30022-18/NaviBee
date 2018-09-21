@@ -31,6 +31,8 @@ import au.edu.unimelb.eng.navibee.NaviBeeApplication
 import au.edu.unimelb.eng.navibee.R
 import au.edu.unimelb.eng.navibee.utils.getActionBarHeight
 import au.edu.unimelb.eng.navibee.utils.retrieveTopObscureHeight
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -55,7 +57,6 @@ import net.time4j.format.TextWidth
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.wrapContent
-import timber.log.Timber
 import java.util.*
 
 class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -73,8 +74,10 @@ class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<NestedScrollView>
 
-    private var originName = "Debug origin name"
-    private var destinationName = "Debug destination name"
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    private lateinit var originName: String
+    private lateinit var destinationName: String
 
     private var defaultColor = 0
     private var defaultTextColor = 0
@@ -82,10 +85,10 @@ class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var googleMap: GoogleMap? = null
 
-    private var originLat = -37.799149
-    private var originLon = 144.994426
-    private var destLat = -37.83640
-    private var destLon = 144.92214
+    private var originLat = 0.0
+    private var originLon = 0.0
+    private var destLat = 0.0
+    private var destLon = 0.0
 
     private val stopMarkers = mutableListOf<Marker>()
 
@@ -93,6 +96,11 @@ class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
     private var statusBarSize = 0
 
     companion object {
+        const val EXTRA_LATITUDE = "latitude"
+        const val EXTRA_LONGITUDE = "longitude"
+        const val EXTRA_ORIGIN_NAME = "origin_name"
+        const val EXTRA_DESTINATION_NAME = "destination_name"
+
         private val NULL_LISTENER = View.OnClickListener { }
         private val WALKING_PATTERN = listOf(Dot(), Gap(16f))
 
@@ -112,6 +120,14 @@ class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
 
         supportActionBar?.title = ""
 
+        originName = intent.getStringExtra(EXTRA_ORIGIN_NAME)
+            ?: getString(R.string.navigation_your_location)
+        destinationName = intent.getStringExtra(EXTRA_DESTINATION_NAME)
+            ?: getString(R.string.navigation_default_destination)
+
+        destLat = intent.getDoubleExtra(EXTRA_LATITUDE, 0.0)
+        destLon = intent.getDoubleExtra(EXTRA_LONGITUDE, 0.0)
+
         MARKER_STOP = BitmapDescriptorFactory.fromBitmap(
             AppCompatResources.getDrawable(this, R.drawable.ic_navigation_transit_stop_marker)?.toBitmap())
         MARKER_TERMINUS = BitmapDescriptorFactory.fromBitmap(
@@ -123,11 +139,29 @@ class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
 
         setupRecyclerView()
 
+        setupLocation()
+
         viewModel = ViewModelProviders.of(this).get(TransitNavigationViewModel::class.java)
 
         subscribe()
 
-        viewModel.getRoute()
+    }
+
+    private fun setupLocation() {
+        // Setup location service
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.lastLocation.addOnSuccessListener {
+                it?.run {
+                    originLat = latitude
+                    originLon = longitude
+                    viewModel.getRoute(latitude, longitude, destLat, destLon)
+                    googleMap?.run { onMapReady(this) }
+                }
+            }
+        }
     }
 
     private fun setupRecyclerView() {
@@ -148,23 +182,14 @@ class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
 
         bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(view: View, percentage: Float) {
-                Timber.v("Percentage: $percentage")
                 recyclerView.getChildAt(0).apply {
-//                    setPaddingRelative(
-//                        paddingStart,
-//                        (percentage * statusBarSize).toInt(),
-//                        paddingEnd,
-//                        paddingBottom
-//                    )
                     updateLayoutParams<ViewGroup.MarginLayoutParams>{
                         topMargin = (percentage * statusBarSize).toInt()
                     }
-
                 }
             }
 
             override fun onStateChanged(view: View, state: Int) {
-                Timber.v("State: $state")
                 if (state == BottomSheetBehavior.STATE_EXPANDED) {
                     supportActionBar?.hide()
                 } else if (state == BottomSheetBehavior.STATE_COLLAPSED) {
@@ -461,12 +486,7 @@ private class TransitNavigationViewModel(context: Application):
 
     val routeInfo = MutableLiveData<Response?>()
 
-    fun getRoute() {
-        val originLat = -37.799149f
-        val originLon = 144.994426f
-        val destLat = -37.83640f
-        val destLon = 144.92214f
-
+    fun getRoute(originLat: Double, originLon: Double, destLat: Double, destLon: Double) {
         if (routeInfo.value == null)
             launch {
                 getTransitDirections(originLat, originLon, destLat, destLon)?.let {
