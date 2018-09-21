@@ -74,10 +74,15 @@ public class FriendActivity extends AppCompatActivity {
         }
 
         public void displayNameAndIcon(TextView textView, ImageView imageView) {
+            textView.setTag(conv.getConvId());
+
             if (conv instanceof PrivateConversation) {
                 UserInfoManager.getInstance().getUserInfo(((PrivateConversation) conv).getTargetUid(), userInfo -> {
-                    textView.setText(userInfo.getName());
-                    NetworkImageHelper.loadImage(imageView, userInfo.getPhotoUrl());
+                    // text view haven't changed
+                    if (((String)textView.getTag()).equals(conv.getConvId())) {
+                        textView.setText(userInfo.getName());
+                        NetworkImageHelper.loadImage(imageView, userInfo.getPhotoUrl());
+                    }
                 });
             } else {
                 textView.setText(((GroupConversation) conv).getName());
@@ -86,14 +91,6 @@ public class FriendActivity extends AppCompatActivity {
         }
 
 
-    }
-
-    public static class ViewHolder {
-        public ImageView image;
-        public TextView text;
-        public TextView unread;
-        public TextView lastTime;
-        public TextView lastMessage;
     }
 
     public static class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> implements View.OnClickListener {
@@ -124,7 +121,6 @@ public class FriendActivity extends AppCompatActivity {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_item, parent, false);
             v.setOnClickListener(this);
             FriendViewHolder vh = new FriendViewHolder(v);
-            vh.setIsRecyclable(false);
             return vh;
         }
 
@@ -177,7 +173,6 @@ public class FriendActivity extends AppCompatActivity {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_list_item, parent, false);
             v.setOnClickListener(this);
             ChatViewHolder vh = new ChatViewHolder(v);
-            vh.setIsRecyclable(false);
             return vh;
         }
 
