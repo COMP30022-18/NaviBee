@@ -159,7 +159,7 @@ private class DestinationSuggestionModel(private val context: Application):
     private var db = FirebaseFirestore.getInstance()
 
     fun getDestinationSuggestions(refresh: Boolean = false) {
-        if (popularDestinations.value != null || refresh) {
+        if (popularDestinations.value == null || refresh) {
             db.collection("popularDestinations")
                 .orderBy("order")
                 .get()
@@ -182,9 +182,9 @@ private class DestinationSuggestionModel(private val context: Application):
 }
 
 private data class PopularDestination (
-    var name: String,
-    var address: String,
-    var order: Int,
+    var name: String = "",
+    var address: String = "",
+    var order: Int = 0,
     var placeId: String = ""
 ) {
     fun withId(id: String): PopularDestination {
