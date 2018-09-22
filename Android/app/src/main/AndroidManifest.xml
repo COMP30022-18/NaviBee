@@ -96,7 +96,11 @@
                 android:name="android.app.default_searchable"
                 android:value=".navigation.DestinationsSearchResultActivity" />
         </activity>
-        <activity android:name=".navigation.DestinationsSearchResultActivity">
+        <activity android:name=".navigation.DestinationsSearchResultActivity"
+            android:launchMode="singleTask">
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".navigation.DestinationsSearchResultActivity" />
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -125,10 +129,23 @@
         <activity
             android:name=".navigation.NavigationActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".navigation.TransitNavigationActivity" />
+        <activity android:name=".navigation.TransitNavigationActivity"
+            android:theme="@style/AppTheme.TranslucentActionBar"/>
         <activity
             android:name=".navigation.NavigationSelectorActivity"
             android:theme="@style/AppTheme.Translucent" />
+
+        <!-- Settings -->
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
         <activity
             android:name=".social.ChatActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -145,14 +162,6 @@
         <activity
             android:name=".social.ChatImageViewActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-        </activity>
         <activity android:name=".EventPicFullscreenActivity" />
         <activity
             android:name=".EventsActivity"

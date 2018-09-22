@@ -36,10 +36,10 @@ import org.jetbrains.anko.startActivity
     private lateinit var destinationName: CharSequence
 
     companion object {
-        @JvmField val EXTRA_LATITUDE = "latitude"
-        @JvmField val EXTRA_LONGITUDE = "longitude"
-        @JvmField val EXTRA_ORIGIN_NAME = "origin_name"
-        @JvmField val EXTRA_DESTINATION_NAME = "destination_name"
+        const val EXTRA_LATITUDE = "latitude"
+        const val EXTRA_LONGITUDE = "longitude"
+        const val EXTRA_ORIGIN_NAME = "origin_name"
+        const val EXTRA_DESTINATION_NAME = "destination_name"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,7 +87,12 @@ import org.jetbrains.anko.startActivity
     }
 
     fun startTransitNavigation() {
-        // TODO: Transit navigation.
+        startActivity<TransitNavigationActivity>(
+            TransitNavigationActivity.EXTRA_LATITUDE to latitude,
+            TransitNavigationActivity.EXTRA_LONGITUDE to longitude,
+            TransitNavigationActivity.EXTRA_DESTINATION_NAME to destinationName,
+            TransitNavigationActivity.EXTRA_ORIGIN_NAME to originName
+        )
         this.finish()
     }
 }

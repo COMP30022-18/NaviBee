@@ -35,8 +35,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import au.edu.unimelb.eng.navibee.navigation.DestinationsActivity;
 import au.edu.unimelb.eng.navibee.social.ConversationManager;
 import au.edu.unimelb.eng.navibee.social.FriendActivity;
-import au.edu.unimelb.eng.navibee.social.ConversationManager;
-import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
+import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
 import timber.log.Timber;
 
 import static au.edu.unimelb.eng.navibee.utils.DisplayUtilitiesKt.updateDpi;
@@ -88,9 +87,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mOverflowButton.setOnClickListener(v -> mPopupWindow.show());
 
-        NetworkImageHelper.loadRoundImage(
-                mOverflowButton,
-                Objects.requireNonNull(mUser.getPhotoUrl()).toString());
+        new URLImageViewCacheLoader(
+                Objects.requireNonNull(mUser.getPhotoUrl()).toString(),
+                mOverflowButton).roundImage(true).execute();
 
         TextView welcomeLine = findViewById(R.id.landing_welcome_line);
         String format = getResources().getString(R.string.landing_welcome_line);
@@ -270,8 +269,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     profile.setClipToOutline(true);
                 }
-                NetworkImageHelper.loadRoundImage(profile,
-                        Objects.requireNonNull(mUser.getPhotoUrl()).toString());
+
+                new URLImageViewCacheLoader(
+                        Objects.requireNonNull(mUser.getPhotoUrl()).toString(),
+                        profile).roundImage(true).execute();
+
             } else {
                 if (!(convertView instanceof LinearLayout)) {
                     holder = new ViewHolder();

@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.recycler_view_error_message.view.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 
-class DestinationsRVAdaptor(private val data: ArrayList<DestinationRVItem>) :
+class DestinationsRVAdaptor(private val data: MutableList<DestinationRVItem>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

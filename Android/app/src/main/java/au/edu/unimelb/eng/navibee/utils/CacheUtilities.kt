@@ -3,8 +3,12 @@ package au.edu.unimelb.eng.navibee.utils
 import android.graphics.BitmapFactory
 import android.view.View
 import android.widget.ImageView
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import au.edu.unimelb.eng.navibee.NaviBeeApplication
 import com.google.common.io.ByteStreams
+import kotlinx.coroutines.experimental.Job
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
@@ -25,17 +29,22 @@ import java.io.FileOutputStream
  */
 abstract class CachedLoader(private val prefix: String = "general-cache") {
     abstract val defaultKey: String
-    fun execute(key: String? = null) {
-        val k = key ?: defaultKey
-        val file = File(
-            NaviBeeApplication.instance.cacheDir,
-            "$prefix-${sha256String(k)}"
-        )
+    lateinit var job: Job
 
-        if (file.exists()) {
-            postLoad(file)
-        } else {
-            loadTask(file)
+    @JvmOverloads
+    open fun execute(key: String? = null) {
+        job = launch {
+            val k = key ?: defaultKey
+            val file = File(
+                NaviBeeApplication.instance.cacheDir,
+                "$prefix-${sha256String(k)}"
+            )
+
+            if (file.exists()) {
+                postLoad(file)
+            } else {
+                loadTask(file)
+            }
         }
     }
 
@@ -43,30 +52,72 @@ abstract class CachedLoader(private val prefix: String = "general-cache") {
     abstract fun loadTask(file: File)
 }
 
-abstract class ImageViewCacheLoader(val imageView: ImageView,
-                                    prefix: String = "general-cache"):
+abstract class ImageViewCacheLoader
+    @JvmOverloads constructor(val imageView: ImageView,
+                              prefix: String = "general-cache",
+                              val singleJob: Boolean = true,
+                              private var roundImage: Boolean = false):
         CachedLoader(prefix) {
+    private var tag: Any? = null
+
+    override fun execute(key: String?) {
+        if (singleJob) {
+            if (imageView.tag is Job)
+                (imageView.tag as Job).cancel()
+            else
+                tag = imageView.tag
+        }
+        super.execute(key)
+        if (singleJob) {
+            imageView.tag = job
+        }
+    }
+
+    fun roundImage(value: Boolean): ImageViewCacheLoader {
+        this.roundImage = value
+        return this
+    }
+
     override fun postLoad(file: File) {
         try {
-            imageView.visibility = View.VISIBLE
-            imageView.setImageBitmap(BitmapFactory.decodeStream(FileInputStream(file)))
+            val bitmap = BitmapFactory.decodeStream(FileInputStream(file))
+            if (roundImage) {
+                val r = imageView.resources
+                val drawable = RoundedBitmapDrawableFactory.create(r, bitmap)
+                drawable.setAntiAlias(true)
+                drawable.isCircular = true
+                launch(UI) {
+                    imageView.visibility = View.VISIBLE
+                    imageView.setImageDrawable(drawable)
+                }
+            } else {
+                launch(UI) {
+                    imageView.visibility = View.VISIBLE
+                    imageView.setImageBitmap(bitmap)
+                }
+            }
         } catch (e: Exception) {
             Timber.e(e, "Failed loading image to ImageView.")
         }
+        if (singleJob)
+            imageView.tag = tag
     }
 }
 
-class URLImageViewCacheLoader(val url: String, iv: ImageView,
-                              prefix: String = "image-url"):
-        ImageViewCacheLoader(iv, prefix) {
+class URLImageViewCacheLoader
+    @JvmOverloads constructor(private val url: String, iv: ImageView,
+                              prefix: String = "image-url",
+                              singleJob: Boolean = true,
+                              roundImage: Boolean = false):
+        ImageViewCacheLoader(iv, prefix, singleJob, roundImage) {
     override val defaultKey = url
     override fun loadTask(file: File) {
-
         try {
             val input = java.net.URL(url).openStream()
             val output = FileOutputStream(file)
             ByteStreams.copy(input, output)
-            loadTask(file)
+            output.close()
+            postLoad(file)
         } catch (e: Exception) {
             Timber.e(e, "Failed loading image from URL.")
         }

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".navigation.DestinationsSearchResultActivity">
 
-    <fragment xmlns:tools="http://schemas.android.com/tools"
+    <fragment
         android:id="@+id/navigation.destinations.search_result.map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:background="@color/colorLightGrey"
         app:behavior_hideable="false"
-        app:behavior_peekHeight="300dp"
+        app:behavior_peekHeight="60dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         tools:listitem="@layout/recycler_view_destination_list_entry" />
 

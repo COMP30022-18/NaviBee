@@ -31,8 +31,8 @@ private val httpClient = OkHttpClient()
 fun parseResponseJson(json: String?): Response? =
         if (json == null) null else moshiAdapter.fromJson(json)
 
-fun getTransitDirections(originLat: Float, originLon: Float,
-                        destLat: Float, destLon: Float,
+fun getTransitDirections(originLat: Double, originLon: Double,
+                        destLat: Double, destLon: Double,
                         time: Date = Date()): Response? {
     val dateString = ISO8601Utils.format(time).dropLast(1)
     val response = httpClient.newCall(
@@ -541,7 +541,7 @@ data class Guidance(
 @JsonClass(generateAdapter = true)
 data class Maneuvers(
     @Json(name = "sec_ids")
-    val sedIds: String,
+    val secIds: String,
     @Json(name = "Maneuver")
     val maneuvers: List<Maneuver>?
 )
@@ -557,9 +557,7 @@ data class Maneuver(
     val nextNumber: String?,
     val distance: Int?,
     val traffic: Float?,
-    @Json(name = "Instruction")
     val instruction: String?,
-    @Json(name = "Graph")
     val graph: String?
 )
 
