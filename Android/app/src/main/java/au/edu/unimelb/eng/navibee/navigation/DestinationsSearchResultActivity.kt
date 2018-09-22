@@ -217,6 +217,16 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
 
     private fun handleIntent(intent: Intent) {
         when (intent.action) {
+            Intent.ACTION_VIEW -> {
+                val placeId = intent.extras?.getString(SearchManager.EXTRA_DATA_KEY)
+                if (placeId != null) {
+                    startActivity<DestinationDetailsActivity>(
+                        DestinationDetailsActivity.EXTRA_PLACE_ID to placeId
+                    )
+                    finish()
+                    return
+                }
+            }
             Intent.ACTION_SEARCH -> {
                 query = intent.getStringExtra(SearchManager.QUERY)
                 supportActionBar?.title = query
@@ -229,14 +239,6 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
                         "query" to query,
                         "snackBarLayout" to R.id.destinations_activity_coordinator_layout
                 )
-            }
-            Intent.ACTION_VIEW -> {
-                val placeId = intent.extras?.getString(SearchManager.EXTRA_DATA_KEY)
-                if (placeId != null)
-                    startActivity<DestinationDetailsActivity>(
-                            DestinationDetailsActivity.EXTRA_PLACE_ID to placeId
-                    )
-                finish()
             }
         }
     }
