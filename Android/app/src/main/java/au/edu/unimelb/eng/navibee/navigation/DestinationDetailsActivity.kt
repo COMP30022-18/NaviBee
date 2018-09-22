@@ -272,10 +272,8 @@ class DestinationDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun colorA(color: Int, alpha: Float) =
             colorRGBA(Color.red(color), Color.green(color), Color.blue(color), alpha)
 
-
-    private fun colorRGBA(red: Int, green: Int, blue: Int, alpha: Float): Int {
-        return (alpha * 255).toInt() shl 24 or (red shl 16) or (green shl 8) or blue
-    }
+    private fun colorRGBA(red: Int, green: Int, blue: Int, alpha: Float) =
+        (alpha * 255).toInt() shl 24 or (red shl 16) or (green shl 8) or blue
 
     fun onClickGo(view: View) {
         viewModel.placeDetails.value?.data?.get(0)?.run {

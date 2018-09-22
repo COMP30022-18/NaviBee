@@ -17,11 +17,6 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.startActivity
 
-
-
-
-
-
 class DestinationsActivity : AppCompatActivity(){
 
     // Recycler view

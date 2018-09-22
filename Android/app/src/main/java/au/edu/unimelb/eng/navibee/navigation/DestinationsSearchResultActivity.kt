@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.app.Application
 import android.app.SearchManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -12,8 +13,10 @@ import android.os.Bundle
 import android.provider.SearchRecentSuggestions
 import android.text.Html
 import android.util.DisplayMetrics
+import android.view.Menu
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -66,6 +69,7 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
     private var lastKnownLocation: Location? = null
 
     // incoming parameters
+    private var query: String? = null
     private var sendResult: Boolean = false
 
     // Recycler view
@@ -80,6 +84,8 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
     private var googleMap: GoogleMap? = null
 
     private lateinit var viewModel: DestinationSearchResultViewModel
+
+    private var searchView: SearchView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -124,6 +130,10 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
         mapFragment?.getMapAsync(this)
 
         handleIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        handleIntent(intent ?: return)
     }
 
     private fun subscribe() {
@@ -181,10 +191,34 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
         })
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu
+        this.menuInflater.inflate(R.menu.menu_navigation_destinations_opitons, menu)
+
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+
+        // Set up the search view
+        val menuItemSearchView = menu.findItem(R.id.nav_dest_optmnu_search)
+        searchView = (menuItemSearchView.actionView as SearchView)
+        searchView?.apply {
+            setSearchableInfo(searchManager.getSearchableInfo(componentName))
+
+            // Prevent the search view from collapsing within the subview
+            setIconifiedByDefault(false)
+
+            // Let the search view to fill the entire space
+            maxWidth = Integer.MAX_VALUE
+        }
+        searchView?.post {
+            searchView?.setQuery(query, false)
+        }
+        return true
+    }
+
     private fun handleIntent(intent: Intent) {
         when (intent.action) {
             Intent.ACTION_SEARCH -> {
-                val query = intent.getStringExtra(SearchManager.QUERY)
+                query = intent.getStringExtra(SearchManager.QUERY)
                 supportActionBar?.title = query
                 SearchRecentSuggestions(this,
                         DestinationsSearchSuggestionsContentProvider.AUTHORITY,
@@ -304,9 +338,11 @@ private class DestinationSearchResultViewModel(val context: Application):
             .build()
 
     val searchResult = MutableLiveData<Resource<PlacesSearchResponse>>()
+    private val query: String? = null
+    private val location: Location? = null
 
     fun searchForLocation(query: String, location: Location?) {
-        if (searchResult.value != null) return
+        if (this.query == query && this.location == location) return
         val callback = object : PendingResult.Callback<PlacesSearchResponse> {
             override fun onFailure(e: Throwable?) {
                 if (e != null)
