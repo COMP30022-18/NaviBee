@@ -141,8 +141,20 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
                 builder.show();
-
                 break;
+            case R.id.show_chat_detail_button:
+                if (isPrivate){
+                    Intent intent = new Intent(this, FriendDetail.class);
+                    intent.putExtra("CONV_ID", conversation.getConvId());
+                    intent.putExtra("FRIEND_ID", ((PrivateConversation) conversation).getTargetUid());
+                    startActivity(intent);
+                }
+                else{
+                    Intent intent = new Intent(this, GroupDetailActivity.class);
+                    intent.putExtra("CONV_ID", conversation.getConvId());
+                    startActivity(intent);
+                }
+
         }
 
     }
