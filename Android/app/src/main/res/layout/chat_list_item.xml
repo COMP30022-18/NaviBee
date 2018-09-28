@@ -7,6 +7,7 @@
     android:layout_height="wrap_content">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/chat_list_item_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -91,5 +92,12 @@
         </RelativeLayout>
 
     </LinearLayout>
+    <View
+        android:id="@+id/chat_list_item_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_gravity="bottom"
+        android:background="#B6B6B6"
+        app:layout_constraintTop_toBottomOf="@+id/chat_list_item_layout"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
