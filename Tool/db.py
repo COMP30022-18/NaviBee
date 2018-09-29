@@ -32,4 +32,12 @@ def update3():
     for doc in docs:
         print(doc.id)
         db.collection('conversations').document(doc.id).update({'createTimestamp': datetime.datetime.now()})
-update3()
+# update3()
+
+# add isDeleted flag in conversations
+def update4():
+    docs = db.collection('conversations').get()
+    for doc in docs:
+        print(doc.id)
+        db.collection('conversations').document(doc.id).update({'isDeleted': False})
+update4()
