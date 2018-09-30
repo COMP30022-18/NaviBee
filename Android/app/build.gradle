@@ -102,12 +102,10 @@ dependencies {
     implementation 'com.github.chrisbanes:PhotoView:2.0.0'
     kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.6.0'
 
-    testImplementation "org.mockito:mockito-core:2.22.0"
-
+    testImplementation "org.mockito:mockito-core:2.8.47"
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.powermock:powermock:1.6.5'
-    testImplementation 'org.powermock:powermock-module-junit4:1.6.5'
-    testImplementation 'org.powermock:powermock-api-mockito:1.6.5'
+    testImplementation 'org.powermock:powermock-module-junit4:1.7.4'
+    testImplementation 'org.powermock:powermock-api-mockito2:1.7.4'
 }
 
 kotlin {
