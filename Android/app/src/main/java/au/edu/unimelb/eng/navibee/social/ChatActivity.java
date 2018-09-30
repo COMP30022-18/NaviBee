@@ -10,11 +10,15 @@ import android.content.IntentFilter;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -80,7 +84,38 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         IntentFilter intFilt = new IntentFilter(Conversation.BROADCAST_NEW_MESSAGE);
         registerReceiver(br, intFilt);
 
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.activity_chat_toolbar);
+        setSupportActionBar(myToolbar);
+
         scrollToBottom();
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_chat_activity, menu);
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_chat_detail:
+                if (isPrivate){
+                    Intent intent = new Intent(this, FriendDetail.class);
+                    intent.putExtra("CONV_ID", conversation.getConvId());
+                    intent.putExtra("FRIEND_ID", ((PrivateConversation) conversation).getTargetUid());
+                    startActivity(intent);
+                }
+                else{
+                    Intent intent = new Intent(this, GroupDetailActivity.class);
+                    intent.putExtra("CONV_ID", conversation.getConvId());
+                    startActivity(intent);
+                }
+                return true;
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void loadNewMsg() {
@@ -142,19 +177,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 });
                 builder.show();
                 break;
-            case R.id.show_chat_detail_button:
-                if (isPrivate){
-                    Intent intent = new Intent(this, FriendDetail.class);
-                    intent.putExtra("CONV_ID", conversation.getConvId());
-                    intent.putExtra("FRIEND_ID", ((PrivateConversation) conversation).getTargetUid());
-                    startActivity(intent);
-                }
-                else{
-                    Intent intent = new Intent(this, GroupDetailActivity.class);
-                    intent.putExtra("CONV_ID", conversation.getConvId());
-                    startActivity(intent);
-                }
-
         }
 
     }

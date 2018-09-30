@@ -98,11 +98,11 @@ public class FriendActivity extends AppCompatActivity {
 
         private ArrayList<ContactItem> contactList;
         private RecyclerView mRecyclerView;
-        private FriendActivity friendActivity;
+        private Context friendActivity;
         private Boolean isChatList;
 
 
-        public FriendAdapter(FriendActivity context, ArrayList<ContactItem> contactList, RecyclerView mRecyclerView, Boolean isChatList){
+        public FriendAdapter(Context context, ArrayList<ContactItem> contactList, RecyclerView mRecyclerView, Boolean isChatList){
             this.friendActivity = context;
             this.contactList = contactList;
             this.mRecyclerView = mRecyclerView;
@@ -162,7 +162,7 @@ public class FriendActivity extends AppCompatActivity {
             if (isChatList){
                 int itemPosition = mRecyclerView.getChildLayoutPosition(view);
                 ContactItem tempChat = contactList.get(itemPosition);
-                Intent intent = new Intent(friendActivity.getBaseContext(), ChatActivity.class);
+                Intent intent = new Intent(friendActivity, ChatActivity.class);
                 Conversation tempConv = tempChat.getConv();
                 intent.putExtra("CONV_ID", tempConv.getConvId());
                 friendActivity.startActivity(intent);
@@ -170,7 +170,7 @@ public class FriendActivity extends AppCompatActivity {
             else {
                 int itemPosition = mRecyclerView.getChildLayoutPosition(view);
                 ContactItem tempPerson = contactList.get(itemPosition);
-                Intent intent = new Intent(friendActivity.getBaseContext(), FriendDetail.class);
+                Intent intent = new Intent(friendActivity, FriendDetail.class);
                 PrivateConversation tempConv = (PrivateConversation) tempPerson.getConv();
                 intent.putExtra("CONV_ID", tempConv.getConvId());
                 intent.putExtra("FRIEND_ID", tempConv.getTargetUid());
