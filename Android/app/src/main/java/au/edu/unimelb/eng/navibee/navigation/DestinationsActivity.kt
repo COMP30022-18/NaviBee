@@ -9,11 +9,15 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.*
+import androidx.recyclerview.widget.DiffUtil
 import au.edu.unimelb.eng.navibee.R
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_destinations.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.startActivity
+
+
 
 
 
@@ -27,7 +31,7 @@ class DestinationsActivity : AppCompatActivity(){
 
     private lateinit var viewModel: DestinationSuggestionModel
 
-    private val destinations = ArrayList<DestinationRVItem>()
+    private val destinations = mutableListOf<DestinationRVItem>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,21 +50,22 @@ class DestinationsActivity : AppCompatActivity(){
             setHasFixedSize(true)
             layoutManager = viewManager
             adapter = viewAdapter
-//            addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(context, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
         }
 
         updateRecyclerView()
 
-//        viewModel.getDestinationSuggestions()
+        viewModel.getDestinationSuggestions()
 
     }
 
     private fun subscribe() {
         viewModel.searchHistory.observe(this, Observer { updateRecyclerView() })
+        viewModel.popularDestinations.observe(this, Observer { updateRecyclerView() })
     }
 
     private fun updateRecyclerView() {
         launch(UI){
+            val oldList = destinations.toList()
             destinations.clear()
             destinations.add(DestinationRVButton(resources.getString(R.string.action_navigation_say_a_place),
                     R.drawable.ic_keyboard_voice_black_24dp,
@@ -73,7 +78,7 @@ class DestinationsActivity : AppCompatActivity(){
                         startActivity<TransitNavigationActivity>()
                     }))
             viewModel.searchHistory.value?.run {
-                if (this.isNotEmpty())
+                if (isNotEmpty())
                     destinations.add(DestinationRVDivider(resources.getString(R.string.navigation_destinations_header_recent_destinations)))
                 for (i in this) {
                     destinations.add(DestinationRVEntry(
@@ -89,14 +94,26 @@ class DestinationsActivity : AppCompatActivity(){
                 }
             }
 
-            // TODO: Populate the list of destination suggestions with real data
-            destinations.add(DestinationRVDivider(resources.getString(R.string.navigation_destinations_header_recommended_places)))
-            destinations.add(DestinationRVEntry("Place 3", "Location 3",
-                    onClick = View.OnClickListener {  }))
-            destinations.add(DestinationRVEntry("Place 4", "Location 4",
-                    onClick = View.OnClickListener {  }))
+            viewModel.popularDestinations.value?.run {
+                if (isNotEmpty())
+                    destinations.add(DestinationRVDivider(resources.getString(R.string.navigation_destinations_header_recommended_places)))
+                for (i in this) {
+                    destinations.add(DestinationRVEntry(
+                        name = i.name,
+                        location = i.address,
+                        googlePlaceId = i.placeId,
+                        onClick = View.OnClickListener {
+                            startActivity<DestinationDetailsActivity>(
+                                DestinationDetailsActivity.EXTRA_PLACE_ID to i.placeId
+                            )
+                        }
+                    ))
+                }
+            }
 
-            viewAdapter.notifyDataSetChanged()
+            DiffUtil.calculateDiff(DestinationsRVDiffCallback(oldList, destinations))
+                .dispatchUpdatesTo(viewAdapter)
+//            viewAdapter.notifyDataSetChanged()
         }
     }
 
@@ -125,14 +142,40 @@ class DestinationsActivity : AppCompatActivity(){
 
 }
 
+private class DestinationsRVDiffCallback(private val old: List<DestinationRVItem>,
+                                         private val new: List<DestinationRVItem>): DiffUtil.Callback() {
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int) =
+            old[oldItemPosition] == new[newItemPosition]
+
+    override fun getOldListSize() = old.size
+
+    override fun getNewListSize() = new.size
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
+        old[oldItemPosition] == new[newItemPosition]
+}
+
 
 private class DestinationSuggestionModel(private val context: Application):
         AndroidViewModel(context), LifecycleObserver {
     val searchHistory = MutableLiveData<List<LocationSearchHistory>>()
+    val popularDestinations = MutableLiveData<List<PopularDestination>>()
 
-    fun getDestinationSuggestions() {
-        if (searchHistory.value != null)
-            searchHistory.postValue(getRecentSearchQueries(context))
+    private var db = FirebaseFirestore.getInstance()
+
+    fun getDestinationSuggestions(refresh: Boolean = false) {
+        if (popularDestinations.value != null || refresh) {
+            db.collection("popularDestinations")
+                .orderBy("order")
+                .get()
+                .addOnSuccessListener { result ->
+                    popularDestinations.postValue(
+                        result
+                            .map { it.toObject(PopularDestination::class.java).withId(it.id) }
+                            .toList()
+                    )
+                }
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
@@ -140,5 +183,17 @@ private class DestinationSuggestionModel(private val context: Application):
         launch {
             searchHistory.postValue(getRecentSearchQueries(context))
         }
+    }
+}
+
+private data class PopularDestination (
+    var name: String,
+    var address: String,
+    var order: Int,
+    var placeId: String = ""
+) {
+    fun withId(id: String): PopularDestination {
+        placeId = id
+        return this
     }
 }

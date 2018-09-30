@@ -74,10 +74,15 @@ public class FriendActivity extends AppCompatActivity {
         }
 
         public void displayNameAndIcon(TextView textView, ImageView imageView) {
+            textView.setTag(conv.getConvId());
+
             if (conv instanceof PrivateConversation) {
                 UserInfoManager.getInstance().getUserInfo(((PrivateConversation) conv).getTargetUid(), userInfo -> {
-                    textView.setText(userInfo.getName());
-                    NetworkImageHelper.loadImage(imageView, userInfo.getPhotoUrl());
+                    // text view haven't changed
+                    if (((String)textView.getTag()).equals(conv.getConvId())) {
+                        textView.setText(userInfo.getName());
+                        NetworkImageHelper.loadImage(imageView, userInfo.getPhotoUrl());
+                    }
                 });
             } else {
                 textView.setText(((GroupConversation) conv).getName());
@@ -124,7 +129,6 @@ public class FriendActivity extends AppCompatActivity {
             }
             v.setOnClickListener(this);
             FriendViewHolder vh = new FriendViewHolder(v);
-            vh.setIsRecyclable(false);
             return vh;
         }
 
@@ -159,15 +163,14 @@ public class FriendActivity extends AppCompatActivity {
 
         @Override
         public void onClick(final View view) {
-            if (isChatList){
+            if (isChatList) {
                 int itemPosition = mRecyclerView.getChildLayoutPosition(view);
                 ContactItem tempChat = contactList.get(itemPosition);
                 Intent intent = new Intent(friendActivity, ChatActivity.class);
                 Conversation tempConv = tempChat.getConv();
                 intent.putExtra("CONV_ID", tempConv.getConvId());
                 friendActivity.startActivity(intent);
-            }
-            else {
+            } else {
                 int itemPosition = mRecyclerView.getChildLayoutPosition(view);
                 ContactItem tempPerson = contactList.get(itemPosition);
                 Intent intent = new Intent(friendActivity, FriendDetail.class);
@@ -176,9 +179,7 @@ public class FriendActivity extends AppCompatActivity {
                 intent.putExtra("FRIEND_ID", tempConv.getTargetUid());
                 friendActivity.startActivity(intent);
             }
-
         }
-
     }
 
     private ConversationManager cm = ConversationManager.getInstance();

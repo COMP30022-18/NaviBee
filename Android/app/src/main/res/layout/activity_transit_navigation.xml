@@ -4,13 +4,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".navigation.TransitNavigationActivity"
-    android:orientation="vertical">
+    tools:context=".navigation.TransitNavigationActivity">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/navigation.transit_navigation.recycler_view"
+    <fragment
+        android:id="@+id/navigation.destinations.search_result.map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </androidx.recyclerview.widget.RecyclerView>
+        android:layout_height="match_parent"
+        app:cameraZoom="13" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:behavior_hideable="false"
+        app:behavior_peekHeight="60dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        >
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/navigation.transit_navigation.recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            tools:listitem="@layout/recycler_view_transit_origin"
+            />
+    </androidx.core.widget.NestedScrollView>
     
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

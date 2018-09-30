@@ -27,9 +27,10 @@
 
             <LinearLayout
                 android:id="@+id/linear_layout_left"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
+                android:layout_toStartOf="@id/linear_layout_right"
                 android:paddingLeft="5dp"
                 android:paddingVertical="5dp">
 
@@ -40,8 +41,8 @@
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:maxWidth="165dp"
-                    tools:text="Friend Name"
-                    android:textSize="30sp" />
+                    android:textSize="30sp"
+                    tools:text="Friend Name" />
 
                 <TextView
                     android:id="@+id/chat_list_item_last_message"
@@ -57,11 +58,12 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/linear_layout_right"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="right"
                 android:orientation="vertical"
-                android:layout_toRightOf="@+id/linear_layout_left"
+
                 android:layout_alignParentRight="true"
                 android:paddingRight="5dp"
                 android:paddingVertical="5dp">
@@ -85,10 +87,11 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center_vertical|right"
-                    android:text="08/16/2018 16:39:45"
+                    android:text="Yesterday\n14:42"
                     android:textSize="20sp" />
 
             </LinearLayout>
+
         </RelativeLayout>
 
     </LinearLayout>
