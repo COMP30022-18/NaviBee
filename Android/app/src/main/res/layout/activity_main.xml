@@ -228,6 +228,7 @@
         android:fontFamily="sans-serif-light"
         android:textColor="@color/colorLightTextPrimary"
         android:textSize="40sp"
+        android:textAlignment="viewStart"
         app:layout_constraintBottom_toBottomOf="@+id/landing_group_16_9"
         app:layout_constraintEnd_toStartOf="@+id/landing_guideline_80"
         app:layout_constraintStart_toStartOf="parent"

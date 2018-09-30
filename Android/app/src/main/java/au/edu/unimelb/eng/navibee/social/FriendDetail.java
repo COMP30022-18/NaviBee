@@ -36,7 +36,7 @@ public class FriendDetail extends AppCompatActivity {
                 startActivity(intent);
                 break;
             case R.id.activity_friend_detail_deleteFriend_button:
-                //ConversationManager.getInstance().deleteFriend(friendId);
+                ConversationManager.getInstance().deleteFriend(friendId);
                 break;
         }
     }

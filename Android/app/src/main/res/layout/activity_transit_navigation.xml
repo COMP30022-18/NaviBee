@@ -11,13 +11,15 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:cameraZoom="13" />
+        app:cameraZoom="13"
+        />
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/navigation.transit_navigation.nested_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:behavior_hideable="false"
-        app:behavior_peekHeight="60dp"
+        app:behavior_peekHeight="@dimen/transit_navigation_summary_height"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         >
 

@@ -60,6 +60,7 @@ public class ConversationManager {
     private void listenPrivateConv() {
         // private conversation (friend list)
         db.collection("conversations")
+                .whereEqualTo("isDeleted", false)
                 .whereEqualTo("users."+uid, true)
                 .whereEqualTo("type", "private")
                 .addSnapshotListener((snapshots, e) -> {
@@ -112,6 +113,7 @@ public class ConversationManager {
         // private conversation (friend list)
         db.collection("conversations")
                 .whereEqualTo("users."+uid, true)
+                .whereEqualTo("isDeleted", false)
                 .whereEqualTo("type", "group")
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null) {
@@ -185,6 +187,11 @@ public class ConversationManager {
         data.put("targetUid", targetUid);
 
         return mFunctions.getHttpsCallable("addFriend").call(data);
+    }
+
+    public void deleteFriend(String targetUid) {
+        String convId = getPrivateConvId(targetUid);
+        db.collection("conversations").document(convId).update("isDeleted", true);
     }
 
     public Task<HttpsCallableResult> createGroupChat(ArrayList<String> uses, String name, String icon) {
