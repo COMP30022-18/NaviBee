@@ -34,6 +34,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -76,6 +77,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     private Bitmap addIcon;
     private ChipGroup chipgroup;
     private ScrollView scrollView;
+    private ProgressBar progressBar;
     private final int MAX_NUM_OF_PHOTOS = 6;
 
     public static class TimePickerFragment extends DialogFragment {
@@ -121,6 +123,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         chipgroup = (ChipGroup) findViewById(R.id.eventFriendChips);
         picsView = (GridView) findViewById(R.id.eventPics);
         scrollView = (ScrollView) findViewById(R.id.eventScrollView);
+        progressBar = (ProgressBar) findViewById(R.id.event_indefinite_progress);
 
         loadData();
     }
@@ -129,6 +132,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         Intent intent = getIntent();
         Boolean isEdit = intent.getBooleanExtra("isEdit", false);
 
+        // init scrollView
         scrollView.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
         scrollView.setFocusable(true);
         scrollView.setFocusableInTouchMode(true);
@@ -136,14 +140,15 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             v.clearFocus();
             return false;
         });
-
+        // init nameView
         nameView.setOnFocusChangeListener((v, hasFocus) -> {
             if(!hasFocus) {
                 InputMethodManager imm =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
             }
         });
-
+        // init progress bar
+        progressBar.setVisibility(View.GONE);
         // init date map
         dateMap = new HashMap<>();
         // init date and time button
@@ -245,6 +250,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
                 // if it's not recycled, initialize some attributes
                 imageView = new ImageView(mContext);
                 int width = Resources.getSystem().getDisplayMetrics().widthPixels;
+                picsView.setVerticalSpacing(3*width/60);
                 imageView.setLayoutParams(new GridView.LayoutParams(9*width/30, 9*width/30));
                 imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 imageView.setPadding(8, 8, 8, 8);
@@ -537,6 +543,17 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         drawable.draw(canvas);
 
         return bitmap;
+    }
+
+    private void progressingMode(Boolean enterMode) {
+        if(enterMode){
+            scrollView.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+        }
+        else{
+            progressBar.setVisibility(View.GONE);
+            scrollView.setVisibility(View.VISIBLE);
+        }
     }
 
 
