@@ -429,15 +429,16 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             picsUri.remove(0);
 
             try {
-                UploadTask task = FirebaseStorageHelper.uploadImage(uri, null, "event", 80);
-                task.addOnCompleteListener(taskResult -> {
-                    if (taskResult.isSuccessful()) {
-                        picsStoragePath.add(taskResult.getResult().getMetadata().getPath());
-                        finishedEditEvent();
-                    } else {
-                        // fail
-                    }
-                });
+                FirebaseStorageHelper
+                    .uploadImage(uri, null, "event", 70, true, (isSuccess, path) -> {
+                        if (isSuccess) {
+                            picsStoragePath.add(path);
+                            finishedEditEvent();
+                        } else {
+                            //fail
+                        }
+                    });
+
             } catch (Exception e) {
                 // fail
 
