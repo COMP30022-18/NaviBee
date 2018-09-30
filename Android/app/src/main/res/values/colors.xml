@@ -9,6 +9,9 @@
     <color name="colorLightTextPrimary">#ff000000</color>
     <color name="colorLightTextSecondary">#a6000000</color>
 
+    <color name="colorDarkTextPrimary">#ffffffff</color>
+    <color name="colorDarkTextSecondary">#afffffff</color>
+
     <color name="iconTintOnLightBackground">#a6000000</color>
     <color name="iconTintOnLightBackgroundSecondary">#20000000</color>
 
@@ -30,4 +33,6 @@
     <color name="black_overlay">#66000000</color>
 
     <color name="transitWalkingColor">#2CC3F8</color>
+
+    <color name="translucentActionBarBackground">#30000000</color>
 </resources>

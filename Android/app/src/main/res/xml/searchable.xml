@@ -6,6 +6,7 @@
     android:searchSuggestAuthority="au.edu.unimelb.eng.navibee.navigation.DestinationsSearchSuggestionsContentProvider"
     android:searchSuggestIntentAction="android.intent.action.VIEW"
     android:voiceLanguageModel="web_search"
+    android:searchSuggestSelection=" ?"
     android:voicePromptText="@string/navigation_search_hint">
 
 </searchable>

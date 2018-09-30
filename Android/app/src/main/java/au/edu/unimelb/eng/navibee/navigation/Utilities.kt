@@ -28,14 +28,18 @@ class GoogleMapsPlaceIdCacheImageLoader(private val placeId: String,
         GoogleMapsPhotoReferenceCacheImageLoader("", iv, maxHeight, singleJob) {
     override val defaultKey = "$placeId-$index"
     override fun loadTask(file: File) {
-        val placeDetails = PlacesApi.placeDetails(geoContext, placeId).await()
-        placeDetails?.photos?.run {
-            if (isNotEmpty()) {
-                photoReference = this[0]?.photoReference ?: ""
-                if (photoReference.isNotBlank()) {
-                    super.loadTask(file)
+        try {
+            val placeDetails = PlacesApi.placeDetails(geoContext, placeId).await()
+            placeDetails?.photos?.run {
+                if (isNotEmpty()) {
+                    photoReference = this[0]?.photoReference ?: ""
+                    if (photoReference.isNotBlank()) {
+                        super.loadTask(file)
+                    }
                 }
             }
+        } catch (e: Exception) {
+            Timber.e(e, "Error occurred while loading image from Google Maps")
         }
     }
 }
