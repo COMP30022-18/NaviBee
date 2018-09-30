@@ -18,16 +18,22 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import au.edu.unimelb.eng.navibee.NaviBeeApplication;
 
 public class FirebaseStorageHelper {
 
-    private static final int IMAGE_SIZE = 2000;
+    private static final int IMAGE_SIZE = 1500;
     private static final int THUMB_IMAGE_SIZE = 500;
 
     public static int getOrientation(Uri photoUri) {
@@ -105,12 +111,9 @@ public class FirebaseStorageHelper {
 
 
 
-    public static UploadTask uploadImage(Uri uri, String uploadName, String category, int compressQuality) throws FileNotFoundException, IOException {
-        // image
-        byte[] bo = scaleImage(uri, IMAGE_SIZE, compressQuality);
+    public static void uploadImage(Uri uri, String uploadName, String category,
+              int compressQuality, boolean thumbOnly, UploadCallback callback) throws IOException {
 
-        // thumb
-        byte[] bt = scaleImage(uri, THUMB_IMAGE_SIZE, compressQuality);
 
         // storage reference
         FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -124,17 +127,53 @@ public class FirebaseStorageHelper {
         StorageReference storageRefOri = storageRef.child(uploadName + ".jpg");
         StorageReference storageRefThumb = storageRef.child(uploadName + "-thumb.jpg");
 
+        String fullFilename = storageRefOri.getPath();
 
-        // upload
-        UploadTask uploadTaskOri = storageRefOri.putBytes(bo);
-        UploadTask uploadTaskThumb = storageRefThumb.putBytes(bt);
-        uploadTaskOri.pause();
 
-        uploadTaskThumb.addOnSuccessListener(taskSnapshot -> uploadTaskOri.resume());
-        uploadTaskThumb.addOnFailureListener(taskSnapshot -> uploadTaskOri.cancel());
 
-        return uploadTaskOri;
+
+        ArrayList<UploadTask> tasks = new ArrayList<>();
+
+
+        if (!thumbOnly) {
+            // image
+            byte[] bo = scaleImage(uri, IMAGE_SIZE, compressQuality);
+            tasks.add(storageRefOri.putBytes(bo));
+        }
+
+        // thumb
+        byte[] bt = scaleImage(uri, THUMB_IMAGE_SIZE, compressQuality);
+        tasks.add(storageRefThumb.putBytes(bt));
+
+        AtomicBoolean failed = new AtomicBoolean(false);
+
+        for (UploadTask task : tasks) {
+            task.addOnCompleteListener(result -> {
+                if (failed.get()) return;
+
+                if (result.isSuccessful()) {
+                    tasks.remove(task);
+                    if (tasks.isEmpty()) {
+                        callback.callback(true, fullFilename);
+                    }
+                } else {
+                    failed.set(true);
+                    for (UploadTask t:tasks) {
+                        if (t!=task) {
+                            t.cancel();
+                        }
+                    }
+                    callback.callback(false, "");
+                }
+            });
+        }
     }
+
+    public interface UploadCallback {
+        void callback(boolean isSuccess, String path);
+    }
+
+
 
     public static void loadImage(ImageView imageView, String filePath, boolean isThumb) {
         loadImage(imageView, filePath, isThumb, null);
@@ -148,12 +187,12 @@ public class FirebaseStorageHelper {
         }
 
         // fs- is for firebase storage caches
-        String filename = "fs-"+ NetworkImageHelper.sha256(filePath);
+        String filename = "fs-"+ sha256(filePath);
         File file = new File(NaviBeeApplication.getInstance().getCacheDir(), filename);
 
         if (file.exists()) {
             // cache exists
-            NetworkImageHelper.loadImageFromCacheFile(imageView, file);
+            loadImageFromCacheFile(imageView, file);
             if (callback!=null) callback.callback(true);
         } else {
             // cache not exists
@@ -163,7 +202,7 @@ public class FirebaseStorageHelper {
             storageRef = storageRef.child(filePath);
             storageRef.getFile(file).addOnSuccessListener(taskSnapshot -> {
                 // Local temp file has been created
-                NetworkImageHelper.loadImageFromCacheFile(imageView, file);
+                loadImageFromCacheFile(imageView, file);
                 if (callback!=null) callback.callback(true);
             }).addOnFailureListener(taskSnapshot -> {
                 if (callback!=null) callback.callback(false);
@@ -174,6 +213,39 @@ public class FirebaseStorageHelper {
 
     public interface Callback {
         void callback(boolean isSuccess);
+    }
+
+    private static String sha256(String url) {
+        String sha256 = "";
+        try {
+            MessageDigest crypt = MessageDigest.getInstance("SHA-256");
+            crypt.reset();
+            crypt.update(url.getBytes("UTF-8"));
+            sha256 = byteToHex(crypt.digest());
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return sha256;
+    }
+
+    private static String byteToHex(final byte[] hash) {
+        Formatter formatter = new Formatter();
+        for (byte b : hash) {
+            formatter.format("%02x", b);
+        }
+        String result = formatter.toString();
+        formatter.close();
+        return result;
+    }
+
+    private static void loadImageFromCacheFile(ImageView imageView, File file) {
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            Bitmap bitmap = BitmapFactory.decodeStream(fis);
+            imageView.setImageBitmap(bitmap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

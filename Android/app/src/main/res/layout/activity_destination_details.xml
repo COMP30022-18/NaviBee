@@ -26,6 +26,13 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <fragment
+        android:id="@+id/navigation.destinations.details.map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cameraZoom="13" />
+
     <com.synnapps.carouselview.CarouselView
         android:id="@+id/navigation.destinations.details.image_preview"
         android:layout_width="match_parent"
@@ -58,7 +65,7 @@
         app:cornerRadius="72dp"
         app:layout_anchor="@id/navigation.destinations.details.recycler_view"
         android:onClick="onClickGo"
-        app:layout_anchorGravity="top|end"
-        android:fitsSystemWindows="true"/>
+        android:gravity="center"
+        app:layout_anchorGravity="top|end"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

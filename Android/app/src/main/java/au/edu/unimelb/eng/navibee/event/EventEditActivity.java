@@ -148,7 +148,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             }
         });
         // init progress bar
-        progressBar.setVisibility(View.GONE);
+        progressingMode(false);
         // init date map
         dateMap = new HashMap<>();
         // init date and time button
@@ -408,10 +408,14 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         Date eventDate = calendar.getTime();
 
         Map<String, Boolean> users = new HashMap<>();
-        for(String user: selectedUidList) {
-            users.put(user, true);
+        if(selectedUidList != null){
+            for(String user: selectedUidList) {
+                users.put(user, true);
+            }
         }
         users.put(holder, true);
+
+
 
         EventsActivity.EventItem newEvent = new EventsActivity.EventItem(name, holder, location, eventDate, users, picsStoragePath);
 
@@ -443,20 +447,22 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     }
 
     private void finishedEditEvent() {
+        progressingMode(true);
         if (!picsUri.isEmpty()) {
             Uri uri = picsUri.get(0);
             picsUri.remove(0);
 
             try {
-                UploadTask task = FirebaseStorageHelper.uploadImage(uri, null, "event", 80);
-                task.addOnCompleteListener(taskResult -> {
-                    if (taskResult.isSuccessful()) {
-                        picsStoragePath.add(taskResult.getResult().getMetadata().getPath());
-                        finishedEditEvent();
-                    } else {
-                        // fail
-                    }
-                });
+                FirebaseStorageHelper
+                    .uploadImage(uri, null, "event", 70, true, (isSuccess, path) -> {
+                        if (isSuccess) {
+                            picsStoragePath.add(path);
+                            finishedEditEvent();
+                        } else {
+                            //fail
+                        }
+                    });
+
             } catch (Exception e) {
                 // fail
 
@@ -479,20 +485,19 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         }
 
         // check if any friends selected
-        if(selectedUidList == null || selectedUidList.size() == 0) {
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-            dialog.setMessage("You haven't invite any friends");
-            dialog.setNegativeButton("I don't have friends", (dialoginterface, i) -> {
-                dialoginterface.cancel();
-                selectedUidList = new ArrayList<>();
-                finishedEditEvent();
-            });
-            dialog.setPositiveButton("Oops! Forgot", (dialoginterface, i) -> {
-                Intent intent = new Intent(EventEditActivity.this, EventSelectFriendsActivity.class);
-                startActivityForResult(intent, 1);
-            });
-            dialog.show();
-        }
+//        if(selectedUidList == null || selectedUidList.size() == 0) {
+//            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+//            dialog.setMessage("You haven't invite any friends");
+//            dialog.setNegativeButton("I don't have friends", (dialoginterface, i) -> {
+//                dialoginterface.cancel();
+//                selectedUidList = new ArrayList<>();
+//            });
+//            dialog.setPositiveButton("Oops! Forgot", (dialoginterface, i) -> {
+//                Intent intent = new Intent(EventEditActivity.this, EventSelectFriendsActivity.class);
+//                startActivityForResult(intent, 1);
+//            });
+//            dialog.show();
+//        }
 
         // check if date and time selected
         if(dateMap.size() < 5){
@@ -516,7 +521,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     public void onPickResult(PickResult r) {
         if (r.getError() == null) {
 
-            pics.add(0, r.getBitmap());
+            pics.add(pics.size()-1, r.getBitmap());
             picsUri.add(r.getUri());
 
             picsUpdate();

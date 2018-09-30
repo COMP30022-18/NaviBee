@@ -13,4 +13,5 @@
 
     <!-- Transit navigation -->
     <dimen name="transit_navigation_route_bar_width">20dp</dimen>
+    <dimen name="transit_navigation_summary_height">64dp</dimen>
 </resources>

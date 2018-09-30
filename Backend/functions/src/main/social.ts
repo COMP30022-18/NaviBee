@@ -13,6 +13,9 @@ export const newMessageNotification = functions.firestore
         // get sender and receiver
         const sender = doc.sender;
         const convDoc = (await db.collection('conversations').doc(convID).get()).data();
+        if (convDoc.isDeleted) {
+            return;
+        }
 
         // get sender name
         const senderDoc = (await db.collection('users').doc(sender).get()).data();
@@ -86,6 +89,7 @@ export const addFriend = functions.https.onCall(
         }
 
         let convDoc = await db.collection('conversations')
+                            .where('isDeleted', '==', false)
                             .where('users.' + uid, '==', true)
                             .where('users.' + targetUid, '==', true)
                             .where('type', '==', 'private')
@@ -98,6 +102,7 @@ export const addFriend = functions.https.onCall(
         // set up private conversations
         // private conversation holds relationship
         let conv = {};
+        conv['isDeleted'] = false;
         conv['users'] = {};
         conv['users'][uid] = true;
         conv['users'][targetUid] = true;
@@ -120,6 +125,7 @@ export const createGroupChat = functions.https.onCall(
         }
 
         let conv = {};
+        conv['isDeleted'] = false;
         conv['type'] = 'group';
         conv['creator'] = uid;
         conv['name'] = data.name;

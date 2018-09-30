@@ -23,23 +23,23 @@ import org.jetbrains.anko.startActivity
  * Start this activity to start an activity.
  *
  * Args:
- *      EXTRA_LATITUDE: float, latitude of destination
- *      EXTRA_LONGITUDE: float, longitude of destination
+ *      EXTRA_LATITUDE: double, latitude of destination
+ *      EXTRA_LONGITUDE: double, longitude of destination
  *      EXTRA_ORIGIN_NAME: CharSequence, name of origin, optional
  *      EXTRA_DESTINATION_NAME: CharSequence, name of destination, optional
  */
-class NavigationSelectorActivity : AppCompatActivity() {
+    class NavigationSelectorActivity : AppCompatActivity() {
 
-    private var latitude = 0.0f
-    private var longitude = 0.0f
+    private var latitude = 0.0
+    private var longitude = 0.0
     private lateinit var originName: CharSequence
     private lateinit var destinationName: CharSequence
 
     companion object {
-        @JvmStatic val EXTRA_LATITUDE = "latitude"
-        @JvmStatic val EXTRA_LONGITUDE = "longitude"
-        @JvmStatic val EXTRA_ORIGIN_NAME = "origin_name"
-        @JvmStatic val EXTRA_DESTINATION_NAME = "destination_name"
+        const val EXTRA_LATITUDE = "latitude"
+        const val EXTRA_LONGITUDE = "longitude"
+        const val EXTRA_ORIGIN_NAME = "origin_name"
+        const val EXTRA_DESTINATION_NAME = "destination_name"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,8 +49,8 @@ class NavigationSelectorActivity : AppCompatActivity() {
             throw IllegalArgumentException("Latitude and longitude is required for navigation.")
         }
 
-        latitude = intent.getFloatExtra(EXTRA_LATITUDE, latitude)
-        longitude = intent.getFloatExtra(EXTRA_LONGITUDE, longitude)
+        latitude = intent.getDoubleExtra(EXTRA_LATITUDE, latitude)
+        longitude = intent.getDoubleExtra(EXTRA_LONGITUDE, longitude)
         originName = intent.getCharSequenceExtra(EXTRA_ORIGIN_NAME)
                 ?: resources.getString(R.string.navigation_your_location)
         destinationName = intent.getCharSequenceExtra(EXTRA_DESTINATION_NAME)
@@ -87,7 +87,12 @@ class NavigationSelectorActivity : AppCompatActivity() {
     }
 
     fun startTransitNavigation() {
-        // TODO: Transit navigation.
+        startActivity<TransitNavigationActivity>(
+            TransitNavigationActivity.EXTRA_LATITUDE to latitude,
+            TransitNavigationActivity.EXTRA_LONGITUDE to longitude,
+            TransitNavigationActivity.EXTRA_DESTINATION_NAME to destinationName,
+            TransitNavigationActivity.EXTRA_ORIGIN_NAME to originName
+        )
         this.finish()
     }
 }
