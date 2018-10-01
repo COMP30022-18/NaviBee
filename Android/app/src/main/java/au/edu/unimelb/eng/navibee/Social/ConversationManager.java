@@ -132,8 +132,8 @@ public class ConversationManager {
 
                                 // load new conversation
                                 Conversation conv = new GroupConversation(convId, timestamp.toDate(), createTimestamp.toDate(),
-                                        (String) dc.getDocument().get("name"), (String) dc.getDocument().get("icon"), (Map<String, Boolean>) dc.getDocument().get("users"));
-
+                                        (String) dc.getDocument().get("name"), (String) dc.getDocument().get("icon"),
+                                        (Map<String, Boolean>) dc.getDocument().get("users"), (String) dc.getDocument().get("creator"));
                                 convIdMap.put(convId, conv);
                                 break;
 
