@@ -80,7 +80,7 @@
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
         <activity android:name=".EventSelectFriendsActivity" />
         <activity
-            android:name=".SosActivity"
+            android:name=".sos.SosActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".social.FriendActivity"

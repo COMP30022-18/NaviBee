@@ -1,4 +1,4 @@
-package au.edu.unimelb.eng.navibee;
+package au.edu.unimelb.eng.navibee.sos;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -9,6 +9,8 @@ import android.net.Uri;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+import au.edu.unimelb.eng.navibee.R;
+
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
@@ -46,6 +48,8 @@ public class SosActivity extends AppCompatActivity {
         checkPhoneCallPermission();
 
         makePhoneCall(phoneText);
+
+        FallDetection.getInstance().start();
 
     }
 

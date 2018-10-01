@@ -35,6 +35,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import au.edu.unimelb.eng.navibee.navigation.DestinationsActivity;
 import au.edu.unimelb.eng.navibee.social.ConversationManager;
 import au.edu.unimelb.eng.navibee.social.FriendActivity;
+import au.edu.unimelb.eng.navibee.sos.SosActivity;
 import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
 import timber.log.Timber;
 
