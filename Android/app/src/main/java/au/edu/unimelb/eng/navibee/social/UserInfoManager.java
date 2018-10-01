@@ -94,7 +94,6 @@ public class UserInfoManager {
             this.photoUrl = photoUrl;
         }
 
-
         public String getName() {
             return name;
         }

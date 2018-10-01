@@ -1,11 +1,12 @@
 package au.edu.unimelb.eng.navibee.social;
 
+import com.google.firebase.Timestamp;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
-
 
 import static org.junit.Assert.*;
 
@@ -16,38 +17,61 @@ public class ConversationTest {
     }
 
     @Test
-    public void testMessage() throws Exception {
-        Date testTime = new Date();
+    public void testMessage() {
 
-        String mData = "data";
-        String mSender = "sender";
-        Date mTime = testTime;
-        String mType = "type";
+        String data = "data";
+        String sender = "sender";
+        Date time_ = new Date();
+        Timestamp time = new Timestamp(time_);
+        String type = "type";
 
-        Conversation.Message mMessage = new Conversation.Message(mData, mSender, mTime, mType);
+        Conversation.Message message = new Conversation.Message(data, sender, time, type);
+        Conversation.Message message_ = new Conversation.Message(data, sender, time_, type);
 
-        // Getter function
-        assertEquals("data", mMessage.getData());
-        assertEquals("sender", mMessage.getSender());
-        assertEquals(testTime, mMessage.getTime_());
-        assertEquals("type", mMessage.getType());
+        assertNotNull(message);
+        assertNotNull(message_);
 
-        // getSummary function
-        mType = "text";
-        mMessage = new Conversation.Message(mData, mSender, mTime, mType);
-        assertEquals(mData, mMessage.getSummary());
+        // Assert getter functions
+        assertEquals(data, message.getData());
+        assertEquals(sender, message.getSender());
+        assertEquals(time, message.getTime());
+        assertEquals(time_, message.getTime_());
+        assertEquals(type, message.getType());
 
-        mType = "image";
-        mMessage = new Conversation.Message(mData, mSender, mTime, mType);
-        assertEquals("[Photo]", mMessage.getSummary());
+        assertEquals(data, message_.getData());
+        assertEquals(sender, message_.getSender());
+        assertEquals(time, message_.getTime());
+        assertEquals(time_, message_.getTime_());
+        assertEquals(type, message_.getType());
 
-        mType = "voicecall";
-        mMessage = new Conversation.Message(mData, mSender, mTime, mType);
-        assertEquals("[Voice Call]", mMessage.getSummary());
+    }
 
-        mType = "location";
-        mMessage = new Conversation.Message(mData, mSender, mTime, mType);
-        assertEquals("[Location]", mMessage.getSummary());
+    @Test
+    public void testGetSummary() {
+
+        String data = "data";
+        String sender = "sender";
+        Date time = new Date();
+        String type;
+
+        Conversation.Message message;
+
+        // 4 cases need to be tested
+        type = "text";
+        message = new Conversation.Message(data, sender, time, type);
+        assertEquals(data, message.getSummary());
+
+        type = "image";
+        message = new Conversation.Message(data, sender, time, type);
+        assertEquals("[Photo]", message.getSummary());
+
+        type = "voicecall";
+        message = new Conversation.Message(data, sender, time, type);
+        assertEquals("[Voice Call]", message.getSummary());
+
+        type = "location";
+        message = new Conversation.Message(data, sender, time, type);
+        assertEquals("[Location]", message.getSummary());
 
     }
 
