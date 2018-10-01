@@ -197,10 +197,10 @@ public class ConversationManager {
         db.collection("conversations").document(convId).update("isDeleted", true);
     }
 
-    public Task<HttpsCallableResult> createGroupChat(ArrayList<String> uses, String name, String icon) {
+    public Task<HttpsCallableResult> createGroupChat(ArrayList<String> users, String name, String icon) {
         FirebaseFunctions mFunctions = FirebaseFunctions.getInstance();
         Map<String, Object> data = new HashMap<>();
-        data.put("users", uses);
+        data.put("users", users);
         data.put("name", name);
         data.put("icon", icon);
 
