@@ -61,21 +61,21 @@ public class GroupDetailActivity extends AppCompatActivity {
 
         // create a new ImageView for each item referenced by the Adapter
         public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder viewHolder;
+            ViewHolder holder;
             String member = members.get(position);
             if (convertView == null){
-                viewHolder = new ViewHolder();
+                holder = new ViewHolder();
                 LayoutInflater inflater = LayoutInflater.from(context);
-                convertView = inflater.inflate(R.layout.group_chat_member_item, parent, false);
-                viewHolder.name = (TextView) convertView.findViewById(R.id.group_member_name);
-                viewHolder.icon = (ImageView) convertView.findViewById(R.id.group_detail_icon);
+                convertView = inflater.inflate(R.layout.group_chat_member_item, null);
+                holder.name = (TextView) convertView.findViewById(R.id.group_member_name);
+                holder.icon = (ImageView) convertView.findViewById(R.id.group_member_icon);
             }
             else{
-                viewHolder = (ViewHolder) convertView.getTag();
+                holder = (ViewHolder) convertView.getTag();
             }
             UserInfoManager.getInstance().getUserInfo(member, userInfo -> {
-//                viewHolder.name.setText(userInfo.getName());
-//                NetworkImageHelper.loadImage(viewHolder.icon, userInfo.getPhotoUrl());
+                holder.name.setText(userInfo.getName());
+                NetworkImageHelper.loadImage(holder.icon, userInfo.getPhotoUrl());
             });
             return convertView;
         }
