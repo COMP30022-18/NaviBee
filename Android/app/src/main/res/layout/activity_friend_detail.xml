@@ -48,8 +48,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/friend_detail_name"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="0.6"/>
+        app:layout_constraintBottom_toTopOf="@+id/activity_friend_detail_deleteFriend_button"
+        app:layout_constraintVertical_bias="1"/>
     <Button
         android:id="@+id/activity_friend_detail_deleteFriend_button"
         android:layout_marginHorizontal="8dp"
@@ -61,8 +61,23 @@
         android:onClick="onClick"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/activity_friend_detail_sendMessage_button"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="0.4"/>
+        app:layout_constraintVertical_bias="1"/>
+
+    <Button
+        android:id="@+id/activity_friend_detail_addFriend_button"
+        android:layout_marginHorizontal="8dp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_green_light"
+        android:text="Add Friend"
+        android:textSize="24dp"
+        android:onClick="onClick"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/friend_detail_name"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="1"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

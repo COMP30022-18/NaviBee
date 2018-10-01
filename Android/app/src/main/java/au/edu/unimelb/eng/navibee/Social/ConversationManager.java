@@ -203,4 +203,6 @@ public class ConversationManager {
 
         return mFunctions.getHttpsCallable("createGroupChat").call(data);
     }
+
+    public String getUid(){ return this.uid; }
 }

@@ -3,6 +3,7 @@ package au.edu.unimelb.eng.navibee.social;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,13 +14,28 @@ import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
 public class FriendDetail extends AppCompatActivity {
     private String convId;
     private String friendId;
+    private ConversationManager cm = ConversationManager.getInstance();
+    private Button sendMessageButton;
+    private Button deleteFriendButton;
+    private Button addFriendButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_detail);
-        convId = getIntent().getStringExtra("CONV_ID");
+
         friendId = getIntent().getStringExtra("FRIEND_ID");
+        sendMessageButton = findViewById(R.id.activity_friend_detail_sendMessage_button);
+        deleteFriendButton = findViewById(R.id.activity_friend_detail_deleteFriend_button);
+        addFriendButton = findViewById(R.id.activity_friend_detail_addFriend_button);
+        if (cm.getFriendList().contains(friendId)){
+            convId = ConversationManager.getInstance().getPrivateConvId(friendId);
+            addFriendButton.setVisibility(View.INVISIBLE);
+        }
+        else{
+            sendMessageButton.setVisibility(View.INVISIBLE);
+            deleteFriendButton.setVisibility(View.INVISIBLE);
+        }
         ImageView icon = findViewById(R.id.friend_detail_icon);
         TextView name = findViewById(R.id.friend_detail_name);
         UserInfoManager.getInstance().getUserInfo(friendId, userInfo -> {
@@ -37,6 +53,9 @@ public class FriendDetail extends AppCompatActivity {
                 break;
             case R.id.activity_friend_detail_deleteFriend_button:
                 ConversationManager.getInstance().deleteFriend(friendId);
+                break;
+            case R.id.activity_friend_detail_addFriend_button:
+                ConversationManager.getInstance().addFriend(friendId);
                 break;
         }
     }

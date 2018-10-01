@@ -175,7 +175,6 @@ public class FriendActivity extends AppCompatActivity {
                 ContactItem tempPerson = contactList.get(itemPosition);
                 Intent intent = new Intent(friendActivity, FriendDetail.class);
                 PrivateConversation tempConv = (PrivateConversation) tempPerson.getConv();
-                intent.putExtra("CONV_ID", tempConv.getConvId());
                 intent.putExtra("FRIEND_ID", tempConv.getTargetUid());
                 friendActivity.startActivity(intent);
             }

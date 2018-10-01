@@ -1,6 +1,7 @@
 package au.edu.unimelb.eng.navibee.social;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -32,14 +33,9 @@ public class GroupDetailActivity extends AppCompatActivity {
     private String creator;
     private String createDate;
 
-    public static class MemberAdapter extends BaseAdapter {
+    public static class MemberAdapter extends BaseAdapter{
         private Context context;
         private ArrayList<String> members;
-
-        private static class ViewHolder{
-            TextView name;
-            ImageView icon;
-        }
 
         public MemberAdapter(Context context, ArrayList<String> members) {
             this.context = context;
@@ -56,28 +52,38 @@ public class GroupDetailActivity extends AppCompatActivity {
         }
 
         public long getItemId(int position) {
-            return position%3;
+            return position;
         }
 
         // create a new ImageView for each item referenced by the Adapter
         public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder holder;
+            View view;
             String member = members.get(position);
             if (convertView == null){
-                holder = new ViewHolder();
                 LayoutInflater inflater = LayoutInflater.from(context);
-                convertView = inflater.inflate(R.layout.group_chat_member_item, null);
-                holder.name = (TextView) convertView.findViewById(R.id.group_member_name);
-                holder.icon = (ImageView) convertView.findViewById(R.id.group_member_icon);
+                view = inflater.inflate(R.layout.group_chat_member_item, parent, false);
+                TextView viewName = (TextView) view.findViewById(R.id.group_member_name);
+                ImageView viewIcon = (ImageView) view.findViewById(R.id.group_member_icon);
+                UserInfoManager.getInstance().getUserInfo(member, userInfo -> {
+                    viewName.setText(userInfo.getName());
+                    NetworkImageHelper.loadImage(viewIcon, userInfo.getPhotoUrl());
+                });
             }
             else{
-                holder = (ViewHolder) convertView.getTag();
+                view = convertView;
             }
-            UserInfoManager.getInstance().getUserInfo(member, userInfo -> {
-                holder.name.setText(userInfo.getName());
-                NetworkImageHelper.loadImage(holder.icon, userInfo.getPhotoUrl());
+            view.setId(position);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!member.equals(ConversationManager.getInstance().getUid())){
+                        Intent intent = new Intent(context, FriendDetail.class);
+                        intent.putExtra("FRIEND_ID", member);
+                        context.startActivity(intent);
+                    }
+                }
             });
-            return convertView;
+            return view;
         }
     }
 
@@ -93,9 +99,6 @@ public class GroupDetailActivity extends AppCompatActivity {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm");
         this.createDate = dateFormat.format(createDate);
         memberList = new ArrayList<>(conv.getMembers());
-        for (String str:memberList){
-            System.out.println(str);
-        }
 
         GridView gridview = (GridView) findViewById(R.id.activity_group_detail_members);
         gridview.setAdapter(new MemberAdapter(this, memberList));
@@ -105,7 +108,9 @@ public class GroupDetailActivity extends AppCompatActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.activity_group_detail_inviteFriend_button:
-            break;
+                break;
+            case R.id.activity_group_detail_LeaveGroup_button:
+                break;
         }
     }
 }

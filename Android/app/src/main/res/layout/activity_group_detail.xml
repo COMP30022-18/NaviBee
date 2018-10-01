@@ -56,9 +56,18 @@
             android:layout_width="match_parent"
             android:layout_height="220dp"
             android:layout_margin="4dp"
-            android:horizontalSpacing="4dp"
-            android:verticalSpacing="4dp"
+            android:horizontalSpacing="12dp"
+            android:verticalSpacing="12dp"
+            android:numColumns="4"
+            android:stretchMode="columnWidth"
             android:layout_marginHorizontal="8dp"/>
+
+        <View
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="bottom"
+            android:background="#B6B6B6"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -82,6 +91,13 @@
                 android:gravity="right" />
         </LinearLayout>
 
+        <View
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="bottom"
+            android:background="#B6B6B6"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -103,6 +119,13 @@
                 android:layout_weight="1"
                 android:gravity="right" />
         </LinearLayout>
+
+        <View
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="bottom"
+            android:background="#B6B6B6"/>
 
 
         <Button
