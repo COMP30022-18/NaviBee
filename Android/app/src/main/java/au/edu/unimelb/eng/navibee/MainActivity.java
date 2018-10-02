@@ -35,6 +35,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import au.edu.unimelb.eng.navibee.navigation.DestinationsActivity;
 import au.edu.unimelb.eng.navibee.social.ConversationManager;
 import au.edu.unimelb.eng.navibee.social.FriendActivity;
+import au.edu.unimelb.eng.navibee.sos.FallDetection;
 import au.edu.unimelb.eng.navibee.sos.SosActivity;
 import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
 import timber.log.Timber;
@@ -77,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             naviBtn.setClipToOutline(true);
         }
+
+        FallDetection.getInstance().start();
     }
 
     private void setupWelcomeBanner() {

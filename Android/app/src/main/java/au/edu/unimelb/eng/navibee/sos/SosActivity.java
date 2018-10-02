@@ -49,8 +49,6 @@ public class SosActivity extends AppCompatActivity {
 
         makePhoneCall(phoneText);
 
-        FallDetection.getInstance().start();
-
     }
 
     // Check the phone call permission

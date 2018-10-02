@@ -1,16 +1,16 @@
 package au.edu.unimelb.eng.navibee.sos;
 
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.widget.Toast;
-
 import au.edu.unimelb.eng.navibee.NaviBeeApplication;
 
 public class FallDetection implements SensorEventListener {
     private static final FallDetection instance = new FallDetection();
+    private static final double FALL_THRESHOLD = 1.8d;
 
     public static FallDetection getInstance() {
         return instance;
@@ -55,11 +55,13 @@ public class FallDetection implements SensorEventListener {
                     + Math.pow(laZ, 2));
 
 
-            if (state == State.Normal && laTotal < 2.0d) {
+            if (state == State.Normal && laTotal < FALL_THRESHOLD) {
                 state = State.Fall;
                 fallTimestamp = System.currentTimeMillis();
 
-                Toast.makeText(NaviBeeApplication.getInstance(), "fall!!!!", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(NaviBeeApplication.getInstance(), SosCountDownActivity.class);
+                NaviBeeApplication.getInstance().startActivity(intent);
+
             } else if (System.currentTimeMillis() >= fallTimestamp + 2000) {
                 state = State.Normal;
             }
