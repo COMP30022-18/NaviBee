@@ -146,8 +146,8 @@ public class ConversationManager {
                         }
                     }
 
-//                    Intent intent = new Intent(BROADCAST_FRIEND_UPDATED);
-//                    NaviBeeApplication.getInstance().sendBroadcast(intent);
+                    Intent intent = new Intent(BROADCAST_FRIEND_UPDATED);
+                    NaviBeeApplication.getInstance().sendBroadcast(intent);
                 });
     }
 
@@ -202,6 +202,9 @@ public class ConversationManager {
         data.put("icon", icon);
 
         return mFunctions.getHttpsCallable("createGroupChat").call(data);
+    }
+
+    public void leaveGroup(String convId){
     }
 
     public String getUid(){ return this.uid; }

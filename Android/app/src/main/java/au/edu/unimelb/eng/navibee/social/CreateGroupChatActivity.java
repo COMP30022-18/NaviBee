@@ -59,9 +59,6 @@ public class CreateGroupChatActivity extends AppCompatActivity {
             friendListView.setOnItemClickListener(
                     (arg0, v, position, id) -> {
                         CheckedTextView item = (CheckedTextView) v;
-                        Toast.makeText(getApplicationContext(), friendNameList.get(position) + " checked : " +
-                                item.isChecked(), Toast.LENGTH_SHORT).show();
-
                         selectedFriendMap.put(friendList.get(position), item.isChecked());
                     }
             );
@@ -101,6 +98,5 @@ public class CreateGroupChatActivity extends AppCompatActivity {
                 this.finish();
             });
         }
-
     }
 }

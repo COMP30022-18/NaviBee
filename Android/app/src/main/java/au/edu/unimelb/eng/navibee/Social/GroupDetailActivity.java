@@ -32,8 +32,6 @@ public class GroupDetailActivity extends AppCompatActivity {
     private GroupConversation conv;
     private ArrayList<String> memberList;
     private String convId;
-    private String creator;
-    private String createDate;
 
 
     public static class MemberAdapter extends BaseAdapter{
@@ -97,25 +95,41 @@ public class GroupDetailActivity extends AppCompatActivity {
 
         convId = getIntent().getStringExtra("CONV_ID");
         conv = (GroupConversation) cm.getConversation(convId);
-        creator = conv.getCreator();
-        Date createDate = conv.getCreateDate();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm");
-        this.createDate = dateFormat.format(createDate);
         memberList = new ArrayList<>(conv.getMembers());
 
         GridView gridview = (GridView) findViewById(R.id.activity_group_detail_members);
         gridview.setAdapter(new MemberAdapter(this, memberList));
 
-        int totalHeight = (memberList.size() / 4);
-        if (memberList.size() % 4 != 0) {
+        int memberCount = memberList.size();
+
+        int numColomns = 4;
+        int totalHeight = (memberList.size() / numColomns);
+        if (memberCount % numColomns != 0) {
             totalHeight++;
         }
         ViewGroup.LayoutParams params = gridview.getLayoutParams();
-        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 96*totalHeight, getResources().getDisplayMetrics());
+        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 96*totalHeight + 32, getResources().getDisplayMetrics());
         params.height = height;
         gridview.setLayoutParams(params);
         gridview.requestLayout();
 
+        TextView members = findViewById(R.id.activity_group_detail_members_text);
+        String memberText = "Members (" + Integer.toString(memberCount) + ")";
+        members.setText(memberText);
+
+
+        TextView creator = findViewById(R.id.activity_group_detail_creator);
+        UserInfoManager.getInstance().getUserInfo(conv.getCreator(), userInfo -> {
+            creator.setText(userInfo.getName());
+        });
+        TextView createDate = findViewById(R.id.activity_group_detail_date_created);
+        Date date = conv.getCreateDate();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm");
+        createDate.setText(dateFormat.format(date));
+        TextView groupName = findViewById(R.id.group_detail_name);
+        groupName.setText(conv.getName());
+        ImageView groupIcon = findViewById(R.id.group_detail_icon);
+        NetworkImageHelper.loadImage(groupIcon, conv.getIcon());
     }
 
     public void onClick(View view) {
