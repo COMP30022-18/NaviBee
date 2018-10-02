@@ -65,7 +65,21 @@ public class UserInfoManagerTest {
     @Test
     public void testUserInfo() {
 
+        String name = "name";
+        String photoUrl = "photo url";
 
+        UserInfoManager.UserInfo userInfo = new UserInfoManager.UserInfo(name, photoUrl);
+
+        assertEquals(name, userInfo.getName());
+        assertEquals(photoUrl, userInfo.getPhotoUrl());
+
+        name = "new name";
+        photoUrl = "new photo url";
+        userInfo.setName(name);
+        userInfo.setPhotoUrl(photoUrl);
+
+        assertEquals(name, userInfo.getName());
+        assertEquals(photoUrl, userInfo.getPhotoUrl());
 
     }
 

@@ -31,8 +31,8 @@ public class EventsActivityTest {
         users.put("user2", true);
         assertNotNull(users);
 
-        Date dateTime = new Date();
-        Timestamp time = new Timestamp(dateTime);
+        Date time_ = new Date();
+        Timestamp time = new Timestamp(time_);
 
         ArrayList<String> images = new ArrayList<>();
         images.add("image1");
@@ -40,15 +40,34 @@ public class EventsActivityTest {
         assertNotNull(images);
 
         EventsActivity.EventItem eventItem = new EventsActivity.EventItem(name, holder, location, time, users, images);
+        EventsActivity.EventItem eventItem_ = new EventsActivity.EventItem(name, holder, location, time_, users, images);
 
         // check values
         assertEquals(name, eventItem.getName());
         assertEquals(holder, eventItem.getHolder());
         assertEquals(location, eventItem.getLocation());
         assertEquals(users, eventItem.getUsers());
-        assertEquals(dateTime, eventItem.getTime_());
         assertEquals(time, eventItem.getTime());
+        assertEquals(time_, eventItem.getTime_());
         assertEquals(images, eventItem.getImages());
+
+        assertEquals(name, eventItem_.getName());
+        assertEquals(holder, eventItem_.getHolder());
+        assertEquals(location, eventItem_.getLocation());
+        assertEquals(users, eventItem_.getUsers());
+        assertEquals(time, eventItem_.getTime());
+        assertEquals(time_, eventItem_.getTime_());
+        assertEquals(images, eventItem_.getImages());
+
+        assertTrue(!eventItem.isTag());
+        eventItem.setTag(true);
+        assertTrue(eventItem.isTag());
+
+        assertNull(eventItem.getEventId());
+        String eventId = "event id";
+        eventItem.setEventId(eventId);
+        assertNotNull(eventItem.getEventId());
+        assertEquals(eventId, eventItem.getEventId());
 
     }
 

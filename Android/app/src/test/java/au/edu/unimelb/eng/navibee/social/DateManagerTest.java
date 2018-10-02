@@ -13,8 +13,6 @@ import static org.junit.Assert.assertEquals;
 
 public class DateManagerTest {
 
-    private DateManager dateManager = new DateManager();
-
     @Before
     public void setUp() throws Exception {
     }
@@ -22,9 +20,16 @@ public class DateManagerTest {
     @Test
     public void testDateFormatTime() throws Exception {
 
-        Date time = new DateTime().minusMillis(10).toDate();
-//        assertEquals("just now", );
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
 
+        Date justNow = new DateTime().minusMillis(10).toDate();
+        assertEquals("just now", DateManager.DateformatTime(justNow));
+
+        Date minsAgo = new DateTime().minusMinutes(20).toDate();
+        assertEquals("20 mins ago", DateManager.DateformatTime(minsAgo));
+
+        Date hoursAgo = new DateTime().minusHours(5).toDate();
+        assertEquals(simpleDateFormat.format(hoursAgo), DateManager.DateformatTime(hoursAgo));
 
     }
 
