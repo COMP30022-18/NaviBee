@@ -226,6 +226,9 @@ public abstract class Conversation {
                 case "location":
                     text = "[Location]";
                     break;
+                case "event":
+                    text = "[Event]";
+                    break;
             }
 
             return text.substring(0, Math.min(text.length(), 50));
