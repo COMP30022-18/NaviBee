@@ -54,12 +54,11 @@
         <GridView
             android:id="@+id/activity_group_detail_members"
             android:layout_width="match_parent"
-            android:layout_height="220dp"
+            android:layout_height="0dp"
             android:layout_margin="4dp"
             android:horizontalSpacing="12dp"
             android:verticalSpacing="12dp"
             android:numColumns="4"
-            android:stretchMode="columnWidth"
             android:layout_marginHorizontal="8dp"/>
 
         <View

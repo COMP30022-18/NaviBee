@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.Image;
 import android.os.Bundle;
+import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +34,7 @@ public class GroupDetailActivity extends AppCompatActivity {
     private String convId;
     private String creator;
     private String createDate;
+
 
     public static class MemberAdapter extends BaseAdapter{
         private Context context;
@@ -102,6 +105,16 @@ public class GroupDetailActivity extends AppCompatActivity {
 
         GridView gridview = (GridView) findViewById(R.id.activity_group_detail_members);
         gridview.setAdapter(new MemberAdapter(this, memberList));
+
+        int totalHeight = (memberList.size() / 4);
+        if (memberList.size() % 4 != 0) {
+            totalHeight++;
+        }
+        ViewGroup.LayoutParams params = gridview.getLayoutParams();
+        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 96*totalHeight, getResources().getDisplayMetrics());
+        params.height = height;
+        gridview.setLayoutParams(params);
+        gridview.requestLayout();
 
     }
 

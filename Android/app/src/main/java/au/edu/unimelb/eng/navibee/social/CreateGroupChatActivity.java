@@ -3,6 +3,7 @@ package au.edu.unimelb.eng.navibee.social;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -64,6 +65,8 @@ public class CreateGroupChatActivity extends AppCompatActivity {
         });
     }
     public void onCreateClicked(View view){
+        Button createButton = findViewById(R.id.activity_createGroupChat_create_button);
+        createButton.setEnabled(false);
         EditText editText = (EditText) findViewById(R.id.activity_createGroupChat_group_name);
         String groupName = editText.getText().toString();
 
@@ -76,6 +79,7 @@ public class CreateGroupChatActivity extends AppCompatActivity {
         }
         if (selectedUidList.size() < 1){
             Toast.makeText(getApplicationContext(), "At least one friend should be selected", Toast.LENGTH_SHORT).show();
+            createButton.setEnabled(true);
         }
         else{
             selectedUidList.add(groupCreator);
