@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.Task;
@@ -27,6 +28,7 @@ public class CreateGroupChatActivity extends AppCompatActivity {
     private Map<String, Boolean> selectedFriendMap = new HashMap<>();
     private ArrayList<String> friendList;
     private ArrayList<String> friendNameList;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,8 @@ public class CreateGroupChatActivity extends AppCompatActivity {
             selectedFriendMap.put(uid, false);
         }
 
+        progressBar = findViewById(R.id.create_groupChat_progress);
+        progressBar.setVisibility(View.GONE);
         ListView friendListView = findViewById(R.id.activity_createGroupChat_select_friends_list);
         friendListView.setChoiceMode(friendListView.CHOICE_MODE_MULTIPLE);
 
@@ -82,15 +86,18 @@ public class CreateGroupChatActivity extends AppCompatActivity {
             createButton.setEnabled(true);
         }
         else{
+            progressBar.setVisibility(View.VISIBLE);
             selectedUidList.add(groupCreator);
             Task<HttpsCallableResult> createGroupTask = cm.createGroupChat(selectedUidList, groupName, "1");
 
             createGroupTask.addOnFailureListener(httpsCallableResult -> {
-                Toast.makeText(this, "Network error.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Network error, create group chat failed", Toast.LENGTH_LONG).show();
+                progressBar.setVisibility(View.GONE);
+                createButton.setEnabled(true);
             });
             createGroupTask.addOnSuccessListener(httpsCallableResult -> {
                 Toast.makeText(this, "Success.", Toast.LENGTH_LONG).show();
-
+                progressBar.setVisibility(View.GONE);
                 this.finish();
             });
         }
