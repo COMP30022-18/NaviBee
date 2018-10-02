@@ -33,17 +33,17 @@
                     android:hint="Event Name"
                     android:inputType="textPersonName"
                     android:padding="@dimen/fab_margin_bottom"
-                    android:textSize="32dp" />
+                    android:textSize="32sp" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
-                android:id="@+id/eventParticipantsName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:text="Friends"
-                android:textSize="32dp" />
+            <!--<TextView-->
+                <!--android:id="@+id/eventParticipantsName"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_margin="4dp"-->
+                <!--android:text="Friends"-->
+                <!--android:textSize="32dp" />-->
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/eventFriendChips"
@@ -51,85 +51,85 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp" />
 
-            <TextView
-                android:id="@+id/eventLocationName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:text="Location"
-                android:textSize="32dp" />
+            <!--<TextView-->
+                <!--android:id="@+id/eventLocationName"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_margin="4dp"-->
+                <!--android:text="Location"-->
+                <!--android:textSize="32dp" />-->
 
             <LinearLayout
                 android:id="@+id/eventLocationSelection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="@dimen/fab_margin_bottom"
                 android:orientation="horizontal">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:id="@+id/button12"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:layout_margin="4dp"
+                    android:layout_margin="0dp"
                     android:layout_weight="1"
                     android:padding="4dp"
                     android:paddingLeft="4dp"
                     android:paddingEnd="4dp"
                     android:paddingBottom="4dp"
-                    android:text="Button"
-                    android:textSize="16dp" />
-
-                <Button
-                    android:id="@+id/button13"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    android:text="Button"
-                    android:textSize="16dp" />
-
-                <Button
-                    android:id="@+id/button14"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    android:text="Button"
-                    android:textSize="16dp" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/eventTimeName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:text="Time"
-                android:textSize="32dp" />
-
-            <LinearLayout
-                android:id="@+id/eventTimeLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/eventPickDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    android:onClick="showDatePickerDialog"
+                    android:textColor="#808080"
                     android:text="Button"
                     android:textSize="16sp" />
 
+                <com.google.android.material.button.MaterialButton
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:id="@+id/button13"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_weight="1"
+                    android:textColor="#808080"
+                    android:text="Button"
+                    android:textSize="16sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:id="@+id/button14"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_margin="0dp"
+                    android:layout_weight="1"
+                    android:textColor="#808080"
+                    android:text="Button"
+                    android:textSize="16sp" />
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/eventPicsName"
+            <!--<TextView-->
+                <!--android:id="@+id/eventTimeName"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_margin="4dp"-->
+                <!--android:text="Time"-->
+                <!--android:textSize="32dp" />-->
+
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/eventPickDate"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:text="Photos"
-                android:textSize="32dp" />
+                android:layout_margin="@dimen/fab_margin_bottom"
+                android:onClick="showDatePickerDialog"
+                android:textColor="#808080"
+                android:textSize="28sp" />
+
+            <!--<TextView-->
+                <!--android:id="@+id/eventPicsName"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_margin="4dp"-->
+                <!--android:text="Photos"-->
+                <!--android:textSize="32dp" />-->
 
             <GridView
                 android:id="@+id/eventPics"
@@ -137,12 +137,15 @@
                 android:layout_height="267dp"
                 android:layout_margin="0dp" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:id="@+id/eventPublish"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
+                android:layout_margin="@dimen/fab_margin_bottom"
                 android:onClick="onPublishClicked"
+                android:textColor="#808080"
+                android:textSize="40sp"
                 android:text="Publish" />
 
         </LinearLayout>

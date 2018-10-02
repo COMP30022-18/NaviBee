@@ -18,6 +18,7 @@ import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -292,6 +293,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
         String timeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ").format(time);
         dateButton.setText(timeString);
+        dateButton.setTextColor(Color.parseColor("#000000"));
     }
 
     @Override
