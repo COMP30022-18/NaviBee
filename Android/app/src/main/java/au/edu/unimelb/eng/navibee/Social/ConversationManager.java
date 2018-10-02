@@ -34,6 +34,14 @@ public class ConversationManager {
 
     public static void init() {
         instance = new ConversationManager();
+
+        instance.uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        instance.db = FirebaseFirestore.getInstance();
+
+        instance.listenPrivateConv();
+        instance.listenGroupConv();
+
+
     }
 
     private static final String TAG = "convM";
@@ -50,11 +58,6 @@ public class ConversationManager {
 
 
     public ConversationManager() {
-        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        db = FirebaseFirestore.getInstance();
-
-        listenPrivateConv();
-        listenGroupConv();
     }
 
     private void listenPrivateConv() {
