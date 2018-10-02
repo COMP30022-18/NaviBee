@@ -213,20 +213,8 @@ public class EventsActivity extends AppCompatActivity {
                     i.getName(),
                     i.getLocation(),
                     view -> {
-                        String relationship;
-                        if(i.getHolder().equals(uid)) {
-                            relationship = "holder";
-                        }
-                        else if(i.getUsers().keySet().contains(uid)){
-                            relationship = "participant";
-                        }
-                        else {
-                            relationship = "passerby";
-                        }
-
                         Intent intent = new Intent(EventsActivity.this, EventDetailsActivity.class);
                         intent.putExtra("eventId", i.getEventId());
-                        intent.putExtra("relationship", relationship);
                         startActivity(intent);
                     }
             ));

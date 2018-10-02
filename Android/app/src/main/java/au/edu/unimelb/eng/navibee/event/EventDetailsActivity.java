@@ -37,6 +37,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -75,14 +76,16 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (relationship.equals("holder")) {
-            menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Edit the Event");
-            menu.add(Menu.NONE, Menu.FIRST + 1, 1, "Delete the Event");
-        } else if (relationship.equals("participant")) {
-            menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Quit the Event");
-        } else {
-            menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Join the Event");
-            menu.add(Menu.NONE, Menu.FIRST + 1, 1, "Follow the Event");
+        if(relationship != null){
+            if (relationship.equals("holder")) {
+                //            menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Edit the Event");
+                menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Delete the Event");
+            } else if (relationship.equals("participant")) {
+                menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Quit the Event");
+            } else {
+                menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Join the Event");
+                //            menu.add(Menu.NONE, Menu.FIRST + 1, 1, "Follow the Event");
+            }
         }
         getMenuInflater().inflate(R.menu.menu_event_detial, menu);
         return true;
@@ -96,7 +99,6 @@ public class EventDetailsActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         eid = getIntent().getStringExtra("eventId");
-        relationship = getIntent().getStringExtra("relationship");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.event_details_fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -227,9 +229,26 @@ public class EventDetailsActivity extends AppCompatActivity {
                 }
 
                 getEventInfo();
+
+                // finish fetch event info
+                relationship = getRelationship(eventItem);
+                invalidateOptionsMenu();
             }
         });
+    }
 
+    private String getRelationship(EventsActivity.EventItem eventItem){
+        String relationship;
+        if(eventItem.getHolder().equals(uid)) {
+            relationship = "holder";
+        }
+        else if(eventItem.getUsers().keySet().contains(uid)){
+            relationship = "participant";
+        }
+        else {
+            relationship = "passerby";
+        }
+        return relationship;
     }
 
     private void getEventInfo() {
@@ -339,13 +358,16 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (relationship.equals("holder")) {
+        if(relationship == null){
+            return true;
+        }
+        else if (relationship.equals("holder")) {
             switch (item.getItemId()) {
+//                case Menu.FIRST + 0:
+//                    Toast.makeText(this, "Edit is clicked", Toast.LENGTH_SHORT).show();
+//                    editEvent();
+//                    break;
                 case Menu.FIRST + 0:
-                    Toast.makeText(this, "Edit is clicked", Toast.LENGTH_SHORT).show();
-                    editEvent();
-                    break;
-                case Menu.FIRST + 1:
                     Toast.makeText(this, "Delete is clicked", Toast.LENGTH_SHORT).show();
                     deleteEvent();
                     break;
@@ -367,9 +389,9 @@ public class EventDetailsActivity extends AppCompatActivity {
                     Toast.makeText(this, "Join is clicked", Toast.LENGTH_SHORT).show();
                     joinEvent();
                     break;
-                case Menu.FIRST + 1:
-                    Toast.makeText(this, "Follow is clicked", Toast.LENGTH_SHORT).show();
-                    break;
+//                case Menu.FIRST + 1:
+//                    Toast.makeText(this, "Follow is clicked", Toast.LENGTH_SHORT).show();
+//                    break;
                 default:
                     break;
             }
@@ -462,43 +484,43 @@ public class EventDetailsActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void editEvent() {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("Alert");
-        dialog.setMessage("Are you sure you want to EDIT this event?");
-        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                dialoginterface.cancel();
-            }
-        });
-        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                // collect event info and start edit event activity
-                Intent intent = new Intent(EventDetailsActivity.this, EventEditActivity.class);
-                intent.putExtra("isEdit", true);
-                // pass event name
-                intent.putExtra("eventName", eventItem.getName());
-                // pass selectedUidList and selectedNameList
-                ArrayList<String> selectedUidList = new ArrayList<>();
-                ArrayList<String> selectedNameList = new ArrayList<>();
-                for(String uid: eventItem.getUsers().keySet()){
-                    if(!uid.equals(eventItem.getHolder())){
-                        selectedUidList.add(uid);
-                        selectedNameList.add(userMap.get(uid));
-                    }
-                }
-                intent.putExtra("selectedUidList", selectedUidList);
-                intent.putExtra("selectedNameList", selectedNameList);
-                // pass date
-                intent.putExtra("eventTime", eventItem.getTime_().getTime());
-                // pass eventId
-                intent.putExtra("eventId", eid);
-
-                startActivity(intent);
-                finish();
-            }
-        });
-        dialog.show();
-    }
+//    private void editEvent() {
+//        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+//        dialog.setTitle("Alert");
+//        dialog.setMessage("Are you sure you want to EDIT this event?");
+//        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//            public void onClick(DialogInterface dialoginterface, int i) {
+//                dialoginterface.cancel();
+//            }
+//        });
+//        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+//            public void onClick(DialogInterface dialoginterface, int i) {
+//                // collect event info and start edit event activity
+//                Intent intent = new Intent(EventDetailsActivity.this, EventEditActivity.class);
+//                intent.putExtra("isEdit", true);
+//                // pass event name
+//                intent.putExtra("eventName", eventItem.getName());
+//                // pass selectedUidList and selectedNameList
+//                ArrayList<String> selectedUidList = new ArrayList<>();
+//                ArrayList<String> selectedNameList = new ArrayList<>();
+//                for(String uid: eventItem.getUsers().keySet()){
+//                    if(!uid.equals(eventItem.getHolder())){
+//                        selectedUidList.add(uid);
+//                        selectedNameList.add(userMap.get(uid));
+//                    }
+//                }
+//                intent.putExtra("selectedUidList", selectedUidList);
+//                intent.putExtra("selectedNameList", selectedNameList);
+//                // pass date
+//                intent.putExtra("eventTime", eventItem.getTime_().getTime());
+//                // pass eventId
+//                intent.putExtra("eventId", eid);
+//
+//                startActivity(intent);
+//                finish();
+//            }
+//        });
+//        dialog.show();
+//    }
 
 }

@@ -121,15 +121,6 @@
                     android:text="Button"
                     android:textSize="16sp" />
 
-                <Button
-                    android:id="@+id/eventPickTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    android:onClick="showTimePickerDialog"
-                    android:text="Button"
-                    android:textSize="16sp" />
             </LinearLayout>
 
             <TextView
@@ -160,10 +151,11 @@
     </ScrollView>
 
     <ProgressBar
+        android:layout_gravity = "center"
         android:id="@+id/event_indefinite_progress"
         style="?android:attr/progressBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="72dp"
+        android:layout_height="72dp" />
 
 </FrameLayout>
 

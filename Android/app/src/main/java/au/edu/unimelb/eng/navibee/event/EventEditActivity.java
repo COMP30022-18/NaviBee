@@ -12,6 +12,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AppCompatActivity;
 import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.social.ConversationManager;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 
 import android.content.res.Resources;
@@ -47,6 +48,7 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
 import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
@@ -72,7 +74,6 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     private ArrayList<String> picsStoragePath = new ArrayList<>();
     private GridView picsView;
     private EditText nameView;
-    private Button timeButton;
     private Button dateButton;
     private Bitmap addIcon;
     private ChipGroup chipgroup;
@@ -118,7 +119,6 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         setContentView(R.layout.event_edit_new);
 
         nameView = findViewById(R.id.eventName);
-        timeButton = (Button)findViewById(R.id.eventPickTime);
         dateButton = (Button)findViewById(R.id.eventPickDate);
         chipgroup = (ChipGroup) findViewById(R.id.eventFriendChips);
         picsView = (GridView) findViewById(R.id.eventPics);
@@ -152,8 +152,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         // init date map
         dateMap = new HashMap<>();
         // init date and time button
-        timeButton.setText("Pick Time");
-        dateButton.setText("Pick Date");
+        dateButton.setText("Pick Time");
         // init chipGroup
         addEditChip2Group();
         // init pics gridView
@@ -179,22 +178,22 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         });
         picsUpdate();
 
-        // load data from previous event if this is not creation activity
-        if(isEdit){
-            // load name
-            nameView.setText(intent.getStringExtra("eventName"));
-            // load participants
-            selectedUidList = intent.getStringArrayListExtra("selectedUidList");
-            selectedNameList = intent.getStringArrayListExtra("selectedNameList");
-            setChipGroupView(selectedUidList, selectedNameList);
-            // load time and date
-            Date oldDate = new Date();
-            oldDate.setTime(intent.getLongExtra("eventTime", -1));
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(oldDate);
-            setEventTime(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE));
-            setEventDate(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH),cal.get(Calendar.DAY_OF_MONTH));
-        }
+//        // load data from previous event if this is not creation activity
+//        if(isEdit){
+//            // load name
+//            nameView.setText(intent.getStringExtra("eventName"));
+//            // load participants
+//            selectedUidList = intent.getStringArrayListExtra("selectedUidList");
+//            selectedNameList = intent.getStringArrayListExtra("selectedNameList");
+//            setChipGroupView(selectedUidList, selectedNameList);
+//            // load time and date
+//            Date oldDate = new Date();
+//            oldDate.setTime(intent.getLongExtra("eventTime", -1));
+//            Calendar cal = Calendar.getInstance();
+//            cal.setTime(oldDate);
+//            setEventTime(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE));
+//            setEventDate(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH),cal.get(Calendar.DAY_OF_MONTH));
+//        }
     }
 
     private void startPicFullscreen(int position){
@@ -274,42 +273,37 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         dateMap.put("minute", minute);
 
         Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, dateMap.get("year"));
+        calendar.set(Calendar.MONTH, dateMap.get("month"));
+        calendar.set(Calendar.DAY_OF_MONTH, dateMap.get("day"));
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, minute);
         Date time = calendar.getTime();
 
-        String timeString = new SimpleDateFormat("HH:mm").format(time);
-        timeButton.setText(timeString);
+        String timeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ").format(time);
+        dateButton.setText(timeString);
     }
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
         setEventDate(year, month, day);
+        showTimePickerDialog();
     }
 
     private void setEventDate(int year, int month, int day){
         dateMap.put("year", year);
         dateMap.put("month", month);
         dateMap.put("day", day);
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month);
-        calendar.set(Calendar.DAY_OF_MONTH, day);
-        Date date = calendar.getTime();
-
-        String dateString = new SimpleDateFormat("EEE, MMM d").format(date);
-        dateButton.setText(dateString);
     }
 
     public void showDatePickerDialog(View v) {
-        DialogFragment newFragment = new DatePickerFragment();
-        newFragment.show(getSupportFragmentManager(), "datePicker");
+        DialogFragment dateFragment = new DatePickerFragment();
+        dateFragment.show(getSupportFragmentManager(), "datePicker");
     }
 
-    public void showTimePickerDialog(View v) {
-        DialogFragment newFragment = new TimePickerFragment();
-        newFragment.show(getSupportFragmentManager(), "timePicker");
+    public void showTimePickerDialog() {
+        DialogFragment timeFragment = new TimePickerFragment();
+        timeFragment.show(getSupportFragmentManager(), "timePicker");
     }
 
     public void onInviteFriendClicked() {
@@ -408,42 +402,38 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         Date eventDate = calendar.getTime();
 
         Map<String, Boolean> users = new HashMap<>();
-        if(selectedUidList != null){
-            for(String user: selectedUidList) {
-                users.put(user, true);
-            }
-        }
         users.put(holder, true);
+
 
 
 
         EventsActivity.EventItem newEvent = new EventsActivity.EventItem(name, holder, location, eventDate, users, picsStoragePath);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("events").document(UUID.randomUUID().toString()).set(newEvent).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                // if need to delete the old event
-                if(getIntent().getBooleanExtra("isEdit", false)){
-                    // delete old event
-                    db.collection("events").document(getIntent().getStringExtra("eventId")).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                // Task completed successfully
-                                finish();
-                            } else {
-                                // Task failed with an exception
+        db.collection("events").add(newEvent).addOnCompleteListener( task -> {
+                    if (task.isSuccessful()) {
+                        String eid = task.getResult().getId();
+                        if(selectedUidList != null && !selectedUidList.isEmpty()){
+
+                            Map<String, String> data = new HashMap<>();
+                            data.put("eid", eid);
+                            data.put("name", name);
+
+                            Gson gson = new Gson();
+                            String payload = gson.toJson(data);
+
+                            for(String user: selectedUidList) {
+                                ConversationManager.getInstance()
+                                    .getPrivateConversation(user).sendMessage("event", payload);
                             }
                         }
-                    });
-                }
-                // it is the creation
-                else{
-                    finish();
-                }
-            }
-        });
+                        finish();
+
+                    } else {
+                        // fail
+                    }
+                });
+
     }
 
     private void finishedEditEvent() {
