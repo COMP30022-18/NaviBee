@@ -156,12 +156,13 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         // init chipGroup
         addEditChip2Group();
         // init pics gridView
-        Drawable addDrawable = getResources().getDrawable(R.drawable.ic_add_white_50dp);
+        Drawable addDrawable = getResources().getDrawable(R.drawable.ic_add_box_yellow_100dp);
         addIcon = drawableToBitmap(addDrawable);
         pics = new ArrayList<>();
         picsUri = new ArrayList<>();
         pics.add(addIcon);
         picsView.setNumColumns(3);
+        picsView.setVerticalSpacing(16);
         picsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
@@ -220,7 +221,17 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
                 pics.add(addIcon);
             }
         }
+
+        int width = Resources.getSystem().getDisplayMetrics().widthPixels;
+        ViewGroup.LayoutParams layoutParams = picsView.getLayoutParams();
+        if(pics.size() > 3){
+            layoutParams.height = 2*width/3 + 16;
+        } else {
+            layoutParams.height = width/3;
+        }
+        picsView.setLayoutParams(layoutParams);
         picsView.setAdapter(new ImageAdapter(EventEditActivity.this));
+
     }
 
     public class ImageAdapter extends BaseAdapter {
@@ -249,8 +260,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
                 // if it's not recycled, initialize some attributes
                 imageView = new ImageView(mContext);
                 int width = Resources.getSystem().getDisplayMetrics().widthPixels;
-                picsView.setVerticalSpacing(3*width/60);
-                imageView.setLayoutParams(new GridView.LayoutParams(9*width/30, 9*width/30));
+                imageView.setLayoutParams(new GridView.LayoutParams(10*width/30, 10*width/30));
                 imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 imageView.setPadding(8, 8, 8, 8);
             } else {

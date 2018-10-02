@@ -135,9 +135,7 @@
                 android:id="@+id/eventPics"
                 android:layout_width="match_parent"
                 android:layout_height="267dp"
-                android:layout_margin="4dp"
-                android:horizontalSpacing="0dp"
-                android:verticalSpacing="0dp" />
+                android:layout_margin="0dp" />
 
             <Button
                 android:id="@+id/eventPublish"
