@@ -108,7 +108,7 @@ public class GroupDetailActivity extends AppCompatActivity {
             totalHeight++;
         }
         ViewGroup.LayoutParams params = gridview.getLayoutParams();
-        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 96*totalHeight + 32, getResources().getDisplayMetrics());
+        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 96*totalHeight + 12, getResources().getDisplayMetrics());
         params.height = height;
         gridview.setLayoutParams(params);
         gridview.requestLayout();
