@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import au.edu.unimelb.eng.navibee.R
-import au.edu.unimelb.eng.navibee.utils.DownloadImageToImageViewAsyncTask
 import au.edu.unimelb.eng.navibee.utils.SimpleRVViewHolder
 import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader
 import kotlinx.android.synthetic.main.recycler_view_attributions.view.*
