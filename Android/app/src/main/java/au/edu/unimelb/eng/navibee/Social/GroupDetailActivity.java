@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
+import jdenticon.Jdenticon;
 
 public class GroupDetailActivity extends AppCompatActivity {
     private ConversationManager cm = ConversationManager.getInstance();
@@ -129,7 +130,9 @@ public class GroupDetailActivity extends AppCompatActivity {
         TextView groupName = findViewById(R.id.group_detail_name);
         groupName.setText(conv.getName());
         ImageView groupIcon = findViewById(R.id.group_detail_icon);
-        NetworkImageHelper.loadImage(groupIcon, conv.getIcon());
+
+        groupIcon.setImageBitmap(conv.getIconBitmap());
+
     }
 
     public void onClick(View view) {

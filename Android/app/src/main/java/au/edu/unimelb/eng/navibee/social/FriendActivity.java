@@ -86,7 +86,7 @@ public class FriendActivity extends AppCompatActivity {
                 });
             } else {
                 textView.setText(((GroupConversation) conv).getName());
-                imageView.setImageResource(R.drawable.ic_navibee_color);
+                imageView.setImageBitmap(((GroupConversation) conv).getIconBitmap());
             }
         }
 
