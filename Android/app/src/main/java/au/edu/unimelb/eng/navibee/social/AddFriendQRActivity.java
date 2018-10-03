@@ -95,14 +95,6 @@ public class AddFriendQRActivity extends AppCompatActivity
         }
     }
 
-    public void buttonScanOnClick(View view) {
-        IntentIntegrator integrator = new IntentIntegrator(this);
-        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
-        integrator.setPrompt(getResources().getString(R.string.friend_scan_qr_code));
-        integrator.setOrientationLocked(true);
-        integrator.initiateScan();
-    }
-
     public void onClickShowQr(View view) {
         // Show my QR
         if (dialog != null) {
@@ -123,7 +115,6 @@ public class AddFriendQRActivity extends AppCompatActivity
         super.onPause();
         mScannerView.stopCamera();
     }
-
 
     @Override
     public void handleResult(Result rawResult) {
@@ -211,7 +202,6 @@ public class AddFriendQRActivity extends AppCompatActivity
 
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
-
     }
 
     @Override
