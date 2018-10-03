@@ -16,7 +16,6 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.functions.HttpsCallableResult;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import androidx.appcompat.app.AlertDialog;
@@ -59,7 +58,7 @@ public class FriendDetail extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 loadButton();
             }
-        }, new IntentFilter(ConversationManager.BROADCAST_FRIEND_UPDATED));
+        }, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
 
     }
     public void loadButton(){

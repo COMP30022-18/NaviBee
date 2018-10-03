@@ -1,7 +1,10 @@
 package au.edu.unimelb.eng.navibee.social;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.Image;
 import android.os.Bundle;
 import android.util.AttributeSet;
@@ -21,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -130,13 +134,51 @@ public class GroupDetailActivity extends AppCompatActivity {
         groupName.setText(conv.getName());
         ImageView groupIcon = findViewById(R.id.group_detail_icon);
         NetworkImageHelper.loadImage(groupIcon, conv.getIcon());
+
+        Button button = findViewById(R.id.activity_group_detail_deleteGroup_button);
+        if (!cm.getUid().equals(conv.getCreator())){
+            button.setVisibility(View.GONE);
+        }
+
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("Alert");
+        dialog.setMessage("Sorry, this group chat has been deleted by the creator.");
+        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialoginterface, int i) {
+                finish();
+            }
+        });
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (ConversationManager.getInstance().getConversation(convId) == null){
+                    dialog.show();
+                }
+            }
+        }, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
+
+
     }
 
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.activity_group_detail_inviteFriend_button:
-                break;
-            case R.id.activity_group_detail_LeaveGroup_button:
+            case R.id.activity_group_detail_deleteGroup_button:
+                AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+                dialog.setTitle("Alert");
+                dialog.setMessage("Are you sure you want to delete this group?");
+                dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialoginterface, int i) {
+                        dialoginterface.cancel();
+                    }
+                });
+                dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialoginterface, int i) {
+                        cm.deleteGroup(convId);
+                        finish();
+                    }
+                });
+                dialog.show();
                 break;
         }
     }

@@ -3,6 +3,7 @@ package au.edu.unimelb.eng.navibee.social;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 
@@ -88,6 +89,29 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         setSupportActionBar(myToolbar);
 
         scrollToBottom();
+
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("Alert");
+        dialog.setMessage("Sorry, this group chat has been deleted by the creator.");
+        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialoginterface, int i) {
+                finish();
+            }
+        });
+
+        if (ConversationManager.getInstance().getConversation(convId) == null){
+            dialog.show();
+        }
+
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (ConversationManager.getInstance().getConversation(convId) == null){
+                    dialog.show();
+                }
+            }
+        }, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -9,22 +9,16 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView;
-import android.widget.Toast;
 
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -274,7 +268,7 @@ public class FriendActivity extends AppCompatActivity {
                 loadContactList();
                 loadChatsList();
             }
-        }, new IntentFilter(ConversationManager.BROADCAST_FRIEND_UPDATED));
+        }, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
 
         registerReceiver(new BroadcastReceiver() {
             @Override
