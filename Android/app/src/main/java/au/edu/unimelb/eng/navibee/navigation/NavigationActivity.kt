@@ -28,6 +28,8 @@ import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute
 import com.mapbox.services.android.navigation.v5.routeprogress.RouteProgress
 import com.mapbox.services.android.navigation.v5.utils.RouteUtils
 import kotlinx.android.synthetic.main.activity_navigation.*
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.okButton
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -108,12 +110,25 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
                     .getRoute(object : Callback<DirectionsResponse> {
                         override fun onResponse(call: Call<DirectionsResponse>,
                                                 response: Response<DirectionsResponse>) {
-                            route = response.body()?.routes()?.get(0) ?: return
+                            route = response.body()?.routes()?.get(0)
+                            if (route == null) {
+                                alert(R.string.navigation_failed_to_fetch_route) {
+                                    okButton {
+                                        finish()
+                                    }
+                                }.show()
+                                return
+                            }
                             if (isMapReady)
                                 startNavigation(route!!)
                         }
 
                         override fun onFailure(call: Call<DirectionsResponse>, t: Throwable) {
+                            alert(R.string.navigation_connection_error) {
+                                okButton {
+                                    finish()
+                                }
+                            }.show()
                             Timber.e(t, "Error occurred on getting a route: $call")
                         }
                     })

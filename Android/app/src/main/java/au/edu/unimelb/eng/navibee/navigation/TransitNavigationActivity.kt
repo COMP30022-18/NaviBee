@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import au.edu.unimelb.eng.navibee.NaviBeeApplication
 import au.edu.unimelb.eng.navibee.R
+import au.edu.unimelb.eng.navibee.utils.Resource
 import au.edu.unimelb.eng.navibee.utils.getActionBarHeight
 import au.edu.unimelb.eng.navibee.utils.retrieveTopObscureHeight
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -54,9 +55,7 @@ import net.time4j.Duration
 import net.time4j.IsoUnit
 import net.time4j.PrettyTime
 import net.time4j.format.TextWidth
-import org.jetbrains.anko.imageResource
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.wrapContent
+import org.jetbrains.anko.*
 import java.util.*
 
 class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -202,13 +201,28 @@ class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun subscribe() {
         viewModel.routeInfo.observe(this, Observer {
-            it?.res?.connections?.connections?.let { connections ->
-                if (!connections.isEmpty()) {
-                    listItems = buildRawViewList(connections[0])
-                    renderListItems.clear()
-                    renderListItems.addAll(listItems)
-                    viewAdapter.notifyDataSetChanged()
-                    renderMap()
+            val conn = it?.data?.res?.connections?.connections
+            if (conn == null) {
+                alert(R.string.navigation_connection_error) {
+                    okButton { _ ->
+                        finish()
+                    }
+                }.show()
+            } else {
+                conn.let { connections ->
+                    if (!connections.isEmpty()) {
+                        listItems = buildRawViewList(connections[0])
+                        renderListItems.clear()
+                        renderListItems.addAll(listItems)
+                        viewAdapter.notifyDataSetChanged()
+                        renderMap()
+                    } else {
+                        alert(R.string.navigation_failed_to_fetch_route) {
+                            okButton { _ ->
+                                finish()
+                            }
+                        }.show()
+                    }
                 }
             }
         })
@@ -368,7 +382,7 @@ class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
             stopMarkers.clear()
 
             val latLngBoundsBuilder = LatLngBounds.Builder()
-            val data = viewModel.routeInfo.value
+            val data = viewModel.routeInfo.value?.data
             val con = data?.res?.connections?.connections?.get(0) ?: return
             val walkingManeuverIds =
                 con.sections.secs.asSequence()
@@ -484,13 +498,13 @@ private class ToggleRVDiffCallback(private val old: List<TransitRouteRVData>,
 private class TransitNavigationViewModel(context: Application):
         AndroidViewModel(context) {
 
-    val routeInfo = MutableLiveData<Response?>()
+    val routeInfo = MutableLiveData<Resource<Response>>()
 
     fun getRoute(originLat: Double, originLon: Double, destLat: Double, destLon: Double) {
         if (routeInfo.value == null)
             launch {
                 getTransitDirections(originLat, originLon, destLat, destLon)?.let {
-                    routeInfo.postValue(it)
+                    routeInfo.postValue(Resource.success(it))
                 }
             }
     }
