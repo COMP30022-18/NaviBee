@@ -11,6 +11,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
@@ -32,7 +33,7 @@ public class SosCountDownActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sos_count_down);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        countDownTextView = findViewById(R.id.sos_countDown_countDownText);
+        countDownTextView = findViewById(R.id.sos_countdown_number);
 
         countDownTimer = new CountDownTimer(10 * 1000, 1000) {
             @Override
@@ -78,16 +79,17 @@ public class SosCountDownActivity extends AppCompatActivity {
         conv.sendMessage("text", "Emergency!");
 
         // location
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "Unable to get current location", Toast.LENGTH_LONG).show();
-        } else {
-            mFusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
-                if (location!=null) {
-                   conv.sendLocation(location.getLatitude(), location.getLongitude());
-                }
-            });
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Unable to get current location", Toast.LENGTH_LONG).show();
+            } else {
+                mFusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
+                    if (location!=null) {
+                       conv.sendLocation(location.getLatitude(), location.getLongitude());
+                    }
+                });
+            }
         }
-
 
 
         // emergency phone call

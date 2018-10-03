@@ -1,78 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/sosRed"
     tools:context=".sos.SosCountDownActivity">
 
-    <Button
-        android:id="@+id/sos.countDown.cancelBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:onClick="cancelOnClick"
-        android:text="Button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <TextView
-        android:id="@+id/sos.countDown.countDownText"
-        android:layout_width="wrap_content"
-        android:layout_height="18dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/sos.countDown.notifyBtn"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sos.countDown.primaryText"
-        tools:text="10" />
-
-    <TextView
-        android:id="@+id/sos.countDown.primaryText"
-        android:layout_width="0dp"
-        android:layout_height="18dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/sos.countDown.countDownText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sos.countDown.secondaryText"
-        tools:text="@tools:sample/lorem[9]" />
-
-    <TextView
-        android:id="@+id/sos.countDown.countDownUnit"
-        android:layout_width="wrap_content"
-        android:layout_height="19dp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintBaseline_toBaselineOf="@+id/sos.countDown.countDownText"
-        app:layout_constraintStart_toEndOf="@+id/sos.countDown.countDownText"
-        tools:text="seconds" />
-
-    <TextView
-        android:id="@+id/sos.countDown.secondaryText"
+        android:id="@+id/sos.countdown.pre_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/sos.countDown.primaryText"
+        android:text="@string/sos_pre_text"
+        android:textAlignment="center"
+        android:textColor="@color/greyWhite"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toTopOf="@+id/sos.countdown.main_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        tools:text="@tools:sample/lorem[12]" />
+        app:layout_constraintVertical_chainStyle="packed" />
 
-    <Button
-        android:id="@+id/sos.countDown.notifyBtn"
+    <TextView
+        android:id="@+id/sos.countdown.main_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/sos_main_text"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="45sp"
+        app:layout_constraintBottom_toTopOf="@+id/sos.countdown_number"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sos.countdown.pre_text"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/sos.countdown_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:textSize="130sp"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/sos.countdown.notify_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sos.countdown.main_text"
+        tools:text="10" />
+
+    <TextView
+        android:id="@+id/sos.countdown.unit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/sos.countdown_number"
+        app:layout_constraintStart_toEndOf="@+id/sos.countdown_number"
+        android:text="@string/sos_time_unit"
+        android:textColor="@color/white"
+        android:textSize="50sp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/sos.countdown.notify_btn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
         android:onClick="notifyOnClick"
-        android:text="Button"
+        android:text="@string/sos_notify_text"
+        android:backgroundTint="@color/colorPrimary"
+        app:cornerRadius="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/sos.countDown.cancelBtn"
+        app:layout_constraintEnd_toStartOf="@+id/sos.countdown.cancel_btn"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/sos.countdown.cancel_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:onClick="cancelOnClick"
+        android:text="Cancel"
+        app:cornerRadius="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -173,7 +173,9 @@
         <activity android:name=".social.CreateGroupChatActivity" />
         <activity android:name=".social.FriendDetail" />
         <activity android:name=".social.LocationDisplayActivity" />
-        <activity android:name=".sos.SosCountDownActivity"></activity>
+        <activity
+            android:name=".sos.SosCountDownActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

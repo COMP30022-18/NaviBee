@@ -234,11 +234,19 @@
     <string name="pref_navigation_search_region_values_default">au</string>
 
     <string name="pref_section_title_sos">SOS</string>
-    <string name="pref_sos_preferred_emergency_call">Preferred emergency call</string>
-    <string name="pref_sos_preferred_emergency_call_titles">Required a phone number to contact.</string>
+    <string name="pref_sos_preferred_emergency_call">Preferred emergency call number</string>
+    <string name="pref_sos_preferred_emergency_call_titles">Required a phone number to call.</string>
+
+    <string name="pref_sos_preferred_emergency_contact">Preferred emergency contact</string>
+    <string name="pref_sos_preferred_emergency_contact_titles">Required a friend to get emergency help.</string>
 
     <string name="title_activity_event_pic_fullscreen">EventPicFullscreenActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="sos_pre_text">We\'ve detected that you might be in danger\.</string>
+    <string name="sos_main_text">Your emergency contact will be notified in</string>
+    <string name="sos_time_unit">seconds</string>
+    <string name="sos_notify_text">Notify Now</string>
 
 </resources>
