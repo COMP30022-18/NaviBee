@@ -208,6 +208,7 @@
     <string name="friend_scan_qr_code_with_nfc">Scan your friend\'s QR code\nor place both phones back to back and touch your screen.</string>
     <string name="friend_wrong_qr_code">This is not a NaviBee QR code.</string>
     <string name="friend_show_my_qr">Show my QR code</string>
+    <string name="friend_request_camera">Camera permission is required to scan a QR code.</string>
 
     <string name="error_failed_to_connect_to_server">Failed to connect to server. Please check your internet connection.</string>
 
