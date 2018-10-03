@@ -40,25 +40,44 @@ public class EventsActivity extends AppCompatActivity {
         private Map<String, Boolean> users;
         private Boolean isTag = false;
         private ArrayList<String> images;
+        private String placeName;
+        private double longitude;
+        private double latitude;
 
         public EventItem(){}
 
-        public EventItem(String name, String holder, String location, Timestamp time, Map<String, Boolean> users, ArrayList<String> images){
+        public EventItem(String name, String holder, String location, Timestamp time, Map<String, Boolean> users, ArrayList<String> images, String placeName, double longitude, double latitude){
             this.holder = holder;
             this.name = name;
             this.location = location;
             this.users = users;
             this.time = time;
             this.images = images;
+            this.placeName = placeName;
+            this.longitude = longitude;
+            this.latitude = latitude;
         }
 
-        public EventItem(String name, String holder, String location, Date time, Map<String, Boolean> users, ArrayList<String> images){
+        public EventItem(String name, String holder, String location, Date time, Map<String, Boolean> users, ArrayList<String> images, String placeName, double longitude, double latitude){
             this.holder = holder;
             this.name = name;
             this.location = location;
             this.users = users;
             this.time = new Timestamp(time);
             this.images = images;
+            this.placeName = placeName;
+            this.longitude = longitude;
+            this.latitude = latitude;
+        }
+
+        public String getPlaceName(){ return placeName; }
+
+        public double getLongitude() {
+            return longitude;
+        }
+
+        public double getLatitude() {
+            return latitude;
         }
 
         public String getHolder() { return holder; }

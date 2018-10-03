@@ -43,6 +43,8 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
+import au.edu.unimelb.eng.navibee.social.LocationDisplayActivity;
 import au.edu.unimelb.eng.navibee.social.UserInfoManager;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVIndefiniteProgressBar;
@@ -104,8 +106,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                startNavigation();
             }
         });
 
@@ -322,9 +323,9 @@ public class EventDetailsActivity extends AppCompatActivity {
         }
 
         // Event location
-        if (eventItem.getLocation() != null) {
+        if (eventItem.getPlaceName() != null) {
             listItems.add(new SimpleRVTextSecondaryPrimaryStatic(
-                    eventItem.getLocation(),
+                    eventItem.getPlaceName(),
                     getResources().getString(R.string.event_details_location)
             ));
         }
@@ -484,43 +485,14 @@ public class EventDetailsActivity extends AppCompatActivity {
         dialog.show();
     }
 
-//    private void editEvent() {
-//        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-//        dialog.setTitle("Alert");
-//        dialog.setMessage("Are you sure you want to EDIT this event?");
-//        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//            public void onClick(DialogInterface dialoginterface, int i) {
-//                dialoginterface.cancel();
-//            }
-//        });
-//        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-//            public void onClick(DialogInterface dialoginterface, int i) {
-//                // collect event info and start edit event activity
-//                Intent intent = new Intent(EventDetailsActivity.this, EventEditActivity.class);
-//                intent.putExtra("isEdit", true);
-//                // pass event name
-//                intent.putExtra("eventName", eventItem.getName());
-//                // pass selectedUidList and selectedNameList
-//                ArrayList<String> selectedUidList = new ArrayList<>();
-//                ArrayList<String> selectedNameList = new ArrayList<>();
-//                for(String uid: eventItem.getUsers().keySet()){
-//                    if(!uid.equals(eventItem.getHolder())){
-//                        selectedUidList.add(uid);
-//                        selectedNameList.add(userMap.get(uid));
-//                    }
-//                }
-//                intent.putExtra("selectedUidList", selectedUidList);
-//                intent.putExtra("selectedNameList", selectedNameList);
-//                // pass date
-//                intent.putExtra("eventTime", eventItem.getTime_().getTime());
-//                // pass eventId
-//                intent.putExtra("eventId", eid);
-//
-//                startActivity(intent);
-//                finish();
-//            }
-//        });
-//        dialog.show();
-//    }
+    private void startNavigation(){
+
+        Intent intent = new Intent(getBaseContext(), NavigationSelectorActivity.class);
+        intent.putExtra(NavigationSelectorActivity.EXTRA_LATITUDE, eventItem.getLatitude());
+        intent.putExtra(NavigationSelectorActivity.EXTRA_LONGITUDE, eventItem.getLongitude());
+//        intent.putExtra(NavigationSelectorActivity.EXTRA_DESTINATION_NAME, eventItem.getPlaceName());
+
+        startActivity(intent);
+    }
 
 }

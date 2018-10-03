@@ -7,149 +7,117 @@
     android:layout_height="fill_parent"
     android:id="@+id/event_root_view">
 
-    <ScrollView
-        android:id="@+id/eventScrollView"
+    <LinearLayout
+        android:layout_weight="1"
+        android:id="@+id/eventMainLinearLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/eventLinearLayout"
+        <ScrollView
+            android:layout_weight="1"
+            android:id="@+id/eventScrollView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin_bottom">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/eventName"
-                    style="@style/Widget.MaterialComponents.TextInputEditText.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="Event Name"
-                    android:inputType="textPersonName"
-                    android:padding="@dimen/fab_margin_bottom"
-                    android:textSize="32sp" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!--<TextView-->
-                <!--android:id="@+id/eventParticipantsName"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_margin="4dp"-->
-                <!--android:text="Friends"-->
-                <!--android:textSize="32dp" />-->
-
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/eventFriendChips"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp" />
-
-            <!--<TextView-->
-                <!--android:id="@+id/eventLocationName"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_margin="4dp"-->
-                <!--android:text="Location"-->
-                <!--android:textSize="32dp" />-->
+            android:layout_height="match_parent">
 
             <LinearLayout
-                android:id="@+id/eventLocationSelection"
+                android:id="@+id/eventLinearLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin_bottom"
-                android:orientation="horizontal">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/fab_margin_bottom">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/eventName"
+                        style="@style/Widget.MaterialComponents.TextInputEditText.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:hint="Event Name"
+                        android:inputType="textPersonName"
+                        android:padding="@dimen/fab_margin_bottom"
+                        android:textSize="32sp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!--<TextView-->
+                    <!--android:id="@+id/eventParticipantsName"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_margin="4dp"-->
+                    <!--android:text="Friends"-->
+                    <!--android:textSize="32dp" />-->
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/eventFriendChips"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/fab_margin_bottom"/>
+
 
                 <com.google.android.material.button.MaterialButton
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:id="@+id/button12"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_margin="0dp"
-                    android:layout_weight="1"
-                    android:padding="4dp"
-                    android:paddingLeft="4dp"
-                    android:paddingEnd="4dp"
-                    android:paddingBottom="4dp"
+                    android:id="@+id/eventLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/fab_margin_bottom"
                     android:textColor="#808080"
-                    android:text="Button"
-                    android:textSize="16sp" />
+                    android:textSize="32sp"
+                    android:text="Pick Location" />
+
+                <!--<TextView-->
+                    <!--android:id="@+id/eventTimeName"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_margin="4dp"-->
+                    <!--android:text="Time"-->
+                    <!--android:textSize="32dp" />-->
+
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/eventPickDate"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:id="@+id/button13"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/fab_margin_bottom"
+                    android:onClick="showDatePickerDialog"
                     android:textColor="#808080"
-                    android:text="Button"
-                    android:textSize="16sp" />
+                    android:textSize="32sp" />
 
-                <com.google.android.material.button.MaterialButton
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:id="@+id/button14"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_margin="0dp"
-                    android:layout_weight="1"
-                    android:textColor="#808080"
-                    android:text="Button"
-                    android:textSize="16sp" />
+                <!--<TextView-->
+                    <!--android:id="@+id/eventPicsName"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_margin="4dp"-->
+                    <!--android:text="Photos"-->
+                    <!--android:textSize="32dp" />-->
+
+                <GridView
+                    android:id="@+id/eventPics"
+                    android:layout_width="match_parent"
+                    android:layout_height="267dp"
+                    android:layout_margin="@dimen/fab_margin_bottom" />
+
             </LinearLayout>
+        </ScrollView>
 
-            <!--<TextView-->
-                <!--android:id="@+id/eventTimeName"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_margin="4dp"-->
-                <!--android:text="Time"-->
-                <!--android:textSize="32dp" />-->
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:id="@+id/eventPublish"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin_bottom"
+            android:onClick="onPublishClicked"
+            android:textColor="#808080"
+            android:textSize="40sp"
+            android:text="Publish" />
 
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/eventPickDate"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin_bottom"
-                android:onClick="showDatePickerDialog"
-                android:textColor="#808080"
-                android:textSize="28sp" />
-
-            <!--<TextView-->
-                <!--android:id="@+id/eventPicsName"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_margin="4dp"-->
-                <!--android:text="Photos"-->
-                <!--android:textSize="32dp" />-->
-
-            <GridView
-                android:id="@+id/eventPics"
-                android:layout_width="match_parent"
-                android:layout_height="267dp"
-                android:layout_margin="0dp" />
-
-            <com.google.android.material.button.MaterialButton
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:id="@+id/eventPublish"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin_bottom"
-                android:onClick="onPublishClicked"
-                android:textColor="#808080"
-                android:textSize="40sp"
-                android:text="Publish" />
-
-        </LinearLayout>
-    </ScrollView>
+    </LinearLayout>
 
     <ProgressBar
         android:layout_gravity = "center"

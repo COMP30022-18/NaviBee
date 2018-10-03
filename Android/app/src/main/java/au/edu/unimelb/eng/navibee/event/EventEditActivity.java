@@ -41,6 +41,10 @@ import android.widget.ScrollView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -76,10 +80,12 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     private GridView picsView;
     private EditText nameView;
     private Button dateButton;
+    private Button locationButton;
     private Bitmap addIcon;
     private ChipGroup chipgroup;
     private ScrollView scrollView;
     private ProgressBar progressBar;
+    private Place eventLocation;
     private final int MAX_NUM_OF_PHOTOS = 6;
 
     public static class TimePickerFragment extends DialogFragment {
@@ -125,6 +131,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         picsView = (GridView) findViewById(R.id.eventPics);
         scrollView = (ScrollView) findViewById(R.id.eventScrollView);
         progressBar = (ProgressBar) findViewById(R.id.event_indefinite_progress);
+        locationButton = (Button) findViewById(R.id.eventLocation);
 
         loadData();
     }
@@ -133,6 +140,21 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         Intent intent = getIntent();
         Boolean isEdit = intent.getBooleanExtra("isEdit", false);
 
+
+        // init location button
+        locationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    showPlacePicker();
+
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
+                } catch (GooglePlayServicesRepairableException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
         // init scrollView
         scrollView.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
         scrollView.setFocusable(true);
@@ -179,23 +201,12 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             }
         });
         picsUpdate();
+    }
 
-//        // load data from previous event if this is not creation activity
-//        if(isEdit){
-//            // load name
-//            nameView.setText(intent.getStringExtra("eventName"));
-//            // load participants
-//            selectedUidList = intent.getStringArrayListExtra("selectedUidList");
-//            selectedNameList = intent.getStringArrayListExtra("selectedNameList");
-//            setChipGroupView(selectedUidList, selectedNameList);
-//            // load time and date
-//            Date oldDate = new Date();
-//            oldDate.setTime(intent.getLongExtra("eventTime", -1));
-//            Calendar cal = Calendar.getInstance();
-//            cal.setTime(oldDate);
-//            setEventTime(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE));
-//            setEventDate(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH),cal.get(Calendar.DAY_OF_MONTH));
-//        }
+    private void showPlacePicker() throws GooglePlayServicesNotAvailableException, GooglePlayServicesRepairableException {
+        int PLACE_PICKER_REQUEST = 3;
+        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+        startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
     }
 
     private void startPicFullscreen(int position){
@@ -291,7 +302,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         calendar.set(Calendar.MINUTE, minute);
         Date time = calendar.getTime();
 
-        String timeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ").format(time);
+        String timeString = new SimpleDateFormat("EEE, MMM d, HH:mm:ss").format(time);
         dateButton.setText(timeString);
         dateButton.setTextColor(Color.parseColor("#000000"));
     }
@@ -345,6 +356,16 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
                     picsUri.remove(position);
                     picsUpdate();
                 }
+            }
+        }
+        // place picker feedback
+        if (requestCode == 3) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(intent, this);
+//                String toastMsg = String.format("Place: %s", place.getName());
+//                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
+                locationButton.setText(place.getName());
+                eventLocation = place;
             }
         }
     }
@@ -419,7 +440,9 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
 
 
-        EventsActivity.EventItem newEvent = new EventsActivity.EventItem(name, holder, location, eventDate, users, picsStoragePath);
+        EventsActivity.EventItem newEvent = new EventsActivity.EventItem(name, holder, location,
+                eventDate, users, picsStoragePath, eventLocation.getName().toString(),
+                eventLocation.getLatLng().longitude, eventLocation.getLatLng().latitude);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("events").add(newEvent).addOnCompleteListener( task -> {
@@ -481,7 +504,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         // check if name has entered
         if(nameView.getText().toString().length() == 0){
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-            dialog.setMessage("You haven't complete event name");
+            dialog.setMessage("You haven't complete event NAME");
             dialog.setPositiveButton("Oops! Forgot", (dialoginterface, i) -> dialoginterface.cancel());
             dialog.show();
         }
@@ -504,7 +527,15 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         // check if date and time selected
         if(dateMap.size() < 5){
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-            dialog.setMessage("You haven't complete event time");
+            dialog.setMessage("You haven't complete event TIME");
+            dialog.setPositiveButton("Oops! Forgot", (dialoginterface, i) -> dialoginterface.cancel());
+            dialog.show();
+        }
+
+        // check if location selected
+        if(eventLocation == null){
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+            dialog.setMessage("You haven't complete event LOCATION");
             dialog.setPositiveButton("Oops! Forgot", (dialoginterface, i) -> dialoginterface.cancel());
             dialog.show();
         }
