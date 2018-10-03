@@ -1,0 +1,31 @@
+service cloud.firestore {
+    match /databases/{database}/documents {
+
+        // todo
+        match /conversations/{conv}/messages/{msg} {
+            allow read, write;
+        }
+
+        // todo
+        match /conversations/{doc} {
+            allow read, write;
+        }
+
+        // not perfect
+        match /events/{doc} {
+            allow read, write: if request.auth.uid != null;
+        }
+
+        match /fcmTokens/{doc} {
+            allow read, write: if request.auth.uid == resource.data.uid;
+        }
+
+        match /popularDestinations/{doc} {
+            allow read: if request.auth.uid != null;
+        }
+
+        match /users/{doc} {
+            allow get: if request.auth.uid != null;
+        }
+    }
+}
