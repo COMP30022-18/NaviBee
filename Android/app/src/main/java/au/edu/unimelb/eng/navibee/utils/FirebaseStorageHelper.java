@@ -23,14 +23,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import au.edu.unimelb.eng.navibee.NaviBeeApplication;
 
 public class FirebaseStorageHelper {
 
-    private static final int IMAGE_SIZE = 2000;
+    private static final int IMAGE_SIZE = 1500;
     private static final int THUMB_IMAGE_SIZE = 500;
 
     public static int getOrientation(Uri photoUri) {
@@ -108,12 +111,9 @@ public class FirebaseStorageHelper {
 
 
 
-    public static UploadTask uploadImage(Uri uri, String uploadName, String category, int compressQuality) throws FileNotFoundException, IOException {
-        // image
-        byte[] bo = scaleImage(uri, IMAGE_SIZE, compressQuality);
+    public static void uploadImage(Uri uri, String uploadName, String category,
+              int compressQuality, boolean thumbOnly, UploadCallback callback) throws IOException {
 
-        // thumb
-        byte[] bt = scaleImage(uri, THUMB_IMAGE_SIZE, compressQuality);
 
         // storage reference
         FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -127,17 +127,53 @@ public class FirebaseStorageHelper {
         StorageReference storageRefOri = storageRef.child(uploadName + ".jpg");
         StorageReference storageRefThumb = storageRef.child(uploadName + "-thumb.jpg");
 
+        String fullFilename = storageRefOri.getPath();
 
-        // upload
-        UploadTask uploadTaskOri = storageRefOri.putBytes(bo);
-        UploadTask uploadTaskThumb = storageRefThumb.putBytes(bt);
-        uploadTaskOri.pause();
 
-        uploadTaskThumb.addOnSuccessListener(taskSnapshot -> uploadTaskOri.resume());
-        uploadTaskThumb.addOnFailureListener(taskSnapshot -> uploadTaskOri.cancel());
 
-        return uploadTaskOri;
+
+        ArrayList<UploadTask> tasks = new ArrayList<>();
+
+
+        if (!thumbOnly) {
+            // image
+            byte[] bo = scaleImage(uri, IMAGE_SIZE, compressQuality);
+            tasks.add(storageRefOri.putBytes(bo));
+        }
+
+        // thumb
+        byte[] bt = scaleImage(uri, THUMB_IMAGE_SIZE, compressQuality);
+        tasks.add(storageRefThumb.putBytes(bt));
+
+        AtomicBoolean failed = new AtomicBoolean(false);
+
+        for (UploadTask task : tasks) {
+            task.addOnCompleteListener(result -> {
+                if (failed.get()) return;
+
+                if (result.isSuccessful()) {
+                    tasks.remove(task);
+                    if (tasks.isEmpty()) {
+                        callback.callback(true, fullFilename);
+                    }
+                } else {
+                    failed.set(true);
+                    for (UploadTask t:tasks) {
+                        if (t!=task) {
+                            t.cancel();
+                        }
+                    }
+                    callback.callback(false, "");
+                }
+            });
+        }
     }
+
+    public interface UploadCallback {
+        void callback(boolean isSuccess, String path);
+    }
+
+
 
     public static void loadImage(ImageView imageView, String filePath, boolean isThumb) {
         loadImage(imageView, filePath, isThumb, null);

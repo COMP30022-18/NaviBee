@@ -6,7 +6,7 @@
     android:id="@+id/events_activity_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".EventsActivity"
+    tools:context=".event.EventsActivity"
     android:background="@color/colorLightGrey">
 
     <androidx.constraintlayout.widget.ConstraintLayout
