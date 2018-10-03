@@ -10,6 +10,9 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.NFC" />
+
+    <uses-feature android:name="android.hardware.nfc" />
 
     <application
         android:name=".NaviBeeApplication"
@@ -27,17 +30,6 @@
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
-
-        <!-- Services -->
-
-        <service
-            android:name="com.here.android.mpa.service.MapService"
-            android:exported="false"
-            android:label="NaviBeeHereMapService">
-            <intent-filter>
-                <action android:name="au.edu.unimelb.eng.navibee.hereService" />
-            </intent-filter>
-        </service>
 
         <!-- Metadata -->
 
@@ -149,7 +141,13 @@
         <activity
             android:name=".social.ChatActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".social.AddFriendQRActivity" />
+        <activity android:name=".social.AddFriendQRActivity">
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="application/navibee" />
+            </intent-filter>
+        </activity>
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
