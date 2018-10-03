@@ -38,14 +38,19 @@ public class SosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sos);
 
+        checkPhoneCallPermission();
+
         TextView phoneText = findViewById(R.id.sos_phone_number);
 
         // Get emergency contact from preference
         String number = PreferenceManager.getDefaultSharedPreferences(this).getString("sos_emergency_call", "empty");
 
-        phoneText.setText(number);
-
-        checkPhoneCallPermission();
+        if (number.equals(" ")) {
+            phoneText.setText("Please go Setting");
+            Toast.makeText(this, "Please go setting to set an emergency call number", Toast.LENGTH_SHORT).show();
+        } else {
+            phoneText.setText(number);
+        }
 
         makePhoneCall(phoneText);
 
@@ -60,9 +65,15 @@ public class SosActivity extends AppCompatActivity {
 
     // Call the provided phone number
     private void makePhoneCall(TextView phoneText) {
+
         Button callButton = findViewById(R.id.sos_call_button);
 
         callButton.setOnClickListener((View view) -> {
+
+            if (!android.text.TextUtils.isDigitsOnly(phoneText.getText().toString())) {
+                Toast.makeText(this, "Digits Only!", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             Intent callIntent = new Intent(Intent.ACTION_CALL);
 
