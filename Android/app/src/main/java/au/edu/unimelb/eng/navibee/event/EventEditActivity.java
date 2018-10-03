@@ -148,9 +148,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
                 try {
                     showPlacePicker();
 
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    e.printStackTrace();
-                } catch (GooglePlayServicesRepairableException e) {
+                } catch (GooglePlayServicesNotAvailableException | GooglePlayServicesRepairableException e) {
                     e.printStackTrace();
                 }
             }
@@ -361,10 +359,15 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         // place picker feedback
         if (requestCode == 3) {
             if (resultCode == RESULT_OK) {
-                Place place = PlacePicker.getPlace(intent, this);
+                Place place = PlacePicker.getPlace(this, intent);
 //                String toastMsg = String.format("Place: %s", place.getName());
 //                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
-                locationButton.setText(place.getName());
+                String placeName = place.getName().toString();
+                if (placeName.matches("\\d+°((\\d+'([\\d.]+\")?)?)?[WS] \\d+°((\\d+'([\\d.]+\")?)?)?[NE]")) {
+                    // if place name is a coordinate
+                    placeName = place.getAddress().toString();
+                }
+                locationButton.setText(placeName);
                 eventLocation = place;
             }
         }
@@ -436,8 +439,6 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
         Map<String, Boolean> users = new HashMap<>();
         users.put(holder, true);
-
-
 
 
         EventsActivity.EventItem newEvent = new EventsActivity.EventItem(name, holder, location,
