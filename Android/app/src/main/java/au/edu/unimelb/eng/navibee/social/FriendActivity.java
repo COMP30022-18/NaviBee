@@ -1,5 +1,7 @@
 package au.edu.unimelb.eng.navibee.social;
 
+
+import android.text.format.DateUtils;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -60,9 +62,9 @@ public class FriendActivity extends AppCompatActivity {
             return conv.getMessageCount()>0;
         }
 
-        public String getLastMessageTime (){
-            if (!hasMessage()) return "";
-            return DateManager.DateformatTime(conv.getMessage(conv.getMessageCount()-1).getTime_());
+        public Long getLastMessageTime (){
+            Date date = conv.getMessage(conv.getMessageCount() - 1).getTime_();
+            return date.getTime();
         }
 
         public Date getTimeForSort() {
@@ -146,7 +148,12 @@ public class FriendActivity extends AppCompatActivity {
                 }
                 if (tempChat.hasMessage()){
                     ((TextView) holder.itemView.findViewById(R.id.chat_list_item_last_message)).setText(tempChat.getLastMessage());
-                    ((TextView) holder.itemView.findViewById(R.id.chat_list_item_time)).setText(tempChat.getLastMessageTime());
+                    Long time = tempChat.getLastMessageTime();
+                    Long current = System.currentTimeMillis();
+                    DateUtils dateUtils = new DateUtils();
+                    CharSequence relativeTime = dateUtils.getRelativeTimeSpanString(time, current, dateUtils.MINUTE_IN_MILLIS, dateUtils.FORMAT_ABBREV_RELATIVE );
+
+                    ((TextView) holder.itemView.findViewById(R.id.chat_list_item_time)).setText(relativeTime);
                 }
                 else{
                     ((TextView) holder.itemView.findViewById(R.id.chat_list_item_last_message)).setText("");
