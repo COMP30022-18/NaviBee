@@ -201,6 +201,11 @@
         <item quantity="other">Ride %1$d stops (%2$s)</item>
     </plurals>
 
+    <string name="friend_scan_qr_code">Scan your friend\'s QR code.</string>
+    <string name="friend_wrong_qr_code">This is not a NaviBee QR code.</string>
+
+    <string name="error_failed_to_connect_to_server">Failed to connect to server. Please check your internet connection.</string>
+
     <!-- Strings related to Settings -->
     <string name="pref_section_title_navigation">Navigation</string>
 
