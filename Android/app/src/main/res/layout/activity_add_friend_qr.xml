@@ -3,38 +3,68 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/addfriend_coordinatorlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".social.AddFriendQRActivity">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <Button
-            android:id="@+id/addfriend_button_scan"
-            android:layout_width="266dp"
-            android:layout_height="103dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp"
-            android:background="@color/colorPrimary"
-            android:onClick="buttonScanOnClick"
-            android:text="Scan"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/addfriend_imageView_qrcode"
-            app:layout_constraintHorizontal_bias="0.511"
-            app:layout_constraintStart_toStartOf="@id/addfriend_imageView_qrcode"
-            app:layout_constraintTop_toBottomOf="@+id/addfriend_imageView_qrcode" />
+        android:layout_height="match_parent"
+        android:background="#000000">
 
-        <ImageView
-            android:id="@+id/addfriend_imageView_qrcode"
-            android:layout_width="282dp"
-            android:layout_height="271dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="64dp"
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/add_friend_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.15" />
+
+        <FrameLayout
+            android:id="@+id/addfriend_scanner_frame"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/navibee_placeholder" />
+            app:layout_constraintVertical_bias="1.0" />
+
+        <Button
+            android:id="@+id/addfriend_button_show_qr"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@color/colorPrimary"
+            android:onClick="onClickShowQr"
+            android:text="@string/friend_show_my_qr"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/addfriend_prompt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="8dp"
+            android:breakStrategy="balanced"
+            android:text="@string/friend_scan_qr_code"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/add_friend_guideline"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/add_friend_guideline"
+            tools:text="Scan your friend\'s QR code\nor place both phones back to back\nand touch your screen." />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -48,6 +78,8 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:indeterminate="true" />
+
         </RelativeLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

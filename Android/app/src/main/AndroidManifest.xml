@@ -141,7 +141,8 @@
         <activity
             android:name=".social.ChatActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".social.AddFriendQRActivity">
+        <activity android:name=".social.AddFriendQRActivity"
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar">
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
                 <category android:name="android.intent.category.DEFAULT"/>

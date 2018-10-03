@@ -7,9 +7,12 @@ import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.Task;
@@ -17,38 +20,59 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.functions.HttpsCallableResult;
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.Result;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Map;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import au.edu.unimelb.eng.navibee.R;
+import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-public class AddFriendQRActivity extends AppCompatActivity implements NfcAdapter.OnNdefPushCompleteCallback,
-        NfcAdapter.CreateNdefMessageCallback{
+public class AddFriendQRActivity extends AppCompatActivity
+        implements NfcAdapter.OnNdefPushCompleteCallback,
+        NfcAdapter.CreateNdefMessageCallback,
+        ZXingScannerView.ResultHandler {
 
     private String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
     private static final String ADD_FRIEND_URL = "https://comp30022-18.github.io/NaviBee/user?id=";
 
     private NfcAdapter mNfcAdapter;
-
+    private ZXingScannerView mScannerView;
     private CoordinatorLayout rootLayout;
+
+    private Bitmap qrCode;
+    private AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friend_qr);
-        rootLayout = (CoordinatorLayout) getWindow().getDecorView().getRootView();
+        rootLayout = findViewById(R.id.addfriend_coordinatorlayout);
         generateQRCode();
         findViewById(R.id.add_friend_progressbar).setVisibility(View.GONE);
+
+        // Setup scanner.
+        ViewGroup contentFrame = findViewById(R.id.addfriend_scanner_frame);
+        mScannerView = new ZXingScannerView(this);
+        ArrayList<BarcodeFormat> formats = new ArrayList<>();
+        formats.add(BarcodeFormat.QR_CODE);
+        mScannerView.setFormats(formats);
+        contentFrame.addView(mScannerView);
 
         // Check if NFC is available on device
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if (mNfcAdapter != null) {
+            // Setup label
+            ((TextView) findViewById(R.id.addfriend_prompt))
+                    .setText(R.string.friend_scan_qr_code_with_nfc);
+
             //This will refer back to createNdefMessage for what it will send
             mNfcAdapter.setNdefPushMessageCallback(this, this);
 
@@ -59,12 +83,15 @@ public class AddFriendQRActivity extends AppCompatActivity implements NfcAdapter
 
     private void generateQRCode() {
         try {
-            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-            Bitmap bitmap = barcodeEncoder.encodeBitmap(ADD_FRIEND_URL + uid, BarcodeFormat.QR_CODE, 400, 400);
-            ImageView imageViewQrCode = findViewById(R.id.addfriend_imageView_qrcode);
-            imageViewQrCode.setImageBitmap(bitmap);
-        } catch(Exception e) {
+            qrCode = new BarcodeEncoder().encodeBitmap(ADD_FRIEND_URL + uid,
+                    BarcodeFormat.QR_CODE, 768, 768);
 
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            ImageView image = new ImageView(this);
+            image.setImageBitmap(qrCode);
+            builder.setView(image);
+            dialog = builder.create();
+        } catch (Exception ignored) {
         }
     }
 
@@ -76,10 +103,39 @@ public class AddFriendQRActivity extends AppCompatActivity implements NfcAdapter
         integrator.initiateScan();
     }
 
+    public void onClickShowQr(View view) {
+        // Show my QR
+        if (dialog != null) {
+            dialog.show();
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
+        mScannerView.setResultHandler(this);
+        mScannerView.startCamera();
         handleNfcIntent(getIntent());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mScannerView.stopCamera();
+    }
+
+
+    @Override
+    public void handleResult(Result rawResult) {
+        addFriend(rawResult.getText());
+
+        // Note:
+        // * Wait 2 seconds to resume the preview.
+        // * On older devices continuously stopping and resuming camera preview can result in freezing the app.
+        // * I don't know why this is the case but I don't have the time to figure out.
+        Handler handler = new Handler();
+        handler.postDelayed(() -> mScannerView
+                .resumeCameraPreview(AddFriendQRActivity.this), 2000);
     }
 
     // Get the results:
