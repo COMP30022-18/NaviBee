@@ -203,7 +203,7 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
                 NavigationViewOptions.builder()
                         .directionsRoute(route)
                         .navigationListener(this)
-                        .shouldSimulateRoute(true)
+                        // .shouldSimulateRoute(true)
                         .milestoneEventListener(this)
                         .navigationListener(this)
                         .build()

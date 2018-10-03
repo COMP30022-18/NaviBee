@@ -89,11 +89,10 @@ public class UserInfoManager {
     public static class UserInfo {
         private String name, photoUrl;
 
-        private UserInfo(String name, String photoUrl) {
+        public UserInfo(String name, String photoUrl) {
             this.name = name;
             this.photoUrl = photoUrl;
         }
-
 
         public String getName() {
             return name;
