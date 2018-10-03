@@ -268,28 +268,24 @@ public class FriendActivity extends AppCompatActivity {
         loadChatsList();
         loadContactList();
 
-        IntentFilter intFilt = new IntentFilter(ConversationManager.BROADCAST_FRIEND_UPDATED);
-        registerReceiver(br, intFilt);
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                loadContactList();
+                loadChatsList();
+            }
+        }, new IntentFilter(ConversationManager.BROADCAST_FRIEND_UPDATED));
 
-        registerReceiver(brMsgReadState, new IntentFilter(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE));
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                recyclerFriendsAdapter.notifyDataSetChanged();
+                sortChatsList();
+                recyclerChatsAdapter.notifyDataSetChanged();
+            }
+        }, new IntentFilter(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE));
     }
 
-    BroadcastReceiver br = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            loadContactList();
-            loadChatsList();
-        }
-    };
-
-    BroadcastReceiver brMsgReadState = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            recyclerFriendsAdapter.notifyDataSetChanged();
-            sortChatsList();
-            recyclerChatsAdapter.notifyDataSetChanged();
-        }
-    };
 
     private void loadContactList() {
         contactList.clear();

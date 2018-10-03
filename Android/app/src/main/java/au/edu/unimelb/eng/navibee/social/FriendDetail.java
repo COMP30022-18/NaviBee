@@ -1,7 +1,10 @@
 package au.edu.unimelb.eng.navibee.social;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -41,14 +44,9 @@ public class FriendDetail extends AppCompatActivity {
         sendMessageButton = findViewById(R.id.activity_friend_detail_sendMessage_button);
         deleteFriendButton = findViewById(R.id.activity_friend_detail_deleteFriend_button);
         addFriendButton = findViewById(R.id.activity_friend_detail_addFriend_button);
-        if (cm.getFriendList().contains(friendId)){
-            convId = ConversationManager.getInstance().getPrivateConvId(friendId);
-            addFriendButton.setVisibility(View.GONE);
-        }
-        else{
-            sendMessageButton.setVisibility(View.GONE);
-            deleteFriendButton.setVisibility(View.GONE);
-        }
+
+        loadButton();
+
         ImageView icon = findViewById(R.id.friend_detail_icon);
         TextView name = findViewById(R.id.friend_detail_name);
         UserInfoManager.getInstance().getUserInfo(friendId, userInfo -> {
@@ -56,6 +54,26 @@ public class FriendDetail extends AppCompatActivity {
             NetworkImageHelper.loadImage(icon, userInfo.getHighResolutionPhotoUrl());
         });
 
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                loadButton();
+            }
+        }, new IntentFilter(ConversationManager.BROADCAST_FRIEND_UPDATED));
+
+    }
+    public void loadButton(){
+        if (cm.getFriendList().contains(friendId)){
+            convId = ConversationManager.getInstance().getPrivateConvId(friendId);
+            addFriendButton.setVisibility(View.GONE);
+            sendMessageButton.setVisibility(View.VISIBLE);
+            deleteFriendButton.setVisibility(View.VISIBLE);
+        }
+        else{
+            addFriendButton.setVisibility(View.VISIBLE);
+            sendMessageButton.setVisibility(View.GONE);
+            deleteFriendButton.setVisibility(View.GONE);
+        }
     }
     protected void onClick(View view){
         switch (view.getId()) {
@@ -93,13 +111,10 @@ public class FriendDetail extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     final Map<String, Object> res = ((Map<String, Object>) httpsCallableResult.getData());
                     if (((Integer) res.get("code"))==0) {
-                        Toast.makeText(this, "Success.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "Success, you will soon be able to chat with your friend", Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(this, ((String) res.get("msg")), Toast.LENGTH_LONG).show();
                     }
-                    addFriendButton.setVisibility(View.GONE);
-                    sendMessageButton.setVisibility(View.VISIBLE);
-                    deleteFriendButton.setVisibility(View.VISIBLE);
                 });
                 break;
         }
