@@ -34,6 +34,14 @@ public class ConversationManager {
 
     public static void init() {
         instance = new ConversationManager();
+
+        instance.uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        instance.db = FirebaseFirestore.getInstance();
+
+        instance.listenPrivateConv();
+        instance.listenGroupConv();
+
+
     }
 
     private static final String TAG = "convM";
@@ -50,11 +58,6 @@ public class ConversationManager {
 
 
     public ConversationManager() {
-        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        db = FirebaseFirestore.getInstance();
-
-        listenPrivateConv();
-        listenGroupConv();
     }
 
     private void listenPrivateConv() {
@@ -194,10 +197,10 @@ public class ConversationManager {
         db.collection("conversations").document(convId).update("isDeleted", true);
     }
 
-    public Task<HttpsCallableResult> createGroupChat(ArrayList<String> uses, String name, String icon) {
+    public Task<HttpsCallableResult> createGroupChat(ArrayList<String> users, String name, String icon) {
         FirebaseFunctions mFunctions = FirebaseFunctions.getInstance();
         Map<String, Object> data = new HashMap<>();
-        data.put("users", uses);
+        data.put("users", users);
         data.put("name", name);
         data.put("icon", icon);
 
