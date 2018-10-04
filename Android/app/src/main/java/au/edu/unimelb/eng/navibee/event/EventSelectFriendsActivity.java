@@ -1,12 +1,6 @@
 package au.edu.unimelb.eng.navibee.event;
 
 import android.content.Intent;
-import androidx.appcompat.app.AppCompatActivity;
-import au.edu.unimelb.eng.navibee.R;
-import au.edu.unimelb.eng.navibee.event.EventEditActivity;
-import au.edu.unimelb.eng.navibee.social.ConversationManager;
-import au.edu.unimelb.eng.navibee.social.UserInfoManager;
-
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -18,11 +12,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.appcompat.app.AppCompatActivity;
+import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.social.ConversationManager;
+import au.edu.unimelb.eng.navibee.social.UserInfoManager;
+
 public class EventSelectFriendsActivity extends AppCompatActivity {
 
     private Map<String, Boolean> selectedFriendMap;
     private ArrayList<String> friendList;
     private ArrayList<String> friendNameList;
+    private Map<String, UserInfoManager.UserInfo> stringUserInfoMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +36,7 @@ public class EventSelectFriendsActivity extends AppCompatActivity {
 
 
         UserInfoManager.getInstance().getUserInfo(friendList, stringUserInfoMap -> {
+            this.stringUserInfoMap = stringUserInfoMap;
             friendNameList = new ArrayList<>();
             for (String uid: friendList) {
                 friendNameList.add(stringUserInfoMap.get(uid).getName());
@@ -74,31 +75,34 @@ public class EventSelectFriendsActivity extends AppCompatActivity {
         }
         // load already selected friends uid from previews activity
         Intent intent = getIntent();
-        ArrayList<String> haveSelected = intent.getStringArrayListExtra("selectedUid");
-        if(haveSelected != null){
-            for(String uid: haveSelected){
-                selectedFriendMap.put(uid, true);
+        HashMap<String, UserInfoManager.UserInfo> haveSelected =
+                (HashMap<String, UserInfoManager.UserInfo>)
+                intent.getSerializableExtra("selected");
+        if (haveSelected != null){
+            for (String user: haveSelected.keySet()){
+                selectedFriendMap.put(user, true);
             }
         }
     }
 
     public void editEventDetail(View view){
         // get selected friends' uid
-        ArrayList<String> selectedUidList = new ArrayList<>();
-        ArrayList<String> selectedNameList = new ArrayList<>();
-        for(String uid: selectedFriendMap.keySet()){
-            if(selectedFriendMap.get(uid)){
-                selectedUidList.add(uid);
-                selectedNameList.add(uid2Name(uid));
+        if (selectedFriendMap == null) {
+            setResult(RESULT_CANCELED);
+            finish();
+            return;
+        }
+        HashMap<String, UserInfoManager.UserInfo> selected = new HashMap<>();
+        for (String uid: selectedFriendMap.keySet()){
+            if (selectedFriendMap.get(uid) == true) {
+                selected.put(uid, stringUserInfoMap.get(uid));
             }
         }
         // start next step
         Intent intent = new Intent(this, EventEditActivity.class);
-        intent.putStringArrayListExtra("selectedUid", selectedUidList);
-        intent.putStringArrayListExtra("selectedName", selectedNameList);
+        intent.putExtra("selected", selected);
         setResult(RESULT_OK, intent);
         finish();
     }
 
-    private String uid2Name(String uid){ return friendNameList.get(friendList.indexOf(uid)); }
 }

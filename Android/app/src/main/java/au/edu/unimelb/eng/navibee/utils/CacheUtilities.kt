@@ -1,10 +1,12 @@
 package au.edu.unimelb.eng.navibee.utils
 
+import android.content.res.Resources
 import android.graphics.BitmapFactory
 import android.view.View
 import android.widget.ImageView
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import au.edu.unimelb.eng.navibee.NaviBeeApplication
+import com.google.android.material.chip.ChipDrawable
 import com.google.common.io.ByteStreams
 import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.UI
@@ -120,6 +122,42 @@ class URLImageViewCacheLoader
             postLoad(file)
         } catch (e: Exception) {
             Timber.e(e, "Failed loading image from URL.")
+        }
+    }
+}
+
+class URLChipDrawableCacheLoader
+@JvmOverloads constructor(private val url: String,
+                          private val chipDrawable: ChipDrawable,
+                          private val resources: Resources,
+                          prefix: String = "image-url"):
+        CachedLoader(prefix) {
+    override val defaultKey = url
+
+    override fun loadTask(file: File) {
+        try {
+            val input = java.net.URL(url).openStream()
+            val output = FileOutputStream(file)
+            ByteStreams.copy(input, output)
+            output.close()
+            postLoad(file)
+        } catch (e: Exception) {
+            Timber.e(e, "Failed loading image from URL.")
+        }
+    }
+
+    override fun postLoad(file: File) {
+        try {
+            val drawable = RoundedBitmapDrawableFactory
+                    .create(resources, FileInputStream(file))
+            drawable.setAntiAlias(true)
+            drawable.isCircular = true
+
+            launch(UI) {
+                chipDrawable.chipIcon = drawable
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Failed loading image to ImageView.")
         }
     }
 }

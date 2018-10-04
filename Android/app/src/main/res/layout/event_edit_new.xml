@@ -30,7 +30,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/fab_margin_bottom">
+                    android:layout_margin="@dimen/form_bottom_padding">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/eventName"
@@ -40,54 +40,77 @@
                         android:ems="10"
                         android:hint="Event Name"
                         android:inputType="textPersonName"
-                        android:padding="@dimen/fab_margin_bottom"
+                        android:padding="@dimen/form_bottom_padding"
                         android:textSize="32sp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!--<TextView-->
-                    <!--android:id="@+id/eventParticipantsName"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_margin="4dp"-->
-                    <!--android:text="Friends"-->
-                    <!--android:textSize="32dp" />-->
-
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/eventFriendChips"
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/fab_margin_bottom"/>
+                    android:layout_margin="@dimen/form_bottom_padding">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/event_create_participants"
+                        style="@style/Widget.MaterialComponents.TextInputEditText.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollHorizontally="false"
+                        android:ems="10"
+                        android:hint="@string/event_create_participants"
+                        android:padding="@dimen/form_bottom_padding"
+                        android:textSize="32sp"
+                        android:inputType="textNoSuggestions|textMultiLine"
+                        android:focusableInTouchMode="false"
+                        android:onClick="onInviteFriendClicked"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
 
 
-                <com.google.android.material.button.MaterialButton
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:id="@+id/eventLocation"
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/fab_margin_bottom"
-                    android:textColor="#808080"
-                    android:textSize="32sp"
-                    android:text="Pick Location" />
+                    android:layout_margin="@dimen/form_bottom_padding">
 
-                <!--<TextView-->
-                    <!--android:id="@+id/eventTimeName"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_margin="4dp"-->
-                    <!--android:text="Time"-->
-                    <!--android:textSize="32dp" />-->
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/event_create_location"
+                        style="@style/Widget.MaterialComponents.TextInputEditText.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollHorizontally="false"
+                        android:ems="10"
+                        android:hint="@string/event_create_location"
+                        android:padding="@dimen/form_bottom_padding"
+                        android:inputType="textNoSuggestions|textMultiLine"
+                        android:textSize="32sp"
+                        android:focusableInTouchMode="false"
+                        android:onClick="showPlacePicker"/>
 
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/eventPickDate"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/fab_margin_bottom"
-                    android:onClick="showDatePickerDialog"
-                    android:textColor="#808080"
-                    android:textSize="32sp" />
+                    android:layout_margin="@dimen/form_bottom_padding">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/event_create_time"
+                        style="@style/Widget.MaterialComponents.TextInputEditText.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollHorizontally="false"
+                        android:ems="10"
+                        android:hint="@string/event_create_time"
+                        android:padding="@dimen/form_bottom_padding"
+                        android:textSize="32sp"
+                        android:inputType="textNoSuggestions|textMultiLine"
+                        android:focusableInTouchMode="false"
+                        android:onClick="showDatePickerDialog"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <!--<TextView-->
                     <!--android:id="@+id/eventPicsName"-->
@@ -101,7 +124,7 @@
                     android:id="@+id/eventPics"
                     android:layout_width="match_parent"
                     android:layout_height="267dp"
-                    android:layout_margin="@dimen/fab_margin_bottom" />
+                    android:layout_margin="@dimen/form_bottom_padding" />
 
             </LinearLayout>
         </ScrollView>
@@ -111,7 +134,7 @@
             android:id="@+id/eventPublish"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/fab_margin_bottom"
+            android:layout_margin="@dimen/form_bottom_padding"
             android:onClick="onPublishClicked"
             android:textColor="#808080"
             android:textSize="40sp"
