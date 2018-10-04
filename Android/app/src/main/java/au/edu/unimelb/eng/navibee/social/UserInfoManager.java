@@ -1,11 +1,14 @@
 package au.edu.unimelb.eng.navibee.social;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -86,13 +89,30 @@ public class UserInfoManager {
     }
 
 
-    public static class UserInfo {
+    public static class UserInfo implements Parcelable, Serializable {
         private String name, photoUrl;
 
         public UserInfo(String name, String photoUrl) {
             this.name = name;
             this.photoUrl = photoUrl;
         }
+
+        protected UserInfo(Parcel in) {
+            name = in.readString();
+            photoUrl = in.readString();
+        }
+
+        public static final Creator<UserInfo> CREATOR = new Creator<UserInfo>() {
+            @Override
+            public UserInfo createFromParcel(Parcel in) {
+                return new UserInfo(in);
+            }
+
+            @Override
+            public UserInfo[] newArray(int size) {
+                return new UserInfo[size];
+            }
+        };
 
         public String getName() {
             return name;
@@ -106,12 +126,25 @@ public class UserInfoManager {
             return photoUrl.replace("s96-c", "s400-c");
         }
 
+        public String getOriginalPhotoUrl() {
+            return photoUrl.replace("/s96-c", "");
+        }
+
         public void setName(String name) {
             this.name = name;
         }
 
         public void setPhotoUrl(String photoUrl) {
             this.photoUrl = photoUrl;
+        }
+
+        @Override
+        public int describeContents() { return 0; }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(name);
+            dest.writeString(photoUrl);
         }
     }
 }
