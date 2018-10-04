@@ -157,7 +157,12 @@
             android:screenOrientation="portrait"
             tools:replace="android:screenOrientation" />
         <activity android:name=".event.EventEditActivity"
-            android:label="@string/event_create_event"/>
+            android:label="@string/event_create_event"
+            android:parentActivityName=".event.EventsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".event.EventsActivity" />
+        </activity>
         <activity
             android:name=".event.EventDetailsActivity"
             android:parentActivityName=".event.EventsActivity"
@@ -165,14 +170,6 @@
         <activity
             android:name=".social.ChatImageViewActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-        </activity>
         <activity
             android:name=".event.EventPicFullscreenActivity">
         </activity>

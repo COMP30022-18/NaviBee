@@ -168,10 +168,14 @@
     <string name="alert_dialog_title_select_method_of_travel">Select a method of travel…</string>
     <string name="title_activity_event_details">EventDetailsActivity</string>
     <string name="date_format">EEE, MMM d, HH:mm</string>
+    <string name="event_create_name">Event Name</string>
+    <string name="event_create_name_required">Event name is required.</string>
     <string name="event_create_event">New event</string>
     <string name="event_create_create">Create event</string>
     <string name="event_create_location">Location</string>
+    <string name="event_create_location_required">Event location is required.</string>
     <string name="event_create_time">Time</string>
+    <string name="event_create_time_required">Event time is required.</string>
     <string name="event_create_photos">Photos</string>
     <string name="event_create_participants">Participants</string>
     <string name="event_details_location">Location</string>
