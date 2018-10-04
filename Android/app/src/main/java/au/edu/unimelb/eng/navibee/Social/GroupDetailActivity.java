@@ -128,7 +128,7 @@ public class GroupDetailActivity extends AppCompatActivity {
         });
         TextView createDate = findViewById(R.id.activity_group_detail_date_created);
         Date date = conv.getCreateDate();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         createDate.setText(dateFormat.format(date));
         TextView groupName = findViewById(R.id.group_detail_name);
         groupName.setText(conv.getName());
