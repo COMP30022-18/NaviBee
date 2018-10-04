@@ -156,10 +156,8 @@
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="android:screenOrientation" />
-        <activity android:name=".event.EventEditActivity" />
-        <activity
-            android:name=".SosSettingActivity"
-            android:label="@string/sos_setting" />
+        <activity android:name=".event.EventEditActivity"
+            android:label="@string/event_create_event"/>
         <activity
             android:name=".event.EventDetailsActivity"
             android:parentActivityName=".event.EventsActivity"

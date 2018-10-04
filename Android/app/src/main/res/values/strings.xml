@@ -169,8 +169,10 @@
     <string name="title_activity_event_details">EventDetailsActivity</string>
     <string name="date_format">EEE, MMM d, HH:mm</string>
     <string name="event_create_event">New event</string>
+    <string name="event_create_create">Create event</string>
     <string name="event_create_location">Location</string>
     <string name="event_create_time">Time</string>
+    <string name="event_create_photos">Photos</string>
     <string name="event_create_participants">Participants</string>
     <string name="event_details_location">Location</string>
     <string name="event_details_organiser">Organiser</string>

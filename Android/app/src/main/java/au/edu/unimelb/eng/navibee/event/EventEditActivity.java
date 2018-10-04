@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
@@ -19,7 +18,6 @@ import android.text.style.ImageSpan;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -35,7 +33,6 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.material.chip.ChipDrawable;
-import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -60,6 +57,7 @@ import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.social.ConversationManager;
 import au.edu.unimelb.eng.navibee.social.UserInfoManager;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
+import au.edu.unimelb.eng.navibee.utils.SquareImageView;
 import au.edu.unimelb.eng.navibee.utils.URLChipDrawableCacheLoader;
 
 public class EventEditActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener, IPickResult {
@@ -81,7 +79,6 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     private TextInputEditText timeField;
     private TextInputEditText locationField;
     private TextInputEditText participatnsField;
-    private Bitmap addIcon;
     private ScrollView scrollView;
     private ProgressBar progressBar;
     private Place eventLocation;
@@ -159,26 +156,15 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         // init date map
         dateMap = new HashMap<>();
         // init pics gridView
-        Drawable addDrawable = getResources().getDrawable(R.drawable.ic_add_box_yellow_100dp);
-        addIcon = drawableToBitmap(addDrawable);
         pics = new ArrayList<>();
         picsUri = new ArrayList<>();
-        pics.add(addIcon);
-        picsView.setNumColumns(3);
-        picsView.setVerticalSpacing(16);
-        picsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                Toast.makeText(getApplicationContext(), "" + position,
-                        Toast.LENGTH_SHORT).show();
-                if(pics.get(position).equals(addIcon)){
-                    selectPics();
-                }
-                else{
-                    startPicFullscreen(position);
-                }
-                picsUpdate();
+        picsView.setOnItemClickListener((parent, v, position, id) -> {
+            if (position == pics.size()){
+                selectPics();
+            } else {
+                startPicFullscreen(position);
             }
+            picsUpdate();
         });
         picsUpdate();
     }
@@ -205,26 +191,14 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     }
 
     private void picsUpdate(){
-        Bitmap lastPic = pics.get(pics.size()-1);
-        if(pics.size() > MAX_NUM_OF_PHOTOS){
-            if(lastPic.equals(addIcon)){
-                pics.remove(lastPic);
-            }
-        }
-        else{
-            if(!lastPic.equals(addIcon)){
-                pics.add(addIcon);
-            }
-        }
-
-        int width = Resources.getSystem().getDisplayMetrics().widthPixels;
-        ViewGroup.LayoutParams layoutParams = picsView.getLayoutParams();
-        if(pics.size() > 3){
-            layoutParams.height = 2*width/3 + 16;
-        } else {
-            layoutParams.height = width/3;
-        }
-        picsView.setLayoutParams(layoutParams);
+//        int width = Resources.getSystem().getDisplayMetrics().widthPixels;
+//        ViewGroup.LayoutParams layoutParams = picsView.getLayoutParams();
+//        if(pics.size() > 3){
+//            layoutParams.height = 2*width/3 + 16;
+//        } else {
+//            layoutParams.height = width/3;
+//        }
+//        picsView.setLayoutParams(layoutParams);
         picsView.setAdapter(new ImageAdapter(EventEditActivity.this));
 
     }
@@ -237,11 +211,13 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         }
 
         public int getCount() {
-            return pics.size();
+            return Math.min(pics.size() + 1, MAX_NUM_OF_PHOTOS);
         }
 
         public Object getItem(int position) {
-            return pics.get(position);
+            if (position < pics.size())
+                return pics.get(position);
+            return null;
         }
 
         public long getItemId(int position) {
@@ -250,18 +226,31 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
         // create a new ImageView for each item referenced by the Adapter
         public View getView(int position, View convertView, ViewGroup parent) {
-            ImageView imageView;
+            SquareImageView imageView;
             if (convertView == null) {
                 // if it's not recycled, initialize some attributes
-                imageView = new ImageView(mContext);
-                int width = Resources.getSystem().getDisplayMetrics().widthPixels;
-                imageView.setLayoutParams(new GridView.LayoutParams(10*width/30, 10*width/30));
-                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                imageView = new SquareImageView(mContext);
+//                int width = Resources.getSystem().getDisplayMetrics().widthPixels;
+//                imageView.setLayoutParams(new GridView.LayoutParams(10*width/30, 10*width/30));
+                imageView.setLayoutParams(new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT));
+                imageView.setPadding(8, 8, 8, 8);
+                imageView.setPadding(8, 8, 8, 8);
+                imageView.setPadding(8, 8, 8, 8);
                 imageView.setPadding(8, 8, 8, 8);
             } else {
-                imageView = (ImageView) convertView;
+                imageView = (SquareImageView) convertView;
             }
-            imageView.setImageBitmap(pics.get(position));
+            if (position < pics.size()) {
+                imageView.setImageBitmap(pics.get(position));
+                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                imageView.setBackgroundResource(R.color.transparentBlack);
+            } else {
+                imageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_add_white_48dp));
+                imageView.setScaleType(ImageView.ScaleType.CENTER);
+                imageView.setBackgroundResource(R.color.black_overlay);
+            }
             return imageView;
         }
 
@@ -549,7 +538,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     public void onPickResult(PickResult r) {
         if (r.getError() == null) {
 
-            pics.add(pics.size()-1, r.getBitmap());
+            pics.add(r.getBitmap());
             picsUri.add(r.getUri());
 
             picsUpdate();

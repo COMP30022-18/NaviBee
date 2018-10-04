@@ -15,5 +15,5 @@
     <dimen name="transit_navigation_route_bar_width">20dp</dimen>
     <dimen name="transit_navigation_summary_height">64dp</dimen>
 
-    <dimen name="form_bottom_padding">8dp</dimen>
+    <dimen name="form_vertical_padding">8dp</dimen>
 </resources>
