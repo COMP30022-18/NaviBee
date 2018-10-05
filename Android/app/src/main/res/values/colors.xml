@@ -35,4 +35,6 @@
     <color name="transitWalkingColor">#2CC3F8</color>
 
     <color name="translucentActionBarBackground">#30000000</color>
+
+    <color name="checkedGreen">#43A047</color>
 </resources>

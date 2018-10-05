@@ -175,6 +175,7 @@
     <string name="event_create_location">Location</string>
     <string name="event_create_location_required">Event location is required.</string>
     <string name="event_create_time">Time</string>
+    <string name="event_create_choose_participants">Choose participants</string>
     <string name="event_create_time_required">Event time is required.</string>
     <string name="event_create_photos">Photos</string>
     <string name="event_create_participants">Participants</string>
@@ -221,6 +222,8 @@
 
     <string name="error_failed_to_connect_to_server">Failed to connect to server. Please check your internet connection.</string>
 
+
+    <string name="action_confirm">Confirm</string>
     <!-- Strings related to Settings -->
     <string name="pref_section_title_navigation">Navigation</string>
 

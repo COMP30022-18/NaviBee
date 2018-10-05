@@ -71,9 +71,10 @@
             android:name=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
         <activity
-            android:name=".EventActivity"
+            android:name=".event.EventsActivity"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".event.EventSelectFriendsActivity" />
+        <activity android:name=".event.EventSelectFriendsActivity"
+            android:label="@string/event_create_choose_participants"/>
         <activity
             android:name=".SosActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -176,10 +177,6 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".event.EventPicFullscreenActivity">
-        </activity>
-        <activity
-            android:name=".event.EventsActivity"
-            android:label="@string/landing_events">
         </activity>
         <activity
             android:name=".social.VoiceCallActivity"

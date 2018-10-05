@@ -23,7 +23,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/Applications/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/content/ic_add_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/Applications/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_check_circle_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -33,11 +33,11 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="ffffff" />
+                            <entry key="assetSourceType" value="FILE" />
                             <entry key="height" value="48" />
-                            <entry key="outputName" value="ic_add_white_48dp" />
+                            <entry key="outputName" value="ic_check_circle_color" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="$USER_HOME$/ps/NaviBee/navigation_transit_terminus_marker.svg" />
+                            <entry key="sourceFile" value="$USER_HOME$/ps/NaviBee/check_circle_color.svg" />
                             <entry key="width" value="48" />
                           </map>
                         </option>
