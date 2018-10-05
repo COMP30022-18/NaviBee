@@ -118,10 +118,14 @@ public abstract class Conversation {
 
     public void sendPicture(Uri uri) {
         try {
-            UploadTask uploadTask = FirebaseStorageHelper.uploadImage(uri,null, "message", 70);
-            uploadTask.addOnSuccessListener(taskSnapshot -> sendMessage("image", taskSnapshot.getStorage().getPath()));
-            uploadTask.addOnCanceledListener(() -> Toast.makeText(NaviBeeApplication.getInstance(), "Failed to send the photo.", Toast.LENGTH_LONG).show());
-            uploadTask.addOnFailureListener(taskSnapshot -> Toast.makeText(NaviBeeApplication.getInstance(), "Failed to send the photo.", Toast.LENGTH_LONG).show());
+            FirebaseStorageHelper
+                    .uploadImage(uri,null, "message", 70, false, ((isSuccess, path) -> {
+                        if (isSuccess) {
+                            sendMessage("image", path);
+                        } else {
+                            Toast.makeText(NaviBeeApplication.getInstance(), "Failed to send the photo.", Toast.LENGTH_LONG).show();
+                        }
+                    }));
         } catch (Exception e) {
             Log.w(TAG, "sendPicture", e);
         }
@@ -231,6 +235,9 @@ public abstract class Conversation {
                     break;
                 case "location":
                     text = "[Location]";
+                    break;
+                case "event":
+                    text = "[Event]";
                     break;
             }
 

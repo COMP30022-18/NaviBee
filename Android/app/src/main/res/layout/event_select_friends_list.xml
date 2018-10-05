@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".EventSelectFriendsActivity">
+    tools:context=".event.EventSelectFriendsActivity">
 
     <ListView
         android:id="@+id/event_select_friends_list"
@@ -23,11 +23,11 @@
         android:id="@+id/event_button3"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:onClick="editEventDetail"
-        android:text="NEXT"
+        android:text="FINISH"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

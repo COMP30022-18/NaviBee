@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import au.edu.unimelb.eng.navibee.R
-import au.edu.unimelb.eng.navibee.utils.DownloadImageToImageViewAsyncTask
 import au.edu.unimelb.eng.navibee.utils.SimpleRVViewHolder
+import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader
 import kotlinx.android.synthetic.main.recycler_view_attributions.view.*
 import kotlinx.android.synthetic.main.recycler_view_destination_list_button.view.*
 import kotlinx.android.synthetic.main.recycler_view_destination_list_divider.view.*
@@ -69,7 +69,7 @@ class DestinationsRVAdaptor(private val data: MutableList<DestinationRVItem>) :
                 val imageView = holder.itemView.recycler_view_destinations_list_entry_preview
                 when {
                     data.thumbnail != null ->
-                        DownloadImageToImageViewAsyncTask(imageView).execute(data.thumbnail)
+                        URLImageViewCacheLoader(data.thumbnail, imageView)
                     data.googlePhotoReference != null -> {
                         val viewHeight = Resources.getSystem().displayMetrics.heightPixels
                         GoogleMapsPhotoReferenceCacheImageLoader(
