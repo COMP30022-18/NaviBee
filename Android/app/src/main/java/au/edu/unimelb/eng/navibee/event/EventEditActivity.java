@@ -466,7 +466,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
     private void finishedEditEvent() {
         progressingMode(true);
-        /*
+
         if (!picsUri.isEmpty()) {
             Uri uri = picsUri.get(0);
             picsUri.remove(0);
@@ -491,7 +491,6 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             // complete
             uploadAll();
         }
-        */
     }
 
     public void onPublishClicked(View v) {
