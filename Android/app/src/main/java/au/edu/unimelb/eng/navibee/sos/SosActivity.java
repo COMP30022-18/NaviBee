@@ -6,19 +6,25 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import au.edu.unimelb.eng.navibee.R;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowInsets;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -37,6 +43,47 @@ public class SosActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sos);
+
+        AppBarLayout appbar = (AppBarLayout) findViewById(R.id.sos_appbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.sos_toolbar);
+        View toolbarPadding = (View) findViewById(R.id.sos_toolbar_padding);
+
+        // Action Bar
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(true);
+        }
+
+        // Set padding for status bar
+        // Require API 20
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            toolbarPadding.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+                @Override
+                public WindowInsets onApplyWindowInsets(View view, WindowInsets windowInsets) {
+                    ViewGroup.LayoutParams layoutParams = toolbarPadding.getLayoutParams();
+                    layoutParams.height = windowInsets.getSystemWindowInsetTop();
+                    toolbarPadding.setLayoutParams(layoutParams);
+
+                    return windowInsets;
+                }
+            });
+        } else {
+            ViewGroup.LayoutParams layoutParams = toolbarPadding.getLayoutParams();
+
+            int resId = toolbarPadding.getResources().getIdentifier("status_bar_height", "dimen", "android");
+            if (resId > 0) {
+                layoutParams.height = toolbarPadding.getResources().getDimensionPixelOffset(resId);
+            } else {
+                layoutParams.height = 1024;
+            }
+            toolbarPadding.setLayoutParams(layoutParams);
+        }
+
+        // Remove redundant shadow in transparent app bar
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            appbar.setOutlineProvider(null);
+        }
 
         checkPhoneCallPermission();
 

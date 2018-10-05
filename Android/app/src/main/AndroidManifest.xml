@@ -81,7 +81,9 @@
         <activity android:name=".EventSelectFriendsActivity" />
         <activity
             android:name=".sos.SosActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_sos"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
         <activity
             android:name=".social.FriendActivity"
             android:label="@string/title_activity_friend" />
