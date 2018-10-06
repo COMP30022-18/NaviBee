@@ -75,8 +75,10 @@
             android:parentActivityName=".MainActivity" />
         <activity android:name=".event.EventSelectFriendsActivity" />
         <activity
-            android:name=".SosActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:name=".sos.SosActivity"
+            android:label="@string/title_activity_sos"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
         <activity
             android:name=".social.FriendActivity"
             android:label="@string/title_activity_friend" />
@@ -91,7 +93,8 @@
                 android:name="android.app.default_searchable"
                 android:value=".navigation.DestinationsSearchResultActivity" />
         </activity>
-        <activity android:name=".navigation.DestinationsSearchResultActivity"
+        <activity
+            android:name=".navigation.DestinationsSearchResultActivity"
             android:launchMode="singleTask">
             <meta-data
                 android:name="android.app.default_searchable"
@@ -124,8 +127,9 @@
         <activity
             android:name=".navigation.NavigationActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".navigation.TransitNavigationActivity"
-            android:theme="@style/AppTheme.TranslucentActionBar"/>
+        <activity
+            android:name=".navigation.TransitNavigationActivity"
+            android:theme="@style/AppTheme.TranslucentActionBar" />
         <activity
             android:name=".navigation.NavigationSelectorActivity"
             android:theme="@style/AppTheme.Translucent" />
@@ -140,7 +144,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
         <activity
             android:name=".social.ChatActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -188,6 +191,9 @@
         <activity android:name=".social.CreateGroupChatActivity" />
         <activity android:name=".social.FriendDetail" />
         <activity android:name=".social.LocationDisplayActivity" />
+        <activity
+            android:name=".sos.SosCountDownActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>
