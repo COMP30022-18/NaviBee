@@ -139,7 +139,7 @@ class DestinationDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
             adapter = viewAdapter
             addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(context, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
         }
-        recyclerView.retrieveTopObscureHeight { _, height ->
+        navigation_destinations_details_image_preview.retrieveTopObscureHeight { _, height ->
             topObscureSize = height
         }
 
