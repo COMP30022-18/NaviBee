@@ -49,6 +49,10 @@ export const newMessageNotification = functions.firestore
             }
         }
 
+        let data = {
+            'convID': convID
+        }
+
         for (let key in convDoc.users) {
             // for all users of this conversation
             if (key!=sender) {
@@ -61,7 +65,7 @@ export const newMessageNotification = functions.firestore
                 tokens.forEach( tokenDoc => {
                     let token = tokenDoc.id;
                     try {
-                        msg.send({token: token, android: android});
+                        msg.send({token: token, android: android, data: data});
                     } catch(Error) {
                         // token is invalid
                     }
