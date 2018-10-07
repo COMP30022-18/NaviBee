@@ -7,6 +7,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -51,6 +52,9 @@ public class VoiceCallActivity extends AppCompatActivity {
 
     private boolean callStarted = false;
 
+    private PowerManager mPowerManager;
+    private PowerManager.WakeLock mWakeLock;
+
 
     private long timeCount;
     Thread thread = new Thread() {
@@ -90,6 +94,13 @@ public class VoiceCallActivity extends AppCompatActivity {
                     timeCount = 0;
                     textViewStatus.setText("");
                     thread.start();
+
+                    if (mWakeLock == null) {
+                        mWakeLock = mPowerManager.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "Navibee:VoiceCall");
+                    }
+                    if (!mWakeLock.isHeld()) {
+                        mWakeLock.acquire();
+                    }
                 }
 
             });
@@ -124,6 +135,9 @@ public class VoiceCallActivity extends AppCompatActivity {
         friendIcon = findViewById(R.id.voicecall_friend_icon);
         friendName = findViewById(R.id.voicecall_button_username);
         changingDot = findViewById(R.id.voicecall_textView_dot);
+
+        mPowerManager = (PowerManager) getSystemService(POWER_SERVICE);
+
 
         new Thread() {
             public void run() {
@@ -274,6 +288,10 @@ public class VoiceCallActivity extends AppCompatActivity {
         VoiceCallEngine.getInstance().leaveChannel();
 
         thread.interrupt();
+
+        if (mWakeLock != null && mWakeLock.isHeld()) {
+            mWakeLock.release();
+        }
     }
 
 
