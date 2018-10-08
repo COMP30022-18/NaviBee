@@ -1,13 +1,8 @@
 package au.edu.unimelb.eng.navibee.social;
 
-import androidx.appcompat.app.AppCompatActivity;
-import au.edu.unimelb.eng.navibee.R;
-import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -15,6 +10,10 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import androidx.appcompat.app.AppCompatActivity;
+import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
 
 public class LocationDisplayActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -47,8 +46,8 @@ public class LocationDisplayActivity extends AppCompatActivity implements OnMapR
     public void onMapReady(GoogleMap googleMap) {
         LatLng location = new LatLng(lat, lon);
         googleMap.addMarker(new MarkerOptions().position(location));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
         googleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM_LEVEL));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
     }
 
     public void onFabClick(final View view) {
