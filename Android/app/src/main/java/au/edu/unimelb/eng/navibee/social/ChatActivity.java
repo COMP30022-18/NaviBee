@@ -5,13 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,17 +25,20 @@ import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.event.EventDetailsActivity;
 import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 
 
-public class ChatActivity extends AppCompatActivity implements View.OnClickListener, IPickResult {
+public class ChatActivity extends AppCompatActivity implements IPickResult {
 
     private Conversation conversation;
     private boolean isPrivate;
@@ -105,49 +102,42 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.btn_send_message:
-                EditText editText = (EditText)findViewById(R.id.edit_text_message);
-                String text = editText.getText().toString();
-                if (!text.equals("")) {
-                    conversation.sendMessage("text", text);
-                    editText.setText("");
-                }
-                break;
+    public void onClickSend(View view) {
+        EditText editText = findViewById(R.id.edit_text_message);
+        String text = editText.getText().toString();
+        if (!text.equals("")) {
+            conversation.sendMessage("text", text);
+            editText.setText("");
+        }
+    }
 
-            case R.id.btn_send_extra:
-                String[] items;
+    public void onClickExtra(View view) {
+        String[] items;
 
-                if (isPrivate) {
-                    items = new String[]{"Picture", "Location", "Voice Call"};
-                } else {
-                    items = new String[]{"Picture", "Location"};
-                }
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Send");
-                builder.setItems(items, (dialog, which) -> {
-                    if (which==0) {
-                        PickImageDialog.build(new PickSetup().setSystemDialog(true)).show(ChatActivity.this);
-                    } else if (which==1) {
-                        try {
-                            PlacePicker.IntentBuilder builder1 = new PlacePicker.IntentBuilder();
-                            startActivityForResult(builder1.build(ChatActivity.this), PLACE_PICKER_REQUEST);
-                        } catch (Exception e) {
-                            Log.d("Chat", "send location error:" + e);
-                        }
-                    } else if (which==2) {
-                        String voiceCallChannelId = UUID.randomUUID().toString();
-                        conversation.sendMessage("voicecall", voiceCallChannelId);
-                    }
-                });
-                builder.show();
-
-                break;
+        if (isPrivate) {
+            items = new String[]{"Picture", "Location", "Voice Call"};
+        } else {
+            items = new String[]{"Picture", "Location"};
         }
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Send");
+        builder.setItems(items, (dialog, which) -> {
+            if (which==0) {
+                PickImageDialog.build(new PickSetup().setSystemDialog(true)).show(ChatActivity.this);
+            } else if (which==1) {
+                try {
+                    PlacePicker.IntentBuilder builder1 = new PlacePicker.IntentBuilder();
+                    startActivityForResult(builder1.build(ChatActivity.this), PLACE_PICKER_REQUEST);
+                } catch (Exception e) {
+                    Log.d("Chat", "send location error:" + e);
+                }
+            } else if (which==2) {
+                String voiceCallChannelId = UUID.randomUUID().toString();
+                conversation.sendMessage("voicecall", voiceCallChannelId);
+            }
+        });
+        builder.show();
     }
 
     @Override
