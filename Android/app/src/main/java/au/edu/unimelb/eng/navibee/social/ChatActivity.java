@@ -6,12 +6,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,10 +36,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import au.edu.unimelb.eng.navibee.BuildConfig;
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.event.EventDetailsActivity;
 import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
+import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
 
 
 public class ChatActivity extends AppCompatActivity implements IPickResult {
@@ -45,7 +51,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
 
     private RecyclerView chatRecyclerView;
     private RecyclerView.Adapter chatAdapter;
-    private RecyclerView.LayoutManager chatLayoutManager;
+    private LinearLayoutManager chatLayoutManager;
 
     int PLACE_PICKER_REQUEST = 2;
 
@@ -67,7 +73,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
         conversation = ConversationManager.getInstance().getConversation(convId);
         isPrivate = conversation instanceof PrivateConversation;
 
-        chatRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_chat);
+        chatRecyclerView = findViewById(R.id.recycler_view_chat);
         chatRecyclerView.setHasFixedSize(true);
         chatLayoutManager = new LinearLayoutManager(this);
         chatRecyclerView.setLayoutManager(chatLayoutManager);
@@ -81,6 +87,12 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
         registerReceiver(br, intFilt);
 
         scrollToBottom();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(br);
     }
 
     private void loadNewMsg() {
@@ -163,12 +175,18 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
 
     public static class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHolder> implements View.OnClickListener {
 
+        private Gson gson = new Gson();
 
         public static class MessageViewHolder extends RecyclerView.ViewHolder{
+
+            private View content;
 
             public MessageViewHolder(@NonNull View itemView) {
                 super(itemView);
             }
+
+            public void setContentView(View content) { this.content = content; }
+            public View getContentView() { return content; }
         }
 
         private ArrayList<Conversation.Message> mDataset;
@@ -177,8 +195,21 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
 
         private final String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        private static final int VT_SEND=0;
-        private static final int VT_RECV=1;
+        private static final int VT_CONVERSATION_TYPE = 0b1;
+        private static final int VT_SEND = 0b0;
+        private static final int VT_RECV = 0b1;
+        private static final int VT_MESSAGE_TYPE = 0b1110;
+        private static final int VT_TEXT = 0b000;
+        private static final int VT_IMAGE = 0b001 << 1;
+        private static final int VT_LOCATION = 0b010 << 1;
+        private static final int VT_EVENT = 0b011 << 1;
+        private static final int VT_VOICE_CALL = 0b100 << 1;
+
+        private static final String STATIC_MAP_URL =
+                "https://maps.googleapis.com/maps/api/staticmap?" +
+                "zoom=16&size=640x320&scale=2&maptype=roadmap&sensor=true&center=%s" +
+                "&markers=color:red|%s&key=" +
+                BuildConfig.GOOGLE_PLACES_API_KEY;
 
         // Provide a suitable constructor (depends on the kind of dataset)
         public ChatAdapter(ArrayList<Conversation.Message> myDataset, RecyclerView recyclerView, ChatActivity chatActivity) {
@@ -194,26 +225,76 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
 
         @Override
         public int getItemViewType(int position) {
-            // Just as an example, return 0 or 2 depending on position
-            // Note that unlike in ListView adapters, types don't have to be contiguous
-            return mDataset.get(position).getSender().equals(uid)? VT_SEND: VT_RECV;
+            Conversation.Message m = mDataset.get(position);
+            int type = m.getSender().equals(uid) ? VT_SEND : VT_RECV;
+            switch (m.getType()) {
+                case "text": type |= VT_TEXT; break;
+                case "image": type |= VT_IMAGE; break;
+                case "voicecall": type |= VT_VOICE_CALL; break;
+                case "location": type |= VT_LOCATION; break;
+                case "event": type |= VT_EVENT; break;
+            }
+            return type;
         }
 
 
         // Create new views (invoked by the layout manager)
+        @NonNull
         @Override
         public MessageViewHolder onCreateViewHolder(ViewGroup parent,
                                                        int viewType) {
             int resource;
-            if (chatActivity.isPrivate) {
-                resource = (viewType==VT_RECV)? R.layout.layout_recipient_message: R.layout.layout_sender_message;
+            int theme;
+
+            if ((viewType & VT_CONVERSATION_TYPE) == VT_RECV) {
+                if (chatActivity.isPrivate) {
+                    resource = R.layout.layout_recipient_message;
+                } else {
+                    resource = R.layout.layout_recipient_message_group;
+                }
+                theme = R.style.AppTheme_Messaging_Other;
             } else {
-                resource = (viewType==VT_RECV)? R.layout.layout_recipient_message_group: R.layout.layout_sender_message;
+                resource = R.layout.layout_sender_message;
+                theme = R.style.AppTheme_Messaging_Self;
+            }
+            LayoutInflater lf = LayoutInflater.from(
+                    new ContextThemeWrapper(parent.getContext(), theme)
+            );
+            View v = lf.inflate(resource, parent, false);
+            RelativeLayout f = v.findViewById(R.id.chat_message_content);
+
+            switch (viewType & VT_MESSAGE_TYPE) {
+                default:
+                case VT_TEXT:
+                    resource = R.layout.layout_text_message;
+                    break;
+                case VT_LOCATION:
+                case VT_IMAGE:
+                    resource = R.layout.layout_photo_message;
+                    break;
+                case VT_VOICE_CALL:
+                    resource = R.layout.layout_voice_message;
+                    break;
+                case VT_EVENT:
+                    resource = R.layout.layout_event_message;
+                    break;
             }
 
-            View v = LayoutInflater.from(parent.getContext()).inflate(resource, parent, false);
+            View cv = lf.inflate(resource, f, false);
+
+            if ((viewType & VT_CONVERSATION_TYPE) == VT_RECV) {
+                f.setGravity(Gravity.START);
+            } else {
+                f.setGravity(Gravity.END);
+            }
+
+            f.addView(cv);
+
             v.setOnClickListener(this);
+
             MessageViewHolder vh = new MessageViewHolder(v);
+            vh.setContentView(cv);
+
             return vh;
         }
 
@@ -224,32 +305,40 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
             // - replace the contents of the view with that element
 
             Conversation.Message msg = mDataset.get(position);
+            View content = holder.getContentView();
 
-            ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.GONE);
-            ((ImageView) holder.itemView.findViewById(R.id.message_image)).setVisibility(View.GONE);
+//            ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.GONE);
+//            ((ImageView) holder.itemView.findViewById(R.id.message_image)).setVisibility(View.GONE);
 
-            if (msg.getType().equals("text")) {
-                ((TextView) holder.itemView.findViewById(R.id.message_text)).setText(msg.getData());
-                ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
-            } else if (msg.getType().equals("image")) {
-                ((ImageView) holder.itemView.findViewById(R.id.message_image)).setVisibility(View.VISIBLE);
-                FirebaseStorageHelper.loadImage(((ImageView) holder.itemView.findViewById(R.id.message_image)), msg.getData(), true);
-            } else if (msg.getType().equals("voicecall")) {
-                ((TextView) holder.itemView.findViewById(R.id.message_text)).setText("[Voice Call]");
-                ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
-            } else if (msg.getType().equals("location")) {
-                ((TextView) holder.itemView.findViewById(R.id.message_text)).setText("[Location]");
-                ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
-            } else if (msg.getType().equals("event")) {
-                String text = "[Event] ";
-
-                Gson gson = new Gson();
-                Map<String, String> data = gson.fromJson(msg.getData(), Map.class);
-
-                text = text + data.get("name");
-
-                ((TextView) holder.itemView.findViewById(R.id.message_text)).setText(text);
-                ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
+            TextView textView = content.findViewById(R.id.message_text);
+            TextView descView = content.findViewById(R.id.message_description);
+            ImageView imageView = content.findViewById(R.id.message_image);
+            switch (msg.getType()) {
+                case "text": {
+                    textView.setText(msg.getData());
+                    break;
+                }
+                case "image":
+                    FirebaseStorageHelper.loadImage(imageView, msg.getData(), true);
+                    break;
+                case "voicecall":
+                    CharSequence time =
+                            DateUtils.getRelativeTimeSpanString(msg.getTime_().getTime());
+                    textView.setText(time);
+                    break;
+                case "location":
+                    double[] coord = gson.fromJson(msg.getData(), double[].class);
+                    String coordText = coord[0] + "," + coord[1];
+                    String previewUrl = String.format(STATIC_MAP_URL, coordText, coordText);
+                    new URLImageViewCacheLoader(previewUrl, imageView).execute();
+                    break;
+                case "event": {
+                    Gson gson = new Gson();
+                    Map<String, String> data = gson.fromJson(msg.getData(), Map.class);
+                    String text = data.get("name");
+                    textView.setText(text);
+                    break;
+                }
             }
 
             // set user name
@@ -270,29 +359,34 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
         public void onClick(final View view) {
             int itemPosition = mRecyclerView.getChildLayoutPosition(view);
             Conversation.Message msg = mDataset.get(itemPosition);
-            if (msg.getType().equals("image")) {
-                Intent intent = new Intent(chatActivity.getBaseContext(), ChatImageViewActivity.class);
-                intent.putExtra("IMG_FS_PATH", msg.getData());
-                chatActivity.startActivity(intent);
-            } else if (msg.getType().equals("location")) {
-                Gson gson = new Gson();
-                double[] coord = gson.fromJson(msg.getData(), double[].class);
+            switch (msg.getType()) {
+                case "image": {
+                    Intent intent = new Intent(chatActivity.getBaseContext(), ChatImageViewActivity.class);
+                    intent.putExtra("IMG_FS_PATH", msg.getData());
+                    chatActivity.startActivity(intent);
+                    break;
+                }
+                case "location": {
+                    double[] coord = gson.fromJson(msg.getData(), double[].class);
 
-                Intent intent = new Intent(chatActivity.getBaseContext(), LocationDisplayActivity.class);
-                intent.putExtra(NavigationSelectorActivity.EXTRA_LATITUDE, coord[0]);
-                intent.putExtra(NavigationSelectorActivity.EXTRA_LONGITUDE, coord[1]);
+                    Intent intent = new Intent(chatActivity.getBaseContext(), LocationDisplayActivity.class);
+                    intent.putExtra(NavigationSelectorActivity.EXTRA_LATITUDE, coord[0]);
+                    intent.putExtra(NavigationSelectorActivity.EXTRA_LONGITUDE, coord[1]);
 
-                chatActivity.startActivity(intent);
+                    chatActivity.startActivity(intent);
 
-            } else if (msg.getType().equals("event")) {
-                Gson gson = new Gson();
-                Map<String, String> data = gson.fromJson(msg.getData(), Map.class);
+                    break;
+                }
+                case "event": {
+                    Map<String, String> data = gson.fromJson(msg.getData(), Map.class);
 
-                Intent intent = new Intent(chatActivity.getBaseContext(), EventDetailsActivity.class);
+                    Intent intent = new Intent(chatActivity.getBaseContext(), EventDetailsActivity.class);
 
-                intent.putExtra("eventId", data.get("eid"));
-                chatActivity.startActivity(intent);
+                    intent.putExtra("eventId", data.get("eid"));
+                    chatActivity.startActivity(intent);
 
+                    break;
+                }
             }
 
         }
