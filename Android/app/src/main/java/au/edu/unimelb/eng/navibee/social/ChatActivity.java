@@ -76,6 +76,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
         chatRecyclerView = findViewById(R.id.recycler_view_chat);
         chatRecyclerView.setHasFixedSize(true);
         chatLayoutManager = new LinearLayoutManager(this);
+        chatLayoutManager.setStackFromEnd(true);
         chatRecyclerView.setLayoutManager(chatLayoutManager);
         chatAdapter = new ChatAdapter(conversation.getCurrentMessageList(), chatRecyclerView, this);
         chatRecyclerView.setAdapter(chatAdapter);
@@ -169,7 +170,8 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
 
 
     public void scrollToBottom() {
-            chatRecyclerView.scrollToPosition(chatAdapter.getItemCount() - 1);
+        if (chatAdapter.getItemCount() > 0)
+            chatRecyclerView.smoothScrollToPosition(chatAdapter.getItemCount() - 1);
     }
 
 
