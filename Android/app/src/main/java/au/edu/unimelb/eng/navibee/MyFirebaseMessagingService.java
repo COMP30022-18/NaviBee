@@ -19,6 +19,7 @@ import java.util.Set;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import au.edu.unimelb.eng.navibee.social.Conversation;
 import au.edu.unimelb.eng.navibee.social.ConversationManager;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
@@ -32,12 +33,21 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         if (remoteMessage.getData() != null) {
 
-//            ConversationManager cm = ConversationManager.getInstance();
-//            if (cm != null) {
-//                // app is running
-//            }
-
             Map<String, String> data = remoteMessage.getData();
+
+            ConversationManager cm = ConversationManager.getInstance();
+            if (cm != null) {
+                // app is running
+                Conversation conv = cm.getConversation(data.get("convID"));
+                if (conv!=null) {
+                    if ((conv.getMessageById(data.get("msgID")) != null)&&conv.getUnreadMsgCount()==0) {
+                        // msg already been read
+                        return;
+                    }
+                }
+            }
+
+
             String content = "";
 
             // TODO: strings
