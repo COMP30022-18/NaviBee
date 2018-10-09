@@ -4,21 +4,26 @@ package au.edu.unimelb.eng.navibee;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import au.edu.unimelb.eng.navibee.social.ConversationManager;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public static final String CHANNEL_ID = "Default";
+    public static final String NOTIFICATION_PREFS_NAME = "NotificationIDs";
 
 
     @Override
@@ -26,6 +31,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         super.onMessageReceived(remoteMessage);
 
         if (remoteMessage.getData() != null) {
+
+//            ConversationManager cm = ConversationManager.getInstance();
+//            if (cm != null) {
+//                // app is running
+//            }
+
             Map<String, String> data = remoteMessage.getData();
             String content = "";
 
@@ -71,9 +82,21 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             // TODO: save notification id
             int id = createID();
             notificationManager.notify(id, notification);
+
+            saveNotification(id, data.get("convID"));
         }
 
     }
+
+    private void saveNotification(int id, String convID) {
+        SharedPreferences prefs = getSharedPreferences(NOTIFICATION_PREFS_NAME, MODE_PRIVATE);
+        Set<String> ids = prefs.getStringSet(convID, new HashSet<>());
+
+        ids.add(Integer.toString(id));
+
+        prefs.edit().putStringSet(convID, ids).apply();
+    }
+
 
     private int createID(){
         Date now = new Date();
