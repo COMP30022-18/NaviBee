@@ -24,6 +24,7 @@
     <string name="sos_setting">SOS Setting</string>
     <string name="sos_setting_btn">Save</string>
     <string name="button_yes">Yes</string>
+    <string name="button_ok">Ok</string>
     <string name="button_cancel">Cancel</string>
     <string name="voice_recognition_result_check_title">Did you say…?</string>
     <string name="fail_to_get_last_location">Failed to get your current location. Please retry later in a more open place with your GPS settings turned on.</string>
@@ -188,6 +189,8 @@
     <string name="action_navigation_say_a_place">Say a place</string>
     <string name="navigation_destinations_header_recent_destinations">Recent destinations</string>
     <string name="navigation_destinations_header_recommended_places">Recommended places</string>
+    <string name="navigation_failed_to_fetch_route">Sorry, we didn\'t manage to find a route to your destination.</string>
+    <string name="navigation_connection_error">Failed to fetch a route for navigation, please try again.</string>
 
     <string name="landing_welcome_line">Hi, %s!\nHow can I help you today?</string>
     <string name="navigation_your_location">Your location</string>
@@ -200,6 +203,13 @@
         <item quantity="one">Ride %1$d stop (%2$s)</item>
         <item quantity="other">Ride %1$d stops (%2$s)</item>
     </plurals>
+
+    <string name="friend_scan_qr_code">Scan your friend\'s QR code.</string>
+    <string name="friend_scan_qr_code_with_nfc">Scan your friend\'s QR code\nor place both phones back to back and touch your screen.</string>
+    <string name="friend_wrong_qr_code">This is not a NaviBee QR code.</string>
+    <string name="friend_show_my_qr">Show my QR code</string>
+
+    <string name="error_failed_to_connect_to_server">Failed to connect to server. Please check your internet connection.</string>
 
     <!-- Strings related to Settings -->
     <string name="pref_section_title_navigation">Navigation</string>

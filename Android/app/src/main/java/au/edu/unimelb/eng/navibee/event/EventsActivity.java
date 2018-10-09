@@ -1,9 +1,9 @@
-package au.edu.unimelb.eng.navibee;
+package au.edu.unimelb.eng.navibee.event;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.utils.EventRVDivider;
 import au.edu.unimelb.eng.navibee.utils.EventRVEntry;
 import au.edu.unimelb.eng.navibee.utils.EventRVIndefiniteProgressBar;
@@ -40,25 +40,44 @@ public class EventsActivity extends AppCompatActivity {
         private Map<String, Boolean> users;
         private Boolean isTag = false;
         private ArrayList<String> images;
+        private String placeName;
+        private double longitude;
+        private double latitude;
 
         public EventItem(){}
 
-        public EventItem(String name, String holder, String location, Timestamp time, Map<String, Boolean> users, ArrayList<String> images){
+        public EventItem(String name, String holder, String location, Timestamp time, Map<String, Boolean> users, ArrayList<String> images, String placeName, double longitude, double latitude){
             this.holder = holder;
             this.name = name;
             this.location = location;
             this.users = users;
             this.time = time;
             this.images = images;
+            this.placeName = placeName;
+            this.longitude = longitude;
+            this.latitude = latitude;
         }
 
-        public EventItem(String name, String holder, String location, Date time, Map<String, Boolean> users, ArrayList<String> images){
+        public EventItem(String name, String holder, String location, Date time, Map<String, Boolean> users, ArrayList<String> images, String placeName, double longitude, double latitude){
             this.holder = holder;
             this.name = name;
             this.location = location;
             this.users = users;
             this.time = new Timestamp(time);
             this.images = images;
+            this.placeName = placeName;
+            this.longitude = longitude;
+            this.latitude = latitude;
+        }
+
+        public String getPlaceName(){ return placeName; }
+
+        public double getLongitude() {
+            return longitude;
+        }
+
+        public double getLatitude() {
+            return latitude;
         }
 
         public String getHolder() { return holder; }
@@ -95,7 +114,9 @@ public class EventsActivity extends AppCompatActivity {
 
         public ArrayList<String> getImages() {
             ArrayList<String> result = new ArrayList<>();
-            result.addAll(images);
+            if(images != null) {
+                result.addAll(images);
+            }
             return result;
         }
 
@@ -211,20 +232,8 @@ public class EventsActivity extends AppCompatActivity {
                     i.getName(),
                     i.getLocation(),
                     view -> {
-                        String relationship;
-                        if(i.getHolder().equals(uid)) {
-                            relationship = "holder";
-                        }
-                        else if(i.getUsers().keySet().contains(uid)){
-                            relationship = "participant";
-                        }
-                        else {
-                            relationship = "passerby";
-                        }
-
                         Intent intent = new Intent(EventsActivity.this, EventDetailsActivity.class);
                         intent.putExtra("eventId", i.getEventId());
-                        intent.putExtra("relationship", relationship);
                         startActivity(intent);
                     }
             ));

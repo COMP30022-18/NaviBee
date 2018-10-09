@@ -36,9 +36,12 @@ import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.event.EventDetailsActivity;
 import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 
@@ -305,6 +308,16 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             } else if (msg.getType().equals("location")) {
                 ((TextView) holder.itemView.findViewById(R.id.message_text)).setText("[Location]");
                 ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
+            } else if (msg.getType().equals("event")) {
+                String text = "[Event] ";
+
+                Gson gson = new Gson();
+                Map<String, String> data = gson.fromJson(msg.getData(), Map.class);
+
+                text = text + data.get("name");
+
+                ((TextView) holder.itemView.findViewById(R.id.message_text)).setText(text);
+                ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
             }
 
             // set user name
@@ -339,7 +352,17 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
                 chatActivity.startActivity(intent);
 
+            } else if (msg.getType().equals("event")) {
+                Gson gson = new Gson();
+                Map<String, String> data = gson.fromJson(msg.getData(), Map.class);
+
+                Intent intent = new Intent(chatActivity.getBaseContext(), EventDetailsActivity.class);
+
+                intent.putExtra("eventId", data.get("eid"));
+                chatActivity.startActivity(intent);
+
             }
+
         }
 
     }

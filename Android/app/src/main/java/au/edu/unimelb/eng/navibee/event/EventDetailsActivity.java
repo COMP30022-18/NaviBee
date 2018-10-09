@@ -1,4 +1,4 @@
-package au.edu.unimelb.eng.navibee;
+package au.edu.unimelb.eng.navibee.event;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,7 +27,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.synnapps.carouselview.CarouselView;
-import com.synnapps.carouselview.ImageListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,11 +37,16 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
+import au.edu.unimelb.eng.navibee.social.LocationDisplayActivity;
 import au.edu.unimelb.eng.navibee.social.UserInfoManager;
+import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVIndefiniteProgressBar;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVTextPrimarySecondaryStatic;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVTextSecondaryPrimaryStatic;
@@ -75,14 +78,16 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (relationship.equals("holder")) {
-            menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Edit the Event");
-            menu.add(Menu.NONE, Menu.FIRST + 1, 1, "Delete the Event");
-        } else if (relationship.equals("participant")) {
-            menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Quit the Event");
-        } else {
-            menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Join the Event");
-            menu.add(Menu.NONE, Menu.FIRST + 1, 1, "Follow the Event");
+        if(relationship != null){
+            if (relationship.equals("holder")) {
+                //            menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Edit the Event");
+                menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Delete the Event");
+            } else if (relationship.equals("participant")) {
+                menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Quit the Event");
+            } else {
+                menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Join the Event");
+                //            menu.add(Menu.NONE, Menu.FIRST + 1, 1, "Follow the Event");
+            }
         }
         getMenuInflater().inflate(R.menu.menu_event_detial, menu);
         return true;
@@ -96,14 +101,12 @@ public class EventDetailsActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         eid = getIntent().getStringExtra("eventId");
-        relationship = getIntent().getStringExtra("relationship");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.event_details_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                startNavigation();
             }
         });
 
@@ -167,21 +170,12 @@ public class EventDetailsActivity extends AppCompatActivity {
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
 
         // Carousel view
-        carouselView = (CarouselView) findViewById(R.id.event_details_image_preview);
-        carouselView.setPageCount(1);
-        carouselView.setImageListener(new ImageListener() {
-            @Override
-            public void setImageForPosition(int position, ImageView imageView) {
-//                imageView.setImageBitmap();
-//                imageView.setImageResource(R.drawable.navibee_placeholder);
-                imageView.setImageDrawable(getResources().getDrawable(R.drawable.navibee_placeholder));
+        carouselView = findViewById(R.id.event_details_image_preview);
+        carouselView.setPageCount(0);
+        carouselView.setImageListener((position, imageView) -> {
+            imageView.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.navibee_placeholder));
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    imageView.setImageDrawable(getResources().getDrawable(R.drawable.navibee_placeholder, null));
-                } else {
-                    imageView.setImageDrawable(getResources().getDrawable(R.drawable.navibee_placeholder));
-                }
-            }
+            FirebaseStorageHelper.loadImage(imageView, eventItem.getImages().get(position), true);
         });
 
         // Layout adjustment
@@ -231,11 +225,31 @@ public class EventDetailsActivity extends AppCompatActivity {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 eventItem = documentSnapshot.toObject(EventsActivity.EventItem.class);
+                if (eventItem.getImages().size() != 0) {
+                    carouselView.setPageCount(eventItem.getImages().size());
+                }
 
                 getEventInfo();
+
+                // finish fetch event info
+                relationship = getRelationship(eventItem);
+                invalidateOptionsMenu();
             }
         });
+    }
 
+    private String getRelationship(EventsActivity.EventItem eventItem){
+        String relationship;
+        if(eventItem.getHolder().equals(uid)) {
+            relationship = "holder";
+        }
+        else if(eventItem.getUsers().keySet().contains(uid)){
+            relationship = "participant";
+        }
+        else {
+            relationship = "passerby";
+        }
+        return relationship;
     }
 
     private void getEventInfo() {
@@ -309,9 +323,9 @@ public class EventDetailsActivity extends AppCompatActivity {
         }
 
         // Event location
-        if (eventItem.getLocation() != null) {
+        if (eventItem.getPlaceName() != null) {
             listItems.add(new SimpleRVTextSecondaryPrimaryStatic(
-                    eventItem.getLocation(),
+                    eventItem.getPlaceName(),
                     getResources().getString(R.string.event_details_location)
             ));
         }
@@ -345,13 +359,16 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (relationship.equals("holder")) {
+        if(relationship == null){
+            return true;
+        }
+        else if (relationship.equals("holder")) {
             switch (item.getItemId()) {
+//                case Menu.FIRST + 0:
+//                    Toast.makeText(this, "Edit is clicked", Toast.LENGTH_SHORT).show();
+//                    editEvent();
+//                    break;
                 case Menu.FIRST + 0:
-                    Toast.makeText(this, "Edit is clicked", Toast.LENGTH_SHORT).show();
-                    editEvent();
-                    break;
-                case Menu.FIRST + 1:
                     Toast.makeText(this, "Delete is clicked", Toast.LENGTH_SHORT).show();
                     deleteEvent();
                     break;
@@ -373,9 +390,9 @@ public class EventDetailsActivity extends AppCompatActivity {
                     Toast.makeText(this, "Join is clicked", Toast.LENGTH_SHORT).show();
                     joinEvent();
                     break;
-                case Menu.FIRST + 1:
-                    Toast.makeText(this, "Follow is clicked", Toast.LENGTH_SHORT).show();
-                    break;
+//                case Menu.FIRST + 1:
+//                    Toast.makeText(this, "Follow is clicked", Toast.LENGTH_SHORT).show();
+//                    break;
                 default:
                     break;
             }
@@ -468,43 +485,14 @@ public class EventDetailsActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void editEvent() {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("Alert");
-        dialog.setMessage("Are you sure you want to EDIT this event?");
-        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                dialoginterface.cancel();
-            }
-        });
-        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                // collect event info and start edit event activity
-                Intent intent = new Intent(EventDetailsActivity.this, EventEditActivity.class);
-                intent.putExtra("isEdit", true);
-                // pass event name
-                intent.putExtra("eventName", eventItem.getName());
-                // pass selectedUidList and selectedNameList
-                ArrayList<String> selectedUidList = new ArrayList<>();
-                ArrayList<String> selectedNameList = new ArrayList<>();
-                for(String uid: eventItem.getUsers().keySet()){
-                    if(!uid.equals(eventItem.getHolder())){
-                        selectedUidList.add(uid);
-                        selectedNameList.add(userMap.get(uid));
-                    }
-                }
-                intent.putExtra("selectedUidList", selectedUidList);
-                intent.putExtra("selectedNameList", selectedNameList);
-                // pass date
-                intent.putExtra("eventTime", eventItem.getTime_().getTime());
-                // pass eventId
-                intent.putExtra("eventId", eid);
+    private void startNavigation(){
 
-                startActivity(intent);
-                finish();
-            }
-        });
-        dialog.show();
+        Intent intent = new Intent(getBaseContext(), NavigationSelectorActivity.class);
+        intent.putExtra(NavigationSelectorActivity.EXTRA_LATITUDE, eventItem.getLatitude());
+        intent.putExtra(NavigationSelectorActivity.EXTRA_LONGITUDE, eventItem.getLongitude());
+//        intent.putExtra(NavigationSelectorActivity.EXTRA_DESTINATION_NAME, eventItem.getPlaceName());
+
+        startActivity(intent);
     }
 
 }

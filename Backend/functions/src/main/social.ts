@@ -34,6 +34,8 @@ export const newMessageNotification = functions.firestore
             content = "[Voice Call]"
         } else if (doc.type == "location") {
             content = "[Location]"
+        } else if (doc.type == "event") {
+            content = "[Event]"
         }
 
         // android payload

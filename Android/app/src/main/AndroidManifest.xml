@@ -10,6 +10,9 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.NFC" />
+
+    <uses-feature android:name="android.hardware.nfc" />
 
     <application
         android:name=".NaviBeeApplication"
@@ -27,17 +30,6 @@
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
-
-        <!-- Services -->
-
-        <service
-            android:name="com.here.android.mpa.service.MapService"
-            android:exported="false"
-            android:label="NaviBeeHereMapService">
-            <intent-filter>
-                <action android:name="au.edu.unimelb.eng.navibee.hereService" />
-            </intent-filter>
-        </service>
 
         <!-- Metadata -->
 
@@ -78,7 +70,10 @@
         <activity
             android:name=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
-        <activity android:name=".EventSelectFriendsActivity" />
+        <activity
+            android:name=".EventActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity android:name=".event.EventSelectFriendsActivity" />
         <activity
             android:name=".SosActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -150,23 +145,44 @@
         <activity
             android:name=".social.ChatActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".social.AddFriendQRActivity" />
+        <activity android:name=".social.AddFriendQRActivity"
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar">
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="application/navibee" />
+            </intent-filter>
+        </activity>
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="android:screenOrientation" />
-        <activity android:name=".EventEditActivity" />
+        <activity android:name=".event.EventEditActivity" />
         <activity
-            android:name=".EventDetailsActivity"
-            android:parentActivityName=".EventsActivity"
+            android:name=".SosSettingActivity"
+            android:label="@string/sos_setting" />
+        <activity
+            android:name=".event.EventDetailsActivity"
+            android:parentActivityName=".event.EventsActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
         <activity
             android:name=".social.ChatImageViewActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".EventPicFullscreenActivity" />
         <activity
-            android:name=".EventsActivity"
-            android:label="@string/landing_events" />
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".event.EventPicFullscreenActivity">
+        </activity>
+        <activity
+            android:name=".event.EventsActivity"
+            android:label="@string/landing_events">
+        </activity>
         <activity
             android:name=".social.VoiceCallActivity"
             android:theme="@style/AppTheme.NoActionBar" />

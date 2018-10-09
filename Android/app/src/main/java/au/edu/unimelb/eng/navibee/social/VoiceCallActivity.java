@@ -2,31 +2,28 @@ package au.edu.unimelb.eng.navibee.social;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.TypedValue;
+import android.os.PowerManager;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
-import io.agora.rtc.RtcEngine;
 
 import au.edu.unimelb.eng.navibee.R;
 
 public class VoiceCallActivity extends AppCompatActivity {
 
 
-    private static final int MY_PERMISSIONS_RECORD_AUDIO = 1;
+    private static final int PERMISSIONS_RECORD_AUDIO = 1;
 
     public static final int VOCIECALL_EXPIRE = 60 * 1000;
 
@@ -61,6 +58,9 @@ public class VoiceCallActivity extends AppCompatActivity {
     private boolean callStarted = false;
     private int padding;
 
+    private PowerManager mPowerManager;
+    private PowerManager.WakeLock mWakeLock;
+
 
     private long timeCount;
     Thread thread = new Thread() {
@@ -70,15 +70,12 @@ public class VoiceCallActivity extends AppCompatActivity {
             try {
                 while (!thread.isInterrupted()) {
                     Thread.sleep(1000);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            timeCount += 1;
-                            String text = String.format("%d:%02d:%02d", (timeCount / 60 / 60) % 60,
-                                        (timeCount / 60) % 60, timeCount % 60);
-                            textViewTime.setText(text);
+                    runOnUiThread(() -> {
+                        timeCount += 1;
+                        String text = String.format("%d:%02d:%02d", (timeCount / 60 / 60) % 60,
+                                    (timeCount / 60) % 60, timeCount % 60);
+                        textViewTime.setText(text);
 
-                        }
                     });
                 }
             } catch (InterruptedException e) {
@@ -89,34 +86,33 @@ public class VoiceCallActivity extends AppCompatActivity {
     private final VoiceCallEngine.EventHandler mEventHandler = new VoiceCallEngine.EventHandler() {
         @Override
         public void onUserOffline(final int uid, final int reason) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    showDialogAndClose("Call Cancelled.");
-                }
-            });
+            runOnUiThread(() -> showDialogAndClose("Call Cancelled."));
         }
 
         @Override
         public void  onUserJoined(int uid, int elapsed) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (!callStarted) {
-                        // call started
-                        callStarted = true;
-                        timeoutTimer.cancel();
-                        timeoutTimer.purge();
-                        timeCount = 0;
-                        textViewStatus.setText("");
-                        textViewTime.setVisibility(View.VISIBLE);
-                        changingDot.setVisibility(View.INVISIBLE);
-                        buttonMic.setVisibility(View.VISIBLE);
-                        buttonSpeaker.setVisibility(View.VISIBLE);
-                        thread.start();
-                    }
+            runOnUiThread(() -> {
+                if (!callStarted) {
+                    // call started
+                    callStarted = true;
+                    timeoutTimer.cancel();
+                    timeoutTimer.purge();
+                    timeCount = 0;
+                    textViewStatus.setText("");
+                    textViewTime.setVisibility(View.VISIBLE);
+                    changingDot.setVisibility(View.INVISIBLE);
+                    buttonMic.setVisibility(View.VISIBLE);
+                    buttonSpeaker.setVisibility(View.VISIBLE);
+                    thread.start();
 
+                    if (mWakeLock == null) {
+                        mWakeLock = mPowerManager.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "Navibee:VoiceCall");
+                    }
+                    if (!mWakeLock.isHeld()) {
+                        mWakeLock.acquire();
+                    }
                 }
+
             });
         }
     };
@@ -155,30 +151,29 @@ public class VoiceCallActivity extends AppCompatActivity {
         changingDot = findViewById(R.id.voicecall_textView_dot);
 
         padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics());
+        mPowerManager = (PowerManager) getSystemService(POWER_SERVICE);
+
 
         new Thread() {
             public void run() {
                 try {
                     while (!thread.isInterrupted()) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                dotCount++;
-                                switch (dotCount) {
-                                    case 0:
-                                        changingDot.setText("");
-                                        break;
-                                    case 1:
-                                        changingDot.setText(".");
-                                        break;
-                                    case 2:
-                                        changingDot.setText("..");
-                                        break;
-                                    case 3:
-                                        changingDot.setText("...");
-                                        dotCount = -1;
-                                        break;
-                                }
+                        runOnUiThread(() -> {
+                            dotCount++;
+                            switch (dotCount) {
+                                case 0:
+                                    changingDot.setText("");
+                                    break;
+                                case 1:
+                                    changingDot.setText(".");
+                                    break;
+                                case 2:
+                                    changingDot.setText("..");
+                                    break;
+                                case 3:
+                                    changingDot.setText("...");
+                                    dotCount = -1;
+                                    break;
                             }
                         });
                         Thread.sleep(300);
@@ -209,11 +204,7 @@ public class VoiceCallActivity extends AppCompatActivity {
             answerTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            showDialogAndClose("Call Cancelled.");
-                        }
-                    });
+                    runOnUiThread(() -> showDialogAndClose("Call Cancelled."));
                 }
             }, ANSWER_TIMEOUT);
         }
@@ -276,11 +267,7 @@ public class VoiceCallActivity extends AppCompatActivity {
             timeoutTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            showDialogAndClose("No response from the other end");
-                        }
-                    });
+                    runOnUiThread(() -> showDialogAndClose("No response from the other end"));
                 }
             }, WAITING_TIMEOUT);
 
@@ -290,11 +277,7 @@ public class VoiceCallActivity extends AppCompatActivity {
             timeoutTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            showDialogAndClose("Unable to connect");
-                        }
-                    });
+                    runOnUiThread(() -> showDialogAndClose("Unable to connect"));
                 }
             }, CONNECTING_TIMEOUT);
         }
@@ -308,11 +291,9 @@ public class VoiceCallActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Do you want to cancel this call?")
                 .setNegativeButton("No", null)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        closeVoiceCall();
-                        finish();
-                    }
+                .setPositiveButton("Yes", (dialog, id) -> {
+                    closeVoiceCall();
+                    finish();
                 });
         AlertDialog alert = builder.create();
         alert.show();
@@ -320,7 +301,7 @@ public class VoiceCallActivity extends AppCompatActivity {
 
     private void checkPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, MY_PERMISSIONS_RECORD_AUDIO);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_RECORD_AUDIO);
         }
     }
 
@@ -330,11 +311,9 @@ public class VoiceCallActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(msg)
                 .setCancelable(false)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // go back
-                        finish();
-                    }
+                .setPositiveButton("OK", (dialog, id) -> {
+                    // go back
+                    finish();
                 });
         AlertDialog alert = builder.create();
         alert.show();
@@ -349,6 +328,10 @@ public class VoiceCallActivity extends AppCompatActivity {
         VoiceCallEngine.getInstance().leaveChannel();
 
         thread.interrupt();
+
+        if (mWakeLock != null && mWakeLock.isHeld()) {
+            mWakeLock.release();
+        }
     }
 
 
