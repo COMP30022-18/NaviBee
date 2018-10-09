@@ -7,6 +7,18 @@
     tools:context=".social.VoiceCallActivity"
     android:background="@color/md_grey_900">
 
+    <ImageView
+        android:id="@+id/voicecall_exit_full_screen"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_fullscreen_exit_white_24dp" />
+
     <TextView
         android:id="@+id/voicecall_textView_status"
         android:layout_width="wrap_content"
@@ -22,7 +34,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.1" />
+        app:layout_constraintVertical_bias="0.15" />
 
     <TextView
         android:id="@+id/voicecall_textView_dot"
@@ -39,7 +51,7 @@
         app:layout_constraintHorizontal_bias="0.01"
         app:layout_constraintStart_toEndOf="@+id/voicecall_textView_status"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.1" />
+        app:layout_constraintVertical_bias="0.15" />
     <ImageView
         android:id="@+id/voicecall_friend_icon"
         android:layout_width="183dp"
