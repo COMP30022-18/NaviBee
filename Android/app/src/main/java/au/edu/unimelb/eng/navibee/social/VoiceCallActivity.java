@@ -8,6 +8,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -52,8 +53,13 @@ public class VoiceCallActivity extends AppCompatActivity {
     private TextView friendName;
     private TextView changingDot;
     private int dotCount;
+    private ImageView buttonMic;
+    private ImageView buttonSpeaker;
+    private boolean micEnabled = true;
+    private boolean speakerEnabled = false;
 
     private boolean callStarted = false;
+    private int padding;
 
 
     private long timeCount;
@@ -103,6 +109,10 @@ public class VoiceCallActivity extends AppCompatActivity {
                         timeoutTimer.purge();
                         timeCount = 0;
                         textViewStatus.setText("");
+                        textViewTime.setVisibility(View.VISIBLE);
+                        changingDot.setVisibility(View.INVISIBLE);
+                        buttonMic.setVisibility(View.VISIBLE);
+                        buttonSpeaker.setVisibility(View.VISIBLE);
                         thread.start();
                     }
 
@@ -135,10 +145,16 @@ public class VoiceCallActivity extends AppCompatActivity {
         buttonHangup = findViewById(R.id.voicecall_button_hangup);
         buttonAccept = findViewById(R.id.voicecall_button_accept);
         buttonDecline = findViewById(R.id.voicecall_button_decline);
+        buttonMic = findViewById(R.id.voicecall_button_mic);
+        buttonSpeaker = findViewById(R.id.voicecall_button_speaker);
+        buttonMic.setVisibility(View.INVISIBLE);
+        buttonSpeaker.setVisibility(View.INVISIBLE);
 
         friendIcon = findViewById(R.id.voicecall_friend_icon);
         friendName = findViewById(R.id.voicecall_button_username);
         changingDot = findViewById(R.id.voicecall_textView_dot);
+
+        padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics());
 
         new Thread() {
             public void run() {
@@ -212,7 +228,6 @@ public class VoiceCallActivity extends AppCompatActivity {
                 buttonHangup.setVisibility(View.VISIBLE);
                 buttonAccept.setVisibility(View.INVISIBLE);
                 buttonDecline.setVisibility(View.INVISIBLE);
-
                 connect();
                 break;
             case R.id.voicecall_button_decline:
@@ -224,6 +239,32 @@ public class VoiceCallActivity extends AppCompatActivity {
             case R.id.voicecall_button_hangup:
                 closeVoiceCall();
                 finish();
+                break;
+            case R.id.voicecall_button_mic:
+                if (micEnabled){
+                    micEnabled = false;
+                    buttonMic.setImageResource(R.drawable.ic_mic_off_white_24dp);
+                    buttonMic.setBackgroundResource(R.drawable.voicecall_button_background_white_hollow);
+                }
+                else{
+                    micEnabled = true;
+                    buttonMic.setImageResource(R.drawable.ic_mic_black_24dp);
+                    buttonMic.setBackgroundResource(R.drawable.voicecall_mic_background);
+                }
+                buttonMic.setPadding(padding,padding,padding,padding);
+                break;
+            case R.id.voicecall_button_speaker:
+                if (speakerEnabled){
+                    speakerEnabled = false;
+                    buttonSpeaker.setImageResource(R.drawable.ic_speaker_white_24dp);
+                    buttonSpeaker.setBackgroundResource(R.drawable.voicecall_button_background_white_hollow);
+                }
+                else{
+                    speakerEnabled = true;
+                    buttonSpeaker.setImageResource(R.drawable.ic_speaker_black_24dp);
+                    buttonSpeaker.setBackgroundResource(R.drawable.voicecall_mic_background);
+                }
+                buttonSpeaker.setPadding(padding,padding,padding,padding);
                 break;
         }
     }
