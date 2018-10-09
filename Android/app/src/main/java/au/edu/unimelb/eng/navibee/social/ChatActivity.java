@@ -96,7 +96,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         dialog.setTitle("Alert");
-        dialog.setMessage("Sorry, this group chat has been deleted by the creator.");
+        dialog.setMessage("Sorry, this chat is out of dater.");
         dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialoginterface, int i) {
                 finish();
