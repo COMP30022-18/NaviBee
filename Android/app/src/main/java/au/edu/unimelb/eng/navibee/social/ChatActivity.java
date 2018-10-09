@@ -3,17 +3,22 @@ package au.edu.unimelb.eng.navibee.social;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -83,7 +88,61 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         IntentFilter intFilt = new IntentFilter(Conversation.BROADCAST_NEW_MESSAGE);
         registerReceiver(br, intFilt);
 
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.activity_chat_toolbar);
+        setSupportActionBar(myToolbar);
+
         scrollToBottom();
+
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("Alert");
+        dialog.setMessage("Sorry, this chat is out of dater.");
+        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialoginterface, int i) {
+                finish();
+            }
+        });
+
+        if (ConversationManager.getInstance().getConversation(convId) == null){
+            dialog.show();
+        }
+
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (ConversationManager.getInstance().getConversation(convId) == null){
+                    dialog.show();
+                }
+            }
+        }, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_chat_activity, menu);
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_chat_detail:
+                if (isPrivate){
+                    Intent intent = new Intent(this, FriendDetail.class);
+                    intent.putExtra("CONV_ID", conversation.getConvId());
+                    intent.putExtra("FRIEND_ID", ((PrivateConversation) conversation).getTargetUid());
+                    startActivity(intent);
+                }
+                else{
+                    Intent intent = new Intent(this, GroupDetailActivity.class);
+                    intent.putExtra("CONV_ID", conversation.getConvId());
+                    startActivity(intent);
+                }
+                return true;
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void loadNewMsg() {
@@ -144,7 +203,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
                 builder.show();
-
                 break;
         }
 
