@@ -30,12 +30,27 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
+import jdenticon.Jdenticon;
 
 public class GroupDetailActivity extends AppCompatActivity {
     private ConversationManager cm = ConversationManager.getInstance();
     private GroupConversation conv;
     private ArrayList<String> memberList;
     private String convId;
+
+    private BroadcastReceiver convUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (ConversationManager.getInstance().getConversation(convId) == null){
+                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+                dialog.setTitle("Alert");
+                dialog.setMessage("Sorry, this group chat has been deleted by the creator.");
+                dialog.setPositiveButton("Ok", (dialoginterface, i) -> finish());
+
+                dialog.show();
+            }
+        }
+    };
 
 
     public static class MemberAdapter extends BaseAdapter{
@@ -133,7 +148,8 @@ public class GroupDetailActivity extends AppCompatActivity {
         TextView groupName = findViewById(R.id.group_detail_name);
         groupName.setText(conv.getName());
         ImageView groupIcon = findViewById(R.id.group_detail_icon);
-        NetworkImageHelper.loadImage(groupIcon, conv.getIcon());
+
+        groupIcon.setImageBitmap(conv.getIconBitmap());
 
         Button button = findViewById(R.id.activity_group_detail_deleteGroup_button);
         if (!cm.getUid().equals(conv.getCreator())){
@@ -149,16 +165,15 @@ public class GroupDetailActivity extends AppCompatActivity {
                 finish();
             }
         });
-        registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (ConversationManager.getInstance().getConversation(convId) == null){
-                    dialog.show();
-                }
-            }
-        }, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
 
+        registerReceiver(convUpdateReceiver, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(convUpdateReceiver);
     }
 
     public void onClick(View view) {

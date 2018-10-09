@@ -82,7 +82,7 @@ public class FriendActivity extends AppCompatActivity {
                 });
             } else {
                 textView.setText(((GroupConversation) conv).getName());
-                imageView.setImageResource(R.drawable.ic_navibee_color);
+                imageView.setImageBitmap(((GroupConversation) conv).getIconBitmap());
             }
         }
 
@@ -197,6 +197,22 @@ public class FriendActivity extends AppCompatActivity {
     private RecyclerView recyclerFriendsList;
     private RecyclerView.LayoutManager recyclerFriendsManager;
 
+    private BroadcastReceiver convUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            loadContactList();
+            loadChatsList();
+        }
+    };
+    private BroadcastReceiver msgUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            recyclerFriendsAdapter.notifyDataSetChanged();
+            sortChatsList();
+            recyclerChatsAdapter.notifyDataSetChanged();
+        }
+    };
+
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -262,22 +278,16 @@ public class FriendActivity extends AppCompatActivity {
         loadChatsList();
         loadContactList();
 
-        registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                loadContactList();
-                loadChatsList();
-            }
-        }, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
+        registerReceiver(convUpdateReceiver, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
 
-        registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                recyclerFriendsAdapter.notifyDataSetChanged();
-                sortChatsList();
-                recyclerChatsAdapter.notifyDataSetChanged();
-            }
-        }, new IntentFilter(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE));
+        registerReceiver(msgUpdateReceiver, new IntentFilter(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(convUpdateReceiver);
+        unregisterReceiver(msgUpdateReceiver);
     }
 
 
