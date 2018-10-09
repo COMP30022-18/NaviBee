@@ -38,6 +38,20 @@ public class GroupDetailActivity extends AppCompatActivity {
     private ArrayList<String> memberList;
     private String convId;
 
+    private BroadcastReceiver convUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (ConversationManager.getInstance().getConversation(convId) == null){
+                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+                dialog.setTitle("Alert");
+                dialog.setMessage("Sorry, this group chat has been deleted by the creator.");
+                dialog.setPositiveButton("Ok", (dialoginterface, i) -> finish());
+
+                dialog.show();
+            }
+        }
+    };
+
 
     public static class MemberAdapter extends BaseAdapter{
         private Context context;
@@ -151,16 +165,15 @@ public class GroupDetailActivity extends AppCompatActivity {
                 finish();
             }
         });
-        registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (ConversationManager.getInstance().getConversation(convId) == null){
-                    dialog.show();
-                }
-            }
-        }, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
 
+        registerReceiver(convUpdateReceiver, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(convUpdateReceiver);
     }
 
     public void onClick(View view) {

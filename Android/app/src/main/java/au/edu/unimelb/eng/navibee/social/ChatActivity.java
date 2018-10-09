@@ -3,7 +3,6 @@ package au.edu.unimelb.eng.navibee.social;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 
@@ -36,7 +35,6 @@ import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -60,10 +58,19 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private int currentMsgCount = 0;
 
-    BroadcastReceiver br = new BroadcastReceiver() {
+    BroadcastReceiver msgUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             loadNewMsg();
+        }
+    };
+
+    BroadcastReceiver convUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (ConversationManager.getInstance().getConversation(conversation.getConvId()) == null){
+                finish();
+            }
         }
     };
 
@@ -85,36 +92,25 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         currentMsgCount = conversation.getMessageCount();
         conversation.markAllAsRead();
 
-        IntentFilter intFilt = new IntentFilter(Conversation.BROADCAST_NEW_MESSAGE);
-        registerReceiver(br, intFilt);
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.activity_chat_toolbar);
         setSupportActionBar(myToolbar);
 
         scrollToBottom();
 
-
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("Alert");
-        dialog.setMessage("Sorry, this chat is out of dater.");
-        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                finish();
-            }
-        });
-
         if (ConversationManager.getInstance().getConversation(convId) == null){
-            dialog.show();
+            finish();
         }
 
-        registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (ConversationManager.getInstance().getConversation(convId) == null){
-                    dialog.show();
-                }
-            }
-        }, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
+        registerReceiver(convUpdateReceiver, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
+        registerReceiver(msgUpdateReceiver, new IntentFilter(Conversation.BROADCAST_NEW_MESSAGE));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(convUpdateReceiver);
+        unregisterReceiver(msgUpdateReceiver);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -32,6 +32,13 @@ public class FriendDetail extends AppCompatActivity {
     private Button addFriendButton;
     private ProgressBar progressBar;
 
+    private BroadcastReceiver convUpdateReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                loadButton();
+            }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,14 +60,16 @@ public class FriendDetail extends AppCompatActivity {
             NetworkImageHelper.loadImage(icon, userInfo.getHighResolutionPhotoUrl());
         });
 
-        registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                loadButton();
-            }
-        }, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
+        registerReceiver(convUpdateReceiver, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(convUpdateReceiver);
+    }
+
     public void loadButton(){
         if (cm.getFriendList().contains(friendId)){
             convId = ConversationManager.getInstance().getPrivateConvId(friendId);
