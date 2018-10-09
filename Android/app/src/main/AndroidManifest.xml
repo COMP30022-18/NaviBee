@@ -147,11 +147,14 @@
         <activity
             android:name=".social.ChatActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".social.AddFriendQRActivity"
+        <activity
+            android:name=".social.AddFriendQRActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar">
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
-                <category android:name="android.intent.category.DEFAULT"/>
+
+                <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="application/navibee" />
             </intent-filter>
         </activity>
@@ -178,13 +181,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity
-            android:name=".event.EventPicFullscreenActivity">
-        </activity>
+        <activity android:name=".event.EventPicFullscreenActivity"></activity>
         <activity
             android:name=".event.EventsActivity"
-            android:label="@string/landing_events">
-        </activity>
+            android:label="@string/landing_events"></activity>
         <activity
             android:name=".social.VoiceCallActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -193,7 +193,8 @@
         <activity android:name=".social.LocationDisplayActivity" />
         <activity
             android:name=".sos.SosCountDownActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".social.FloatWindowActivity"></activity>
     </application>
 
 </manifest>
