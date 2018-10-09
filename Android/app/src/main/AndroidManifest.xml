@@ -190,11 +190,14 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".social.CreateGroupChatActivity" />
         <activity android:name=".social.FriendDetail" />
+        <activity android:name=".social.GroupDetailActivity" />
         <activity android:name=".social.LocationDisplayActivity" />
+        <activity android:name=".social.GroupChatInviteFriendActivity"/>
         <activity
             android:name=".sos.SosCountDownActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".social.FloatWindowActivity"></activity>
+
     </application>
 
 </manifest>
