@@ -214,11 +214,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             if (resultCode == RESULT_OK) {
                 PlacePicker.getLatLngBounds(data);
                 Place place = PlacePicker.getPlace(this, data);
-                double[] coord = new double[2];
-                coord[0] = place.getLatLng().latitude;
-                coord[1] = place.getLatLng().longitude;
-                Gson gson = new Gson();
-                conversation.sendMessage("location", gson.toJson(coord));
+                conversation.sendLocation(place.getLatLng().latitude, place.getLatLng().longitude);
             }
         }
     }

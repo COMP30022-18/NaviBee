@@ -23,11 +23,17 @@
 
     <PreferenceCategory android:title="@string/pref_section_title_sos">
         <EditTextPreference
+            android:inputType="phone"
+            android:digits="0123456789"
             android:dialogTitle="@string/pref_sos_preferred_emergency_call"
-            android:icon="@drawable/ic_people_black_24dp"
+            android:icon="@drawable/ic_call_black_24dp"
             android:key="sos_emergency_call"
-            android:summary="@string/pref_sos_preferred_emergency_call_titles"
             android:title="@string/pref_sos_preferred_emergency_call"/>
+        <!--<au.edu.unimelb.eng.navibee.FriendListPreference-->
+            <!--android:key="sos_emergency_contact"-->
+            <!--android:title="@string/pref_sos_preferred_emergency_contact"-->
+            <!--android:summary="@string/pref_sos_preferred_emergency_contact_titles"-->
+            <!--android:icon="@drawable/ic_people_black_24dp"/>-->
     </PreferenceCategory>
 
 </PreferenceScreen>
