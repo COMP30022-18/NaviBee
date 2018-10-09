@@ -101,6 +101,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 notificationManager.createNotificationChannel(channel);
             }
         }
+
+        String convID = getIntent().getStringExtra("convID");
+        if (convID!=null) {
+            // notification clicked
+            ConversationManager.getInstance().waitForOpenChatAvtivity(convID);
+        }
     }
 
     private void setupWelcomeBanner() {

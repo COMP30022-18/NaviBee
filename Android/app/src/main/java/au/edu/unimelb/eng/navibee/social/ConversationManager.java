@@ -53,6 +53,8 @@ public class ConversationManager {
     private Map<String, String> uidToConvId = new HashMap<>();
     private Map<String, Conversation> convIdMap = new HashMap<>();
 
+    private String waitingConvId = "";
+
 
     private boolean initialized = false;
 
@@ -109,6 +111,13 @@ public class ConversationManager {
 
                     Intent intent = new Intent(BROADCAST_FRIEND_UPDATED);
                     NaviBeeApplication.getInstance().sendBroadcast(intent);
+
+                    if (!waitingConvId.equals("")) {
+                        if (openChatActivity(waitingConvId)) {
+                            waitingConvId = "";
+                        }
+                    }
+
                 });
     }
 
@@ -151,6 +160,13 @@ public class ConversationManager {
 
 //                    Intent intent = new Intent(BROADCAST_FRIEND_UPDATED);
 //                    NaviBeeApplication.getInstance().sendBroadcast(intent);
+
+
+                    if (!waitingConvId.equals("")) {
+                        if (openChatActivity(waitingConvId)) {
+                            waitingConvId = "";
+                        }
+                    }
                 });
     }
 
@@ -205,5 +221,21 @@ public class ConversationManager {
         data.put("icon", icon);
 
         return mFunctions.getHttpsCallable("createGroupChat").call(data);
+    }
+
+    public void waitForOpenChatAvtivity(String convId) {
+        if (!openChatActivity(convId)) {
+            waitingConvId = convId;
+        }
+    }
+
+    private boolean openChatActivity(String convId) {
+        if (getConversation(convId)!=null) {
+            Intent intent = new Intent(NaviBeeApplication.getInstance(), ChatActivity.class);
+            intent.putExtra("CONV_ID", convId);
+            NaviBeeApplication.getInstance().startActivity(intent);
+            return true;
+        }
+        return false;
     }
 }
