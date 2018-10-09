@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <uses-feature android:name="android.hardware.nfc" />
 
@@ -163,9 +164,6 @@
             android:screenOrientation="portrait"
             tools:replace="android:screenOrientation" />
         <activity android:name=".event.EventEditActivity" />
-        <activity
-            android:name=".SosSettingActivity"
-            android:label="@string/sos_setting" />
         <activity
             android:name=".event.EventDetailsActivity"
             android:parentActivityName=".event.EventsActivity"

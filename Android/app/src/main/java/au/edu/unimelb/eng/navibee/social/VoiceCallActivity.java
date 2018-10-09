@@ -2,16 +2,22 @@ package au.edu.unimelb.eng.navibee.social;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.TypedValue;
 import android.os.PowerManager;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -22,11 +28,10 @@ import au.edu.unimelb.eng.navibee.R;
 
 public class VoiceCallActivity extends AppCompatActivity {
 
-
-    private static final int PERMISSIONS_RECORD_AUDIO = 1;
-
     public static final int VOCIECALL_EXPIRE = 60 * 1000;
 
+    private static final int OVERLAY_PERMISSION_REQ_CODE = 0x001;
+    private static final int PERMISSIONS_RECORD_AUDIO = 1;
     private static final int CONNECTING_TIMEOUT = 5 * 1000;
     private static final int ANSWER_TIMEOUT = 20 * 1000;
     private static final int WAITING_TIMEOUT = 40 * 1000;
@@ -61,6 +66,8 @@ public class VoiceCallActivity extends AppCompatActivity {
     private PowerManager mPowerManager;
     private PowerManager.WakeLock mWakeLock;
 
+    private DraggableFloatWindow mFloatWindow;
+
 
     private long timeCount;
     Thread thread = new Thread() {
@@ -90,7 +97,7 @@ public class VoiceCallActivity extends AppCompatActivity {
         }
 
         @Override
-        public void  onUserJoined(int uid, int elapsed) {
+        public void onUserJoined(int uid, int elapsed) {
             runOnUiThread(() -> {
                 if (!callStarted) {
                     // call started
@@ -244,7 +251,7 @@ public class VoiceCallActivity extends AppCompatActivity {
                     buttonMic.setImageResource(R.drawable.ic_mic_black_24dp);
                     buttonMic.setBackgroundResource(R.drawable.voicecall_mic_background);
                 }
-                buttonMic.setPadding(padding,padding,padding,padding);
+                buttonMic.setPadding(padding, padding, padding, padding);
                 break;
             case R.id.voicecall_button_speaker:
                 if (speakerEnabled){
@@ -259,7 +266,17 @@ public class VoiceCallActivity extends AppCompatActivity {
                     buttonSpeaker.setImageResource(R.drawable.ic_speaker_black_24dp);
                     buttonSpeaker.setBackgroundResource(R.drawable.voicecall_mic_background);
                 }
-                buttonSpeaker.setPadding(padding,padding,padding,padding);
+                buttonSpeaker.setPadding(padding, padding, padding, padding);
+                break;
+            case R.id.voicecall_exit_full_screen:
+                mFloatWindow = DraggableFloatWindow.getDraggableFloatWindow(VoiceCallActivity.this, null);
+                mFloatWindow.show();
+                mFloatWindow.setOnTouchButtonListener(new DraggableFloatView.OnTouchButtonClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(VoiceCallActivity.this, "clicked", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 break;
         }
     }
