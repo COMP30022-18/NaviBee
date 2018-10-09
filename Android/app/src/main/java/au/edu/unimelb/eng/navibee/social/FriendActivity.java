@@ -1,5 +1,7 @@
 package au.edu.unimelb.eng.navibee.social;
 
+
+import android.text.format.DateUtils;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -7,22 +9,16 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView;
-import android.widget.Toast;
 
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -60,9 +56,9 @@ public class FriendActivity extends AppCompatActivity {
             return conv.getMessageCount()>0;
         }
 
-        public String getLastMessageTime (){
-            if (!hasMessage()) return "";
-            return DateManager.DateformatTime(conv.getMessage(conv.getMessageCount()-1).getTime_());
+        public Long getLastMessageTime (){
+            Date date = conv.getMessage(conv.getMessageCount() - 1).getTime_();
+            return date.getTime();
         }
 
         public Date getTimeForSort() {
@@ -146,7 +142,12 @@ public class FriendActivity extends AppCompatActivity {
                 }
                 if (tempChat.hasMessage()){
                     ((TextView) holder.itemView.findViewById(R.id.chat_list_item_last_message)).setText(tempChat.getLastMessage());
-                    ((TextView) holder.itemView.findViewById(R.id.chat_list_item_time)).setText(tempChat.getLastMessageTime());
+                    Long time = tempChat.getLastMessageTime();
+                    Long current = System.currentTimeMillis();
+                    DateUtils dateUtils = new DateUtils();
+                    CharSequence relativeTime = dateUtils.getRelativeTimeSpanString(time, current, dateUtils.MINUTE_IN_MILLIS, dateUtils.FORMAT_ABBREV_RELATIVE );
+
+                    ((TextView) holder.itemView.findViewById(R.id.chat_list_item_time)).setText(relativeTime);
                 }
                 else{
                     ((TextView) holder.itemView.findViewById(R.id.chat_list_item_last_message)).setText("");
@@ -261,28 +262,24 @@ public class FriendActivity extends AppCompatActivity {
         loadChatsList();
         loadContactList();
 
-        IntentFilter intFilt = new IntentFilter(ConversationManager.BROADCAST_FRIEND_UPDATED);
-        registerReceiver(br, intFilt);
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                loadContactList();
+                loadChatsList();
+            }
+        }, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
 
-        registerReceiver(brMsgReadState, new IntentFilter(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE));
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                recyclerFriendsAdapter.notifyDataSetChanged();
+                sortChatsList();
+                recyclerChatsAdapter.notifyDataSetChanged();
+            }
+        }, new IntentFilter(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE));
     }
 
-    BroadcastReceiver br = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            loadContactList();
-            loadChatsList();
-        }
-    };
-
-    BroadcastReceiver brMsgReadState = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            recyclerFriendsAdapter.notifyDataSetChanged();
-            sortChatsList();
-            recyclerChatsAdapter.notifyDataSetChanged();
-        }
-    };
 
     private void loadContactList() {
         contactList.clear();

@@ -167,23 +167,15 @@
 
         <Button
             android:layout_marginTop="24dp"
-            android:id="@+id/activity_group_detail_inviteFriend_button"
-            android:layout_marginHorizontal="8dp"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Invite Friend"
-            android:textSize="24dp"
-            android:onClick="onClick" />
-
-        <Button
-            android:id="@+id/activity_group_detail_LeaveGroup_button"
+            android:id="@+id/activity_group_detail_deleteGroup_button"
             android:layout_marginHorizontal="8dp"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/holo_red_light"
-            android:text="Leave Group"
+            android:text="Delete Group"
             android:textSize="24dp"
             android:onClick="onClick" />
+
     </LinearLayout>
 
 

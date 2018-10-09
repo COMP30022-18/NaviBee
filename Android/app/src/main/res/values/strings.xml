@@ -7,6 +7,7 @@
     <string name="landing_events">Events</string>
     <string name="landing_social">Friends</string>
     <string name="landing_sos">SOS</string>
+    <string name="title_activity_sos">SOS Help</string>
     <string name="title_activity_event_detail">EventDetailActivity</string>
     <string name="navigation_search_hint">Where do you want to go?</string>
     <string name="search_button_text">Search</string>
@@ -24,6 +25,7 @@
     <string name="sos_setting">SOS Setting</string>
     <string name="sos_setting_btn">Save</string>
     <string name="button_yes">Yes</string>
+    <string name="button_ok">Ok</string>
     <string name="button_cancel">Cancel</string>
     <string name="voice_recognition_result_check_title">Did you say…?</string>
     <string name="fail_to_get_last_location">Failed to get your current location. Please retry later in a more open place with your GPS settings turned on.</string>
@@ -188,6 +190,8 @@
     <string name="action_navigation_say_a_place">Say a place</string>
     <string name="navigation_destinations_header_recent_destinations">Recent destinations</string>
     <string name="navigation_destinations_header_recommended_places">Recommended places</string>
+    <string name="navigation_failed_to_fetch_route">Sorry, we didn\'t manage to find a route to your destination.</string>
+    <string name="navigation_connection_error">Failed to fetch a route for navigation, please try again.</string>
 
     <string name="landing_welcome_line">Hi, %s!\nHow can I help you today?</string>
     <string name="navigation_your_location">Your location</string>
@@ -200,6 +204,13 @@
         <item quantity="one">Ride %1$d stop (%2$s)</item>
         <item quantity="other">Ride %1$d stops (%2$s)</item>
     </plurals>
+
+    <string name="friend_scan_qr_code">Scan your friend\'s QR code.</string>
+    <string name="friend_scan_qr_code_with_nfc">Scan your friend\'s QR code\nor place both phones back to back and touch your screen.</string>
+    <string name="friend_wrong_qr_code">This is not a NaviBee QR code.</string>
+    <string name="friend_show_my_qr">Show my QR code</string>
+
+    <string name="error_failed_to_connect_to_server">Failed to connect to server. Please check your internet connection.</string>
 
     <!-- Strings related to Settings -->
     <string name="pref_section_title_navigation">Navigation</string>
@@ -234,11 +245,19 @@
     <string name="pref_navigation_search_region_values_default">au</string>
 
     <string name="pref_section_title_sos">SOS</string>
-    <string name="pref_sos_preferred_emergency_call">Preferred emergency call</string>
-    <string name="pref_sos_preferred_emergency_call_titles">Required a phone number to contact.</string>
+    <string name="pref_sos_preferred_emergency_call">Preferred emergency call number</string>
+    <string name="pref_sos_preferred_emergency_call_titles">Required a phone number to call.</string>
+
+    <string name="pref_sos_preferred_emergency_contact">Preferred emergency contact</string>
+    <string name="pref_sos_preferred_emergency_contact_titles">Required a friend to get emergency help.</string>
 
     <string name="title_activity_event_pic_fullscreen">EventPicFullscreenActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="sos_pre_text">We\'ve detected that you might be in danger\.</string>
+    <string name="sos_main_text">Your emergency contact will be notified in</string>
+    <string name="sos_time_unit">seconds</string>
+    <string name="sos_notify_text">Notify Now</string>
 
 </resources>

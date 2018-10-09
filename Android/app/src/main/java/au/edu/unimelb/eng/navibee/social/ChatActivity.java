@@ -3,6 +3,7 @@ package au.edu.unimelb.eng.navibee.social;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 
@@ -35,9 +36,12 @@ import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.event.EventDetailsActivity;
 import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 
@@ -88,6 +92,29 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         setSupportActionBar(myToolbar);
 
         scrollToBottom();
+
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("Alert");
+        dialog.setMessage("Sorry, this chat is out of dater.");
+        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialoginterface, int i) {
+                finish();
+            }
+        });
+
+        if (ConversationManager.getInstance().getConversation(convId) == null){
+            dialog.show();
+        }
+
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (ConversationManager.getInstance().getConversation(convId) == null){
+                    dialog.show();
+                }
+            }
+        }, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -187,11 +214,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             if (resultCode == RESULT_OK) {
                 PlacePicker.getLatLngBounds(data);
                 Place place = PlacePicker.getPlace(this, data);
-                double[] coord = new double[2];
-                coord[0] = place.getLatLng().latitude;
-                coord[1] = place.getLatLng().longitude;
-                Gson gson = new Gson();
-                conversation.sendMessage("location", gson.toJson(coord));
+                conversation.sendLocation(place.getLatLng().latitude, place.getLatLng().longitude);
             }
         }
     }
@@ -281,6 +304,16 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             } else if (msg.getType().equals("location")) {
                 ((TextView) holder.itemView.findViewById(R.id.message_text)).setText("[Location]");
                 ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
+            } else if (msg.getType().equals("event")) {
+                String text = "[Event] ";
+
+                Gson gson = new Gson();
+                Map<String, String> data = gson.fromJson(msg.getData(), Map.class);
+
+                text = text + data.get("name");
+
+                ((TextView) holder.itemView.findViewById(R.id.message_text)).setText(text);
+                ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
             }
 
             // set user name
@@ -315,7 +348,17 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
                 chatActivity.startActivity(intent);
 
+            } else if (msg.getType().equals("event")) {
+                Gson gson = new Gson();
+                Map<String, String> data = gson.fromJson(msg.getData(), Map.class);
+
+                Intent intent = new Intent(chatActivity.getBaseContext(), EventDetailsActivity.class);
+
+                intent.putExtra("eventId", data.get("eid"));
+                chatActivity.startActivity(intent);
+
             }
+
         }
 
     }
