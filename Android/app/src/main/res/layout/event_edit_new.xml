@@ -7,19 +7,17 @@
     android:layout_height="fill_parent"
     android:id="@+id/event_root_view">
 
-    <LinearLayout
-        android:layout_weight="1"
-        android:id="@+id/eventMainLinearLayout"
+    <RelativeLayout
+        android:id="@+id/eventMainLayout"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
         <ScrollView
-            android:layout_weight="1"
+            android:layout_above="@id/eventPublish"
             android:id="@+id/eventScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
             <LinearLayout
                 android:id="@+id/eventLinearLayout"
                 android:layout_width="match_parent"
@@ -103,21 +101,30 @@
                     android:layout_height="267dp"
                     android:layout_margin="@dimen/fab_margin_bottom" />
 
+                <Button
+                    android:id="@+id/eventIsPrivate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/fab_margin_bottom"
+                    android:text="Public"/>
+
+
             </LinearLayout>
         </ScrollView>
 
         <com.google.android.material.button.MaterialButton
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_alignParentBottom="true"
             android:id="@+id/eventPublish"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin_bottom"
             android:onClick="onPublishClicked"
             android:textColor="#808080"
-            android:textSize="40sp"
-            android:text="Publish" />
+            android:textSize="32sp"
+            android:text="PUBLISH" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <ProgressBar
         android:layout_gravity = "center"

@@ -37,6 +37,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -81,11 +82,14 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     private EditText nameView;
     private Button dateButton;
     private Button locationButton;
+    private Button isPrivateButton;
     private Bitmap addIcon;
     private ChipGroup chipgroup;
     private ScrollView scrollView;
+    private RelativeLayout mainView;
     private ProgressBar progressBar;
     private Place eventLocation;
+    private Boolean isPrivate;
     private final int MAX_NUM_OF_PHOTOS = 6;
 
     public static class TimePickerFragment extends DialogFragment {
@@ -130,8 +134,10 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         chipgroup = (ChipGroup) findViewById(R.id.eventFriendChips);
         picsView = (GridView) findViewById(R.id.eventPics);
         scrollView = (ScrollView) findViewById(R.id.eventScrollView);
+        mainView = (RelativeLayout) findViewById(R.id.eventMainLayout);
         progressBar = (ProgressBar) findViewById(R.id.event_indefinite_progress);
         locationButton = (Button) findViewById(R.id.eventLocation);
+        isPrivateButton = (Button) findViewById(R.id.eventIsPrivate);
 
         loadData();
     }
@@ -152,6 +158,21 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
                     e.printStackTrace();
                 } catch (GooglePlayServicesRepairableException e) {
                     e.printStackTrace();
+                }
+            }
+        });
+        // init isPrivate Button
+        isPrivate = false;
+        isPrivateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isPrivate){
+                    isPrivate = false;
+                    isPrivateButton.setText("Public");
+                }
+                else{
+                    isPrivate = true;
+                    isPrivateButton.setText("Private");
                 }
             }
         });
@@ -442,7 +463,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
         EventsActivity.EventItem newEvent = new EventsActivity.EventItem(name, holder, location,
                 eventDate, users, picsStoragePath, eventLocation.getName().toString(),
-                eventLocation.getLatLng().longitude, eventLocation.getLatLng().latitude);
+                eventLocation.getLatLng().longitude, eventLocation.getLatLng().latitude, isPrivate);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("events").add(newEvent).addOnCompleteListener( task -> {
@@ -585,12 +606,12 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
     private void progressingMode(Boolean enterMode) {
         if(enterMode){
-            scrollView.setVisibility(View.GONE);
+            mainView.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
         }
         else{
             progressBar.setVisibility(View.GONE);
-            scrollView.setVisibility(View.VISIBLE);
+            mainView.setVisibility(View.VISIBLE);
         }
     }
 
