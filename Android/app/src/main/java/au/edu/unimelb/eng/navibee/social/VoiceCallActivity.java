@@ -234,10 +234,12 @@ public class VoiceCallActivity extends AppCompatActivity {
             case R.id.voicecall_button_mic:
                 if (micEnabled){
                     micEnabled = false;
+                    VoiceCallEngine.getInstance().muteMic();
                     buttonMic.setImageResource(R.drawable.ic_mic_off_white_24dp);
                     buttonMic.setBackgroundResource(R.drawable.voicecall_button_background_white_hollow);
                 }
                 else{
+                    VoiceCallEngine.getInstance().unmuteMic();
                     micEnabled = true;
                     buttonMic.setImageResource(R.drawable.ic_mic_black_24dp);
                     buttonMic.setBackgroundResource(R.drawable.voicecall_mic_background);
@@ -246,11 +248,13 @@ public class VoiceCallActivity extends AppCompatActivity {
                 break;
             case R.id.voicecall_button_speaker:
                 if (speakerEnabled){
+                    VoiceCallEngine.getInstance().useSpeaker();
                     speakerEnabled = false;
                     buttonSpeaker.setImageResource(R.drawable.ic_speaker_white_24dp);
                     buttonSpeaker.setBackgroundResource(R.drawable.voicecall_button_background_white_hollow);
                 }
                 else{
+                    VoiceCallEngine.getInstance().useEarpiece();
                     speakerEnabled = true;
                     buttonSpeaker.setImageResource(R.drawable.ic_speaker_black_24dp);
                     buttonSpeaker.setBackgroundResource(R.drawable.voicecall_mic_background);
