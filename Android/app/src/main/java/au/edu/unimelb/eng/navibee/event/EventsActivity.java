@@ -43,10 +43,11 @@ public class EventsActivity extends AppCompatActivity {
         private String placeName;
         private double longitude;
         private double latitude;
+        private Boolean isPrivate;
 
         public EventItem(){}
 
-        public EventItem(String name, String holder, String location, Timestamp time, Map<String, Boolean> users, ArrayList<String> images, String placeName, double longitude, double latitude){
+        public EventItem(String name, String holder, String location, Timestamp time, Map<String, Boolean> users, ArrayList<String> images, String placeName, double longitude, double latitude, Boolean isPrivate){
             this.holder = holder;
             this.name = name;
             this.location = location;
@@ -58,7 +59,7 @@ public class EventsActivity extends AppCompatActivity {
             this.latitude = latitude;
         }
 
-        public EventItem(String name, String holder, String location, Date time, Map<String, Boolean> users, ArrayList<String> images, String placeName, double longitude, double latitude){
+        public EventItem(String name, String holder, String location, Date time, Map<String, Boolean> users, ArrayList<String> images, String placeName, double longitude, double latitude, Boolean isPrivate){
             this.holder = holder;
             this.name = name;
             this.location = location;
@@ -69,6 +70,8 @@ public class EventsActivity extends AppCompatActivity {
             this.longitude = longitude;
             this.latitude = latitude;
         }
+
+        public Boolean getPrivate() { return isPrivate; }
 
         public String getPlaceName(){ return placeName; }
 
@@ -199,7 +202,7 @@ public class EventsActivity extends AppCompatActivity {
             if ((!i.getHolder().equals(uid)) && i.getUsers().keySet().contains(uid)) {
                 joinedList.add(i);
             }
-            if (!i.getUsers().keySet().contains(uid)) {
+            if (!i.getUsers().keySet().contains(uid) && !i.isPrivate) {
                 recommendedList.add(i);
             }
         }
