@@ -24,11 +24,12 @@
     <PreferenceCategory android:title="@string/pref_section_title_sos">
         <SwitchPreference
             android:defaultValue="true"
-            android:dialogTitle="Enable fall detection countdown"
+            android:dialogTitle="@string/pref_sos_enable_fall_detection"
             android:icon="@drawable/ic_history_black_24dp"
             android:key="countdown_enabled"
-            android:title="Fall detection countdown"/>
+            android:title="@string/pref_sos_enable_fall_detection"/>
         <EditTextPreference
+            android:defaultValue=""
             android:inputType="phone"
             android:digits="0123456789"
             android:dialogTitle="@string/pref_sos_preferred_emergency_call"

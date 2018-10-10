@@ -1,82 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center_horizontal"
+    android:background="@color/sosRed"
     tools:context=".sos.SosActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/sos.appbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:fitsSystemWindows="true">
-
-        <View
-            android:id="@+id/sos.toolbar_padding"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"/>
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/sos.toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?android:attr/actionBarSize"
-            android:background="@android:color/transparent" />
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <ImageView
-        android:id="@+id/sos_warning"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="64dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="24dp"
-        android:tint="@color/landing_red"
-        app:layout_constraintBottom_toTopOf="@+id/sos_guideline"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_warning_black_24dp" />
-
     <TextView
-        android:id="@+id/sos_phone_number"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:textAlignment="center"
-        android:textSize="60sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sos_guideline" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/sos_call_button"
-        android:layout_width="wrap_content"
+        android:id="@+id/sos.countdown.pre_text"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/sos_btn"
-        android:textSize="50sp"
-        android:textColor="@color/white"
-        app:cornerRadius="16dp"
-        app:backgroundTint="@color/colorPrimary"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        android:text="@string/sos_act_text"
+        android:textColor="@color/greyWhite"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toTopOf="@+id/sos.countdown.main_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sos_phone_number" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/sos_guideline"
+    <TextView
+        android:id="@+id/sos.countdown.main_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/sos_main_text"
+        android:textColor="@color/white"
+        android:textSize="34sp"
+        app:layout_constraintBottom_toTopOf="@+id/sos.countdown_number"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sos.countdown.pre_text"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/sos.countdown_number"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:textAlignment="textEnd"
+        android:textColor="@color/white"
+        android:textSize="130sp"
+        app:layout_constraintBottom_toTopOf="@+id/sos.countdown.notify_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sos.countdown.main_text"
+        tools:text="10" />
+
+    <TextView
+        android:id="@+id/sos.countdown.unit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.4" />
+        android:layout_marginStart="8dp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/sos.countdown_number"
+        app:layout_constraintStart_toEndOf="@+id/sos.countdown_number"
+        android:text="@string/sos_time_unit"
+        android:textColor="@color/white"
+        android:textSize="50sp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/sos.countdown.notify_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="32dp"
+        android:onClick="notifyOnClick"
+        android:text="@string/sos_notify_text"
+        android:backgroundTint="@color/colorPrimary"
+        app:cornerRadius="30dp"
+        app:icon="@drawable/ic_notification_important"
+        app:iconTint="@android:color/black"
+        app:iconSize="36dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/sos.countdown.cancel_fab"
+        app:layout_constraintStart_toStartOf="parent" >
+
+    </com.google.android.material.button.MaterialButton>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/sos.countdown.cancel_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="38dp"
+        android:clickable="true"
+        android:onClick="cancelOnClick"
+        android:fitsSystemWindows="true"
+        android:layout_gravity="bottom|end"
+        android:focusable="true"
+        app:fabCustomSize="60dp"
+        app:srcCompat="@drawable/ic_close_white_24dp"
+        app:maxImageSize="40dp"
+        android:tint="@color/grey"
+        android:backgroundTint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
