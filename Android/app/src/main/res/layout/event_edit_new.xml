@@ -164,7 +164,7 @@
             android:onClick="onPublishClicked"
             android:text="@string/event_create_create"
             android:layout_marginTop="@dimen/form_vertical_padding"
-            android:layout_marginBottom="@dimen/form_vertical_padding"
+            android:layout_marginBottom="@dimen/boundary_margin"
             android:layout_marginStart="@dimen/boundary_margin"
             android:layout_marginEnd="@dimen/boundary_margin"
             android:layout_gravity="center_horizontal"
