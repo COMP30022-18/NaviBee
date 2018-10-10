@@ -39,7 +39,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SosActivity extends AppCompatActivity {
-    // TODO magic string
 
     private CountDownTimer countDownTimer;
     private TextView countDownTextView;
