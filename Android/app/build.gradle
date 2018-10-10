@@ -103,6 +103,7 @@ dependencies {
     implementation 'com.github.chrisbanes:PhotoView:2.0.0'
     implementation 'br.com.simplepass:loading-button-android:1.14.0'
     implementation 'com.github.Commit451:ModalBottomSheetDialogFragment:1.1.0'
+    implementation "com.leinardi.android:speed-dial:2.0.1"
 
     kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.6.0'
 

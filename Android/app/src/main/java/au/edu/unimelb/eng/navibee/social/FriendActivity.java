@@ -1,31 +1,31 @@
 package au.edu.unimelb.eng.navibee.social;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView;
-import android.widget.Toast;
 
-import java.security.acl.Group;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.leinardi.android.speeddial.SpeedDialActionItem;
+import com.leinardi.android.speeddial.SpeedDialView;
+
 import java.util.ArrayList;
 import java.util.Date;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import au.edu.unimelb.eng.navibee.R;
@@ -208,39 +208,66 @@ public class FriendActivity extends AppCompatActivity {
     }
 
     private ConversationManager cm = ConversationManager.getInstance();
-    private ArrayList<ContactItem> contactList = new ArrayList<ContactItem>();
-    private ArrayList<ContactItem> chatsList = new ArrayList<ContactItem>();
+    private ArrayList<ContactItem> contactList = new ArrayList<>();
+    private ArrayList<ContactItem> chatsList = new ArrayList<>();
 
     private ChatsAdapter recyclerChatsAdapter;
-    private Button createGroupChatButton;
     private RecyclerView recyclerChatsList;
     private RecyclerView.LayoutManager recyclerChatsManager;
 
 
     private FriendAdapter recyclerFriendsAdapter;
-    private Button addFriendButton;
     private RecyclerView recyclerFriendsList;
     private RecyclerView.LayoutManager recyclerFriendsManager;
 
+    private BottomNavigationView navigation;
 
+
+    private void fadeOutView(View view, int delay) {
+        view.animate()
+                .alpha(0.0f)
+                .setStartDelay(delay)
+                .setDuration(300)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        view.setVisibility(View.GONE);
+                    }
+                });
+    }
+
+    private void fadeInView(View view, int delay) {
+        view.animate()
+                .alpha(1.0f)
+                .setStartDelay(delay)
+                .setDuration(300)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        super.onAnimationStart(animation);
+                        view.setVisibility(View.VISIBLE);
+                    }
+                });
+    }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+            ActionBar tb = getSupportActionBar();
             switch (item.getItemId()) {
                 case R.id.switch_friend_list:
-                    recyclerChatsList.setVisibility(View.INVISIBLE);
-                    createGroupChatButton.setVisibility(View.INVISIBLE);
-                    recyclerFriendsList.setVisibility(View.VISIBLE);
-                    addFriendButton.setVisibility(View.VISIBLE);
+                    tb.setTitle(R.string.friends_tab_friends);
+                    fadeOutView(recyclerChatsList, 0);
+                    fadeInView(recyclerFriendsList, 150);
                     return true;
                 case R.id.switch_recent_chat:
-                    recyclerChatsList.setVisibility(View.VISIBLE);
-                    createGroupChatButton.setVisibility(View.VISIBLE);
-                    recyclerFriendsList.setVisibility(View.INVISIBLE);
-                    addFriendButton.setVisibility(View.INVISIBLE);
+                    tb.setTitle(R.string.friends_tab_chats);
+                    fadeInView(recyclerChatsList, 150);
+                    fadeOutView(recyclerFriendsList, 0);
                     return true;
             }
             return false;
@@ -252,12 +279,10 @@ public class FriendActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.friend_list);
 
-//        mTextMessage = (TextView) findViewById(R.id.message);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.friend_activity_navbar);
+        navigation = findViewById(R.id.friend_activity_navbar);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-
-        recyclerFriendsList = (RecyclerView) findViewById(R.id.contactRecyclerView);
+        recyclerFriendsList = findViewById(R.id.contactRecyclerView);
         recyclerFriendsList.setHasFixedSize(true);
         // use a linear layout manager
         recyclerFriendsManager = new LinearLayoutManager(this);
@@ -267,12 +292,8 @@ public class FriendActivity extends AppCompatActivity {
         recyclerFriendsList.setAdapter(recyclerFriendsAdapter);
         recyclerFriendsList.setVisibility(View.INVISIBLE);
 
-        addFriendButton = (Button) findViewById(R.id.addFriendButton);
-        addFriendButton.setVisibility(View.INVISIBLE);
 
-
-
-        recyclerChatsList = (RecyclerView) findViewById(R.id.chatsRecyclerView);
+        recyclerChatsList = findViewById(R.id.chatsRecyclerView);
         recyclerChatsList.setHasFixedSize(true);
         // use a linear layout manager
         recyclerChatsManager = new LinearLayoutManager(this);
@@ -280,13 +301,30 @@ public class FriendActivity extends AppCompatActivity {
         // specify an adapter (see also next example)
         recyclerChatsAdapter = new ChatsAdapter(this, chatsList, recyclerChatsList);
         recyclerChatsList.setAdapter(recyclerChatsAdapter);
-        recyclerChatsList.setVisibility(View.INVISIBLE);
 
-        createGroupChatButton = (Button) findViewById(R.id.createGroupChatButton);
         recyclerChatsList.setVisibility(View.VISIBLE);
 
+        getSupportActionBar().setTitle(R.string.friends_tab_chats);
 
+        SpeedDialView fab = findViewById(R.id.friend_activity_fab);
+        fab.getMainFab().setCustomSize(getResources().getDimensionPixelSize(R.dimen.fab_size));
 
+        fab.addActionItem(
+                new SpeedDialActionItem
+                        .Builder(R.id.friend_fab_add_friend, R.drawable.ic_person_add_black_24dp)
+                        .setFabImageTintColor(ResourcesCompat.getColor(getResources(), R.color.colorLightTextPrimary, getTheme()))
+                        .setLabel(getString(R.string.friends_add_friend))
+                        .create()
+        );
+        fab.addActionItem(
+                new SpeedDialActionItem
+                        .Builder(R.id.friend_fab_create_group, R.drawable.ic_people_black_24dp)
+                        .setFabImageTintColor(ResourcesCompat.getColor(getResources(), R.color.colorLightTextPrimary, getTheme()))
+                        .setLabel(getString(R.string.friends_create_group))
+                        .create()
+        );
+
+        fab.setOnActionSelectedListener(fabListener);
 
         loadChatsList();
         loadContactList();
@@ -296,6 +334,19 @@ public class FriendActivity extends AppCompatActivity {
 
         registerReceiver(brMsgReadState, new IntentFilter(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE));
     }
+
+    SpeedDialView.OnActionSelectedListener fabListener = speedDialActionItem -> {
+        switch (speedDialActionItem.getId()) {
+            case R.id.friend_fab_add_friend:
+                startActivity(new Intent(this,  AddFriendQRActivity.class));
+                return false; // true to keep the Speed Dial open
+            case R.id.friend_fab_create_group:
+                startActivity(new Intent(this, CreateGroupChatActivity.class));
+                return false;
+            default:
+                return false;
+        }
+    };
 
     BroadcastReceiver br = new BroadcastReceiver() {
         @Override
@@ -338,17 +389,6 @@ public class FriendActivity extends AppCompatActivity {
 
     private void sortChatsList() {
         chatsList.sort((p1, p2) -> p2.getTimeForSort().compareTo(p1.getTimeForSort()));
-    }
-
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.addFriendButton:
-                startActivity(new Intent(this,  AddFriendQRActivity.class));
-                break;
-            case R.id.createGroupChatButton:
-                startActivity(new Intent(this, CreateGroupChatActivity.class));
-                break;
-        }
     }
 
 }

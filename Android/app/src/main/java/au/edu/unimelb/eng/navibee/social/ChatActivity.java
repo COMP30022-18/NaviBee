@@ -116,6 +116,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
                 new URLImageViewCacheLoader(userInfo.getPhotoUrl(), toolbarIcon).roundImage(true).execute();
             });
         } else if (conversation instanceof GroupConversation) {
+            toolbarTitle.setText(((GroupConversation) conversation).getName());
             toolbarSubtitle.setText(R.string.chat_type_group);
             // TODO: Group headers.
         }

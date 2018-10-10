@@ -19,8 +19,8 @@
         android:fitsSystemWindows="true"
         android:focusable="true"
         android:onClick="onFabClick"
-        app:fabCustomSize="60dp"
-        app:maxImageSize="36dp"
+        app:fabCustomSize="@dimen/fab_size"
+        app:maxImageSize="@dimen/fab_icon_size"
         app:rippleColor="@color/white"
         app:srcCompat="@drawable/ic_navigation"
         app:layout_anchor="@id/chat.locationDisplay.bab"/>
