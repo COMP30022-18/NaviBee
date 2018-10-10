@@ -144,7 +144,12 @@
 
         <activity
             android:name=".social.ChatActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".social.FriendActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".social.FriendActivity" />
+        </activity>
         <activity android:name=".social.AddFriendQRActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar">
             <intent-filter>

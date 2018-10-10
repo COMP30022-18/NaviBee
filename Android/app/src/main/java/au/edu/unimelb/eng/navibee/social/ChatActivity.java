@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,6 +42,8 @@ import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.event.EventDetailsActivity;
 import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
+import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
+import au.edu.unimelb.eng.navibee.utils.URLActionBarIconCacheLoader;
 import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
 
 
@@ -80,6 +83,23 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
         chatRecyclerView.setLayoutManager(chatLayoutManager);
         chatAdapter = new ChatAdapter(conversation.getCurrentMessageList(), chatRecyclerView, this);
         chatRecyclerView.setAdapter(chatAdapter);
+
+        setSupportActionBar(findViewById(R.id.toolbar));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        TextView toolbarTitle = findViewById(R.id.chat_toolbar_title);
+        TextView toolbarSubtitle = findViewById(R.id.chat_toolbar_subtitle);
+        ImageView toolbarIcon = findViewById(R.id.chat_toolbar_icon);
+
+        if (conversation instanceof PrivateConversation) {
+            toolbarSubtitle.setText(R.string.chat_type_private);
+            UserInfoManager.getInstance().getUserInfo(((PrivateConversation) conversation).getTargetUid(), userInfo -> {
+                toolbarTitle.setText(userInfo.getName());
+                new URLImageViewCacheLoader(userInfo.getPhotoUrl(), toolbarIcon).roundImage(true).execute();
+            });
+        } else if (conversation instanceof GroupConversation) {
+            toolbarSubtitle.setText(R.string.chat_type_group);
+            // TODO: Group headers.
+        }
 
         currentMsgCount = conversation.getMessageCount();
         conversation.markAllAsRead();
@@ -136,16 +156,16 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Send");
         builder.setItems(items, (dialog, which) -> {
-            if (which==0) {
+            if (which == 0) {
                 PickImageDialog.build(new PickSetup().setSystemDialog(true)).show(ChatActivity.this);
-            } else if (which==1) {
+            } else if (which == 1) {
                 try {
                     PlacePicker.IntentBuilder builder1 = new PlacePicker.IntentBuilder();
                     startActivityForResult(builder1.build(ChatActivity.this), PLACE_PICKER_REQUEST);
                 } catch (Exception e) {
                     Log.d("Chat", "send location error:" + e);
                 }
-            } else if (which==2) {
+            } else if (which == 2) {
                 String voiceCallChannelId = UUID.randomUUID().toString();
                 conversation.sendMessage("voicecall", voiceCallChannelId);
             }
