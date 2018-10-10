@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
@@ -29,6 +30,7 @@ import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -56,8 +58,9 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
     private RecyclerView.Adapter chatAdapter;
     private LinearLayoutManager chatLayoutManager;
 
-    int PLACE_PICKER_REQUEST = 2;
+    protected HashMap<String, UserInfoManager.UserInfo> userInfos = new HashMap<>();
 
+    int PLACE_PICKER_REQUEST = 2;
 
     private int currentMsgCount = 0;
 
@@ -90,9 +93,14 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
         TextView toolbarSubtitle = findViewById(R.id.chat_toolbar_subtitle);
         ImageView toolbarIcon = findViewById(R.id.chat_toolbar_icon);
 
+        UserInfoManager.getInstance().getUserInfo(conversation.uid, userInfo -> {
+            userInfos.put(conversation.uid, userInfo);
+        });
+
         if (conversation instanceof PrivateConversation) {
             toolbarSubtitle.setText(R.string.chat_type_private);
             UserInfoManager.getInstance().getUserInfo(((PrivateConversation) conversation).getTargetUid(), userInfo -> {
+                userInfos.put(((PrivateConversation) conversation).getTargetUid(), userInfo);
                 toolbarTitle.setText(userInfo.getName());
                 new URLImageViewCacheLoader(userInfo.getPhotoUrl(), toolbarIcon).roundImage(true).execute();
             });
@@ -312,7 +320,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
 
             f.addView(cv);
 
-            v.setOnClickListener(this);
+            cv.setOnClickListener(this);
 
             MessageViewHolder vh = new MessageViewHolder(v);
             vh.setContentView(cv);
@@ -389,13 +397,17 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
                     break;
                 }
                 case "location": {
-                    double[] coord = gson.fromJson(msg.getData(), double[].class);
+                        double[] coord = gson.fromJson(msg.getData(), double[].class);
 
-                    Intent intent = new Intent(chatActivity.getBaseContext(), LocationDisplayActivity.class);
-                    intent.putExtra(NavigationSelectorActivity.EXTRA_LATITUDE, coord[0]);
-                    intent.putExtra(NavigationSelectorActivity.EXTRA_LONGITUDE, coord[1]);
+                        Intent intent = new Intent(chatActivity.getBaseContext(), LocationDisplayActivity.class);
+                        intent.putExtra(NavigationSelectorActivity.EXTRA_LATITUDE, coord[0]);
+                        intent.putExtra(NavigationSelectorActivity.EXTRA_LONGITUDE, coord[1]);
+                        intent.putExtra(LocationDisplayActivity.EXTRA_TIME, msg.getTime_());
+                        if (chatActivity.userInfos.containsKey(msg.getSender())) {
+                            intent.putExtra(LocationDisplayActivity.EXTRA_SENDER, (Parcelable) chatActivity.userInfos.get(msg.getSender()));
+                        }
 
-                    chatActivity.startActivity(intent);
+                        chatActivity.startActivity(intent);
 
                     break;
                 }

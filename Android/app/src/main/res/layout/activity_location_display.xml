@@ -6,29 +6,56 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/displayLocation_mapView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <com.google.android.gms.maps.MapView
-            android:id="@+id/displayLocation_mapView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="match_parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/displayLocation_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
         android:clickable="true"
         android:fitsSystemWindows="true"
         android:focusable="true"
         android:onClick="onFabClick"
-        app:fabCustomSize="80dp"
-        app:maxImageSize="40dp"
+        app:fabCustomSize="60dp"
+        app:maxImageSize="36dp"
         app:rippleColor="@color/white"
-        app:srcCompat="@drawable/ic_navigation" />
+        app:srcCompat="@drawable/ic_navigation"
+        app:layout_anchor="@id/chat.locationDisplay.bab"/>
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/chat.locationDisplay.bab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:fabAlignmentMode="end"
+        app:backgroundTint="@color/colorPrimary"
+        android:layout_gravity="bottom" >
+        <ImageView
+            android:id="@+id/chat.locationDisplay.icon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            tools:src="@tools:sample/avatars"
+            android:layout_marginEnd="8dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/chat.locationDisplay.title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textColor="@color/colorLightTextPrimary"
+                tools:text="Alice Wonderland"/>
+            <TextView
+                android:id="@+id/chat.locationDisplay.subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorLightTextSecondary"
+                tools:text="10:25 ABCD."/>
+        </LinearLayout>
+
+    </com.google.android.material.bottomappbar.BottomAppBar>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
