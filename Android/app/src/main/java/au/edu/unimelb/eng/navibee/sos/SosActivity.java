@@ -117,6 +117,13 @@ public class SosActivity extends AppCompatActivity {
 
         callButton.setOnClickListener((View view) -> {
 
+            // Checks empty string, no phone call
+            if (phoneText.getText().toString().equals("")) {
+                Toast.makeText(this, "Phone number is empty!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Checks only digits existed, no phone call
             if (!android.text.TextUtils.isDigitsOnly(phoneText.getText().toString())) {
                 Toast.makeText(this, "Digits Only!", Toast.LENGTH_SHORT).show();
                 return;
