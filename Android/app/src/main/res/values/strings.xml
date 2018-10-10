@@ -34,6 +34,11 @@
     <string name="message_type_voice_call">Voice call</string>
     <string name="friends_create_group">Create group</string>
     <string name="friends_add_friend">Add friend</string>
+    <string name="chat_group_name">Group name</string>
+    <string name="chat_create_group_back_warning">Do you want to discard your changes?</string>
+    <string name="action_discard">Discard</string>
+    <string name="action_keep">Keep</string>
+    <string name="chat_group_create_friend_required">At least one friend should be selected.</string>
     <string name="sos_btn">Call</string>
     <string name="sos_setting">SOS Setting</string>
     <string name="sos_setting_btn">Save</string>

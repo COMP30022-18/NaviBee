@@ -1,8 +1,5 @@
 package au.edu.unimelb.eng.navibee.social;
 
-import androidx.annotation.Nullable;
-import au.edu.unimelb.eng.navibee.NaviBeeApplication;
-
 import android.content.Intent;
 import android.util.Log;
 
@@ -10,16 +7,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import au.edu.unimelb.eng.navibee.NaviBeeApplication;
 
 public class ConversationManager {
 
@@ -40,8 +36,6 @@ public class ConversationManager {
 
         instance.listenPrivateConv();
         instance.listenGroupConv();
-
-
     }
 
     private static final String TAG = "convM";

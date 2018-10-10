@@ -23,19 +23,27 @@
         android:id="@+id/contactRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="@+id/chatsRecyclerView"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toTopOf="@+id/friend_activity_navbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:listitem="@layout/chat_list_item"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chatsRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:clipToPadding="false"
         app:layout_constraintBottom_toTopOf="@+id/friend_activity_navbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:listitem="@layout/friend_item"/>
 
     <com.leinardi.android.speeddial.SpeedDialView
         android:id="@+id/friend_activity_fab"

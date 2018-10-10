@@ -186,7 +186,8 @@
         <activity
             android:name=".social.VoiceCallActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".social.CreateGroupChatActivity" />
+        <activity android:name=".social.CreateGroupChatActivity"
+            android:label="@string/friends_create_group"/>
         <activity android:name=".social.FriendDetail" />
         <activity android:name=".social.LocationDisplayActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />

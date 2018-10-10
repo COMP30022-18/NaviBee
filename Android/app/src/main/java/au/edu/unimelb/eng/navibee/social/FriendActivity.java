@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,10 +25,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import au.edu.unimelb.eng.navibee.R;
-import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
+import au.edu.unimelb.eng.navibee.utils.FormatUtilityKt;
+import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
 
 public class FriendActivity extends AppCompatActivity {
     // TODO magic string
@@ -60,9 +61,11 @@ public class FriendActivity extends AppCompatActivity {
             return conv.getMessageCount()>0;
         }
 
-        public String getLastMessageTime (){
+        public CharSequence getLastMessageTime (){
             if (!hasMessage()) return "";
-            return DateManager.DateformatTime(conv.getMessage(conv.getMessageCount()-1).getTime_());
+            return FormatUtilityKt.chatDateShortFormat(
+                    conv.getMessage(conv.getMessageCount() - 1).getTime_().getTime()
+            );
         }
 
         public Date getTimeForSort() {
@@ -79,9 +82,10 @@ public class FriendActivity extends AppCompatActivity {
             if (conv instanceof PrivateConversation) {
                 UserInfoManager.getInstance().getUserInfo(((PrivateConversation) conv).getTargetUid(), userInfo -> {
                     // text view haven't changed
-                    if (((String)textView.getTag()).equals(conv.getConvId())) {
+                    if (textView.getTag().equals(conv.getConvId())) {
                         textView.setText(userInfo.getName());
-                        NetworkImageHelper.loadImage(imageView, userInfo.getPhotoUrl());
+                        new URLImageViewCacheLoader(userInfo.getPhotoUrl(), imageView)
+                                .roundImage(true).execute();
                     }
                 });
             } else {
@@ -126,8 +130,8 @@ public class FriendActivity extends AppCompatActivity {
 
         public void onBindViewHolder(FriendViewHolder holder, int position){
             ContactItem tempPerson = contactList.get(position);
-            tempPerson.displayNameAndIcon((TextView) holder.itemView.findViewById(R.id.friend_item_name),
-                    (ImageView) holder.itemView.findViewById(R.id.friend_item_icon));
+            tempPerson.displayNameAndIcon(holder.itemView.findViewById(R.id.friend_item_name),
+                    holder.itemView.findViewById(R.id.friend_item_icon));
 
         }
 
@@ -177,21 +181,23 @@ public class FriendActivity extends AppCompatActivity {
         }
 
         public void onBindViewHolder(ChatViewHolder holder, int position){
+            TextView unread = holder.itemView.findViewById(R.id.chat_list_item_unread);
+
             ContactItem tempChat = chatsList.get(position);
-            tempChat.displayNameAndIcon((TextView) holder.itemView.findViewById(R.id.chat_list_item_name),
-                    (ImageView) holder.itemView.findViewById(R.id.chat_list_item_icon));
-            ((TextView) holder.itemView.findViewById(R.id.chat_list_item_unread)).setText(Integer.toString(tempChat.getUnreadMessage()));
+
+            tempChat.displayNameAndIcon(holder.itemView.findViewById(R.id.chat_list_item_name),
+                    holder.itemView.findViewById(R.id.chat_list_item_icon));
+            unread.setText(Integer.toString(tempChat.getUnreadMessage()));
             if (tempChat.getUnreadMessage() == 0){
-                holder.itemView.findViewById(R.id.chat_list_item_unread).setVisibility(View.INVISIBLE);
+                unread.setVisibility(View.INVISIBLE);
             }
             else{
-                holder.itemView.findViewById(R.id.chat_list_item_unread).setVisibility(View.VISIBLE);
+                unread.setVisibility(View.VISIBLE);
             }
-            if (tempChat.hasMessage()){
+            if (tempChat.hasMessage()) {
                 ((TextView) holder.itemView.findViewById(R.id.chat_list_item_last_message)).setText(tempChat.getLastMessage());
                 ((TextView) holder.itemView.findViewById(R.id.chat_list_item_time)).setText(tempChat.getLastMessageTime());
-            }
-            else{
+            } else {
                 ((TextView) holder.itemView.findViewById(R.id.chat_list_item_last_message)).setText("");
                 ((TextView) holder.itemView.findViewById(R.id.chat_list_item_time)).setText("");
             }
@@ -292,6 +298,8 @@ public class FriendActivity extends AppCompatActivity {
         recyclerFriendsList.setAdapter(recyclerFriendsAdapter);
         recyclerFriendsList.setVisibility(View.INVISIBLE);
 
+        recyclerFriendsList.addItemDecoration(new DividerItemDecoration(this,
+                DividerItemDecoration.VERTICAL));
 
         recyclerChatsList = findViewById(R.id.chatsRecyclerView);
         recyclerChatsList.setHasFixedSize(true);
@@ -303,6 +311,9 @@ public class FriendActivity extends AppCompatActivity {
         recyclerChatsList.setAdapter(recyclerChatsAdapter);
 
         recyclerChatsList.setVisibility(View.VISIBLE);
+
+        recyclerChatsList.addItemDecoration(new DividerItemDecoration(this,
+                DividerItemDecoration.VERTICAL));
 
         getSupportActionBar().setTitle(R.string.friends_tab_chats);
 
