@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.format.DateUtils;
@@ -20,6 +21,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.commit451.modalbottomsheetdialogfragment.ModalBottomSheetDialogFragment;
+import com.commit451.modalbottomsheetdialogfragment.Option;
+import com.commit451.modalbottomsheetdialogfragment.OptionRequest;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,13 +33,15 @@ import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,12 +50,11 @@ import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.event.EventDetailsActivity;
 import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
-import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
-import au.edu.unimelb.eng.navibee.utils.URLActionBarIconCacheLoader;
 import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
+import timber.log.Timber;
 
 
-public class ChatActivity extends AppCompatActivity implements IPickResult {
+public class ChatActivity extends AppCompatActivity implements IPickResult, ModalBottomSheetDialogFragment.Listener {
 
     private Conversation conversation;
     private boolean isPrivate;
@@ -60,9 +65,15 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
 
     protected HashMap<String, UserInfoManager.UserInfo> userInfos = new HashMap<>();
 
-    int PLACE_PICKER_REQUEST = 2;
+    private static final int PLACE_PICKER_REQUEST = 2;
+
+    private static final int SEND_PHOTO = 1;
+    private static final int SEND_LOCATION = 2;
+    private static final int SEND_VOICE_CALL = 3;
 
     private int currentMsgCount = 0;
+
+    private ModalBottomSheetDialogFragment.Builder extraDialog;
 
     BroadcastReceiver br = new BroadcastReceiver() {
         @Override
@@ -109,6 +120,18 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
             // TODO: Group headers.
         }
 
+        Resources r = getResources();
+
+        extraDialog = new ModalBottomSheetDialogFragment.Builder()
+                .header(r.getString(R.string.chat_send_multimedia), R.layout.modal_bottom_sheet_dialog_fragment_header)
+                .add(new OptionRequest(SEND_PHOTO, r.getString(R.string.message_type_photo), R.drawable.ic_photo_black80_24dp))
+                .add(new OptionRequest(SEND_LOCATION, r.getString(R.string.message_type_location), R.drawable.ic_place_black80_24dp ));
+
+        if (isPrivate) {
+            extraDialog = extraDialog
+                    .add(new OptionRequest(SEND_VOICE_CALL, r.getString(R.string.chat_voice_call), R.drawable.ic_call_black80_24dp));
+        }
+
         currentMsgCount = conversation.getMessageCount();
         conversation.markAllAsRead();
 
@@ -116,6 +139,27 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
         registerReceiver(br, intFilt);
 
         scrollToBottom();
+    }
+
+    @Override
+    public void onModalOptionSelected(@Nullable String s, @NotNull Option option) {
+        switch (option.getId()) {
+            case SEND_PHOTO:
+                PickImageDialog.build(new PickSetup().setSystemDialog(true)).show(ChatActivity.this);
+                break;
+            case SEND_LOCATION:
+                try {
+                    PlacePicker.IntentBuilder builder1 = new PlacePicker.IntentBuilder();
+                    startActivityForResult(builder1.build(ChatActivity.this), PLACE_PICKER_REQUEST);
+                } catch (Exception e) {
+                    Timber.e(e, "send location error.");
+                }
+                break;
+            case SEND_VOICE_CALL:
+                String voiceCallChannelId = UUID.randomUUID().toString();
+                conversation.sendMessage("voicecall", voiceCallChannelId);
+                break;
+        }
     }
 
     @Override
@@ -153,32 +197,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
     }
 
     public void onClickExtra(View view) {
-        String[] items;
-
-        if (isPrivate) {
-            items = new String[]{"Picture", "Location", "Voice Call"};
-        } else {
-            items = new String[]{"Picture", "Location"};
-        }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Send");
-        builder.setItems(items, (dialog, which) -> {
-            if (which == 0) {
-                PickImageDialog.build(new PickSetup().setSystemDialog(true)).show(ChatActivity.this);
-            } else if (which == 1) {
-                try {
-                    PlacePicker.IntentBuilder builder1 = new PlacePicker.IntentBuilder();
-                    startActivityForResult(builder1.build(ChatActivity.this), PLACE_PICKER_REQUEST);
-                } catch (Exception e) {
-                    Log.d("Chat", "send location error:" + e);
-                }
-            } else if (which == 2) {
-                String voiceCallChannelId = UUID.randomUUID().toString();
-                conversation.sendMessage("voicecall", voiceCallChannelId);
-            }
-        });
-        builder.show();
+        extraDialog.show(getSupportFragmentManager(), "extra");
     }
 
     @Override

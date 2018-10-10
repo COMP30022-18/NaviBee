@@ -102,6 +102,7 @@ dependencies {
     implementation 'net.time4j:time4j-android:3.44.3-2018e'
     implementation 'com.github.chrisbanes:PhotoView:2.0.0'
     implementation 'br.com.simplepass:loading-button-android:1.14.0'
+    implementation 'com.github.Commit451:ModalBottomSheetDialogFragment:1.1.0'
 
     kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.6.0'
 
