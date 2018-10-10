@@ -203,7 +203,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
     }
 
 
-    public static class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHolder> implements View.OnClickListener {
+    public static class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHolder> {
 
         private Gson gson = new Gson();
 
@@ -320,9 +320,8 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
 
             f.addView(cv);
 
-            cv.setOnClickListener(this);
-
             MessageViewHolder vh = new MessageViewHolder(v);
+
             vh.setContentView(cv);
 
             return vh;
@@ -336,6 +335,9 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
 
             Conversation.Message msg = mDataset.get(position);
             View content = holder.getContentView();
+
+
+            content.setOnClickListener(genOnCLick(position));
 
 //            ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.GONE);
 //            ((ImageView) holder.itemView.findViewById(R.id.message_image)).setVisibility(View.GONE);
@@ -385,18 +387,17 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
             return mDataset.size();
         }
 
-        @Override
-        public void onClick(final View view) {
-            int itemPosition = mRecyclerView.getChildLayoutPosition(view);
-            Conversation.Message msg = mDataset.get(itemPosition);
-            switch (msg.getType()) {
-                case "image": {
-                    Intent intent = new Intent(chatActivity.getBaseContext(), ChatImageViewActivity.class);
-                    intent.putExtra("IMG_FS_PATH", msg.getData());
-                    chatActivity.startActivity(intent);
-                    break;
-                }
-                case "location": {
+        private View.OnClickListener genOnCLick(int pos) {
+            return v -> {
+                Conversation.Message msg = mDataset.get(pos);
+                switch (msg.getType()) {
+                    case "image": {
+                        Intent intent = new Intent(chatActivity.getBaseContext(), ChatImageViewActivity.class);
+                        intent.putExtra("IMG_FS_PATH", msg.getData());
+                        chatActivity.startActivity(intent);
+                        break;
+                    }
+                    case "location": {
                         double[] coord = gson.fromJson(msg.getData(), double[].class);
 
                         Intent intent = new Intent(chatActivity.getBaseContext(), LocationDisplayActivity.class);
@@ -409,21 +410,22 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
 
                         chatActivity.startActivity(intent);
 
-                    break;
+                        break;
+                    }
+                    case "event": {
+                        Map<String, String> data = gson.fromJson(msg.getData(), Map.class);
+
+                        Intent intent = new Intent(chatActivity.getBaseContext(), EventDetailsActivity.class);
+
+                        intent.putExtra("eventId", data.get("eid"));
+                        chatActivity.startActivity(intent);
+
+                        break;
+                    }
                 }
-                case "event": {
-                    Map<String, String> data = gson.fromJson(msg.getData(), Map.class);
-
-                    Intent intent = new Intent(chatActivity.getBaseContext(), EventDetailsActivity.class);
-
-                    intent.putExtra("eventId", data.get("eid"));
-                    chatActivity.startActivity(intent);
-
-                    break;
-                }
-            }
-
+            };
         }
+
 
     }
 }
