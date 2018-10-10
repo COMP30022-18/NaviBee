@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.Gravity;
@@ -80,7 +81,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             naviBtn.setClipToOutline(true);
         }
 
-        FallDetection.getInstance().start();
+        Boolean isEnabled = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("countdown_enabled", true);
+
+        if (isEnabled) {
+            FallDetection.getInstance().start();
+        }
+
     }
 
     private void setupWelcomeBanner() {

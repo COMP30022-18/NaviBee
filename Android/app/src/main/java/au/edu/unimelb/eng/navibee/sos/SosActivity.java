@@ -90,7 +90,7 @@ public class SosActivity extends AppCompatActivity {
         TextView phoneText = findViewById(R.id.sos_phone_number);
 
         // Get emergency contact from preference
-        String number = PreferenceManager.getDefaultSharedPreferences(this).getString("sos_emergency_call", "empty");
+        String number = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("sos_emergency_call", "empty");
 
         if (number.equals(" ")) {
             phoneText.setText("Please go Setting");

@@ -194,7 +194,7 @@
         <activity android:name=".social.LocationDisplayActivity" />
         <activity
             android:name=".sos.SosCountDownActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar"/>
     </application>
 
 </manifest>

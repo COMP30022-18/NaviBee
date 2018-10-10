@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.*
+import au.edu.unimelb.eng.navibee.sos.FallDetection
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -66,6 +67,15 @@ class SettingsFragment: PreferenceFragmentCompat(),
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         if (key !in ignoreSummary)
             updateSummary(preferenceScreen.findPreference(key))
+
+        // Checks fall detection countdown is enabled
+        if (key == "countdown_enabled") {
+            if (sharedPreferences?.getBoolean(key, true) == true)
+                FallDetection.getInstance().start()
+            else
+                FallDetection.getInstance().stop()
+        }
+
     }
 
     private fun updateSummary(pref: Preference) {
