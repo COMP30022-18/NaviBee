@@ -1,6 +1,5 @@
 package au.edu.unimelb.eng.navibee.social;
 
-import androidx.annotation.Nullable;
 import au.edu.unimelb.eng.navibee.NaviBeeApplication;
 
 import android.content.Intent;
@@ -10,10 +9,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
@@ -23,8 +19,9 @@ import java.util.Map;
 
 public class ConversationManager {
 
-    public final static String BROADCAST_FRIEND_UPDATED = "broadcast.friend.updated";
+    public final static String BROADCAST_CONVERSATION_UPDATED = "broadcast.conversation.updated";
     public final static String BROADCAST_MESSAGE_READ_CHANGE = "broadcast.message.readchange";
+
 
     private static ConversationManager instance = null;
 
@@ -34,6 +31,14 @@ public class ConversationManager {
 
     public static void init() {
         instance = new ConversationManager();
+
+        instance.uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        instance.db = FirebaseFirestore.getInstance();
+
+        instance.listenPrivateConv();
+        instance.listenGroupConv();
+
+
     }
 
     private static final String TAG = "convM";
@@ -50,11 +55,6 @@ public class ConversationManager {
 
 
     public ConversationManager() {
-        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        db = FirebaseFirestore.getInstance();
-
-        listenPrivateConv();
-        listenGroupConv();
     }
 
     private void listenPrivateConv() {
@@ -104,7 +104,7 @@ public class ConversationManager {
                         UserInfoManager.getInstance().warmCache(friendList);
                     }
 
-                    Intent intent = new Intent(BROADCAST_FRIEND_UPDATED);
+                    Intent intent = new Intent(BROADCAST_CONVERSATION_UPDATED);
                     NaviBeeApplication.getInstance().sendBroadcast(intent);
                 });
     }
@@ -132,8 +132,8 @@ public class ConversationManager {
 
                                 // load new conversation
                                 Conversation conv = new GroupConversation(convId, timestamp.toDate(), createTimestamp.toDate(),
-                                        (String) dc.getDocument().get("name"), (String) dc.getDocument().get("icon"));
-
+                                        (String) dc.getDocument().get("name"), (String) dc.getDocument().get("icon"),
+                                        (Map<String, Boolean>) dc.getDocument().get("users"), (String) dc.getDocument().get("creator"));
                                 convIdMap.put(convId, conv);
                                 break;
 
@@ -146,8 +146,8 @@ public class ConversationManager {
                         }
                     }
 
-//                    Intent intent = new Intent(BROADCAST_FRIEND_UPDATED);
-//                    NaviBeeApplication.getInstance().sendBroadcast(intent);
+                    Intent intent = new Intent(BROADCAST_CONVERSATION_UPDATED);
+                    NaviBeeApplication.getInstance().sendBroadcast(intent);
                 });
     }
 
@@ -194,13 +194,19 @@ public class ConversationManager {
         db.collection("conversations").document(convId).update("isDeleted", true);
     }
 
-    public Task<HttpsCallableResult> createGroupChat(ArrayList<String> uses, String name, String icon) {
+    public Task<HttpsCallableResult> createGroupChat(ArrayList<String> users, String name, String icon) {
         FirebaseFunctions mFunctions = FirebaseFunctions.getInstance();
         Map<String, Object> data = new HashMap<>();
-        data.put("users", uses);
+        data.put("users", users);
         data.put("name", name);
         data.put("icon", icon);
 
         return mFunctions.getHttpsCallable("createGroupChat").call(data);
     }
+
+    public void deleteGroup(String convId){
+        db.collection("conversations").document(convId).update("isDeleted",true);
+    }
+
+    public String getUid(){ return this.uid; }
 }

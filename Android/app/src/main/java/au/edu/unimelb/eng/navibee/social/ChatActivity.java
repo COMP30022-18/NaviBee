@@ -9,11 +9,15 @@ import android.content.IntentFilter;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -31,9 +35,11 @@ import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.UUID;
 
 import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.event.EventDetailsActivity;
 import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 
@@ -52,10 +58,19 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private int currentMsgCount = 0;
 
-    BroadcastReceiver br = new BroadcastReceiver() {
+    BroadcastReceiver msgUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             loadNewMsg();
+        }
+    };
+
+    BroadcastReceiver convUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (ConversationManager.getInstance().getConversation(conversation.getConvId()) == null){
+                finish();
+            }
         }
     };
 
@@ -77,10 +92,53 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         currentMsgCount = conversation.getMessageCount();
         conversation.markAllAsRead();
 
-        IntentFilter intFilt = new IntentFilter(Conversation.BROADCAST_NEW_MESSAGE);
-        registerReceiver(br, intFilt);
+
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.activity_chat_toolbar);
+        setSupportActionBar(myToolbar);
 
         scrollToBottom();
+
+        if (ConversationManager.getInstance().getConversation(convId) == null){
+            finish();
+        }
+
+        registerReceiver(convUpdateReceiver, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
+        registerReceiver(msgUpdateReceiver, new IntentFilter(Conversation.BROADCAST_NEW_MESSAGE));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(convUpdateReceiver);
+        unregisterReceiver(msgUpdateReceiver);
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_chat_activity, menu);
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_chat_detail:
+                if (isPrivate){
+                    Intent intent = new Intent(this, FriendDetail.class);
+                    intent.putExtra("CONV_ID", conversation.getConvId());
+                    intent.putExtra("FRIEND_ID", ((PrivateConversation) conversation).getTargetUid());
+                    startActivity(intent);
+                }
+                else{
+                    Intent intent = new Intent(this, GroupDetailActivity.class);
+                    intent.putExtra("CONV_ID", conversation.getConvId());
+                    startActivity(intent);
+                }
+                return true;
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void loadNewMsg() {
@@ -141,7 +199,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
                 builder.show();
-
                 break;
         }
 
@@ -153,11 +210,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             if (resultCode == RESULT_OK) {
                 PlacePicker.getLatLngBounds(data);
                 Place place = PlacePicker.getPlace(this, data);
-                double[] coord = new double[2];
-                coord[0] = place.getLatLng().latitude;
-                coord[1] = place.getLatLng().longitude;
-                Gson gson = new Gson();
-                conversation.sendMessage("location", gson.toJson(coord));
+                conversation.sendLocation(place.getLatLng().latitude, place.getLatLng().longitude);
             }
         }
     }
@@ -247,6 +300,16 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             } else if (msg.getType().equals("location")) {
                 ((TextView) holder.itemView.findViewById(R.id.message_text)).setText("[Location]");
                 ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
+            } else if (msg.getType().equals("event")) {
+                String text = "[Event] ";
+
+                Gson gson = new Gson();
+                Map<String, String> data = gson.fromJson(msg.getData(), Map.class);
+
+                text = text + data.get("name");
+
+                ((TextView) holder.itemView.findViewById(R.id.message_text)).setText(text);
+                ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.VISIBLE);
             }
 
             // set user name
@@ -281,7 +344,17 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
                 chatActivity.startActivity(intent);
 
+            } else if (msg.getType().equals("event")) {
+                Gson gson = new Gson();
+                Map<String, String> data = gson.fromJson(msg.getData(), Map.class);
+
+                Intent intent = new Intent(chatActivity.getBaseContext(), EventDetailsActivity.class);
+
+                intent.putExtra("eventId", data.get("eid"));
+                chatActivity.startActivity(intent);
+
             }
+
         }
 
     }

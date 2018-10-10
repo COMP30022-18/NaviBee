@@ -58,6 +58,8 @@ public class VoiceCallEngine {
         this.handler = handler;
         mutex.unlock();
         mRtcEngine.joinChannel(null, channelID, "", 0);
+        unmuteMic();
+        useEarpiece();
     }
 
     public void leaveChannel() {
@@ -65,6 +67,22 @@ public class VoiceCallEngine {
         handler = null;
         mutex.unlock();
         mRtcEngine.leaveChannel();
+    }
+
+    public void muteMic() {
+        mRtcEngine.muteLocalAudioStream(true);
+    }
+
+    public void unmuteMic() {
+        mRtcEngine.muteLocalAudioStream(false);
+    }
+
+    public void useSpeaker() {
+        mRtcEngine.setEnableSpeakerphone(true);
+    }
+
+    public void useEarpiece() {
+        mRtcEngine.setEnableSpeakerphone(false);
     }
 
 
