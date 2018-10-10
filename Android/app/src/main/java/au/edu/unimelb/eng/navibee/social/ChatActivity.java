@@ -333,7 +333,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
 //            ((ImageView) holder.itemView.findViewById(R.id.message_image)).setVisibility(View.GONE);
 
             TextView textView = content.findViewById(R.id.message_text);
-            TextView descView = content.findViewById(R.id.message_description);
+            // TextView descView = content.findViewById(R.id.message_description);
             ImageView imageView = content.findViewById(R.id.message_image);
             switch (msg.getType()) {
                 case "text": {

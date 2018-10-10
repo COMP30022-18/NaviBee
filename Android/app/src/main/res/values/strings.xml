@@ -25,6 +25,7 @@
     <string name="chat_voice_call">Voice call</string>
     <string name="chat_type_private">Private chat</string>
     <string name="chat_type_group">Group chat</string>
+    <string name="chat_msg_type_event">Event invitation</string>
     <string name="sos_btn">Call</string>
     <string name="sos_setting">SOS Setting</string>
     <string name="sos_setting_btn">Save</string>
