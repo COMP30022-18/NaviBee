@@ -192,6 +192,7 @@
         <activity android:name=".social.FriendDetail" />
         <activity android:name=".social.GroupDetailActivity" />
         <activity android:name=".social.LocationDisplayActivity" />
+        <activity android:name=".social.RealTimeLocationDisplayActivity" />
         <activity
             android:name=".sos.SosCountDownActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
