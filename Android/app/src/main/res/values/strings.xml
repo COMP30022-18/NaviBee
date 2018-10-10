@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" tools:override="true">NaviBee</string>
     <string name="action_settings">Settings</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
     <string name="action_log_out">Log out</string>
     <string name="app_version_short">α</string>
     <string name="landing_navigation">Get somewhere</string>
@@ -39,6 +40,9 @@
     <string name="action_discard">Discard</string>
     <string name="action_keep">Keep</string>
     <string name="chat_group_create_friend_required">At least one friend should be selected.</string>
+    <string name="user_profile_subtitle">A proud NaviBee user.</string>
+    <string name="profile_send_message">Send message</string>
+    <string name="profile_delete_friend">Delete friend</string>
     <string name="sos_btn">Call</string>
     <string name="sos_setting">SOS Setting</string>
     <string name="sos_setting_btn">Save</string>

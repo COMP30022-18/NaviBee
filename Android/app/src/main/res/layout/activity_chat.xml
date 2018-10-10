@@ -7,15 +7,18 @@
     android:layout_height="match_parent"
     tools:context=".social.ChatActivity">
     <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
         android:id="@+id/appbar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary">
+            android:background="?attr/colorPrimary"
+            app:contentInsetStart="0dp"
+            app:contentInsetStartWithNavigation="0dp"
+            >
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -89,8 +92,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:tint="@color/colorLightTextSecondary"
             app:rippleColor="@color/rippleOnLight"
-            app:fabCustomSize="@dimen/fab_size"
-            app:maxImageSize="@dimen/fab_icon_size"
+            app:fabCustomSize="48dp"
+            app:maxImageSize="36dp"
             app:srcCompat="@drawable/ic_add_white_48dp"/>
 
         <LinearLayout
@@ -128,8 +131,8 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_send_message"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="0dp"
                 android:layout_marginBottom="0dp"

@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import au.edu.unimelb.eng.navibee.R;
-import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
+import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
 
 public class FriendDetail extends AppCompatActivity {
     private String convId;
@@ -18,26 +18,26 @@ public class FriendDetail extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_detail);
+        setSupportActionBar(findViewById(R.id.userProfile_actionBar));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         convId = getIntent().getStringExtra("CONV_ID");
         friendId = getIntent().getStringExtra("FRIEND_ID");
         ImageView icon = findViewById(R.id.friend_detail_icon);
         TextView name = findViewById(R.id.friend_detail_name);
         UserInfoManager.getInstance().getUserInfo(friendId, userInfo -> {
             name.setText(userInfo.getName());
-            NetworkImageHelper.loadImage(icon, userInfo.getHighResolutionPhotoUrl());
+            new URLImageViewCacheLoader(userInfo.getHighResolutionPhotoUrl(), icon)
+                    .roundImage(true).execute();
         });
 
     }
-    protected void onClick(View view){
-        switch (view.getId()) {
-            case R.id.activity_friend_detail_sendMessage_button:
-                Intent intent = new Intent(getBaseContext(), ChatActivity.class);
-                intent.putExtra("CONV_ID", convId);
-                startActivity(intent);
-                break;
-            case R.id.activity_friend_detail_deleteFriend_button:
-                ConversationManager.getInstance().deleteFriend(friendId);
-                break;
-        }
+    public void onClickSendMessage(View view){
+        Intent intent = new Intent(getBaseContext(), ChatActivity.class);
+        intent.putExtra("CONV_ID", convId);
+        startActivity(intent);
+    }
+
+    public void onClickDeleteFriend(View view){
+        ConversationManager.getInstance().deleteFriend(friendId);
     }
 }
