@@ -16,6 +16,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
@@ -40,6 +41,8 @@ public abstract class Conversation {
     private Date readTimestamp;
     private Date createTimestamp;
 
+    private ListenerRegistration mListener;
+
 
     public Conversation(String id, Date readTimestamp, Date createTimestamp) {
         conversationId = id;
@@ -60,7 +63,7 @@ public abstract class Conversation {
     }
 
     private void listen() {
-        db.collection("conversations").document(conversationId)
+        mListener = db.collection("conversations").document(conversationId)
                 .collection("messages").orderBy("time")
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null) {
@@ -96,6 +99,10 @@ public abstract class Conversation {
                     intent = new Intent(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE);
                     NaviBeeApplication.getInstance().sendBroadcast(intent);
                 });
+    }
+
+    public void stopListening() {
+        mListener.remove();
     }
 
     protected abstract void newUnreadMsg(Message msg);
