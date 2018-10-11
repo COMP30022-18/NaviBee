@@ -1,5 +1,6 @@
 package au.edu.unimelb.eng.navibee.utils
 
+import android.content.res.Resources
 import android.text.format.DateUtils.*
 import au.edu.unimelb.eng.navibee.NaviBeeApplication
 import java.util.*
@@ -55,4 +56,25 @@ fun chatDateMediumFormat(time: Long): String {
     } else {
         formatDateTime(c, time, FORMAT_SHOW_YEAR)
     }
+}
+
+fun chatDatePreposition(time: Long): String {
+
+    val c = NaviBeeApplication.instance
+
+    val thenCal = GregorianCalendar()
+    thenCal.timeInMillis = time
+    val nowCal = GregorianCalendar()
+    nowCal.timeInMillis = System.currentTimeMillis()
+
+    val prep = if (thenCal.get(Calendar.YEAR) == nowCal.get(Calendar.YEAR)
+            && thenCal.get(Calendar.MONTH) == nowCal.get(Calendar.MONTH)
+            && thenCal.get(Calendar.DAY_OF_MONTH) == nowCal.get(Calendar.DAY_OF_MONTH)) {
+        // Same day
+        Resources.getSystem().getIdentifier("preposition_for_time","string", "android");
+    } else {
+        Resources.getSystem().getIdentifier("preposition_for_date","string", "android");
+    }
+
+    return c.resources.getString(prep, "")
 }

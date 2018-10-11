@@ -202,11 +202,18 @@
             android:parentActivityName=".social.FriendActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".event.EventSelectFriendsActivity" />
+                android:value=".social.FriendActivity" />
         </activity>
         <activity android:name=".social.LocationDisplayActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
-        <activity android:name=".social.GroupDetailActivity" />
+        <activity android:name=".social.GroupDetailActivity"
+            android:label=""
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".social.ChatActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".social.ChatActivity" />
+        </activity>
         <activity
             android:name=".sos.SosCountDownActivity"
             android:theme="@style/AppTheme.NoActionBar"/>

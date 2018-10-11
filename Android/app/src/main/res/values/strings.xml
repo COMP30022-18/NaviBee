@@ -49,8 +49,15 @@
     <string name="action_keep">Keep</string>
     <string name="chat_delete_friend">Do you want to remove %s from friends?</string>
     <string name="action_remove">Remove</string>
+    <string name="chat_group_created_at">Created %s</string>
     <string name="chat_group_create_friend_required">At least one friend should be selected.</string>
+    <string name="chat_group_delete">Dismiss group</string>
     <string name="user_profile_subtitle">A proud NaviBee user.</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_dismiss">Dismiss</string>
+    <string name="action_ok">OK</string>
+    <string name="chat_group_deleted">Sorry, this group is dismissed by the creator.</string>
+    <string name="chat_group_delete_confirm">Do you want to dismiss this group?</string>
     <string name="profile_send_message">Send message</string>
     <string name="profile_delete_friend">Delete friend</string>
     <string name="profile_add_friend">Add friend</string>

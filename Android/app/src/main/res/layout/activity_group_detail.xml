@@ -1,182 +1,151 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/md_grey_200">
-    <LinearLayout
-        android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
+        android:layout_height="wrap_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
         <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@color/white">
+            android:id="@+id/group_member_scroll_list">
+
             <LinearLayout
-                android:layout_marginHorizontal="8dp"
-                android:id="@+id/eventLocationSelection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:layout_gravity="center_vertical">
                 <ImageView
-                    android:layout_marginTop="8dp"
-                    android:id="@+id/group_detail_icon"
-                    android:layout_width="128dp"
-                    android:layout_height="128dp"
-                    app:srcCompat="@drawable/navibee_placeholder" />
-
-
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:scaleType="fitCenter"
+                    android:layout_marginEnd="24dp"
+                    app:srcCompat="@drawable/ic_access_time_black_24dp"
+                    android:tint="@color/colorLightTextSecondary"
+                    android:tintMode="src_in"/>
                 <TextView
-                    android:id="@+id/group_detail_name"
-
-                    android:layout_marginLeft="8dp"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/activity_group_detail_date_created_label"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    tools:text="Group Name"
-                    android:textSize="36sp" />
-            </LinearLayout>
-
-            <View
-                android:layout_marginTop="8dp"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_gravity="bottom"
-                android:background="#B6B6B6"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:background="@color/white"
-            android:layout_marginTop="24dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_gravity="bottom"
-                android:background="#B6B6B6"/>
-
-            <TextView
-                android:id="@+id/activity_group_detail_members_text"
-                android:layout_marginTop="8dp"
-                android:layout_marginHorizontal="8dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Members"
-                android:textSize="24dp"/>
-
-            <GridView
-                android:layout_marginTop="8dp"
-                android:background="@color/white"
-                android:id="@+id/activity_group_detail_members"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginLeft="16dp"
-                android:horizontalSpacing="12dp"
-                android:verticalSpacing="12dp"
-                android:numColumns="4" />
-
-            <View
-                android:layout_marginTop="8dp"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_gravity="bottom"
-                android:background="#B6B6B6"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_marginTop="24dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@color/white">
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_gravity="bottom"
-                android:background="#B6B6B6"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginHorizontal="8dp"
-                android:layout_marginTop="8dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Date Created"
-                    android:textSize="24dp" />
+                    android:layout_weight="1"
+                    android:textSize="18sp"
+                    android:textColor="@color/colorLightTextPrimary"
+                    android:text="@string/chat_group_created_at"/>
                 <TextView
                     android:id="@+id/activity_group_detail_date_created"
-                    android:layout_marginRight="8dp"
-                    android:layout_width="fill_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:text="00/00/00"
-                    android:textSize="24dp"
-                    android:layout_weight="1"
-                    android:gravity="right" />
+                    android:textSize="18sp"
+                    android:textColor="@color/colorLightTextPrimary"
+                    tools:text="@tools:sample/date/day_of_week"/>
             </LinearLayout>
-
             <View
-                android:layout_marginTop="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_gravity="bottom"
-                android:background="#B6B6B6"/>
-
+                android:background="@color/dividerColor"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginHorizontal="8dp"
-                android:layout_marginTop="8dp">
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:gravity="center_vertical">
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:scaleType="fitCenter"
+                    android:layout_marginEnd="24dp"
+                    app:srcCompat="@drawable/ic_people_black_24dp"
+                    android:tint="@color/colorLightTextSecondary"
+                    android:tintMode="src_in"/>
+
+                <ImageView
+                    android:id="@+id/groupDetail_selfAvatar"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:scaleType="fitCenter"
+                    android:layout_marginEnd="8dp"
+                    tools:srcCompat="@tools:sample/avatars"/>
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/groupDetail_selfName"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Creator"
-                    android:textSize="24dp" />
-                <TextView
-                    android:id="@+id/activity_group_detail_creator"
-                    android:layout_marginRight="8dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Mary"
-                    android:textSize="24dp"
-                    android:maxLines="1"
                     android:layout_weight="1"
-                    android:gravity="right" />
+                    android:textSize="18sp"
+                    android:textColor="@color/colorLightTextPrimary"
+                    tools:text="@tools:sample/full_names"/>
+                <ImageView
+                    android:id="@+id/groupDetail_selfIsAdmin"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:scaleType="fitCenter"
+                    android:layout_marginStart="24dp"
+                    app:srcCompat="@drawable/ic_star_black_24dp"
+                    android:tint="@color/colorAccent"
+                    android:tintMode="src_in"/>
             </LinearLayout>
-
-            <View
-                android:layout_marginTop="8dp"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_gravity="bottom"
-                android:background="#B6B6B6"/>
         </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="160dp">
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:contentScrim="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            >
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/chat.groupDetail.toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin" />
+
+            <com.sloydev.collapsingavatartoolbar.CollapsingAvatarToolbar
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:collapsedPadding="64dp">
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:id="@id/cat_avatar"
+                    tools:src="@tools:sample/avatars"
+                    android:layout_gravity="center"
+                    />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@id/cat_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorLightTextPrimary"
+                        android:fontFamily="sans-serif-medium"
+                        tools:text="@tools:sample/full_names" />
+                    <TextView
+                        android:id="@+id/cat_subtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorLightTextSecondary"
+                        tools:text="10 members"/>
+                </LinearLayout>
+            </com.sloydev.collapsingavatartoolbar.CollapsingAvatarToolbar>
 
 
-        <Button
-            android:layout_marginTop="24dp"
-            android:id="@+id/activity_group_detail_deleteGroup_button"
-            android:layout_marginHorizontal="8dp"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/holo_red_light"
-            android:text="Delete Group"
-            android:textSize="24dp"
-            android:onClick="onClick" />
-
-    </LinearLayout>
-
-
-</ScrollView>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

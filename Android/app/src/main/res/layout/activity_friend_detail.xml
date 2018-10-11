@@ -47,6 +47,7 @@
                         android:id="@+id/friend_detail_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
                         android:layout_gravity="center"
                         android:ellipsize="end"
                         android:maxLines="1"
