@@ -166,11 +166,11 @@
         </activity>
         <activity
             android:name=".event.EventDetailsActivity"
-            android:parentActivityName=".navigation.DestinationsActivity"
+            android:parentActivityName=".event.EventsActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".navigation.DestinationsSearchResultActivity" />
+                android:value=".event.EventsActivity" />
         </activity>
         <activity
             android:name=".social.ChatImageViewActivity"

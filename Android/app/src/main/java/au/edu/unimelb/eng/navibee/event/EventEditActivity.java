@@ -542,6 +542,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             participatnsField.setEnabled(false);
             locationField.setEnabled(false);
             timeField.setEnabled(false);
+            privateSwitch.setEnabled(false);
             isEnabled = false;
             submit.startAnimation();
         } else {
@@ -549,6 +550,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             participatnsField.setEnabled(true);
             locationField.setEnabled(true);
             timeField.setEnabled(true);
+            privateSwitch.setEnabled(true);
             isEnabled = true;
             submit.revertAnimation();
         }
