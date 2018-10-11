@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,7 +30,6 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.synnapps.carouselview.CarouselView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -325,7 +325,14 @@ public class EventDetailsActivity extends AppCompatActivity {
 
             listItems.add(new SimpleRVTextPrimarySecondaryStatic(
                     eventItem.getName(),
-                    new SimpleDateFormat(getResources().getString(R.string.date_format)).format(eventItem.getTime_())
+                    DateUtils.formatDateTime(
+                            this,
+                            eventItem.getTime_().getTime(),
+                            DateUtils.FORMAT_SHOW_TIME
+                             | DateUtils.FORMAT_SHOW_DATE
+                             | DateUtils.FORMAT_SHOW_WEEKDAY
+                             | DateUtils.FORMAT_ABBREV_ALL
+                    )
             ));
         }
 
