@@ -21,6 +21,8 @@ public class UserListArrayAdapter extends ArrayAdapter<UserInfoManager.UserInfo>
     private final int mResource;
     private final int mFieldId;
 
+    private boolean enabled = true;
+
     public UserListArrayAdapter(@NonNull Context context, int resource) {
         super(context, resource);
         mResource = resource;
@@ -69,6 +71,19 @@ public class UserListArrayAdapter extends ArrayAdapter<UserInfoManager.UserInfo>
         mFieldId = textViewResourceId;
     }
 
+    public void setEnabled(boolean e) {
+        enabled = e;
+    }
+
+    @Override
+    public boolean isEnabled(int position) {
+        return enabled && super.isEnabled(position);
+    }
+
+    @Override
+    public boolean areAllItemsEnabled() {
+        return enabled && super.areAllItemsEnabled();
+    }
 
     @Override
     public @NonNull

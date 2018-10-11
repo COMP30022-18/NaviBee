@@ -13,6 +13,7 @@
         android:clipToPadding="false">
         <ImageView
             android:id="@+id/message_sender_avatar"
+            android:layout_marginStart="16dp"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:paddingBottom="8dp"

@@ -675,7 +675,7 @@ private class TransitRouteRVAdapter(private val listEntries: MutableList<Transit
     }
 
     private fun defaultTint(color: Int) =
-        ColorStateList(arrayOf(intArrayOf(android.R.attr.state_enabled)), intArrayOf(color))
+        ColorStateList.valueOf(color)
 }
 
 private abstract class TransitRouteRVData
