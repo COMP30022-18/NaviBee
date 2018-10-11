@@ -29,6 +29,11 @@
     <string name="chat_type_group">Group chat</string>
     <string name="chat_msg_type_event">Event invitation</string>
     <string name="chat_send_multimedia">Send…</string>
+
+    <plurals name="chat_group_member_count">
+        <item quantity="one">%1$d member</item>
+        <item quantity="other">%1$d members</item>
+    </plurals>
     <string name="message_type_photo">Photo</string>
     <string name="message_type_location">Location</string>
     <string name="friends_tab_chats">Chats</string>
@@ -38,6 +43,7 @@
     <string name="friends_add_friend">Add friend</string>
     <string name="chat_group_name">Group name</string>
     <string name="friend_added">%s is added as your friend.</string>
+    <string name="friend_since">Friend since %s</string>
     <string name="chat_create_group_back_warning">Do you want to discard your changes?</string>
     <string name="action_discard">Discard</string>
     <string name="action_keep">Keep</string>

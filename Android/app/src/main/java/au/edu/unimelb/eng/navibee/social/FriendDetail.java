@@ -2,41 +2,38 @@ package au.edu.unimelb.eng.navibee.social;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.functions.HttpsCallableResult;
 
 import java.util.Map;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.utils.FormatUtilityKt;
 import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
 
 public class FriendDetail extends AppCompatActivity {
     private String convId;
     private String friendId;
     private ConversationManager cm = ConversationManager.getInstance();
+    private Conversation conv;
     private View sendMessageButton;
     private View deleteFriendButton;
     private View addFriendButton;
 
     private View sendMessageDivider;
     private View friendDivider;
+
+    private TextView subtitle;
 
     private CoordinatorLayout coord;
 
@@ -68,16 +65,17 @@ public class FriendDetail extends AppCompatActivity {
         friendDivider = findViewById(R.id.friendDetail_friendDvdr);
         coord = findViewById(R.id.chat_friendDetail_coordinator);
 
-        loadButton();
-
         ImageView icon = findViewById(R.id.friend_detail_icon);
         TextView name = findViewById(R.id.friend_detail_name);
+        subtitle = findViewById(R.id.friend_detail_subtitle);
         UserInfoManager.getInstance().getUserInfo(friendId, userInfo -> {
             user = userInfo;
             name.setText(userInfo.getName());
             new URLImageViewCacheLoader(userInfo.getHighResolutionPhotoUrl(), icon)
                     .roundImage(true).execute();
         });
+
+        loadButton();
 
         registerReceiver(convUpdateReceiver, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
 
@@ -106,12 +104,17 @@ public class FriendDetail extends AppCompatActivity {
         toggleButtons(true);
         friendDivider.setVisibility(View.VISIBLE);
         if (isFriend){
-            convId = ConversationManager.getInstance().getPrivateConvId(friendId);
+            convId = cm.getPrivateConvId(friendId);
+            conv = cm.getConversation(convId);
+            CharSequence time = FormatUtilityKt.chatDateMediumFormat(
+                    conv.getCreateTimestamp().getTime());
+            subtitle.setText(getString(R.string.friend_since, time));
             addFriendButton.setVisibility(View.GONE);
             deleteFriendButton.setVisibility(View.VISIBLE);
             sendMessageButton.setVisibility(View.VISIBLE);
             sendMessageDivider.setVisibility(View.VISIBLE);
         } else {
+            subtitle.setText(getString(R.string.user_profile_subtitle));
             addFriendButton.setVisibility(View.VISIBLE);
             deleteFriendButton.setVisibility(View.GONE);
             sendMessageButton.setVisibility(View.GONE);

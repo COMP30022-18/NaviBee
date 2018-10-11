@@ -8,14 +8,6 @@ import android.view.MenuItem;
 import android.widget.Checkable;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckedTextView;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
@@ -57,8 +49,6 @@ public class CreateGroupChatActivity extends AppCompatActivity {
             selectedFriendMap.put(uid, false);
         }
 
-        progressBar = findViewById(R.id.create_groupChat_progress);
-        progressBar.setVisibility(View.GONE);
         ListView friendListView = findViewById(R.id.activity_createGroupChat_select_friends_list);
         friendListView.setChoiceMode(friendListView.CHOICE_MODE_MULTIPLE);
 

@@ -126,9 +126,12 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
                 new URLImageViewCacheLoader(userInfo.getPhotoUrl(), toolbarIcon).roundImage(true).execute();
             });
         } else if (conversation instanceof GroupConversation) {
-            toolbarTitle.setText(((GroupConversation) conversation).getName());
-            toolbarSubtitle.setText(R.string.chat_type_group);
-            // TODO: Group headers.
+            GroupConversation group = (GroupConversation) conversation;
+            toolbarTitle.setText(group.getName());
+            String subtitle = getResources().getQuantityString(R.plurals.chat_group_member_count,
+                    group.getMembers().size(), group.getMembers().size());
+            toolbarSubtitle.setText(subtitle);
+            toolbarIcon.setImageDrawable(group.getRoundIconDrawable(getResources()));
         }
 
         Resources r = getResources();

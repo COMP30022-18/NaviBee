@@ -2,7 +2,6 @@ package au.edu.unimelb.eng.navibee.social;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -13,6 +12,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+
+import timber.log.Timber;
 
 public class UserInfoManager {
     private static final String TAG = "UserInfoManager";
@@ -38,7 +39,7 @@ public class UserInfoManager {
     
     public void getUserInfo(String id, Callback<UserInfo> callback) {
         if (userInfoMap.containsKey(id)) {
-            if (callback!=null) callback.callback(userInfoMap.get(id));
+            if (callback != null) callback.callback(userInfoMap.get(id));
             return;
         }
 
@@ -57,10 +58,10 @@ public class UserInfoManager {
                     userInfo.setName((String) doc.get("name"));
                     if (callback!=null) callback.callback(userInfo);
                 } else {
-                    Log.d(TAG, "get failed: user not exists" + id);
+                    Timber.d("get failed: user not exists %s", id);
                 }
             } else {
-                Log.d(TAG, "get failed with ", task.getException());
+                Timber.d(task.getException(), "get failed with ");
             }
         });
     }

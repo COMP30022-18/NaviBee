@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import au.edu.unimelb.eng.navibee.utils.HashUtilitiesKt;
 import jdenticon.Jdenticon;
@@ -53,7 +54,10 @@ public class GroupConversation extends Conversation {
     }
 
     public Drawable getRoundIconDrawable(Resources r) {
-        return RoundedBitmapDrawableFactory.create(r, iconBitmap);
+        RoundedBitmapDrawable d = RoundedBitmapDrawableFactory.create(r, iconBitmap);
+        d.setAntiAlias(true);
+        d.setCircular(true);
+        return d;
     }
 
     public ArrayList<String> getMembers(){ return this.members; }
