@@ -92,6 +92,7 @@ public class UserInfoManager {
 
     public static class UserInfo implements Parcelable, Serializable {
         private String name, photoUrl;
+        private String uid;
 
         public UserInfo(String name, String photoUrl) {
             this.name = name;
@@ -114,6 +115,9 @@ public class UserInfoManager {
                 return new UserInfo[size];
             }
         };
+
+        public void setUserID(String id) { uid = id; }
+        public String getUid() { return uid; }
 
         public String getName() {
             return name;
