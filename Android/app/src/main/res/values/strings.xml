@@ -25,6 +25,7 @@
     <string name="button_send_message">Send message</string>
     <string name="chat_type_message_here">Type your message…</string>
     <string name="chat_voice_call">Voice call</string>
+    <string name="chat_realtime_location">Share realtime location</string>
     <string name="chat_type_private">Private chat</string>
     <string name="chat_type_group">Group chat</string>
     <string name="chat_msg_type_event">Event invitation</string>
