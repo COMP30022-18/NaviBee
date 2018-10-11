@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -23,6 +22,7 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -37,6 +37,7 @@ import java.util.Map;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -63,6 +64,8 @@ public class EventDetailsActivity extends AppCompatActivity {
     private RecyclerView.Adapter viewAdapter;
     private RecyclerView.LayoutManager viewManager;
     private ArrayList<SimpleRecyclerViewItem> listItems = new ArrayList<>();
+
+    private CoordinatorLayout coordinatorLayout;
 
     private CarouselView carouselView;
 
@@ -103,18 +106,15 @@ public class EventDetailsActivity extends AppCompatActivity {
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         eid = getIntent().getStringExtra("eventId");
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.event_details_fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startNavigation();
-            }
-        });
+        FloatingActionButton fab = findViewById(R.id.event_details_fab);
+        fab.setOnClickListener(view -> startNavigation());
 
-        AppBarLayout appbar = (AppBarLayout) findViewById(R.id.event_details_appbar);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.event_details_toolbar);
-        View toolbarPadding = (View) findViewById(R.id.event_details_toolbar_padding);
-        TextView fabText = (TextView) findViewById(R.id.event_details_fab_text);
+        AppBarLayout appbar = findViewById(R.id.event_details_appbar);
+        Toolbar toolbar = findViewById(R.id.event_details_toolbar);
+        View toolbarPadding = findViewById(R.id.event_details_toolbar_padding);
+        TextView fabText = findViewById(R.id.event_details_fab_text);
+
+        coordinatorLayout = findViewById(R.id.event_details_coordinator);
 
         primaryColor = ContextCompat.getColor(this, R.color.colorPrimary);
 
@@ -160,7 +160,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         listItems.add(new SimpleRVIndefiniteProgressBar());
 
         // Recycler View
-        recyclerView = (RecyclerView) findViewById(R.id.event_details_recycler_view);
+        recyclerView = findViewById(R.id.event_details_recycler_view);
 
         viewManager = new LinearLayoutManager(this);
         viewAdapter = new SimpleRecyclerViewAdaptor(listItems);
@@ -371,23 +371,17 @@ public class EventDetailsActivity extends AppCompatActivity {
         }
         else if (relationship.equals("holder")) {
             switch (item.getItemId()) {
-                case Menu.FIRST:
-                    Toast.makeText(this, "Delete is clicked", Toast.LENGTH_SHORT).show();
-                    deleteEvent();
+                case Menu.FIRST:deleteEvent();
                     return true;
             }
         } else if (relationship.equals("participant")) {
             switch (item.getItemId()) {
-                case Menu.FIRST:
-                    Toast.makeText(this, "Quit is clicked", Toast.LENGTH_SHORT).show();
-                    quitEvent();
+                case Menu.FIRST:quitEvent();
                     return true;
             }
         } else {
             switch (item.getItemId()) {
-                case Menu.FIRST:
-                    Toast.makeText(this, "Join is clicked", Toast.LENGTH_SHORT).show();
-                    joinEvent();
+                case Menu.FIRST:joinEvent();
                     return true;
             }
         }
@@ -395,88 +389,59 @@ public class EventDetailsActivity extends AppCompatActivity {
     }
 
     private void quitEvent() {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("Alert");
-        dialog.setMessage("Are you sure you want to QUIT this event?");
-        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                dialoginterface.cancel();
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("users." + uid, FieldValue.delete());
+        db.collection("events").document(eid).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    // TODO: Task completed successfully
+                    finish();
+                } else {
+                    Snackbar.make(coordinatorLayout,
+                            R.string.error_failed_to_connect_to_server,
+                            Snackbar.LENGTH_SHORT).show();
+                }
             }
         });
-        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                Map<String, Object> updates = new HashMap<>();
-                updates.put("users." + uid, FieldValue.delete());
-                db.collection("events").document(eid).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            // Task completed successfully
-                            finish();
-                        } else {
-                            // Task failed with an exception
-                        }
-                    }
-                });
-            }
-        });
-        dialog.show();
     }
 
     private void deleteEvent() {
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("Alert");
-        dialog.setMessage("Are you sure you want to DELETE this event?");
-        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                dialoginterface.cancel();
+        dialog.setMessage(getString(R.string.event_delete_confirmation, eventItem.getName()));
+        dialog.setNegativeButton(R.string.action_cancel, (dialoginterface, i) -> dialoginterface.cancel());
+        dialog.setPositiveButton(R.string.action_delete, (dialoginterface, i) -> db.collection("events").document(eid).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    // TODO: Task completed successfully
+                    finish();
+                } else {
+                    Snackbar.make(coordinatorLayout,
+                            R.string.error_failed_to_connect_to_server,
+                            Snackbar.LENGTH_SHORT).show();
+                }
             }
-        });
-        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                db.collection("events").document(eid).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            // Task completed successfully
-                            finish();
-                        } else {
-                            // Task failed with an exception
-                        }
-                    }
-                });
-            }
-        });
+        }));
         dialog.show();
     }
 
     private void joinEvent() {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("Alert");
-        dialog.setMessage("Are you sure you want to JOIN this event?");
-        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                dialoginterface.cancel();
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("users." + uid, true);
+        db.collection("events").document(eid).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    // TODO: Task completed successfully
+                    finish();
+                } else {
+                    Snackbar.make(coordinatorLayout,
+                            R.string.error_failed_to_connect_to_server,
+                            Snackbar.LENGTH_SHORT).show();
+                }
             }
         });
-        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                Map<String, Object> updates = new HashMap<>();
-                updates.put("users." + uid, true);
-                db.collection("events").document(eid).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            // Task completed successfully
-                            finish();
-                        } else {
-                            // Task failed with an exception
-                        }
-                    }
-                });
-            }
-        });
-        dialog.show();
     }
 
     private void startNavigation(){
