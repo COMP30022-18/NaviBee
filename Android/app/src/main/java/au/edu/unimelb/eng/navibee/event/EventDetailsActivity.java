@@ -239,7 +239,7 @@ public class EventDetailsActivity extends AppCompatActivity {
                     invalidateOptionsMenu();
                 }
                 else{
-                    popup_allert("Sorry, this event has been deleted by the organiser.");
+                    popup_alert(getString(R.string.event_deleted));
                 }
             }
         });
@@ -489,13 +489,13 @@ public class EventDetailsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void popup_allert(String allertMessage){
+    private void popup_alert(String alertMessage){
         AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-        builder1.setMessage(allertMessage);
+        builder1.setMessage(alertMessage);
         builder1.setCancelable(true);
 
         builder1.setPositiveButton(
-                "OK",
+                R.string.action_ok,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();

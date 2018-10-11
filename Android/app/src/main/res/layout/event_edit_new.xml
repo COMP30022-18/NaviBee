@@ -142,7 +142,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Private Event"
+                        android:textColor="@color/colorLightTextPrimary"
+                        android:text="@string/event_private"
                         android:textSize="32sp" />
                     <Switch
                         android:id="@+id/eventPrivateSwitch"

@@ -216,6 +216,8 @@
     <string name="event_create_name_required">Event name is required.</string>
     <string name="event_create_event">New event</string>
     <string name="event_create_create">Create event</string>
+    <string name="event_private">Private event</string>
+    <string name="event_deleted">Sorry, this event has been taken down by the organiser.</string>
     <string name="event_create_location">Location</string>
     <string name="event_create_location_required">Event location is required.</string>
     <string name="event_create_time">Time</string>
