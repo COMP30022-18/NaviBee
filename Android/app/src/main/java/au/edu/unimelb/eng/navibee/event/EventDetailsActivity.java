@@ -76,14 +76,17 @@ public class EventDetailsActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if(relationship != null){
-            if (relationship.equals("holder")) {
-                //            menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Edit the Event");
-                menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Delete the Event");
-            } else if (relationship.equals("participant")) {
-                menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Quit the Event");
-            } else {
-                menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Join the Event");
-                //            menu.add(Menu.NONE, Menu.FIRST + 1, 1, "Follow the Event");
+            switch (relationship) {
+                case "holder":
+
+                    menu.add(Menu.NONE, Menu.FIRST, 0, getString(R.string.event_delete));
+                    break;
+                case "participant":
+                    menu.add(Menu.NONE, Menu.FIRST, 0, getString(R.string.event_quit));
+                    break;
+                default:
+                    menu.add(Menu.NONE, Menu.FIRST, 0, getString(R.string.event_join));
+                    break;
             }
         }
         getMenuInflater().inflate(R.menu.menu_event_detial, menu);
@@ -357,44 +360,31 @@ public class EventDetailsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(relationship == null){
-            return true;
+            return super.onOptionsItemSelected(item);
         }
         else if (relationship.equals("holder")) {
             switch (item.getItemId()) {
-//                case Menu.FIRST + 0:
-//                    Toast.makeText(this, "Edit is clicked", Toast.LENGTH_SHORT).show();
-//                    editEvent();
-//                    break;
-                case Menu.FIRST + 0:
+                case Menu.FIRST:
                     Toast.makeText(this, "Delete is clicked", Toast.LENGTH_SHORT).show();
                     deleteEvent();
-                    break;
-                default:
-                    break;
+                    return true;
             }
         } else if (relationship.equals("participant")) {
             switch (item.getItemId()) {
-                case Menu.FIRST + 0:
+                case Menu.FIRST:
                     Toast.makeText(this, "Quit is clicked", Toast.LENGTH_SHORT).show();
                     quitEvent();
-                    break;
-                default:
-                    break;
+                    return true;
             }
         } else {
             switch (item.getItemId()) {
-                case Menu.FIRST + 0:
+                case Menu.FIRST:
                     Toast.makeText(this, "Join is clicked", Toast.LENGTH_SHORT).show();
                     joinEvent();
-                    break;
-//                case Menu.FIRST + 1:
-//                    Toast.makeText(this, "Follow is clicked", Toast.LENGTH_SHORT).show();
-//                    break;
-                default:
-                    break;
+                    return true;
             }
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     private void quitEvent() {

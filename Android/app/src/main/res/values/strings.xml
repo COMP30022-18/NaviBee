@@ -210,6 +210,9 @@
     <string name="title_activity_event_details">EventDetailsActivity</string>
     <string name="date_format">EEE, MMM d, HH:mm</string>
     <string name="event_create_name">Event Name</string>
+    <string name="event_delete">Delete</string>
+    <string name="event_quit">Quit</string>
+    <string name="event_join">Join</string>
     <string name="event_create_name_required">Event name is required.</string>
     <string name="event_create_event">New event</string>
     <string name="event_create_create">Create event</string>
