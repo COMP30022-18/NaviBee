@@ -18,6 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -104,6 +105,15 @@ public abstract class Conversation {
 
         db.collection("conversations")
                 .document(conversationId).collection("messages").add(message);
+    }
+
+    public void sendLocation(double latitude, double longitude) {
+        double[] coord = new double[2];
+        coord[0] = latitude;
+        coord[1] = longitude;
+        Gson gson = new Gson();
+        sendMessage("location", gson.toJson(coord));
+
     }
 
     public void sendPicture(Uri uri) {

@@ -8,6 +8,7 @@
     <string name="landing_events">Events</string>
     <string name="landing_social">Friends</string>
     <string name="landing_sos">SOS</string>
+    <string name="title_activity_sos">SOS Help</string>
     <string name="title_activity_event_detail">EventDetailActivity</string>
     <string name="navigation_search_hint">Where do you want to go?</string>
     <string name="search_button_text">Search</string>
@@ -36,13 +37,17 @@
     <string name="friends_create_group">Create group</string>
     <string name="friends_add_friend">Add friend</string>
     <string name="chat_group_name">Group name</string>
+    <string name="friend_added">%s is added as your friend.</string>
     <string name="chat_create_group_back_warning">Do you want to discard your changes?</string>
     <string name="action_discard">Discard</string>
     <string name="action_keep">Keep</string>
+    <string name="chat_delete_friend">Do you want to remove %s from friends?</string>
+    <string name="action_remove">Remove</string>
     <string name="chat_group_create_friend_required">At least one friend should be selected.</string>
     <string name="user_profile_subtitle">A proud NaviBee user.</string>
     <string name="profile_send_message">Send message</string>
     <string name="profile_delete_friend">Delete friend</string>
+    <string name="profile_add_friend">Add friend</string>
     <string name="sos_btn">Call</string>
     <string name="sos_setting">SOS Setting</string>
     <string name="sos_setting_btn">Save</string>
@@ -246,6 +251,7 @@
     <string name="error_failed_to_connect_to_server">Failed to connect to server. Please check your internet connection.</string>
 
 
+
     <string name="action_confirm">Confirm</string>
     <!-- Strings related to Settings -->
     <string name="pref_section_title_navigation">Navigation</string>
@@ -280,11 +286,19 @@
     <string name="pref_navigation_search_region_values_default">au</string>
 
     <string name="pref_section_title_sos">SOS</string>
-    <string name="pref_sos_preferred_emergency_call">Preferred emergency call</string>
-    <string name="pref_sos_preferred_emergency_call_titles">Required a phone number to contact.</string>
+    <string name="pref_sos_preferred_emergency_call">Preferred emergency call number</string>
+    <string name="pref_sos_preferred_emergency_call_titles">Required a phone number to call.</string>
+
+    <string name="pref_sos_preferred_emergency_contact">Preferred emergency contact</string>
+    <string name="pref_sos_preferred_emergency_contact_titles">Required a friend to get emergency help.</string>
 
     <string name="title_activity_event_pic_fullscreen">EventPicFullscreenActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="sos_pre_text">We\'ve detected that you might be in danger\.</string>
+    <string name="sos_main_text">Your emergency contact will be notified in</string>
+    <string name="sos_time_unit">seconds</string>
+    <string name="sos_notify_text">Notify Now</string>
 
 </resources>

@@ -1,6 +1,5 @@
 package au.edu.unimelb.eng.navibee.social;
 
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,10 +8,11 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -43,6 +43,7 @@ import java.util.UUID;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import au.edu.unimelb.eng.navibee.BuildConfig;
@@ -75,10 +76,19 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
 
     private ModalBottomSheetDialogFragment.Builder extraDialog;
 
-    BroadcastReceiver br = new BroadcastReceiver() {
+    BroadcastReceiver msgUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             loadNewMsg();
+        }
+    };
+
+    BroadcastReceiver convUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (ConversationManager.getInstance().getConversation(conversation.getConvId()) == null){
+                finish();
+            }
         }
     };
 
@@ -98,7 +108,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
         chatAdapter = new ChatAdapter(conversation.getCurrentMessageList(), chatRecyclerView, this);
         chatRecyclerView.setAdapter(chatAdapter);
 
-        setSupportActionBar(findViewById(R.id.toolbar));
+        setSupportActionBar(findViewById(R.id.activity_chat_toolbar));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         TextView toolbarTitle = findViewById(R.id.chat_toolbar_title);
         TextView toolbarSubtitle = findViewById(R.id.chat_toolbar_subtitle);
@@ -136,10 +146,34 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
         currentMsgCount = conversation.getMessageCount();
         conversation.markAllAsRead();
 
-        IntentFilter intFilt = new IntentFilter(Conversation.BROADCAST_NEW_MESSAGE);
-        registerReceiver(br, intFilt);
-
         scrollToBottom();
+
+        if (ConversationManager.getInstance().getConversation(convId) == null){
+            finish();
+        }
+
+        registerReceiver(convUpdateReceiver, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
+        registerReceiver(msgUpdateReceiver, new IntentFilter(Conversation.BROADCAST_NEW_MESSAGE));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(convUpdateReceiver);
+        unregisterReceiver(msgUpdateReceiver);
+    }
+
+    public void onClickProfileName(View view) {
+        if (isPrivate){
+            Intent intent = new Intent(this, FriendDetail.class);
+            intent.putExtra("CONV_ID", conversation.getConvId());
+            intent.putExtra("FRIEND_ID", ((PrivateConversation) conversation).getTargetUid());
+            startActivity(intent);
+        } else {
+            Intent intent = new Intent(this, GroupDetailActivity.class);
+            intent.putExtra("CONV_ID", conversation.getConvId());
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -162,13 +196,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
                 break;
         }
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(br);
-    }
-
+    
     private void loadNewMsg() {
         while (currentMsgCount < conversation.getMessageCount()) {
             ((ChatAdapter) chatAdapter).addMessage(conversation.getMessage(currentMsgCount));
@@ -207,11 +235,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
             if (resultCode == RESULT_OK) {
                 PlacePicker.getLatLngBounds(data);
                 Place place = PlacePicker.getPlace(this, data);
-                double[] coord = new double[2];
-                coord[0] = place.getLatLng().latitude;
-                coord[1] = place.getLatLng().longitude;
-                Gson gson = new Gson();
-                conversation.sendMessage("location", gson.toJson(coord));
+                conversation.sendLocation(place.getLatLng().latitude, place.getLatLng().longitude);
             }
         }
     }

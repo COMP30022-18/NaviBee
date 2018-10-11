@@ -1,145 +1,187 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
+    android:id="@+id/chat.friendDetail.coordinator">
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/userProfile.actionBar"
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            android:fitsSystemWindows="true"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp">
-
-            <LinearLayout
-                android:layout_width="0dp"
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/userProfile.actionBar"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="@+id/friend_detail_icon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/friend_detail_icon"
-                app:layout_constraintTop_toTopOf="@+id/friend_detail_icon">
+                android:background="?attr/colorPrimary"
+                android:fitsSystemWindows="true"
+                android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
 
-                <TextView
-                    android:id="@+id/friend_detail_name"
-                    android:layout_width="match_parent"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:textColor="@color/colorLightTextPrimary"
-                    android:textSize="24sp"
-                    tools:text="@tools:sample/full_names" />
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="@+id/friend_detail_icon"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/friend_detail_icon"
+                    app:layout_constraintTop_toTopOf="@+id/friend_detail_icon">
 
-                <TextView
-                    android:id="@+id/friend_detail_subtitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:text="@string/user_profile_subtitle"
-                    android:textColor="@color/colorLightTextPrimary"
-                    android:textSize="18sp" />
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/friend_detail_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="@color/colorLightTextPrimary"
+                        android:textSize="24sp"
+                        tools:text="@tools:sample/full_names" />
 
+                    <TextView
+                        android:id="@+id/friend_detail_subtitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="@string/user_profile_subtitle"
+                        android:textColor="@color/colorLightTextPrimary"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/friend_detail_icon"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.2"
+                    tools:srcCompat="@tools:sample/avatars" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/friendDetail.sendMessageBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_gravity="center_vertical"
+            android:background="?selectableItemBackground"
+            android:onClick="onClickSendMessage">
             <ImageView
-                android:id="@+id/friend_detail_icon"
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.2"
-                tools:srcCompat="@tools:sample/avatars" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="20dp"
-        android:paddingBottom="20dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:layout_gravity="center_vertical"
-        android:background="?selectableItemBackground"
-        android:onClick="onClickSendMessage">
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:scaleType="fitCenter"
-            android:layout_marginEnd="24dp"
-            app:srcCompat="@drawable/ic_message"
-            android:tint="@color/colorLightTextSecondary"
-            android:tintMode="src_in"/>
-        <TextView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:scaleType="fitCenter"
+                android:layout_marginEnd="24dp"
+                app:srcCompat="@drawable/ic_message"
+                android:tint="@color/colorLightTextSecondary"
+                android:tintMode="src_in"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="@color/colorLightTextPrimary"
+                android:text="@string/profile_send_message"/>
+        </LinearLayout>
+        <View
+            android:visibility="gone"
+            android:id="@+id/friendDetail.sendMessageDvdr"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/dividerColor"/>
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/friendDetail.deleteFriendBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textColor="@color/colorLightTextPrimary"
-            android:text="@string/profile_send_message"/>
-    </LinearLayout>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/dividerColor"/>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="20dp"
-        android:paddingBottom="20dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:layout_gravity="center_vertical"
-        android:background="?selectableItemBackground"
-        android:onClick="onClickDeleteFriend">
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:scaleType="fitCenter"
-            android:layout_marginEnd="24dp"
-            app:srcCompat="@drawable/ic_delete_black_24dp"
-            android:tint="@color/colorLightTextSecondary"
-            android:tintMode="src_in"/>
-        <TextView
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_gravity="center_vertical"
+            android:background="?selectableItemBackground"
+            android:onClick="onClickDeleteFriend">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:scaleType="fitCenter"
+                android:layout_marginEnd="24dp"
+                app:srcCompat="@drawable/ic_delete_black_24dp"
+                android:tint="@color/colorLightTextSecondary"
+                android:tintMode="src_in"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="@color/colorLightTextPrimary"
+                android:text="@string/profile_delete_friend"/>
+        </LinearLayout>
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/friendDetail.addFriendBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textColor="@color/colorLightTextPrimary"
-            android:text="@string/profile_delete_friend"/>
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_gravity="center_vertical"
+            android:background="?selectableItemBackground"
+            android:onClick="onClickAddFriend">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:scaleType="fitCenter"
+                android:layout_marginEnd="24dp"
+                app:srcCompat="@drawable/ic_person_add_black_24dp"
+                android:tint="@color/colorLightTextSecondary"
+                android:tintMode="src_in"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="@color/colorLightTextPrimary"
+                android:text="@string/profile_add_friend"/>
+        </LinearLayout>
+        <View
+            android:visibility="gone"
+            android:id="@+id/friendDetail.friendDvdr"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/dividerColor"/>
     </LinearLayout>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/dividerColor"/>
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

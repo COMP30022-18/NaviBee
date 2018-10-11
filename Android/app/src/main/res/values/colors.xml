@@ -5,6 +5,8 @@
     <color name="colorAccent">#8bc34a</color>
 
     <color name="white">#ffffff</color>
+    <color name="grey">#757575</color>
+    <color name="greyWhite">#e0e0e0</color>
 
     <color name="colorLightTextPrimary">#ff000000</color>
     <color name="colorLightTextSecondary">#a6000000</color>
@@ -37,4 +39,5 @@
     <color name="translucentActionBarBackground">#30000000</color>
 
     <color name="checkedGreen">#43A047</color>
+    <color name="sosRed">#D32F2F</color>
 </resources>

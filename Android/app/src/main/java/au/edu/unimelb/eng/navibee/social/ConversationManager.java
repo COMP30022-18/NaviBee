@@ -1,5 +1,7 @@
 package au.edu.unimelb.eng.navibee.social;
 
+import au.edu.unimelb.eng.navibee.NaviBeeApplication;
+
 import android.content.Intent;
 import android.util.Log;
 
@@ -19,8 +21,9 @@ import au.edu.unimelb.eng.navibee.NaviBeeApplication;
 
 public class ConversationManager {
 
-    public final static String BROADCAST_FRIEND_UPDATED = "broadcast.friend.updated";
+    public final static String BROADCAST_CONVERSATION_UPDATED = "broadcast.conversation.updated";
     public final static String BROADCAST_MESSAGE_READ_CHANGE = "broadcast.message.readchange";
+
 
     private static ConversationManager instance = null;
 
@@ -101,7 +104,7 @@ public class ConversationManager {
                         UserInfoManager.getInstance().warmCache(friendList);
                     }
 
-                    Intent intent = new Intent(BROADCAST_FRIEND_UPDATED);
+                    Intent intent = new Intent(BROADCAST_CONVERSATION_UPDATED);
                     NaviBeeApplication.getInstance().sendBroadcast(intent);
                 });
     }
@@ -129,8 +132,8 @@ public class ConversationManager {
 
                                 // load new conversation
                                 Conversation conv = new GroupConversation(convId, timestamp.toDate(), createTimestamp.toDate(),
-                                        (String) dc.getDocument().get("name"), (String) dc.getDocument().get("icon"));
-
+                                        (String) dc.getDocument().get("name"), (String) dc.getDocument().get("icon"),
+                                        (Map<String, Boolean>) dc.getDocument().get("users"), (String) dc.getDocument().get("creator"));
                                 convIdMap.put(convId, conv);
                                 break;
 
@@ -143,8 +146,8 @@ public class ConversationManager {
                         }
                     }
 
-//                    Intent intent = new Intent(BROADCAST_FRIEND_UPDATED);
-//                    NaviBeeApplication.getInstance().sendBroadcast(intent);
+                    Intent intent = new Intent(BROADCAST_CONVERSATION_UPDATED);
+                    NaviBeeApplication.getInstance().sendBroadcast(intent);
                 });
     }
 
@@ -186,9 +189,9 @@ public class ConversationManager {
         return mFunctions.getHttpsCallable("addFriend").call(data);
     }
 
-    public void deleteFriend(String targetUid) {
+    public Task<Void> deleteFriend(String targetUid) {
         String convId = getPrivateConvId(targetUid);
-        db.collection("conversations").document(convId).update("isDeleted", true);
+        return db.collection("conversations").document(convId).update("isDeleted", true);
     }
 
     public Task<HttpsCallableResult> createGroupChat(ArrayList<String> users, String name, String icon) {
@@ -200,4 +203,10 @@ public class ConversationManager {
 
         return mFunctions.getHttpsCallable("createGroupChat").call(data);
     }
+
+    public void deleteGroup(String convId){
+        db.collection("conversations").document(convId).update("isDeleted",true);
+    }
+
+    public String getUid(){ return this.uid; }
 }
