@@ -79,7 +79,7 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if(relationship != null){
+        if (relationship != null){
             switch (relationship) {
                 case "holder":
 
@@ -226,7 +226,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         db.collection("events").document(eid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if(documentSnapshot.exists()){
+                if (documentSnapshot.exists()){
                     eventItem = documentSnapshot.toObject(EventsActivity.EventItem.class);
                     if (eventItem.getImages().size() != 0) {
                         carouselView.setPageCount(eventItem.getImages().size());
@@ -237,8 +237,7 @@ public class EventDetailsActivity extends AppCompatActivity {
                     // finish fetch event info
                     relationship = getRelationship(eventItem);
                     invalidateOptionsMenu();
-                }
-                else{
+                } else {
                     popup_alert(getString(R.string.event_deleted));
                 }
             }
@@ -247,13 +246,11 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     private String getRelationship(EventsActivity.EventItem eventItem){
         String relationship;
-        if(eventItem.getHolder().equals(uid)) {
+        if (eventItem.getHolder().equals(uid)) {
             relationship = "holder";
-        }
-        else if(eventItem.getUsers().keySet().contains(uid)){
+        } else if (eventItem.getUsers().keySet().contains(uid)){
             relationship = "participant";
-        }
-        else {
+        } else {
             relationship = "passerby";
         }
         return relationship;
@@ -375,8 +372,7 @@ public class EventDetailsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if(relationship == null){
             return super.onOptionsItemSelected(item);
-        }
-        else if (relationship.equals("holder")) {
+        } else if (relationship.equals("holder")) {
             switch (item.getItemId()) {
                 case Menu.FIRST:deleteEvent();
                     return true;
