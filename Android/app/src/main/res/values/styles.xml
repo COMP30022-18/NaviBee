@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light">
@@ -44,6 +44,7 @@
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@android:style/Animation</item>
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
@@ -85,14 +86,14 @@
     <style name="AppTheme.List.SectionHeader">
         <item name="android:textAllCaps">true</item>
         <item name="android:textSize">16sp</item>
-        <item name="android:letterSpacing">0.1</item>
+        <item name="android:letterSpacing" tools:targetApi="lollipop">0.1</item>
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textColor">@color/colorLightTextSecondary</item>
     </style>
 
     <style name="AppTheme.List.ItemTitle">
         <item name="android:textSize">45sp</item>
-        <item name="android:lineHeight">50sp</item>
+        <item name="android:lineHeight" tools:targetApi="p">50sp</item>
         <item name="android:fontFamily">sans-serif-light</item>
         <item name="android:textColor">@color/colorLightTextPrimary</item>
     </style>
@@ -115,6 +116,8 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:minHeight">72sp</item>
         <item name="android:textSize">24sp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
     </style>
 
     <style name="AppTheme.Button.Colored" parent="AppTheme.Button">
@@ -211,4 +214,61 @@
         <item name="android:background">@color/black_overlay</item>
     </style>
 
+
+    <declare-styleable name="Messaging">
+        <attr name="layoutGravity">
+            <flag name="bottom" value="80" />
+            <flag name="center" value="17" />
+            <flag name="center_horizontal" value="1" />
+            <flag name="center_vertical" value="16" />
+            <flag name="clip_horizontal" value="8" />
+            <flag name="clip_vertical" value="128" />
+            <flag name="end" value="8388613" />
+            <flag name="fill" value="119" />
+            <flag name="fill_horizontal" value="7" />
+            <flag name="fill_vertical" value="112" />
+            <flag name="left" value="3" />
+            <flag name="right" value="5" />
+            <flag name="start" value="8388611" />
+            <flag name="top" value="48" />
+        </attr>
+        <attr name="visibleOnSelf">
+            <flag name="visible" value="0" />
+            <flag name="invisible" value="1" />
+            <flag name="gone" value="2" />
+        </attr>
+        <attr name="visibleOnOther">
+            <flag name="visible" value="0" />
+            <flag name="invisible" value="1" />
+            <flag name="gone" value="2" />
+        </attr>
+        <attr name="mirrorTextAlignment">
+            <flag name="textStart" value="2"/>
+            <flag name="textEnd" value="3"/>
+        </attr>
+        <attr name="bubbleBackground" format="reference"/>
+        <attr name="primaryForeground" format="color"/>
+        <attr name="secondaryForeground" format="color"/>
+    </declare-styleable>
+
+    <style name="AppTheme.Messaging"/>
+
+    <style name="AppTheme.Messaging.Self">
+        <item name="layoutGravity">end</item>
+        <item name="visibleOnSelf">visible</item>
+        <item name="visibleOnOther">gone</item>
+        <item name="mirrorTextAlignment">textStart</item>
+        <item name="bubbleBackground">@drawable/chat_sender_background</item>
+        <item name="primaryForeground">@color/colorDarkTextPrimary</item>
+        <item name="secondaryForeground">@color/colorDarkTextSecondary</item>
+    </style>
+    <style name="AppTheme.Messaging.Other">
+        <item name="layoutGravity">start</item>
+        <item name="visibleOnSelf">gone</item>
+        <item name="visibleOnOther">visible</item>
+        <item name="mirrorTextAlignment">textEnd</item>
+        <item name="bubbleBackground">@drawable/chat_recipient_background</item>
+        <item name="primaryForeground">@color/colorLightTextPrimary</item>
+        <item name="secondaryForeground">@color/colorLightTextSecondary</item>
+    </style>
 </resources>

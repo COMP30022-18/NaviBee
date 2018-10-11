@@ -126,9 +126,9 @@ public class VoiceCallActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voice_call);
 
-        checkPermission();
-
         working = true;
+
+        checkPermission();
 
         isInitiator = getIntent().getBooleanExtra("INITIATOR", false);
         conv = (PrivateConversation) ConversationManager.getInstance()

@@ -5,8 +5,7 @@
     tools:context="au.edu.unimelb.eng.navibee.social.ChatActivity">
 
     <item
-        android:id="@+id/action_chat_detail"
-        android:orderInCategory="100"
-        android:icon="@drawable/ic_more_detail_24dp"
-        app:showAsAction="always"/>
+        android:id="@+id/chat_groupDetails_delete"
+        android:title="@string/chat_group_delete"
+        app:showAsAction="never" />
 </menu>

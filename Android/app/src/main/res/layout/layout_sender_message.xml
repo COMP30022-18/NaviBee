@@ -1,57 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-<LinearLayout
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:layout_alignParentEnd="true"
-    android:layout_alignParentRight="true"
-    android:layout_marginLeft="60dp"
-    android:layout_marginStart="60dp"
-    android:baselineAligned="false"
-    android:layout_marginEnd="10dp"
-    android:layout_marginRight="10dp"
-    android:layout_marginBottom="2dp"
-    android:layout_marginTop="10dp"
-    android:background="@drawable/chat_sender_background">
-
-    <LinearLayout
-        android:layout_width="wrap_content"
+    android:gravity="bottom"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="12dp"
+    android:clipToPadding="false">
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="2"/>
+    <RelativeLayout
+        android:id="@+id/chat_message_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_weight="0.5"
-        android:layout_gravity="bottom">
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <ImageView
-            android:id="@+id/message_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:layout_weight="1"
-            android:visibility="gone"
-            app:srcCompat="@mipmap/ic_launcher_round" />
-
-        <TextView
-            android:id="@+id/message_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Message body here. Message body here. Message body here. Message body here. Message body here. Message body here. Message body here."
-            android:padding="8dp"
-            android:textStyle="bold"
-            android:textSize="24sp"
-            android:textColor="#000000"/>
-
-    </LinearLayout>
-
+        android:layout_weight="8"
+        android:paddingBottom="8dp"
+        android:paddingEnd="4dp"
+        android:paddingStart="4dp"
+        android:clipToPadding="false">
+    </RelativeLayout>
 </LinearLayout>
-
-</RelativeLayout>

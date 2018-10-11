@@ -38,9 +38,10 @@
         android:fitsSystemWindows="true"
         android:layout_gravity="bottom|end"
         android:focusable="true"
-        app:fabCustomSize="80dp"
+        app:fabCustomSize="@dimen/fab_size"
+        app:maxImageSize="@dimen/fab_icon_size"
         app:rippleColor="@color/white"
         app:srcCompat="@drawable/ic_add_white_50dp"
-        app:maxImageSize="40dp" />
+         />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

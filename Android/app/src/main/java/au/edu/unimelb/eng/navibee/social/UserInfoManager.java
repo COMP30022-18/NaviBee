@@ -1,15 +1,19 @@
 package au.edu.unimelb.eng.navibee.social;
 
-import android.util.Log;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+
+import timber.log.Timber;
 
 public class UserInfoManager {
     private static final String TAG = "UserInfoManager";
@@ -35,7 +39,7 @@ public class UserInfoManager {
     
     public void getUserInfo(String id, Callback<UserInfo> callback) {
         if (userInfoMap.containsKey(id)) {
-            if (callback!=null) callback.callback(userInfoMap.get(id));
+            if (callback != null) callback.callback(userInfoMap.get(id));
             return;
         }
 
@@ -54,10 +58,10 @@ public class UserInfoManager {
                     userInfo.setName((String) doc.get("name"));
                     if (callback!=null) callback.callback(userInfo);
                 } else {
-                    Log.d(TAG, "get failed: user not exists" + id);
+                    Timber.d("get failed: user not exists %s", id);
                 }
             } else {
-                Log.d(TAG, "get failed with ", task.getException());
+                Timber.d(task.getException(), "get failed with ");
             }
         });
     }
@@ -86,13 +90,34 @@ public class UserInfoManager {
     }
 
 
-    public static class UserInfo {
+    public static class UserInfo implements Parcelable, Serializable {
         private String name, photoUrl;
+        private String uid;
 
         public UserInfo(String name, String photoUrl) {
             this.name = name;
             this.photoUrl = photoUrl;
         }
+
+        protected UserInfo(Parcel in) {
+            name = in.readString();
+            photoUrl = in.readString();
+        }
+
+        public static final Creator<UserInfo> CREATOR = new Creator<UserInfo>() {
+            @Override
+            public UserInfo createFromParcel(Parcel in) {
+                return new UserInfo(in);
+            }
+
+            @Override
+            public UserInfo[] newArray(int size) {
+                return new UserInfo[size];
+            }
+        };
+
+        public void setUserID(String id) { uid = id; }
+        public String getUid() { return uid; }
 
         public String getName() {
             return name;
@@ -106,12 +131,25 @@ public class UserInfoManager {
             return photoUrl.replace("s96-c", "s400-c");
         }
 
+        public String getOriginalPhotoUrl() {
+            return photoUrl.replace("/s96-c", "");
+        }
+
         public void setName(String name) {
             this.name = name;
         }
 
         public void setPhotoUrl(String photoUrl) {
             this.photoUrl = photoUrl;
+        }
+
+        @Override
+        public int describeContents() { return 0; }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(name);
+            dest.writeString(photoUrl);
         }
     }
 }

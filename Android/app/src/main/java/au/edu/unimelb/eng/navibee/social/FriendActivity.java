@@ -1,16 +1,13 @@
 package au.edu.unimelb.eng.navibee.social;
 
-
-import android.text.format.DateUtils;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,13 +16,23 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.leinardi.android.speeddial.SpeedDialActionItem;
+import com.leinardi.android.speeddial.SpeedDialView;
+
 import java.util.ArrayList;
 import java.util.Date;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import au.edu.unimelb.eng.navibee.R;
-import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
+import au.edu.unimelb.eng.navibee.utils.FormatUtilityKt;
+import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
 
 public class FriendActivity extends AppCompatActivity {
     // TODO magic string
@@ -75,14 +82,16 @@ public class FriendActivity extends AppCompatActivity {
             if (conv instanceof PrivateConversation) {
                 UserInfoManager.getInstance().getUserInfo(((PrivateConversation) conv).getTargetUid(), userInfo -> {
                     // text view haven't changed
-                    if (((String)textView.getTag()).equals(conv.getConvId())) {
+                    if (textView.getTag().equals(conv.getConvId())) {
                         textView.setText(userInfo.getName());
-                        NetworkImageHelper.loadImage(imageView, userInfo.getPhotoUrl());
+                        new URLImageViewCacheLoader(userInfo.getPhotoUrl(), imageView)
+                                .roundImage(true).execute();
                     }
                 });
             } else {
+                Resources r = textView.getResources();
                 textView.setText(((GroupConversation) conv).getName());
-                imageView.setImageBitmap(((GroupConversation) conv).getIconBitmap());
+                imageView.setImageDrawable(((GroupConversation) conv).getRoundIconDrawable(r));
             }
         }
 
@@ -131,34 +140,28 @@ public class FriendActivity extends AppCompatActivity {
         public void onBindViewHolder(FriendViewHolder holder, int position){
             if (isChatList){
                 ContactItem tempChat = contactList.get(position);
-                tempChat.displayNameAndIcon((TextView) holder.itemView.findViewById(R.id.chat_list_item_name),
-                        (ImageView) holder.itemView.findViewById(R.id.chat_list_item_icon));
+                tempChat.displayNameAndIcon(holder.itemView.findViewById(R.id.chat_list_item_name),
+                        holder.itemView.findViewById(R.id.chat_list_item_icon));
                 ((TextView) holder.itemView.findViewById(R.id.chat_list_item_unread)).setText(Integer.toString(tempChat.getUnreadMessage()));
                 if (tempChat.getUnreadMessage() == 0){
                     holder.itemView.findViewById(R.id.chat_list_item_unread).setVisibility(View.INVISIBLE);
-                }
-                else{
+                } else {
                     holder.itemView.findViewById(R.id.chat_list_item_unread).setVisibility(View.VISIBLE);
                 }
                 if (tempChat.hasMessage()){
                     ((TextView) holder.itemView.findViewById(R.id.chat_list_item_last_message)).setText(tempChat.getLastMessage());
                     Long time = tempChat.getLastMessageTime();
-                    Long current = System.currentTimeMillis();
-                    DateUtils dateUtils = new DateUtils();
-                    CharSequence relativeTime = dateUtils.getRelativeTimeSpanString(time, current, dateUtils.MINUTE_IN_MILLIS, dateUtils.FORMAT_ABBREV_RELATIVE );
-
+                    CharSequence relativeTime = FormatUtilityKt.chatDateShortFormat(time);
                     ((TextView) holder.itemView.findViewById(R.id.chat_list_item_time)).setText(relativeTime);
-                }
-                else{
+                } else {
                     ((TextView) holder.itemView.findViewById(R.id.chat_list_item_last_message)).setText("");
                     ((TextView) holder.itemView.findViewById(R.id.chat_list_item_time)).setText("");
                 }
 
-            }
-            else {
+            } else {
                 ContactItem tempPerson = contactList.get(position);
-                tempPerson.displayNameAndIcon((TextView) holder.itemView.findViewById(R.id.friend_item_name),
-                        (ImageView) holder.itemView.findViewById(R.id.friend_item_icon));
+                tempPerson.displayNameAndIcon(holder.itemView.findViewById(R.id.friend_item_name),
+                        holder.itemView.findViewById(R.id.friend_item_icon));
             }
         }
 
@@ -183,17 +186,16 @@ public class FriendActivity extends AppCompatActivity {
     }
 
     private ConversationManager cm = ConversationManager.getInstance();
-    private ArrayList<ContactItem> contactList = new ArrayList<ContactItem>();
-    private ArrayList<ContactItem> chatsList = new ArrayList<ContactItem>();
+    private ArrayList<ContactItem> contactList = new ArrayList<>();
+    private ArrayList<ContactItem> chatsList = new ArrayList<>();
 
     private FriendAdapter recyclerChatsAdapter;
     private Button createGroupChatButton;
     private RecyclerView recyclerChatsList;
     private RecyclerView.LayoutManager recyclerChatsManager;
-
+    private BottomNavigationView navigation;
 
     private FriendAdapter recyclerFriendsAdapter;
-    private Button addFriendButton;
     private RecyclerView recyclerFriendsList;
     private RecyclerView.LayoutManager recyclerFriendsManager;
 
@@ -215,23 +217,51 @@ public class FriendActivity extends AppCompatActivity {
 
 
 
+    private void fadeOutView(View view, int delay) {
+        view.animate()
+                .alpha(0.0f)
+                .setStartDelay(delay)
+                .setDuration(300)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        view.setVisibility(View.GONE);
+                    }
+                });
+    }
+
+    private void fadeInView(View view, int delay) {
+        view.animate()
+                .alpha(1.0f)
+                .setStartDelay(delay)
+                .setDuration(300)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        super.onAnimationStart(animation);
+                        view.setVisibility(View.VISIBLE);
+                    }
+                });
+    }
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+            ActionBar tb = getSupportActionBar();
             switch (item.getItemId()) {
                 case R.id.switch_friend_list:
-                    recyclerChatsList.setVisibility(View.INVISIBLE);
-                    createGroupChatButton.setVisibility(View.INVISIBLE);
-                    recyclerFriendsList.setVisibility(View.VISIBLE);
-                    addFriendButton.setVisibility(View.VISIBLE);
+                    tb.setTitle(R.string.friends_tab_friends);
+                    fadeOutView(recyclerChatsList, 0);
+                    fadeInView(recyclerFriendsList, 150);
                     return true;
                 case R.id.switch_recent_chat:
-                    recyclerChatsList.setVisibility(View.VISIBLE);
-                    createGroupChatButton.setVisibility(View.VISIBLE);
-                    recyclerFriendsList.setVisibility(View.INVISIBLE);
-                    addFriendButton.setVisibility(View.INVISIBLE);
+                    tb.setTitle(R.string.friends_tab_chats);
+                    fadeInView(recyclerChatsList, 150);
+                    fadeOutView(recyclerFriendsList, 0);
                     return true;
             }
             return false;
@@ -243,12 +273,10 @@ public class FriendActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.friend_list);
 
-//        mTextMessage = (TextView) findViewById(R.id.message);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.friend_activity_navbar);
+        navigation = findViewById(R.id.friend_activity_navbar);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-
-        recyclerFriendsList = (RecyclerView) findViewById(R.id.contactRecyclerView);
+        recyclerFriendsList = findViewById(R.id.contactRecyclerView);
         recyclerFriendsList.setHasFixedSize(true);
         recyclerFriendsManager = new LinearLayoutManager(this);
         recyclerFriendsList.setLayoutManager(recyclerFriendsManager);
@@ -256,24 +284,42 @@ public class FriendActivity extends AppCompatActivity {
         recyclerFriendsList.setAdapter(recyclerFriendsAdapter);
         recyclerFriendsList.setVisibility(View.INVISIBLE);
 
-        addFriendButton = (Button) findViewById(R.id.addFriendButton);
-        addFriendButton.setVisibility(View.INVISIBLE);
+        recyclerFriendsList.addItemDecoration(new DividerItemDecoration(this,
+                DividerItemDecoration.VERTICAL));
 
-
-
-        recyclerChatsList = (RecyclerView) findViewById(R.id.chatsRecyclerView);
+        recyclerChatsList = findViewById(R.id.chatsRecyclerView);
         recyclerChatsList.setHasFixedSize(true);
         recyclerChatsManager = new LinearLayoutManager(this);
         recyclerChatsList.setLayoutManager(recyclerChatsManager);
         recyclerChatsAdapter = new FriendAdapter(this, chatsList, recyclerChatsList, true);
         recyclerChatsList.setAdapter(recyclerChatsAdapter);
-        recyclerChatsList.setVisibility(View.INVISIBLE);
 
-        createGroupChatButton = (Button) findViewById(R.id.createGroupChatButton);
         recyclerChatsList.setVisibility(View.VISIBLE);
 
+        recyclerChatsList.addItemDecoration(new DividerItemDecoration(this,
+                DividerItemDecoration.VERTICAL));
 
+        getSupportActionBar().setTitle(R.string.friends_tab_chats);
 
+        SpeedDialView fab = findViewById(R.id.friend_activity_fab);
+        fab.getMainFab().setCustomSize(getResources().getDimensionPixelSize(R.dimen.fab_size));
+
+        fab.addActionItem(
+                new SpeedDialActionItem
+                        .Builder(R.id.friend_fab_add_friend, R.drawable.ic_person_add_black_24dp)
+                        .setFabImageTintColor(ResourcesCompat.getColor(getResources(), R.color.colorLightTextPrimary, getTheme()))
+                        .setLabel(getString(R.string.friends_add_friend))
+                        .create()
+        );
+        fab.addActionItem(
+                new SpeedDialActionItem
+                        .Builder(R.id.friend_fab_create_group, R.drawable.ic_people_black_24dp)
+                        .setFabImageTintColor(ResourcesCompat.getColor(getResources(), R.color.colorLightTextPrimary, getTheme()))
+                        .setLabel(getString(R.string.friends_create_group))
+                        .create()
+        );
+
+        fab.setOnActionSelectedListener(fabListener);
 
         loadChatsList();
         loadContactList();
@@ -282,6 +328,19 @@ public class FriendActivity extends AppCompatActivity {
 
         registerReceiver(msgUpdateReceiver, new IntentFilter(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE));
     }
+
+    SpeedDialView.OnActionSelectedListener fabListener = speedDialActionItem -> {
+        switch (speedDialActionItem.getId()) {
+            case R.id.friend_fab_add_friend:
+                startActivity(new Intent(this,  AddFriendQRActivity.class));
+                return false; // true to keep the Speed Dial open
+            case R.id.friend_fab_create_group:
+                startActivity(new Intent(this, CreateGroupChatActivity.class));
+                return false;
+            default:
+                return false;
+        }
+    };
 
     @Override
     protected void onDestroy() {
@@ -315,17 +374,6 @@ public class FriendActivity extends AppCompatActivity {
 
     private void sortChatsList() {
         chatsList.sort((p1, p2) -> p2.getTimeForSort().compareTo(p1.getTimeForSort()));
-    }
-
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.addFriendButton:
-                startActivity(new Intent(this,  AddFriendQRActivity.class));
-                break;
-            case R.id.createGroupChatButton:
-                startActivity(new Intent(this, CreateGroupChatActivity.class));
-                break;
-        }
     }
 
 }
