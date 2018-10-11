@@ -1,5 +1,7 @@
 package au.edu.unimelb.eng.navibee.event;
 
+
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -33,7 +35,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -115,7 +116,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         View toolbarPadding = (View) findViewById(R.id.event_details_toolbar_padding);
         TextView fabText = (TextView) findViewById(R.id.event_details_fab_text);
 
-        primaryColor = primaryColor = ContextCompat.getColor(this, R.color.colorPrimary);
+        primaryColor = ContextCompat.getColor(this, R.color.colorPrimary);
 
         // Action Bar
         setSupportActionBar(toolbar);
@@ -221,19 +222,25 @@ public class EventDetailsActivity extends AppCompatActivity {
         });
 
         // Get event data
+
         db.collection("events").document(eid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                eventItem = documentSnapshot.toObject(EventsActivity.EventItem.class);
-                if (eventItem.getImages().size() != 0) {
-                    carouselView.setPageCount(eventItem.getImages().size());
+                if(documentSnapshot.exists()){
+                    eventItem = documentSnapshot.toObject(EventsActivity.EventItem.class);
+                    if (eventItem.getImages().size() != 0) {
+                        carouselView.setPageCount(eventItem.getImages().size());
+                    }
+
+                    getEventInfo();
+
+                    // finish fetch event info
+                    relationship = getRelationship(eventItem);
+                    invalidateOptionsMenu();
                 }
-
-                getEventInfo();
-
-                // finish fetch event info
-                relationship = getRelationship(eventItem);
-                invalidateOptionsMenu();
+                else{
+                    popup_allert("Sorry, this event has been deleted by the organiser.");
+                }
             }
         });
     }
@@ -480,6 +487,24 @@ public class EventDetailsActivity extends AppCompatActivity {
 //        intent.putExtra(NavigationSelectorActivity.EXTRA_DESTINATION_NAME, eventItem.getPlaceName());
 
         startActivity(intent);
+    }
+
+    private void popup_allert(String allertMessage){
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+        builder1.setMessage(allertMessage);
+        builder1.setCancelable(true);
+
+        builder1.setPositiveButton(
+                "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                        finish();
+                    }
+                });
+
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
     }
 
 }

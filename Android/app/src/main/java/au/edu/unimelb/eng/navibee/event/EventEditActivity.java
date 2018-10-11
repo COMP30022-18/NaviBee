@@ -6,9 +6,6 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -21,11 +18,10 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.Switch;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -52,7 +48,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import au.edu.unimelb.eng.navibee.R;
@@ -86,6 +81,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     private ScrollView scrollView;
     private CircularProgressButton submit;
     private Place eventLocation;
+    private Switch privateSwitch;
 
     private boolean isEnabled = true;
 
@@ -133,6 +129,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         timeField = findViewById(R.id.event_create_time);
         locationField = findViewById(R.id.event_create_location);
         participatnsField = findViewById(R.id.event_create_participants);
+        privateSwitch = findViewById(R.id.eventPrivateSwitch);
 
         nameLayout = findViewById(R.id.event_create_name_layout);
         timeLayout = findViewById(R.id.event_create_time_layout);
@@ -435,7 +432,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
         EventsActivity.EventItem newEvent = new EventsActivity.EventItem(name, holder, location,
                 eventDate, users, picsStoragePath, eventLocation.getName().toString(),
-                eventLocation.getLatLng().longitude, eventLocation.getLatLng().latitude);
+                eventLocation.getLatLng().longitude, eventLocation.getLatLng().latitude, privateSwitch.isChecked());
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("events").add(newEvent).addOnCompleteListener( task -> {
@@ -545,6 +542,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             participatnsField.setEnabled(false);
             locationField.setEnabled(false);
             timeField.setEnabled(false);
+            privateSwitch.setEnabled(false);
             isEnabled = false;
             submit.startAnimation();
         } else {
@@ -552,6 +550,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             participatnsField.setEnabled(true);
             locationField.setEnabled(true);
             timeField.setEnabled(true);
+            privateSwitch.setEnabled(true);
             isEnabled = true;
             submit.revertAnimation();
         }
