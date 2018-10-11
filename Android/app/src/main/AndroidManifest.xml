@@ -72,6 +72,7 @@
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
         <activity
             android:name=".event.EventsActivity"
+            android:label="@string/events"
             android:parentActivityName=".MainActivity" />
         <activity android:name=".event.EventSelectFriendsActivity"
             android:label="@string/event_create_choose_participants"/>
