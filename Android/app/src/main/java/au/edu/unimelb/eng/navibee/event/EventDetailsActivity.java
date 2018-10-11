@@ -2,7 +2,6 @@ package au.edu.unimelb.eng.navibee.event;
 
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
@@ -12,20 +11,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.WindowInsets;
-import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.synnapps.carouselview.CarouselView;
@@ -44,6 +38,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
+import au.edu.unimelb.eng.navibee.social.FriendDetail;
 import au.edu.unimelb.eng.navibee.social.UserInfoManager;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVIndefiniteProgressBar;
@@ -52,6 +47,7 @@ import au.edu.unimelb.eng.navibee.utils.SimpleRVTextSecondaryPrimaryStatic;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVUserChips;
 import au.edu.unimelb.eng.navibee.utils.SimpleRecyclerViewAdaptor;
 import au.edu.unimelb.eng.navibee.utils.SimpleRecyclerViewItem;
+import au.edu.unimelb.eng.navibee.utils.URLChipCacheLoader;
 
 public class EventDetailsActivity extends AppCompatActivity {
 
@@ -106,13 +102,12 @@ public class EventDetailsActivity extends AppCompatActivity {
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         eid = getIntent().getStringExtra("eventId");
 
-        FloatingActionButton fab = findViewById(R.id.event_details_fab);
+        MaterialButton fab = findViewById(R.id.event_details_fab);
         fab.setOnClickListener(view -> startNavigation());
 
         AppBarLayout appbar = findViewById(R.id.event_details_appbar);
         Toolbar toolbar = findViewById(R.id.event_details_toolbar);
         View toolbarPadding = findViewById(R.id.event_details_toolbar_padding);
-        TextView fabText = findViewById(R.id.event_details_fab_text);
 
         coordinatorLayout = findViewById(R.id.event_details_coordinator);
 
@@ -128,15 +123,12 @@ public class EventDetailsActivity extends AppCompatActivity {
         // Set padding for status bar
         // Require API 20
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
-            toolbarPadding.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
-                @Override
-                public WindowInsets onApplyWindowInsets(View view, WindowInsets windowInsets) {
-                    ViewGroup.LayoutParams layoutParams = toolbarPadding.getLayoutParams();
-                    layoutParams.height = windowInsets.getSystemWindowInsetTop();
-                    toolbarPadding.setLayoutParams(layoutParams);
+            toolbarPadding.setOnApplyWindowInsetsListener((view, windowInsets) -> {
+                ViewGroup.LayoutParams layoutParams = toolbarPadding.getLayoutParams();
+                layoutParams.height = windowInsets.getSystemWindowInsetTop();
+                toolbarPadding.setLayoutParams(layoutParams);
 
-                    return windowInsets;
-                }
+                return windowInsets;
             });
         } else {
             ViewGroup.LayoutParams layoutParams = toolbarPadding.getLayoutParams();
@@ -208,38 +200,32 @@ public class EventDetailsActivity extends AppCompatActivity {
                     toolbar.setTitleTextColor(colorRGBA(0, 0, 0, v));
                     toolbar.setBackgroundColor(colorA(primaryColor, v));
                     toolbarPadding.setBackgroundColor(colorA(primaryColor, v));
-                    fabText.setScaleX(1 - v);
-                    fabText.setScaleY(1 - v);
+                    fab.setScaleX(1 - v);
+                    fab.setScaleY(1 - v);
                 }
             }
         });
 
-        recyclerView.getViewTreeObserver().addOnDrawListener(new ViewTreeObserver.OnDrawListener() {
-            @Override
-            public void onDraw() {
-                updateTitleRowHeight(listItems);
-            }
-        });
+        recyclerView.getViewTreeObserver().addOnDrawListener(() ->
+                updateTitleRowHeight(listItems));
 
         // Get event data
 
-        db.collection("events").document(eid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot.exists()){
-                    eventItem = documentSnapshot.toObject(EventsActivity.EventItem.class);
-                    if (eventItem.getImages().size() != 0) {
-                        carouselView.setPageCount(eventItem.getImages().size());
-                    }
-
-                    getEventInfo();
-
-                    // finish fetch event info
-                    relationship = getRelationship(eventItem);
-                    invalidateOptionsMenu();
-                } else {
-                    popup_alert(getString(R.string.event_deleted));
+        db.collection("events").document(eid).get()
+                .addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()){
+                eventItem = documentSnapshot.toObject(EventsActivity.EventItem.class);
+                if (eventItem.getImages().size() != 0) {
+                    carouselView.setPageCount(eventItem.getImages().size());
                 }
+
+                getEventInfo();
+
+                // finish fetch event info
+                relationship = getRelationship(eventItem);
+                invalidateOptionsMenu();
+            } else {
+                popup_alert(getString(R.string.event_deleted));
             }
         });
     }
@@ -265,17 +251,18 @@ public class EventDetailsActivity extends AppCompatActivity {
             updateEventInfo();
 
             String holder = stringUserInfoMap.get(eventItem.getHolder()).getName();
-            ArrayList<String> participants = new ArrayList<>();
+            ArrayList<UserInfoManager.UserInfo> participants = new ArrayList<>();
 //            ArrayList<String> photos = new ArrayList<>();
 
             userMap = new HashMap<>();
 
             for (int i = 0; i < uidList.size(); i++) {
-                String userName = stringUserInfoMap.get(uidList.get(i)).getName();
-                participants.add(userName);
+                UserInfoManager.UserInfo usr = stringUserInfoMap.get(uidList.get(i));
+                usr.setUserID(uidList.get(i));
+                participants.add(usr);
 
                 // Store user id and name into map
-                userMap.put(uidList.get(i), userName);
+                userMap.put(uidList.get(i), stringUserInfoMap.get(uidList.get(i)).getName());
             }
 
             // Event organiser
@@ -288,12 +275,24 @@ public class EventDetailsActivity extends AppCompatActivity {
 
             ArrayList<Chip> chipList = new ArrayList<>();
 
-            for (String participant : participants) {
-                Chip chip = (Chip) getLayoutInflater().inflate(R.layout.chip_user_profile, null);
-                chip.setText(participant);
-                // TODO use profile picture instead
-                chip.setChipIconResource(R.drawable.ic_people_black_24dp);
+            String myUid =  FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+            for (UserInfoManager.UserInfo participant : participants) {
+                Chip chip = (Chip) getLayoutInflater().inflate(R.layout.chip_user_profile, null);
+                chip.setText(participant.getName());
+                chip.setChipIconResource(R.drawable.ic_people_black_24dp);
+                new URLChipCacheLoader(participant.getPhotoUrl(),
+                        chip, getResources()).execute();
+                if (!participant.getUid().equals(myUid)) {
+                    chip.setOnClickListener(v -> {
+                            Intent intent = new Intent(this, FriendDetail.class);
+                            intent.putExtra("FRIEND_ID", participant.getUid());
+                            startActivity(intent);
+                    });
+                } else {
+                    chip.setClickable(false);
+                    chip.setFocusable(false);
+                }
                 chipList.add(chip);
             }
 
@@ -464,11 +463,9 @@ public class EventDetailsActivity extends AppCompatActivity {
 
         builder1.setPositiveButton(
                 R.string.action_ok,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                        finish();
-                    }
+                (dialog, id) -> {
+                    dialog.cancel();
+                    finish();
                 });
 
         AlertDialog alert11 = builder1.create();

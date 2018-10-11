@@ -50,33 +50,16 @@
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         android:fitsSystemWindows="true" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/event.details.fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:clickable="true"
-        android:fitsSystemWindows="true"
-        android:focusable="true"
-        app:fabCustomSize="@dimen/fab_size"
-        app:maxImageSize="@dimen/fab_icon_size"
+        style="@style/AppTheme.Button.LargeTextFAB"
+        android:layout_width="72dp"
+        android:layout_height="84dp"
+        android:text="@string/button_go"
+        app:cornerRadius="72dp"
         app:layout_anchor="@+id/event.details.recycler_view"
         app:layout_anchorGravity="top|end"
-        app:rippleColor="@color/white" />
-
-    <TextView
-        android:id="@+id/event.details.fab_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textAllCaps="true"
-        android:elevation="24sp"
-        android:text="@string/button_go"
-        android:textSize="30sp"
-        android:textColor="@android:color/primary_text_dark"
-        app:layout_anchor="@id/event.details.fab"
-        app:layout_anchorGravity="center"
-        android:fitsSystemWindows="true" />
+        android:gravity="center"/>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline3"
