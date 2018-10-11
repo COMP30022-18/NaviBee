@@ -68,10 +68,6 @@ class DestinationsActivity : AppCompatActivity(){
                         startVoiceSearch()
                     })
             )
-//            destinations.add(DestinationRVEntry("Transit navigation", "For debug use",
-//                    onClick = View.OnClickListener {
-//                        startActivity<TransitNavigationActivity>()
-//                    }))
             viewModel.searchHistory.value?.run {
                 if (isNotEmpty())
                     destinations.add(DestinationRVDivider(resources.getString(R.string.navigation_destinations_header_recent_destinations)))

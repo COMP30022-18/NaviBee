@@ -2,36 +2,25 @@ package au.edu.unimelb.eng.navibee.sos;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import au.edu.unimelb.eng.navibee.R;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowInsets;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.material.appbar.AppBarLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
 
-import java.util.HashMap;
-import java.util.Map;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import au.edu.unimelb.eng.navibee.R;
 
 public class SosActivity extends AppCompatActivity {
     // TODO magic string
@@ -58,15 +47,12 @@ public class SosActivity extends AppCompatActivity {
         // Set padding for status bar
         // Require API 20
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
-            toolbarPadding.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
-                @Override
-                public WindowInsets onApplyWindowInsets(View view, WindowInsets windowInsets) {
-                    ViewGroup.LayoutParams layoutParams = toolbarPadding.getLayoutParams();
-                    layoutParams.height = windowInsets.getSystemWindowInsetTop();
-                    toolbarPadding.setLayoutParams(layoutParams);
+            toolbarPadding.setOnApplyWindowInsetsListener((view, windowInsets) -> {
+                ViewGroup.LayoutParams layoutParams = toolbarPadding.getLayoutParams();
+                layoutParams.height = windowInsets.getSystemWindowInsetTop();
+                toolbarPadding.setLayoutParams(layoutParams);
 
-                    return windowInsets;
-                }
+                return windowInsets;
             });
         } else {
             ViewGroup.LayoutParams layoutParams = toolbarPadding.getLayoutParams();

@@ -1,10 +1,13 @@
 package au.edu.unimelb.eng.navibee.event;
 
+
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,7 +15,6 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -28,23 +30,20 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.synnapps.carouselview.CarouselView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
-import au.edu.unimelb.eng.navibee.social.LocationDisplayActivity;
 import au.edu.unimelb.eng.navibee.social.UserInfoManager;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVIndefiniteProgressBar;
@@ -66,6 +65,8 @@ public class EventDetailsActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager viewManager;
     private ArrayList<SimpleRecyclerViewItem> listItems = new ArrayList<>();
 
+    private CoordinatorLayout coordinatorLayout;
+
     private CarouselView carouselView;
 
     private EventsActivity.EventItem eventItem;
@@ -78,15 +79,18 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if(relationship != null){
-            if (relationship.equals("holder")) {
-                //            menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Edit the Event");
-                menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Delete the Event");
-            } else if (relationship.equals("participant")) {
-                menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Quit the Event");
-            } else {
-                menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Join the Event");
-                //            menu.add(Menu.NONE, Menu.FIRST + 1, 1, "Follow the Event");
+        if (relationship != null){
+            switch (relationship) {
+                case "holder":
+
+                    menu.add(Menu.NONE, Menu.FIRST, 0, getString(R.string.event_delete));
+                    break;
+                case "participant":
+                    menu.add(Menu.NONE, Menu.FIRST, 0, getString(R.string.event_quit));
+                    break;
+                default:
+                    menu.add(Menu.NONE, Menu.FIRST, 0, getString(R.string.event_join));
+                    break;
             }
         }
         getMenuInflater().inflate(R.menu.menu_event_detial, menu);
@@ -102,25 +106,22 @@ public class EventDetailsActivity extends AppCompatActivity {
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         eid = getIntent().getStringExtra("eventId");
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.event_details_fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startNavigation();
-            }
-        });
+        FloatingActionButton fab = findViewById(R.id.event_details_fab);
+        fab.setOnClickListener(view -> startNavigation());
 
-        AppBarLayout appbar = (AppBarLayout) findViewById(R.id.event_details_appbar);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.event_details_toolbar);
-        View toolbarPadding = (View) findViewById(R.id.event_details_toolbar_padding);
-        TextView fabText = (TextView) findViewById(R.id.event_details_fab_text);
+        AppBarLayout appbar = findViewById(R.id.event_details_appbar);
+        Toolbar toolbar = findViewById(R.id.event_details_toolbar);
+        View toolbarPadding = findViewById(R.id.event_details_toolbar_padding);
+        TextView fabText = findViewById(R.id.event_details_fab_text);
 
-        primaryColor = primaryColor = ContextCompat.getColor(this, R.color.colorPrimary);
+        coordinatorLayout = findViewById(R.id.event_details_coordinator);
+
+        primaryColor = ContextCompat.getColor(this, R.color.colorPrimary);
 
         // Action Bar
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
-            //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowTitleEnabled(true);
         }
 
@@ -159,7 +160,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         listItems.add(new SimpleRVIndefiniteProgressBar());
 
         // Recycler View
-        recyclerView = (RecyclerView) findViewById(R.id.event_details_recycler_view);
+        recyclerView = findViewById(R.id.event_details_recycler_view);
 
         viewManager = new LinearLayoutManager(this);
         viewAdapter = new SimpleRecyclerViewAdaptor(listItems);
@@ -221,32 +222,35 @@ public class EventDetailsActivity extends AppCompatActivity {
         });
 
         // Get event data
+
         db.collection("events").document(eid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                eventItem = documentSnapshot.toObject(EventsActivity.EventItem.class);
-                if (eventItem.getImages().size() != 0) {
-                    carouselView.setPageCount(eventItem.getImages().size());
+                if (documentSnapshot.exists()){
+                    eventItem = documentSnapshot.toObject(EventsActivity.EventItem.class);
+                    if (eventItem.getImages().size() != 0) {
+                        carouselView.setPageCount(eventItem.getImages().size());
+                    }
+
+                    getEventInfo();
+
+                    // finish fetch event info
+                    relationship = getRelationship(eventItem);
+                    invalidateOptionsMenu();
+                } else {
+                    popup_alert(getString(R.string.event_deleted));
                 }
-
-                getEventInfo();
-
-                // finish fetch event info
-                relationship = getRelationship(eventItem);
-                invalidateOptionsMenu();
             }
         });
     }
 
     private String getRelationship(EventsActivity.EventItem eventItem){
         String relationship;
-        if(eventItem.getHolder().equals(uid)) {
+        if (eventItem.getHolder().equals(uid)) {
             relationship = "holder";
-        }
-        else if(eventItem.getUsers().keySet().contains(uid)){
+        } else if (eventItem.getUsers().keySet().contains(uid)){
             relationship = "participant";
-        }
-        else {
+        } else {
             relationship = "passerby";
         }
         return relationship;
@@ -318,7 +322,14 @@ public class EventDetailsActivity extends AppCompatActivity {
 
             listItems.add(new SimpleRVTextPrimarySecondaryStatic(
                     eventItem.getName(),
-                    new SimpleDateFormat(getResources().getString(R.string.date_format)).format(eventItem.getTime_())
+                    DateUtils.formatDateTime(
+                            this,
+                            eventItem.getTime_().getTime(),
+                            DateUtils.FORMAT_SHOW_TIME
+                             | DateUtils.FORMAT_SHOW_DATE
+                             | DateUtils.FORMAT_SHOW_WEEKDAY
+                             | DateUtils.FORMAT_ABBREV_ALL
+                    )
             ));
         }
 
@@ -360,129 +371,80 @@ public class EventDetailsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(relationship == null){
-            return true;
-        }
-        else if (relationship.equals("holder")) {
+            return super.onOptionsItemSelected(item);
+        } else if (relationship.equals("holder")) {
             switch (item.getItemId()) {
-//                case Menu.FIRST + 0:
-//                    Toast.makeText(this, "Edit is clicked", Toast.LENGTH_SHORT).show();
-//                    editEvent();
-//                    break;
-                case Menu.FIRST + 0:
-                    Toast.makeText(this, "Delete is clicked", Toast.LENGTH_SHORT).show();
-                    deleteEvent();
-                    break;
-                default:
-                    break;
+                case Menu.FIRST:deleteEvent();
+                    return true;
             }
         } else if (relationship.equals("participant")) {
             switch (item.getItemId()) {
-                case Menu.FIRST + 0:
-                    Toast.makeText(this, "Quit is clicked", Toast.LENGTH_SHORT).show();
-                    quitEvent();
-                    break;
-                default:
-                    break;
+                case Menu.FIRST:quitEvent();
+                    return true;
             }
         } else {
             switch (item.getItemId()) {
-                case Menu.FIRST + 0:
-                    Toast.makeText(this, "Join is clicked", Toast.LENGTH_SHORT).show();
-                    joinEvent();
-                    break;
-//                case Menu.FIRST + 1:
-//                    Toast.makeText(this, "Follow is clicked", Toast.LENGTH_SHORT).show();
-//                    break;
-                default:
-                    break;
+                case Menu.FIRST:joinEvent();
+                    return true;
             }
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     private void quitEvent() {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("Alert");
-        dialog.setMessage("Are you sure you want to QUIT this event?");
-        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                dialoginterface.cancel();
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("users." + uid, FieldValue.delete());
+        db.collection("events").document(eid).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    // TODO: Task completed successfully
+                    finish();
+                } else {
+                    Snackbar.make(coordinatorLayout,
+                            R.string.error_failed_to_connect_to_server,
+                            Snackbar.LENGTH_SHORT).show();
+                }
             }
         });
-        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                Map<String, Object> updates = new HashMap<>();
-                updates.put("users." + uid, FieldValue.delete());
-                db.collection("events").document(eid).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            // Task completed successfully
-                            finish();
-                        } else {
-                            // Task failed with an exception
-                        }
-                    }
-                });
-            }
-        });
-        dialog.show();
     }
 
     private void deleteEvent() {
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("Alert");
-        dialog.setMessage("Are you sure you want to DELETE this event?");
-        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                dialoginterface.cancel();
+        dialog.setMessage(getString(R.string.event_delete_confirmation, eventItem.getName()));
+        dialog.setNegativeButton(R.string.action_cancel, (dialoginterface, i) -> dialoginterface.cancel());
+        dialog.setPositiveButton(R.string.action_delete, (dialoginterface, i) -> db.collection("events").document(eid).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    // TODO: Task completed successfully
+                    finish();
+                } else {
+                    Snackbar.make(coordinatorLayout,
+                            R.string.error_failed_to_connect_to_server,
+                            Snackbar.LENGTH_SHORT).show();
+                }
             }
-        });
-        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                db.collection("events").document(eid).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            // Task completed successfully
-                            finish();
-                        } else {
-                            // Task failed with an exception
-                        }
-                    }
-                });
-            }
-        });
+        }));
         dialog.show();
     }
 
     private void joinEvent() {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("Alert");
-        dialog.setMessage("Are you sure you want to JOIN this event?");
-        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                dialoginterface.cancel();
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("users." + uid, true);
+        db.collection("events").document(eid).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    // TODO: Task completed successfully
+                    finish();
+                } else {
+                    Snackbar.make(coordinatorLayout,
+                            R.string.error_failed_to_connect_to_server,
+                            Snackbar.LENGTH_SHORT).show();
+                }
             }
         });
-        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                Map<String, Object> updates = new HashMap<>();
-                updates.put("users." + uid, true);
-                db.collection("events").document(eid).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            // Task completed successfully
-                            finish();
-                        } else {
-                            // Task failed with an exception
-                        }
-                    }
-                });
-            }
-        });
-        dialog.show();
     }
 
     private void startNavigation(){
@@ -493,6 +455,24 @@ public class EventDetailsActivity extends AppCompatActivity {
 //        intent.putExtra(NavigationSelectorActivity.EXTRA_DESTINATION_NAME, eventItem.getPlaceName());
 
         startActivity(intent);
+    }
+
+    private void popup_alert(String alertMessage){
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+        builder1.setMessage(alertMessage);
+        builder1.setCancelable(true);
+
+        builder1.setPositiveButton(
+                R.string.action_ok,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                        finish();
+                    }
+                });
+
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
     }
 
 }

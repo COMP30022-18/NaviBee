@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import au.edu.unimelb.eng.navibee.NaviBeeApplication;
+
 public class ConversationManager {
 
     public final static String BROADCAST_CONVERSATION_UPDATED = "broadcast.conversation.updated";
@@ -37,8 +39,6 @@ public class ConversationManager {
 
         instance.listenPrivateConv();
         instance.listenGroupConv();
-
-
     }
 
     private static final String TAG = "convM";
@@ -189,9 +189,9 @@ public class ConversationManager {
         return mFunctions.getHttpsCallable("addFriend").call(data);
     }
 
-    public void deleteFriend(String targetUid) {
+    public Task<Void> deleteFriend(String targetUid) {
         String convId = getPrivateConvId(targetUid);
-        db.collection("conversations").document(convId).update("isDeleted", true);
+        return db.collection("conversations").document(convId).update("isDeleted", true);
     }
 
     public Task<HttpsCallableResult> createGroupChat(ArrayList<String> users, String name, String icon) {

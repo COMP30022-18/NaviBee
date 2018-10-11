@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="?bubbleBackground"
+    android:paddingRight="8dp"
+    android:elevation="4dp"
+    android:clipToPadding="false"
+    android:gravity="center_vertical">
+
+    <ImageView
+        android:id="@+id/chat_event_message_icon_other"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:tint="?primaryForeground"
+        android:visibility="?visibleOnOther"
+        app:srcCompat="@drawable/ic_event_black_44dp" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:orientation="vertical"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/message_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            tools:text="@tools:sample/lorem[3]"
+            android:textAlignment="?mirrorTextAlignment"
+            android:textColor="?primaryForeground"
+            android:textSize="24sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="8dp"
+            android:textAlignment="?mirrorTextAlignment"
+            android:textColor="?secondaryForeground"
+            android:textSize="16sp"
+            android:text="@string/chat_msg_type_event" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/chat_event_message_icon_self"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="8dp"
+        android:tint="?primaryForeground"
+        android:visibility="?visibleOnSelf"
+        app:srcCompat="@drawable/ic_event_black_44dp" />
+</LinearLayout>

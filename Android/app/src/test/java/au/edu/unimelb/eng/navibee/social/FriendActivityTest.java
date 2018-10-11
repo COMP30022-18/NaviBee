@@ -50,7 +50,6 @@ public class FriendActivityTest {
         assertEquals(8, contactItem.getUnreadMessage());
         assertEquals(mMessage.getSummary(), contactItem.getLastMessage());
         assertEquals(true, contactItem.hasMessage());
-        assertEquals(DateManager.DateformatTime(time), contactItem.getLastMessageTime());
         assertEquals(time, contactItem.getTimeForSort());
 
     }
