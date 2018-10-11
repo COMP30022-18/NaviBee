@@ -385,12 +385,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
 
 
             content.setOnClickListener(genOnCLick(position));
-
-//            ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.GONE);
-//            ((ImageView) holder.itemView.findViewById(R.id.message_image)).setVisibility(View.GONE);
-
             TextView textView = content.findViewById(R.id.message_text);
-            // TextView descView = content.findViewById(R.id.message_description);
             ImageView imageView = content.findViewById(R.id.message_image);
             switch (msg.getType()) {
                 case "text": {
@@ -423,8 +418,15 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
             // set user name
             if (!msg.getSender().equals(uid) && !chatActivity.isPrivate) {
                 UserInfoManager.getInstance().getUserInfo(msg.getSender(),
-                        userInfo -> ((TextView) holder.itemView.findViewById(R.id.message_sender))
-                                .setText(userInfo.getName()));
+                        userInfo -> {
+                            ((TextView) holder.itemView.findViewById(R.id.message_sender))
+                                    .setText(userInfo.getName());
+                            new URLImageViewCacheLoader(
+                                    userInfo.getPhotoUrl(),
+                                    holder.itemView.findViewById(R.id.message_sender_avatar)
+                            ).roundImage(true).execute();
+                        });
+
             }
         }
 
