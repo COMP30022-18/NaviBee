@@ -3,8 +3,11 @@ package au.edu.unimelb.eng.navibee.social;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -28,6 +31,7 @@ import java.util.TimerTask;
 
 import androidx.appcompat.app.AppCompatActivity;
 import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
 
 public class RealTimeLocationDisplayActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -77,9 +81,19 @@ public class RealTimeLocationDisplayActivity extends AppCompatActivity implement
 
         updateTimer.scheduleAtFixedRate(updateTask,0, UPDATE_INTERVAL);
 
+
+        TextView title = findViewById(R.id.chat_locationDisplay_title);
+        TextView subtitle = findViewById(R.id.chat_locationDisplay_subtitle);
+        ImageView icon = findViewById(R.id.chat_locationDisplay_icon);
+
+        subtitle.setVisibility(View.GONE);
+
+
         conv = (PrivateConversation) ConversationManager.getInstance().getConversation(getIntent().getStringExtra(EXTRA_CONVID));
         UserInfoManager.getInstance().getUserInfo(conv.getTargetUid(),(userInfo -> {
             userName = userInfo.getName();
+            title.setText(userName);
+            new URLImageViewCacheLoader(userInfo.getPhotoUrl(), icon).roundImage(true).execute();
             update(false);
         }));
 
@@ -105,7 +119,9 @@ public class RealTimeLocationDisplayActivity extends AppCompatActivity implement
                         }
                     }
 
-                });
+        });
+
+
     }
 
     private void update(boolean timer) {
