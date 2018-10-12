@@ -56,16 +56,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     content = data.get("content");
                     break;
                 case "image":
-                    content = "sent you a photo";
+                    content = getString(R.string.notification_image);
                     break;
                 case "voicecall":
-                    content = "is calling you";
+                    content = getString(R.string.notification_voicecall);
                     break;
                 case "location":
-                    content = "send you a location";
+                    content = getString(R.string.notification_location);
                     break;
                 case "event":
-                    content = "send you an event";
+                    content = getString(R.string.notificaiton_event);
                     break;
             }
 
@@ -77,8 +77,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             Notification notification =
                     new NotificationCompat.Builder(this, CHANNEL_ID)
-                    // TODO: change icon
-                    .setSmallIcon(R.drawable.ic_call_icon_white_70dp)
+                    .setSmallIcon(R.drawable.ic_navibee_notification)
                     .setContentTitle(data.get("senderName"))
                     .setContentText(content)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
