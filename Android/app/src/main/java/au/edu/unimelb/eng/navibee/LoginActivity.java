@@ -113,7 +113,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             Intent currentIntent = getIntent();
 
             String convId = getIntent().getStringExtra("convID");
-            if (convId!=null) {
+            if (convId != null) {
                 intent.putExtra("convID", convId);
             }
 
