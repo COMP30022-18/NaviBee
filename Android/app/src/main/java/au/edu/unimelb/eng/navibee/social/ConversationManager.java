@@ -225,7 +225,7 @@ public class ConversationManager {
     }
 
     private boolean openChatActivity(String convId) {
-        if (getConversation(convId)!=null) {
+        if (getConversation(convId) != null) {
             Intent intent = new Intent(NaviBeeApplication.getInstance(), ChatActivity.class);
             intent.putExtra("CONV_ID", convId);
             NaviBeeApplication.getInstance().startActivity(intent);

@@ -39,8 +39,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             if (cm != null) {
                 // app is running
                 Conversation conv = cm.getConversation(data.get("convID"));
-                if (conv!=null) {
-                    if ((conv.getMessageById(data.get("msgID")) != null)&&conv.getUnreadMsgCount()==0) {
+                if (conv != null) {
+                    if ((conv.getMessageById(data.get("msgID")) != null) && conv.getUnreadMsgCount() == 0) {
                         // msg already been read
                         return;
                     }
