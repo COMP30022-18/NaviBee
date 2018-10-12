@@ -1,6 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <dimen name="app_bar_height">180dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="fab_size">60dp</dimen>
+    <dimen name="fab_icon_size">36dp</dimen>
     <dimen name="text_margin">16dp</dimen>
     <dimen name="boundary_margin">16dp</dimen>
 
@@ -14,4 +16,6 @@
     <!-- Transit navigation -->
     <dimen name="transit_navigation_route_bar_width">20dp</dimen>
     <dimen name="transit_navigation_summary_height">64dp</dimen>
+
+    <dimen name="form_vertical_padding">8dp</dimen>
 </resources>

@@ -89,7 +89,7 @@
         app:layout_constraintStart_toStartOf="@+id/golden_ration_guideline"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.gms.common.SignInButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/sign_in_button"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -97,11 +97,16 @@
             android:layout_marginLeft="32dp"
             android:layout_marginRight="32dp"
             android:layout_marginTop="32dp"
-            android:onClick="startNavigationActivity"
+            android:text="@string/sign_in_with_google"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:iconGravity="start"
+            app:iconSize="32dp"
+            app:iconTint="@color/transparentWhite"
+            app:iconTintMode="src_atop"
+            app:icon="@drawable/ic_google_favicon" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

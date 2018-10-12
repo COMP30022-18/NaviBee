@@ -48,11 +48,11 @@
         android:id="@+id/navigation.destinations.details.recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:behavior_hideable="false"
         android:background="@color/white"
+        android:fitsSystemWindows="true"
+        app:behavior_hideable="false"
         app:behavior_peekHeight="300dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-        android:fitsSystemWindows="true"
         tools:listitem="@layout/recycler_view_item_text_secondary_primary_static"/>
 
 

@@ -7,87 +7,154 @@
     android:layout_height="match_parent"
     tools:context=".social.ChatActivity">
     <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
         android:id="@+id/appbar"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+            android:id="@+id/activity_chat_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="@string/app_name"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            app:contentInsetStart="0dp"
+            app:contentInsetStartWithNavigation="0dp"
+            >
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:onClick="onClickProfileName">
+                <ImageView
+                    android:id="@+id/chat_toolbar_icon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="8dp"
+                    tools:src="@tools:sample/avatars"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/chat_toolbar_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:textColor="@color/colorLightTextPrimary"
+                        android:fontFamily="sans-serif-medium"
+                        tools:text="Alice Wonderlando"/>
+                    <TextView
+                        android:id="@+id/chat_toolbar_subtitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textColor="@color/colorLightTextSecondary"
+                        tools:text="Alice, Bob and 2 others"/>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_chat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/divider"
+        android:layout_above="@+id/senderContainer"
         android:layout_below="@+id/appbar"
-        />
+        android:layout_alignParentStart="true"
+        android:background="@color/white"
+        android:clipToPadding="false"
+        app:stackFromEnd="true"
+        app:reverseLayout="true"
+        android:paddingTop="8dp"/>
 
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_gravity="bottom"
-        android:background="#B6B6B6"
-        android:layout_above="@+id/senderContainer"/>
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/senderContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#fff"
+        android:background="@color/white"
         android:layout_alignParentBottom="true"
         android:paddingBottom="4dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
         android:paddingTop="8dp">
 
-        <Button
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btn_send_extra"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@drawable/send_button_background"
-            android:onClick="onClick"
-            android:text="+"
-            android:textColor="#FFFFFF" />
-
-        <EditText
-            android:id="@+id/edit_text_message"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_toRightOf="@+id/btn_send_extra"
-            android:layout_toLeftOf="@+id/btn_send_message"
-            android:gravity="top"
-            android:hint="Type your message"
-            android:selectAllOnFocus="false"
-            android:textColor="#555555"
-            android:textSize="14sp" />
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="16dp"
+            android:onClick="onClickExtra"
+            android:focusable="true"
+            android:clickable="true"
+            app:backgroundTint="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:tint="@color/colorLightTextSecondary"
+            app:rippleColor="@color/rippleOnLight"
+            app:fabCustomSize="48dp"
+            app:maxImageSize="36dp"
+            app:srcCompat="@drawable/ic_add_white_48dp"/>
 
-        <Button
-            android:id="@+id/btn_send_message"
-            android:layout_width="72dp"
-            android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@drawable/send_button_background"
-            android:onClick="onClick"
-            android:text="Send"
-            android:textColor="#FFFFFF" />
-    </RelativeLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/chat_edittext_background"
+            android:elevation="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btn_send_extra"
+            >
+
+            <EditText
+                android:id="@+id/edit_text_message"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="top"
+                android:hint="@string/chat_type_message_here"
+                android:background="@color/transparentWhite"
+                android:importantForAutofill="no"
+                android:inputType="textMultiLine"
+                android:selectAllOnFocus="false"
+                android:textSize="24sp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:maxLines="3"
+                tools:text="a"
+                android:layout_gravity="center"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_send_message"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="0dp"
+                android:layout_marginBottom="0dp"
+                android:layout_marginTop="0dp"
+                android:background="@drawable/send_button_background"
+                android:onClick="onClickSend"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:layout_gravity="bottom"
+                app:iconGravity="textStart"
+                app:icon="@drawable/ic_send_black_24dp"
+                app:iconTint="@color/colorLightTextSecondary"
+                app:iconTintMode="src_in"
+                app:cornerRadius="48dp"
+                app:rippleColor="@color/rippleOnLight"
+                />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ProgressBar
         android:id="@+id/progress_for_chat"
