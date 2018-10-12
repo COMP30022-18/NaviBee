@@ -25,6 +25,7 @@
     <string name="button_send_message">Send message</string>
     <string name="chat_type_message_here">Type your message…</string>
     <string name="chat_voice_call">Voice call</string>
+    <string name="chat_realtime_location">Share realtime location</string>
     <string name="chat_type_private">Private chat</string>
     <string name="chat_type_group">Group chat</string>
     <string name="chat_msg_type_event">Event invitation</string>
@@ -321,5 +322,7 @@
     <string name="notification_voicecall">is calling you</string>
     <string name="notification_location">sent you a location</string>
     <string name="notificaiton_event">sent you an event</string>
+    <string name="notification_realtimelocation">wants to share location with you</string>
+    <string name="chat_realtime_location_title">Location sharing</string>
 
 </resources>

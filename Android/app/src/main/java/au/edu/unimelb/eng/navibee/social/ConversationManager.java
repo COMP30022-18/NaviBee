@@ -94,7 +94,7 @@ public class ConversationManager {
 
                             case REMOVED:
                                 uidToConvId.remove(friendUid);
-                                convIdMap.remove(dc.getDocument().getId());
+                                convIdMap.remove(dc.getDocument().getId()).stopListening();
                                 friendList.remove(friendUid);
                                 break;
                         }
@@ -150,7 +150,7 @@ public class ConversationManager {
                                 break;
 
                             case REMOVED:
-                                convIdMap.remove(dc.getDocument().getId());
+                                convIdMap.remove(dc.getDocument().getId()).stopListening();
                                 break;
                         }
                     }
