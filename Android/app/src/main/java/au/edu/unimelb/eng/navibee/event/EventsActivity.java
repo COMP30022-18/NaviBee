@@ -1,15 +1,5 @@
 package au.edu.unimelb.eng.navibee.event;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import au.edu.unimelb.eng.navibee.R;
-import au.edu.unimelb.eng.navibee.utils.EventRVDivider;
-import au.edu.unimelb.eng.navibee.utils.EventRVEntry;
-import au.edu.unimelb.eng.navibee.utils.EventRVIndefiniteProgressBar;
-import au.edu.unimelb.eng.navibee.utils.EventRVItem;
-import au.edu.unimelb.eng.navibee.utils.EventsRVAdaptor;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -26,6 +16,16 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.utils.EventRVDivider;
+import au.edu.unimelb.eng.navibee.utils.EventRVEntry;
+import au.edu.unimelb.eng.navibee.utils.EventRVIndefiniteProgressBar;
+import au.edu.unimelb.eng.navibee.utils.EventRVItem;
+import au.edu.unimelb.eng.navibee.utils.EventsRVAdaptor;
 
 public class EventsActivity extends AppCompatActivity {
 
@@ -233,9 +233,14 @@ public class EventsActivity extends AppCompatActivity {
 
     private void addToEntry(ArrayList<EventItem> list) {
         for (EventItem i : list) {
+            String eventUrl = null;
+            if (!i.images.isEmpty()) {
+                eventUrl = i.images.get(0);
+            }
             events.add(new EventRVEntry(
                     i.getName(),
                     i.getLocation(),
+                    eventUrl,
                     view -> {
                         Intent intent = new Intent(EventsActivity.this, EventDetailsActivity.class);
                         intent.putExtra("eventId", i.getEventId());

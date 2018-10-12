@@ -221,7 +221,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
 
     public void onClickSend(View view) {
         EditText editText = findViewById(R.id.edit_text_message);
-        String text = editText.getText().toString();
+        String text = editText.getText().toString().trim();
         if (!text.equals("")) {
             conversation.sendMessage("text", text);
             editText.setText("");
