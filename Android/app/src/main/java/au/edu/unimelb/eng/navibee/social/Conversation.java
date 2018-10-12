@@ -1,6 +1,7 @@
 package au.edu.unimelb.eng.navibee.social;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import androidx.annotation.Nullable;
 
@@ -23,7 +24,11 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import androidx.core.app.NotificationManagerCompat;
+import au.edu.unimelb.eng.navibee.MyFirebaseMessagingService;
 import au.edu.unimelb.eng.navibee.NaviBeeApplication;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 
@@ -175,6 +180,18 @@ public abstract class Conversation {
 
         Intent intent = new Intent(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE);
         NaviBeeApplication.getInstance().sendBroadcast(intent);
+
+        // cancel notification
+        SharedPreferences prefs = NaviBeeApplication.getInstance().getSharedPreferences(MyFirebaseMessagingService.NOTIFICATION_PREFS_NAME, NaviBeeApplication.getInstance().MODE_PRIVATE);
+        Set<String> ids = prefs.getStringSet(conversationId, new HashSet<>());
+        prefs.edit().remove(conversationId).apply();
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(NaviBeeApplication.getInstance());
+
+        for (String idString: ids) {
+            int id = Integer.parseInt(idString);
+            notificationManager.cancel(id);
+        }
     }
 
 
