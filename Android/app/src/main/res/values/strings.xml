@@ -317,5 +317,9 @@
     <string name="sos_main_text">Your emergency contact will be notified in</string>
     <string name="sos_time_unit">seconds</string>
     <string name="sos_notify_text">Notify Now</string>
+    <string name="notification_image">sent you a photo</string>
+    <string name="notification_voicecall">is calling you</string>
+    <string name="notification_location">sent you a location</string>
+    <string name="notificaiton_event">sent you an event</string>
 
 </resources>
