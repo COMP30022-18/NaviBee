@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         String convID = getIntent().getStringExtra("convID");
-        if (convID!=null) {
+        if (convID != null) {
             // notification clicked
             ConversationManager.getInstance().waitForOpenChatAvtivity(convID);
         }
