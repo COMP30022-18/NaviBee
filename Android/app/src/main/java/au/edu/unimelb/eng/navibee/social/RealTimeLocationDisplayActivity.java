@@ -113,7 +113,7 @@ public class RealTimeLocationDisplayActivity extends AppCompatActivity implement
                         location = new LatLng((double) data.get("latitude"), (double) data.get("longitude"));
                         lastUpdate = ((Timestamp)data.get("time")).toDate();
                     } else {
-                        if (marker!=null) {
+                        if (marker != null) {
                             marker.remove();
                             location = null;
                         }
@@ -125,15 +125,15 @@ public class RealTimeLocationDisplayActivity extends AppCompatActivity implement
     }
 
     private void update(boolean timer) {
-        if (googleMap==null) return;
-        if (location!=null) {
+        if (googleMap == null) return;
+        if (location != null) {
             long oneAgo = System.currentTimeMillis() - EXPIRE_TIME;
             if (lastUpdate.getTime() < oneAgo) {
-                if (marker!=null) {
+                if (marker != null) {
                     marker.remove();
                 }
             } else {
-                if (marker==null) {
+                if (marker == null) {
                     marker = googleMap.addMarker(new MarkerOptions().position(location));
                     googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
                     googleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM_LEVEL));
@@ -170,7 +170,7 @@ public class RealTimeLocationDisplayActivity extends AppCompatActivity implement
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    if (googleMap!=null) {
+                    if (googleMap != null) {
                         googleMap.setMyLocationEnabled(true);
                     }
 
@@ -236,7 +236,7 @@ public class RealTimeLocationDisplayActivity extends AppCompatActivity implement
         update(false);
 
         googleMap.setOnMyLocationChangeListener(location1 -> {
-            boolean firstTime = myLocation==null;
+            boolean firstTime = myLocation == null;
             myLocation = new LatLng(location1.getLatitude(), location1.getLongitude());
             if (firstTime) update(true);
         });
