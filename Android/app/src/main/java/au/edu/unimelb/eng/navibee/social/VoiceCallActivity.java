@@ -63,6 +63,8 @@ public class VoiceCallActivity extends AppCompatActivity {
     private boolean callStarted = false;
     private int padding;
 
+    private boolean minimiseEnabled = false;
+
     private PowerManager mPowerManager;
     private PowerManager.WakeLock mWakeLock;
 
@@ -355,7 +357,26 @@ public class VoiceCallActivity extends AppCompatActivity {
         }
     }
 
+    public void onClickFab() {
 
+        if (!minimiseEnabled) {
+
+            minimiseEnabled = true;
+            moveTaskToBack(minimiseEnabled);
+
+        } else {
+
+            minimiseEnabled = false;
+            onRestart();
+        }
+
+    }
+
+
+    @Override
+    public boolean moveTaskToBack(boolean nonRoot) {
+        return super.moveTaskToBack(nonRoot);
+    }
 
 
 }

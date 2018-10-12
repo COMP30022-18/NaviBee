@@ -7,6 +7,20 @@
     tools:context=".social.VoiceCallActivity"
     android:background="@color/md_grey_900">
 
+    <au.edu.unimelb.eng.navibee.social.MovableFloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:clickable="true"
+        android:fitsSystemWindows="true"
+        android:focusable="true"
+        android:onClick="onClickFab"
+        app:fabCustomSize="80dp"
+        app:maxImageSize="40dp"
+        app:rippleColor="@color/white"
+        app:srcCompat="@drawable/ic_call_icon_white_70dp"/>
+
     <ImageView
         android:id="@+id/voicecall_exit_full_screen"
         android:layout_width="64dp"
