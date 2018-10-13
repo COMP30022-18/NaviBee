@@ -19,7 +19,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import kotlinx.android.synthetic.main.bottomsheetdialog_navigation_choose_mean_of_transport.*
 import org.jetbrains.anko.alert
-import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.internals.AnkoInternals.createIntent
 import org.jetbrains.anko.startActivityForResult
 
 /**
@@ -97,30 +97,39 @@ import org.jetbrains.anko.startActivityForResult
     }
 
     fun startWalkingNavigation() {
-        startActivity<NavigationActivity>(
-                NavigationActivity.EXTRA_DEST_LAT to latitude,
-                NavigationActivity.EXTRA_DEST_LON to longitude,
-                NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_WALKING
-        )
+
+        val intent = createIntent(this, NavigationActivity::class.java, arrayOf(
+            NavigationActivity.EXTRA_DEST_LAT to latitude,
+            NavigationActivity.EXTRA_DEST_LON to longitude,
+            NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_WALKING
+        ))
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
         this.finish()
     }
 
     fun startDrivingNavigation() {
-        startActivity<NavigationActivity>(
-                NavigationActivity.EXTRA_DEST_LAT to latitude,
-                NavigationActivity.EXTRA_DEST_LON to longitude,
-                NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_DRIVING
-        )
+
+        val intent = createIntent(this, NavigationActivity::class.java, arrayOf(
+            NavigationActivity.EXTRA_DEST_LAT to latitude,
+            NavigationActivity.EXTRA_DEST_LON to longitude,
+            NavigationActivity.EXTRA_MEAN_OF_TRAVEL to NavigationActivity.MEAN_DRIVING
+        ))
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
         this.finish()
     }
 
     fun startTransitNavigation() {
-        startActivity<TransitNavigationActivity>(
+
+        val intent = createIntent(this, TransitNavigationActivity::class.java, arrayOf(
             TransitNavigationActivity.EXTRA_LATITUDE to latitude,
             TransitNavigationActivity.EXTRA_LONGITUDE to longitude,
             TransitNavigationActivity.EXTRA_DESTINATION_NAME to destinationName,
             TransitNavigationActivity.EXTRA_ORIGIN_NAME to originName
-        )
+        ))
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
         this.finish()
     }
 }

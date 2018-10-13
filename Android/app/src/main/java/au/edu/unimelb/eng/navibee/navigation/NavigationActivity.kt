@@ -1,6 +1,8 @@
 package au.edu.unimelb.eng.navibee.navigation
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
@@ -24,6 +26,7 @@ import com.mapbox.services.android.navigation.ui.v5.OnNavigationReadyCallback
 import com.mapbox.services.android.navigation.ui.v5.listeners.NavigationListener
 import com.mapbox.services.android.navigation.v5.milestone.Milestone
 import com.mapbox.services.android.navigation.v5.milestone.MilestoneEventListener
+import com.mapbox.services.android.navigation.v5.navigation.MapboxNavigationOptions
 import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute
 import com.mapbox.services.android.navigation.v5.routeprogress.RouteProgress
 import com.mapbox.services.android.navigation.v5.utils.RouteUtils
@@ -65,6 +68,7 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
 
     private var isMapReady = false
     private var route: DirectionsRoute? = null
+    private lateinit var notification: NaviBeeMapBoxNotification
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,13 +80,8 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
         // initialize location service
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // Get destination location
-        val (destLat, destLon, mean) = getDestinationDetails()
-        val destination = Point.fromLngLat(destLon, destLat)
-
         // Initialize navigation view
         navigationView = navigation_navigation_navigation_view
-        navigationView.initialize(this)
 
         if (isNightModeEnabled() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.statusBarColor = Color.parseColor("#324148")
@@ -94,6 +93,90 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
             finish()
         }
 
+        navigationView.initialize(this)
+    }
+
+    private fun getDestinationDetails(): Triple<Double, Double, String> {
+        if (!intent.hasExtra(EXTRA_DEST_LAT) ||
+                !intent.hasExtra(EXTRA_DEST_LON) ||
+                !intent.hasExtra(EXTRA_MEAN_OF_TRAVEL))
+            finish()
+
+        val destLat = intent.getDoubleExtra(EXTRA_DEST_LAT, 0.0)
+        val destLon = intent.getDoubleExtra(EXTRA_DEST_LON, 0.0)
+        val mean = intent.getStringExtra(EXTRA_MEAN_OF_TRAVEL)
+
+        return Triple(destLat, destLon, mean)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+//        navigationView.onStop()
+//        navigationView.onDestroy()
+    }
+
+    override fun finish() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            finishAndRemoveTask()
+        } else {
+            super.finish()
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        navigationView.onStart()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        navigationView.onResume()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        navigationView.onLowMemory()
+    }
+
+    override fun onBackPressed() {
+        if (!navigationView.onBackPressed()) {
+            // super.onBackPressed()
+            moveTaskToBack(true)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        navigationView.onSaveInstanceState(outState)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        navigationView.onRestoreInstanceState(savedInstanceState)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        navigationView.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        navigationView.onStop()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        notification.unregisterReceiver(this)
+        navigationView.onDestroy()
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onNavigationReady(isRunning: Boolean) {
+
+        // Get destination location
+        val (destLat, destLon, mean) = getDestinationDetails()
+        val destination = Point.fromLngLat(destLon, destLat)
 
         // Retrieve current location
         fusedLocationClient.lastLocation.addOnSuccessListener { loc ->
@@ -119,8 +202,7 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
                                 }.show()
                                 return
                             }
-                            if (isMapReady)
-                                startNavigation(route!!)
+                            startNavigation(route!!)
                         }
 
                         override fun onFailure(call: Call<DirectionsResponse>, t: Throwable) {
@@ -133,75 +215,10 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
                         }
                     })
         }
-
-    }
-
-    private fun getDestinationDetails(): Triple<Double, Double, String> {
-        if (!intent.hasExtra(EXTRA_DEST_LAT) ||
-                !intent.hasExtra(EXTRA_DEST_LON) ||
-                !intent.hasExtra(EXTRA_MEAN_OF_TRAVEL))
-            finish()
-
-        val destLat = intent.getDoubleExtra(EXTRA_DEST_LAT, 0.0)
-        val destLon = intent.getDoubleExtra(EXTRA_DEST_LON, 0.0)
-        val mean = intent.getStringExtra(EXTRA_MEAN_OF_TRAVEL)
-
-        return Triple(destLat, destLon, mean)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        navigationView.onStart()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        navigationView.onResume()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        navigationView.onLowMemory()
-    }
-
-    override fun onBackPressed() {
-        if (!navigationView.onBackPressed())
-            super.onBackPressed()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle?) {
-        navigationView.onSaveInstanceState(outState)
-        super.onSaveInstanceState(outState)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
-        super.onRestoreInstanceState(savedInstanceState)
-        navigationView.onRestoreInstanceState(savedInstanceState)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        navigationView.onPause()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        navigationView.onStop()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        navigationView.onDestroy()
-    }
-
-    override fun onNavigationReady(isRunning: Boolean) {
-        isMapReady = true
-        if (route != null)
-            startNavigation(route!!)
     }
 
     override fun onNavigationFinished() {
-        // Intentionally empty
+        finish()
     }
 
     override fun onNavigationRunning() {
@@ -214,11 +231,22 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
 
     private fun startNavigation(route: DirectionsRoute) {
 
+        notification = NaviBeeMapBoxNotification(
+                this,
+                navigationView
+        )
+
+        val navigationOptions = MapboxNavigationOptions.builder()
+                .navigationNotification(
+                        notification
+                )
+                .build()
+
         navigationView.startNavigation(
                 NavigationViewOptions.builder()
                         .directionsRoute(route)
                         .navigationListener(this)
-                        // .shouldSimulateRoute(true)
+                        .navigationOptions(navigationOptions)
                         .milestoneEventListener(this)
                         .navigationListener(this)
                         .build()
