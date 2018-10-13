@@ -199,8 +199,6 @@
             android:name=".social.VoiceCallActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <service android:name=".social.FloatWindowService" />
-
         <activity android:name=".social.CreateGroupChatActivity"
             android:label="@string/friends_create_group"
             android:parentActivityName=".social.FriendActivity">
