@@ -158,8 +158,9 @@ public class VoiceCallActivity extends AppCompatActivity {
 
 
     private void updateUI() {
+        VoiceCallService.Status status = voiceCallService.getStatus();
 
-        if (voiceCallService.getStatus() == VoiceCallService.Status.Idle) {
+        if (status == VoiceCallService.Status.Idle) {
             // call ended
             finish();
         }
@@ -205,13 +206,44 @@ public class VoiceCallActivity extends AppCompatActivity {
 
 
         if (voiceCallService.getStatus() == VoiceCallService.Status.Waiting) {
+            textViewStatus.setVisibility(View.VISIBLE);
+            textViewStatus.setText("Waiting");
+            changingDot.setVisibility(View.VISIBLE);
 
-        } else {
-            // Calling
 
-
+            if (isInitiator){
+                buttonMic.setVisibility(View.VISIBLE);
+                buttonSpeaker.setVisibility(View.VISIBLE);
+                buttonAccept.setVisibility(View.INVISIBLE);
+                buttonDecline.setVisibility(View.INVISIBLE);
+                buttonHangup.setVisibility(View.VISIBLE);
+            }
+            else{
+                buttonMic.setVisibility(View.INVISIBLE);
+                buttonSpeaker.setVisibility(View.INVISIBLE);
+                buttonAccept.setVisibility(View.VISIBLE);
+                buttonDecline.setVisibility(View.VISIBLE);
+                buttonHangup.setVisibility(View.INVISIBLE);
+            }
         }
-
+        else if (voiceCallService.getStatus() == VoiceCallService.Status.Connecting){
+            textViewStatus.setVisibility(View.VISIBLE);
+            textViewStatus.setText("Connecting");
+            changingDot.setVisibility(View.VISIBLE);
+            buttonMic.setVisibility(View.VISIBLE);
+            buttonSpeaker.setVisibility(View.VISIBLE);
+            buttonAccept.setVisibility(View.INVISIBLE);
+            buttonDecline.setVisibility(View.INVISIBLE);
+            buttonHangup.setVisibility(View.VISIBLE);
+        } else {
+            textViewStatus.setVisibility(View.INVISIBLE);
+            changingDot.setVisibility(View.INVISIBLE);
+            buttonMic.setVisibility(View.VISIBLE);
+            buttonSpeaker.setVisibility(View.VISIBLE);
+            buttonAccept.setVisibility(View.INVISIBLE);
+            buttonDecline.setVisibility(View.INVISIBLE);
+            buttonHangup.setVisibility(View.VISIBLE);
+        }
 
 
         textViewTime.setVisibility(View.INVISIBLE);

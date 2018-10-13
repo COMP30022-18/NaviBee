@@ -13,7 +13,7 @@ import au.edu.unimelb.eng.navibee.NaviBeeApplication;
 
 public class VoiceCallService {
 
-    public enum Status {Idle, Waiting, Calling}
+    public enum Status {Idle, Waiting, Calling, Connecting}
 
     private static final VoiceCallService ourInstance = new VoiceCallService();
 
