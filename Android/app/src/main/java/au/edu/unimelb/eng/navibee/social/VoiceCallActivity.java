@@ -135,9 +135,9 @@ public class VoiceCallActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voice_call);
 
-        checkPermission();
-
         working = true;
+
+        checkPermission();
 
         isInitiator = getIntent().getBooleanExtra("INITIATOR", false);
         conv = (PrivateConversation) ConversationManager.getInstance()
@@ -257,13 +257,13 @@ public class VoiceCallActivity extends AppCompatActivity {
                 break;
             case R.id.voicecall_button_speaker:
                 if (speakerEnabled){
-                    VoiceCallEngine.getInstance().useSpeaker();
+                    VoiceCallEngine.getInstance().useEarpiece();
                     speakerEnabled = false;
                     buttonSpeaker.setImageResource(R.drawable.ic_speaker_white_24dp);
                     buttonSpeaker.setBackgroundResource(R.drawable.voicecall_button_background_white_hollow);
                 }
                 else{
-                    VoiceCallEngine.getInstance().useEarpiece();
+                    VoiceCallEngine.getInstance().useSpeaker();
                     speakerEnabled = true;
                     buttonSpeaker.setImageResource(R.drawable.ic_speaker_black_24dp);
                     buttonSpeaker.setBackgroundResource(R.drawable.voicecall_mic_background);

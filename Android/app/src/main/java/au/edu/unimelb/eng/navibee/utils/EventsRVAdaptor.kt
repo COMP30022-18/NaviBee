@@ -48,8 +48,14 @@ class EventsRVAdaptor(private val data: ArrayList<EventRVItem>) :
                 holder.itemView.recycler_view_events_list_entry_title.text = data.name
                 holder.itemView.recycler_view_events_list_entry_subtitle.text = data.location
                 holder.itemView.setOnClickListener(data.onClick)
-//                holder.itemView.recycler_view_events_list_entry_preview.
-                // TODO event image
+                holder.itemView.recycler_view_events_list_entry_preview.visibility = View.GONE
+                if (data.imageToken?.isNotBlank() == true)
+                    FirebaseStorageHelper.loadImage(
+                            holder.itemView.recycler_view_events_list_entry_preview,
+                             data.imageToken, true) { success ->
+                        if (success)
+                            holder.itemView.recycler_view_events_list_entry_preview.visibility = View.VISIBLE
+                    }
             }
         }
     }
@@ -67,6 +73,7 @@ data class EventRVErrorMessage(
 data class EventRVEntry(
         val name: CharSequence,
         val location: CharSequence,
+        val imageToken: String?,
         val onClick: View.OnClickListener
 ): EventRVItem()
 

@@ -1,6 +1,8 @@
 package au.edu.unimelb.eng.navibee.social;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -32,6 +34,8 @@ import java.util.Map;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import au.edu.unimelb.eng.navibee.R;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
@@ -39,6 +43,8 @@ public class AddFriendQRActivity extends AppCompatActivity
         implements NfcAdapter.OnNdefPushCompleteCallback,
         NfcAdapter.CreateNdefMessageCallback,
         ZXingScannerView.ResultHandler {
+
+    private static final int PERMISSIONS_REQUEST_CAMERA = 1;
 
     private String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
     private static final String ADD_FRIEND_URL = "https://comp30022-18.github.io/NaviBee/user?id=";
@@ -79,6 +85,29 @@ public class AddFriendQRActivity extends AppCompatActivity
             //This will be called if the message is sent successfully
             mNfcAdapter.setOnNdefPushCompleteCallback(this, this);
         }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.CAMERA)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                new AlertDialog.Builder(this)
+                        .setMessage(R.string.friend_request_camera)
+                        .setPositiveButton(R.string.button_ok, (dialog, which) ->
+                                ActivityCompat.requestPermissions(this,
+                                        new String[]{Manifest.permission.CAMERA},
+                                        PERMISSIONS_REQUEST_CAMERA))
+                        .create().show();
+            } else {
+                // No explanation needed; request the permission
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.CAMERA},
+                        PERMISSIONS_REQUEST_CAMERA);
+            }
+        }
     }
 
     private void generateQRCode() {
@@ -108,6 +137,24 @@ public class AddFriendQRActivity extends AppCompatActivity
         mScannerView.setResultHandler(this);
         mScannerView.startCamera();
         handleNfcIntent(getIntent());
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_CAMERA: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted.
+                    mScannerView.startCamera();
+                }
+                break;
+            }
+            // other 'case' lines to check for other
+            // permissions this app might request.
+        }
     }
 
     @Override

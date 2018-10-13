@@ -1,7 +1,11 @@
 package au.edu.unimelb.eng.navibee.navigation
 
+import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +20,7 @@ import com.google.android.material.button.MaterialButton
 import kotlinx.android.synthetic.main.bottomsheetdialog_navigation_choose_mean_of_transport.*
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.startActivityForResult
 
 /**
  * Navigation method selector activity.
@@ -40,6 +45,7 @@ import org.jetbrains.anko.startActivity
         const val EXTRA_LONGITUDE = "longitude"
         const val EXTRA_ORIGIN_NAME = "origin_name"
         const val EXTRA_DESTINATION_NAME = "destination_name"
+        private const val CHECK_LOCATION_PERMISSION = 1
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,6 +62,28 @@ import org.jetbrains.anko.startActivity
         destinationName = intent.getCharSequenceExtra(EXTRA_DESTINATION_NAME)
                 ?: resources.getString(R.string.navigation_default_destination)
 
+        if (ContextCompat.checkSelfPermission(
+                        this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED) {
+            showPopUp()
+        } else {
+            startActivityForResult<LocationPermissionRequestActivity>(
+                    CHECK_LOCATION_PERMISSION
+            )
+        }
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            CHECK_LOCATION_PERMISSION -> {
+                if (resultCode == Activity.RESULT_OK)
+                    showPopUp()
+            }
+        }
+    }
+
+    private fun showPopUp() {
         when (getMeanOfTransport(applicationContext)) {
             MEAN_OF_TRANSPORT_ALWAYS_ASK -> {
                 MeanOfTransportBottomSheetDialogFragment().run {

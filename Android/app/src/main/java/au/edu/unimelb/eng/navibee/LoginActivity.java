@@ -109,6 +109,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         FirebaseUser user = mAuth.getCurrentUser();
         if (user!=null) {
             Intent intent = new Intent(this, MainActivity.class);
+
+            String convId = getIntent().getStringExtra("convID");
+            if (convId != null) {
+                intent.putExtra("convID", convId);
+            }
+
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);
             this.finish();

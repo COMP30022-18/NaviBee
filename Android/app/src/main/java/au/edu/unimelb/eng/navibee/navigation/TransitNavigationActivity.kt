@@ -177,6 +177,7 @@ class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
         recyclerView.retrieveTopObscureHeight { _, height ->
             statusBarSize = height - getActionBarHeight(this)
             topObscureSize = height
+            googleMap?.setPadding(0, topObscureSize, 0, bottomSheetBehavior.peekHeight)
         }
 
         bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
@@ -470,6 +471,7 @@ class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
         googleMap.setPadding(0, topObscureSize, 0, bottomSheetBehavior.peekHeight)
+        googleMap.uiSettings.isMapToolbarEnabled = false
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
             PackageManager.PERMISSION_GRANTED) {
@@ -673,7 +675,7 @@ private class TransitRouteRVAdapter(private val listEntries: MutableList<Transit
     }
 
     private fun defaultTint(color: Int) =
-        ColorStateList(arrayOf(intArrayOf(android.R.attr.state_enabled)), intArrayOf(color))
+        ColorStateList.valueOf(color)
 }
 
 private abstract class TransitRouteRVData

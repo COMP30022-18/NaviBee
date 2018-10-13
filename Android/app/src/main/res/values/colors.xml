@@ -38,5 +38,6 @@
 
     <color name="translucentActionBarBackground">#30000000</color>
 
+    <color name="checkedGreen">#43A047</color>
     <color name="sosRed">#D32F2F</color>
 </resources>

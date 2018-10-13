@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="?bubbleBackground"
+    android:padding="4dp"
+    android:elevation="4dp"
+    android:clipToPadding="false">
+    <au.edu.unimelb.eng.navibee.utils.ClippingImageView
+        android:id="@+id/message_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"
+        android:background="@drawable/chat_image_mask"
+        app:srcCompat="@drawable/navibee_placeholder"
+        tools:src="@tools:sample/backgrounds/scenic"/>
+    <!--
+        clipToOutline is a feature that was supposed to exist
+        but not fixed since 2015.
+
+        The flag can only be triggered programmatically.
+
+        Issue tracker:
+        https://issuetracker.google.com/issues/37036728
+    -->
+
+</FrameLayout>
