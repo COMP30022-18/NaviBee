@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.yhao.floatwindow.FloatWindow;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -41,10 +42,8 @@ public class VoiceCallActivity extends AppCompatActivity {
 
     private static boolean working = false;
 
-    private String channelID;
-    private boolean isInitiator;
-    private PrivateConversation conv;
-    private Conversation.Message msg;
+    private VoiceCallService voiceCallService = VoiceCallService.getInstance();
+
 
     private Timer timeoutTimer = new Timer();
     private Timer answerTimer = new Timer();
@@ -135,18 +134,7 @@ public class VoiceCallActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voice_call);
-
-        working = true;
-
         checkPermission();
-
-        isInitiator = getIntent().getBooleanExtra("INITIATOR", false);
-        conv = (PrivateConversation) ConversationManager.getInstance()
-                        .getConversation(getIntent().getStringExtra("CONV_ID"));
-//        msg = conv.getMessageById(getIntent().getStringExtra("MSG_ID"));
-//        channelID = msg.getData();
-
-        channelID = "123";
 
         textViewStatus = findViewById(R.id.voicecall_textView_status);
         textViewTime = findViewById(R.id.voicecall_textView_time);
@@ -165,43 +153,65 @@ public class VoiceCallActivity extends AppCompatActivity {
         padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics());
         mPowerManager = (PowerManager) getSystemService(POWER_SERVICE);
 
-
-        new Thread() {
-            public void run() {
-                try {
-                    while (!thread.isInterrupted()) {
-                        runOnUiThread(() -> {
-                            dotCount++;
-                            switch (dotCount) {
-                                case 0:
-                                    changingDot.setText("");
-                                    break;
-                                case 1:
-                                    changingDot.setText(".");
-                                    break;
-                                case 2:
-                                    changingDot.setText("..");
-                                    break;
-                                case 3:
-                                    changingDot.setText("...");
-                                    dotCount = -1;
-                                    break;
-                            }
-                        });
-                        Thread.sleep(300);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
+        updateUI();
+    }
 
 
-        String targetUid = conv.getTargetUid();
+    private void updateUI() {
+
+        if (voiceCallService.getStatus() == VoiceCallService.Status.Idle) {
+            // call ended
+            finish();
+        }
+
+//        new Thread() {
+//            public void run() {
+//                try {
+//                    while (!thread.isInterrupted()) {
+//                        runOnUiThread(() -> {
+//                            dotCount++;
+//                            switch (dotCount) {
+//                                case 0:
+//                                    changingDot.setText("");
+//                                    break;
+//                                case 1:
+//                                    changingDot.setText(".");
+//                                    break;
+//                                case 2:
+//                                    changingDot.setText("..");
+//                                    break;
+//                                case 3:
+//                                    changingDot.setText("...");
+//                                    dotCount = -1;
+//                                    break;
+//                            }
+//                        });
+//                        Thread.sleep(300);
+//                    }
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }.start();
+
+
+
+        String targetUid = voiceCallService.getTargetUid();
         UserInfoManager.getInstance().getUserInfo(targetUid, userInfo -> {
             friendName.setText(userInfo.getName());
             NetworkImageHelper.loadImage(friendIcon, userInfo.getHighResolutionPhotoUrl());
         });
+
+
+
+        if (voiceCallService.getStatus() == VoiceCallService.Status.Waiting) {
+
+        } else {
+            // Calling
+
+
+        }
+
 
 
         textViewTime.setVisibility(View.INVISIBLE);
@@ -297,63 +307,21 @@ public class VoiceCallActivity extends AppCompatActivity {
                 }
                 buttonSpeaker.setPadding(padding, padding, padding, padding);
                 break;
-            case R.id.voicecall_exit_full_screen:
-                moveToBackground();
-                break;
         }
     }
 
-    private void moveToBackground() {
-        // float
-        ImageView imageView = new ImageView(getApplicationContext());
-        imageView.setImageResource(R.drawable.ic_call_black80_24dp);
-        FloatWindow.with(NaviBeeApplication.getInstance())
-                .setView(imageView)
-                .setWidth(100)
-                .setHeight(100)
-                .build();
-
-        FloatWindow.get().show();
-    }
-
-    private void connect() {
-        if (isInitiator) {
-            textViewStatus.setText("Waiting");
-
-            timeoutTimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    runOnUiThread(() -> showDialogAndClose("No response from the other end"));
-                }
-            }, WAITING_TIMEOUT);
-
-        } else {
-            textViewStatus.setText("Connecting");
-
-            timeoutTimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    runOnUiThread(() -> showDialogAndClose("Unable to connect"));
-                }
-            }, CONNECTING_TIMEOUT);
-        }
-
-//        VoiceCallEngine.getInstance().joinChannel(channelID, mEventHandler);
-
-    }
-
-    @Override
-    public void onBackPressed() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Do you want to cancel this call?")
-                .setNegativeButton("No", null)
-                .setPositiveButton("Yes", (dialog, id) -> {
-                    closeVoiceCall();
-                    finish();
-                });
-        AlertDialog alert = builder.create();
-        alert.show();
-    }
+//    @Override
+//    public void onBackPressed() {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setMessage("Do you want to cancel this call?")
+//                .setNegativeButton("No", null)
+//                .setPositiveButton("Yes", (dialog, id) -> {
+//                    closeVoiceCall();
+//                    finish();
+//                });
+//        AlertDialog alert = builder.create();
+//        alert.show();
+//    }
 
     private void checkPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -361,57 +329,35 @@ public class VoiceCallActivity extends AppCompatActivity {
         }
     }
 
-    private void showDialogAndClose(String msg) {
-        closeVoiceCall();
+//    private void showDialogAndClose(String msg) {
+//        closeVoiceCall();
+//
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setMessage(msg)
+//                .setCancelable(false)
+//                .setPositiveButton("OK", (dialog, id) -> {
+//                    // go back
+//                    finish();
+//                });
+//        AlertDialog alert = builder.create();
+//        alert.show();
+//    };
+//
+//    private void closeVoiceCall() {
+//        conv.markAllAsRead();
+//        working = false;
+//
+//        timeoutTimer.cancel();
+//        timeoutTimer.purge();
+////        VoiceCallEngine.getInstance().leaveChannel();
+//
+//        thread.interrupt();
+//
+//        if (mWakeLock != null && mWakeLock.isHeld()) {
+//            mWakeLock.release();
+//        }
+//    }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(msg)
-                .setCancelable(false)
-                .setPositiveButton("OK", (dialog, id) -> {
-                    // go back
-                    finish();
-                });
-        AlertDialog alert = builder.create();
-        alert.show();
-    };
-
-    private void closeVoiceCall() {
-        conv.markAllAsRead();
-        working = false;
-
-        timeoutTimer.cancel();
-        timeoutTimer.purge();
-//        VoiceCallEngine.getInstance().leaveChannel();
-
-        thread.interrupt();
-
-        if (mWakeLock != null && mWakeLock.isHeld()) {
-            mWakeLock.release();
-        }
-    }
-
-
-
-    public void onClickFab() {
-
-        if (!minimiseEnabled) {
-
-            minimiseEnabled = true;
-            moveTaskToBack(minimiseEnabled);
-
-        } else {
-
-            minimiseEnabled = false;
-            onRestart();
-        }
-
-    }
-
-
-    @Override
-    public boolean moveTaskToBack(boolean nonRoot) {
-        return super.moveTaskToBack(nonRoot);
-    }
 
 
 }

@@ -34,6 +34,9 @@ public class VoiceCallService {
     PrivateConversation conv;
     private Date startTime;
 
+    private boolean isMicEnabled = true;
+    private boolean isSpeakerEnabled = false;
+
 
     Handler handler = new Handler(Looper.getMainLooper());
     private Timer timeoutTimer = new Timer();
@@ -64,6 +67,17 @@ public class VoiceCallService {
             }, ANSWER_TIMEOUT);
         }
 
+        micEnabled = true;
+        speakerEnabled = false;
+
+        startVoiceCallActivity();
+    }
+
+    private void startVoiceCallActivity() {
+        Intent intent = new Intent(NaviBeeApplication.getInstance().getApplicationContext(),
+                VoiceCallActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        NaviBeeApplication.getInstance().startActivity(intent);
     }
 
     private void connect() {
@@ -123,13 +137,24 @@ public class VoiceCallService {
         alert.show();
     }
 
-    private void closeVoiceCall() {
+    public void answerCall() {
+        if (status == Status.Waiting) {
+            answerTimer.cancel();
+            answerTimer.purge();
+            connect();
+        }
+    }
+
+    public void closeVoiceCall() {
         conv.markAllAsRead();
         status = Status.Idle;
         startTime = null;
+        conv = null;
 
         timeoutTimer.cancel();
         timeoutTimer.purge();
+        answerTimer.cancel();
+        answerTimer.purge();
         VoiceCallEngine.getInstance().leaveChannel();
 
         broadcastUpdate();
@@ -152,4 +177,18 @@ public class VoiceCallService {
     public boolean getIsInitiator() {
         return isInitiator;
     }
+
+    public String getTargetUid() {
+        return conv.getTargetUid();
+    }
+
+    public boolean getIsMicEnabled() {
+        return isMicEnabled;
+    }
+
+    public boolean getIsSpeakerEnabled() {
+        return isSpeakerEnabled;
+    }
+
+
 }

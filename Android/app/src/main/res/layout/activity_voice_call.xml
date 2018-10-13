@@ -7,17 +7,6 @@
     tools:context=".social.VoiceCallActivity"
     android:background="@color/md_grey_900">
 
-    <ImageView
-        android:id="@+id/voicecall_exit_full_screen"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:onClick="onClick"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_fullscreen_exit_white_24dp" />
-
     <TextView
         android:id="@+id/voicecall_textView_status"
         android:layout_width="wrap_content"
