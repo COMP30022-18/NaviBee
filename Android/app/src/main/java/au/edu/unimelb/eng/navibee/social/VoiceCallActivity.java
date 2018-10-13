@@ -19,9 +19,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.yhao.floatwindow.FloatWindow;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
+import au.edu.unimelb.eng.navibee.NaviBeeApplication;
 import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
 
 import au.edu.unimelb.eng.navibee.R;
@@ -67,8 +70,6 @@ public class VoiceCallActivity extends AppCompatActivity {
 
     private PowerManager mPowerManager;
     private PowerManager.WakeLock mWakeLock;
-
-    private DraggableFloatWindow mFloatWindow;
 
 
     private long timeCount;
@@ -142,8 +143,10 @@ public class VoiceCallActivity extends AppCompatActivity {
         isInitiator = getIntent().getBooleanExtra("INITIATOR", false);
         conv = (PrivateConversation) ConversationManager.getInstance()
                         .getConversation(getIntent().getStringExtra("CONV_ID"));
-        msg = conv.getMessageById(getIntent().getStringExtra("MSG_ID"));
-        channelID = msg.getData();
+//        msg = conv.getMessageById(getIntent().getStringExtra("MSG_ID"));
+//        channelID = msg.getData();
+
+        channelID = "123";
 
         textViewStatus = findViewById(R.id.voicecall_textView_status);
         textViewTime = findViewById(R.id.voicecall_textView_time);
@@ -217,7 +220,31 @@ public class VoiceCallActivity extends AppCompatActivity {
                 }
             }, ANSWER_TIMEOUT);
         }
+
+
+        mEventHandler.onUserJoined(0,0);
     }
+
+    @Override
+    protected void onPause() {
+        if (mWakeLock != null && mWakeLock.isHeld()) {
+            mWakeLock.release();
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        if (callStarted) {
+            if (mWakeLock != null) {
+                if (!mWakeLock.isHeld()) {
+                    mWakeLock.acquire();
+                }
+            }
+        }
+        super.onResume();
+    }
+
 
     public void onClick(View v) {
         switch (v.getId()) {
@@ -271,16 +298,22 @@ public class VoiceCallActivity extends AppCompatActivity {
                 buttonSpeaker.setPadding(padding, padding, padding, padding);
                 break;
             case R.id.voicecall_exit_full_screen:
-                mFloatWindow = DraggableFloatWindow.getDraggableFloatWindow(VoiceCallActivity.this, null);
-                mFloatWindow.show();
-                mFloatWindow.setOnTouchButtonListener(new DraggableFloatView.OnTouchButtonClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Toast.makeText(VoiceCallActivity.this, "clicked", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                moveToBackground();
                 break;
         }
+    }
+
+    private void moveToBackground() {
+        // float
+        ImageView imageView = new ImageView(getApplicationContext());
+        imageView.setImageResource(R.drawable.ic_call_black80_24dp);
+        FloatWindow.with(NaviBeeApplication.getInstance())
+                .setView(imageView)
+                .setWidth(100)
+                .setHeight(100)
+                .build();
+
+        FloatWindow.get().show();
     }
 
     private void connect() {
@@ -305,7 +338,7 @@ public class VoiceCallActivity extends AppCompatActivity {
             }, CONNECTING_TIMEOUT);
         }
 
-        VoiceCallEngine.getInstance().joinChannel(channelID, mEventHandler);
+//        VoiceCallEngine.getInstance().joinChannel(channelID, mEventHandler);
 
     }
 
@@ -348,7 +381,7 @@ public class VoiceCallActivity extends AppCompatActivity {
 
         timeoutTimer.cancel();
         timeoutTimer.purge();
-        VoiceCallEngine.getInstance().leaveChannel();
+//        VoiceCallEngine.getInstance().leaveChannel();
 
         thread.interrupt();
 
@@ -356,6 +389,8 @@ public class VoiceCallActivity extends AppCompatActivity {
             mWakeLock.release();
         }
     }
+
+
 
     public void onClickFab() {
 
