@@ -127,6 +127,8 @@ class DestinationDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         // Setup data for loading screen
         supportActionBar?.title = resources.getString(R.string.prompt_loading)
         navigation_destinations_details_toolbar.setTitleTextColor(0)
+        supportActionBar?.subtitle = resources.getString(R.string.prompt_loading)
+        navigation_destinations_details_toolbar.setSubtitleTextColor(0)
         listItems.add(SimpleRVIndefiniteProgressBar())
 
         // Recycler View
@@ -211,6 +213,8 @@ class DestinationDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                     navigation_destinations_details_toolbar
                             .setTitleTextColor(colorRGBA(0, 0, 0, offset))
                     navigation_destinations_details_toolbar
+                            .setSubtitleTextColor(colorRGBA(0, 0, 0, offset * 0.75f))
+                    navigation_destinations_details_toolbar
                             .setBackgroundColor(colorA(primaryColor, offset))
                     navigation_destinations_details_toolbar_padding
                             .setBackgroundColor(colorA(primaryColor, offset))
@@ -286,21 +290,27 @@ class DestinationDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun renderPlaceDetails(place: Place) {
-        supportActionBar?.title = place.name
 
         var attributions: SimpleRVAttributions? = null
 
         if (listItems.isNotEmpty() && listItems.last() is SimpleRVAttributions) {
             attributions = listItems.last() as SimpleRVAttributions
         }
-        
+
+        val placeTypes = place.placeTypes.joinToString(", ") { i ->
+            googlePlaceTypeIDToString(i, resources)
+        }
+
+        supportActionBar?.apply{
+            title = place.name
+            subtitle = placeTypes
+        }
+
         listItems.clear()
         listItems.add(
                 SimpleRVTextPrimarySecondaryStatic(
                         primary = place.name,
-                        secondary = place.placeTypes.joinToString(", ") { i ->
-                            googlePlaceTypeIDToString(i, resources)
-                        }
+                        secondary = placeTypes
                 )
         )
         if (place.address != null)

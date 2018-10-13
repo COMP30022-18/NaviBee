@@ -204,7 +204,7 @@ class TransitNavigationActivity : AppCompatActivity(), OnMapReadyCallback {
         viewModel.routeInfo.observe(this, Observer {
             val conn = it?.data?.res?.connections?.connections
             if (conn == null) {
-                alert(R.string.navigation_connection_error) {
+                alert(R.string.navigation_failed_to_fetch_route) {
                     okButton { _ ->
                         finish()
                     }
