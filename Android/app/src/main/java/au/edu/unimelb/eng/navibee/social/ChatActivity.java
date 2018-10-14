@@ -112,9 +112,8 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
         TextView toolbarSubtitle = findViewById(R.id.chat_toolbar_subtitle);
         ImageView toolbarIcon = findViewById(R.id.chat_toolbar_icon);
 
-        UserInfoManager.getInstance().getUserInfo(conversation.uid, userInfo -> {
-            userInfos.put(conversation.uid, userInfo);
-        });
+        UserInfoManager.getInstance().getUserInfo(conversation.uid,
+                userInfo -> userInfos.put(conversation.uid, userInfo));
 
         if (conversation instanceof PrivateConversation) {
             toolbarSubtitle.setText(R.string.chat_type_private);
@@ -130,6 +129,10 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
                     group.getMembers().size(), group.getMembers().size());
             toolbarSubtitle.setText(subtitle);
             toolbarIcon.setImageDrawable(group.getRoundIconDrawable(getResources()));
+
+            for (String id: ((GroupConversation) conversation).getMembers())
+                UserInfoManager.getInstance().getUserInfo(id,
+                        userInfo -> userInfos.put(id, userInfo));
         }
 
         Resources r = getResources();

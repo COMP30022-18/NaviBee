@@ -1,14 +1,17 @@
 package au.edu.unimelb.eng.navibee.social;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -17,6 +20,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -32,6 +36,8 @@ import java.util.TimerTask;
 import androidx.appcompat.app.AppCompatActivity;
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
+
+import static au.edu.unimelb.eng.navibee.utils.DimensionsUtilitiesKt.getStatusBarHeight;
 
 public class RealTimeLocationDisplayActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -73,8 +79,12 @@ public class RealTimeLocationDisplayActivity extends AppCompatActivity implement
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
 
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_FINE_LOCATION);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        PERMISSIONS_REQUEST_FINE_LOCATION);
+            }
         }
 
         findViewById(R.id.displayLocation_fab).setVisibility(View.GONE);
@@ -161,6 +171,7 @@ public class RealTimeLocationDisplayActivity extends AppCompatActivity implement
 
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -227,18 +238,39 @@ public class RealTimeLocationDisplayActivity extends AppCompatActivity implement
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
 
-        if (!(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-            googleMap.setMyLocationEnabled(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) !=
+                    PackageManager.PERMISSION_GRANTED &&
+                    checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                            PackageManager.PERMISSION_GRANTED)) {
+                googleMap.setMyLocationEnabled(true);
+            }
         }
 
+        googleMap.setPadding(0, getStatusBarHeight(mapView), 0, 0);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
+
+        LocationServices.getFusedLocationProviderClient(this).getLastLocation()
+        .addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                LatLng currentLatLng = new LatLng(location.getLatitude(),
+                        location.getLongitude());
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,
+                        10));
+            }
+
+        });
 
         update(false);
 
         googleMap.setOnMyLocationChangeListener(location1 -> {
             boolean firstTime = myLocation == null;
             myLocation = new LatLng(location1.getLatitude(), location1.getLongitude());
-            if (firstTime) update(true);
+            if (firstTime) {
+                update(true);
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
+            }
         });
     }
 
