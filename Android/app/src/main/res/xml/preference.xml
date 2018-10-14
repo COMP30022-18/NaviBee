@@ -29,6 +29,12 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_section_title_sos">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:dialogTitle="@string/pref_sos_enable_fall_detection"
+            android:icon="@drawable/ic_history_black_24dp"
+            android:key="countdown_enabled"
+            android:title="@string/pref_sos_enable_fall_detection"/>
         <EditTextPreference
             android:inputType="phone"
             android:digits="0123456789"
@@ -36,11 +42,11 @@
             android:icon="@drawable/ic_call_black_24dp"
             android:key="sos_emergency_call"
             android:title="@string/pref_sos_preferred_emergency_call"/>
-        <!--<au.edu.unimelb.eng.navibee.FriendListPreference-->
-            <!--android:key="sos_emergency_contact"-->
-            <!--android:title="@string/pref_sos_preferred_emergency_contact"-->
-            <!--android:summary="@string/pref_sos_preferred_emergency_contact_titles"-->
-            <!--android:icon="@drawable/ic_people_black_24dp"/>-->
+        <ListPreference
+            android:dialogTitle="@string/pref_sos_preferred_emergency_contact"
+            android:icon="@drawable/ic_people_black_24dp"
+            android:key="sos_emergency_contact"
+            android:title="@string/pref_sos_preferred_emergency_contact"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_section_title_developer_options">

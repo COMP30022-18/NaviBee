@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <uses-feature android:name="android.hardware.nfc" />
 
@@ -172,7 +173,9 @@
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar">
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
-                <category android:name="android.intent.category.DEFAULT"/>
+
+                <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="application/navibee" />
             </intent-filter>
         </activity>
@@ -204,6 +207,7 @@
         <activity
             android:name=".social.VoiceCallActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <activity android:name=".social.CreateGroupChatActivity"
             android:label="@string/friends_create_group"
             android:parentActivityName=".social.FriendActivity">
@@ -221,6 +225,8 @@
         </activity>
         <activity android:name=".social.LocationDisplayActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
+        <activity android:name=".social.RealTimeLocationDisplayActivity"
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
         <activity android:name=".social.GroupDetailActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar"
@@ -231,7 +237,7 @@
         </activity>
         <activity
             android:name=".sos.SosCountDownActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar"/>
     </application>
 
 </manifest>

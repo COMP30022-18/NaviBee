@@ -311,6 +311,7 @@
     <string name="pref_developer_options_navigation_emulation">Enable navigation emulation</string>
 
     <string name="pref_section_title_sos">SOS</string>
+    <string name="pref_sos_enable_fall_detection">Enable fall detection countdown</string>
     <string name="pref_sos_preferred_emergency_call">Preferred emergency call number</string>
     <string name="pref_sos_preferred_emergency_call_titles">Required a phone number to call.</string>
 
@@ -320,7 +321,9 @@
     <string name="title_activity_event_pic_fullscreen">EventPicFullscreenActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
-
+    <string name="message_notification_channel">Messages</string>
+    <string name="message_notification_channel_desc">Message notifications</string>
+    <string name="sos_act_text">Activated the SOS mode.</string>
     <string name="sos_pre_text">We\'ve detected that you might be in danger\.</string>
     <string name="sos_main_text">Your emergency contact will be notified in</string>
     <string name="sos_time_unit">seconds</string>
@@ -330,6 +333,8 @@
     <string name="notification_location">sent you a location</string>
     <string name="notificaiton_event">sent you an event</string>
     <string name="event_create_time_invalid">You can not create an event in the past.</string>
+    <string name="notification_realtimelocation">wants to share location with you</string>
+    <string name="chat_realtime_location_title">Location sharing</string>
 
 
 </resources>

@@ -11,8 +11,6 @@ import android.text.format.DateUtils;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -43,7 +41,6 @@ import java.util.UUID;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import au.edu.unimelb.eng.navibee.BuildConfig;
@@ -71,6 +68,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
     private static final int SEND_PHOTO = 1;
     private static final int SEND_LOCATION = 2;
     private static final int SEND_VOICE_CALL = 3;
+    private static final int SEND_REALTIME_LOCATION = 4;
 
     private int currentMsgCount = 0;
 
@@ -143,6 +141,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
 
         if (isPrivate) {
             extraDialog = extraDialog
+                    .add(new OptionRequest(SEND_REALTIME_LOCATION, r.getString(R.string.chat_realtime_location), R.drawable.ic_person_pin_black80_24dp))
                     .add(new OptionRequest(SEND_VOICE_CALL, r.getString(R.string.chat_voice_call), R.drawable.ic_call_black80_24dp));
         }
 
@@ -157,6 +156,12 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
 
         registerReceiver(convUpdateReceiver, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
         registerReceiver(msgUpdateReceiver, new IntentFilter(Conversation.BROADCAST_NEW_MESSAGE));
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 
     @Override
@@ -196,6 +201,12 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
             case SEND_VOICE_CALL:
                 String voiceCallChannelId = UUID.randomUUID().toString();
                 conversation.sendMessage("voicecall", voiceCallChannelId);
+                break;
+            case SEND_REALTIME_LOCATION:
+                Intent intent = new Intent(this, RealTimeLocationDisplayActivity.class);
+                intent.putExtra(RealTimeLocationDisplayActivity.EXTRA_CONVID, conversation.getConvId());
+                startActivity(intent);
+                conversation.sendMessage("realtimelocation", "");
                 break;
         }
     }
@@ -276,11 +287,12 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
         private static final int VT_SEND = 0b0;
         private static final int VT_RECV = 0b1;
         private static final int VT_MESSAGE_TYPE = 0b1110;
-        private static final int VT_TEXT = 0b000;
-        private static final int VT_IMAGE = 0b001 << 1;
-        private static final int VT_LOCATION = 0b010 << 1;
-        private static final int VT_EVENT = 0b011 << 1;
-        private static final int VT_VOICE_CALL = 0b100 << 1;
+        private static final int VT_TEXT = 0;
+        private static final int VT_IMAGE = 1 << 1;
+        private static final int VT_LOCATION = 2 << 1;
+        private static final int VT_EVENT = 3 << 1;
+        private static final int VT_VOICE_CALL = 4 << 1;
+        private static final int VT_REALTIME_LOCATION = 5 << 1;
 
         private static final String STATIC_MAP_URL =
                 "https://maps.googleapis.com/maps/api/staticmap?" +
@@ -310,6 +322,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
                 case "voicecall": type |= VT_VOICE_CALL; break;
                 case "location": type |= VT_LOCATION; break;
                 case "event": type |= VT_EVENT; break;
+                case "realtimelocation": type |= VT_REALTIME_LOCATION; break;
             }
             return type;
         }
@@ -355,6 +368,9 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
                 case VT_EVENT:
                     resource = R.layout.layout_event_message;
                     break;
+                case VT_REALTIME_LOCATION:
+                    resource = R.layout.layout_realtimelocation_message;
+                    break;
             }
 
             View cv = lf.inflate(resource, f, false);
@@ -388,10 +404,9 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
             TextView textView = content.findViewById(R.id.message_text);
             ImageView imageView = content.findViewById(R.id.message_image);
             switch (msg.getType()) {
-                case "text": {
+                case "text":
                     textView.setText(msg.getData());
                     break;
-                }
                 case "image":
                     FirebaseStorageHelper.loadImage(imageView, msg.getData(), true);
                     break;
@@ -406,13 +421,16 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
                     String previewUrl = String.format(STATIC_MAP_URL, coordText, coordText);
                     new URLImageViewCacheLoader(previewUrl, imageView).execute();
                     break;
-                case "event": {
+                case "event":
                     Gson gson = new Gson();
                     Map<String, String> data = gson.fromJson(msg.getData(), Map.class);
                     String text = data.get("name");
                     textView.setText(text);
                     break;
-                }
+                case "realtimelocation":
+                    time = DateUtils.getRelativeTimeSpanString(msg.getTime_().getTime());
+                    textView.setText(time);
+                    break;
             }
 
             // set user name
@@ -440,16 +458,15 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
             return v -> {
                 Conversation.Message msg = mDataset.get(pos);
                 switch (msg.getType()) {
-                    case "image": {
+                    case "image":
                         Intent intent = new Intent(chatActivity.getBaseContext(), ChatImageViewActivity.class);
                         intent.putExtra("IMG_FS_PATH", msg.getData());
                         chatActivity.startActivity(intent);
                         break;
-                    }
-                    case "location": {
+                    case "location":
                         double[] coord = gson.fromJson(msg.getData(), double[].class);
 
-                        Intent intent = new Intent(chatActivity.getBaseContext(), LocationDisplayActivity.class);
+                        intent = new Intent(chatActivity.getBaseContext(), LocationDisplayActivity.class);
                         intent.putExtra(NavigationSelectorActivity.EXTRA_LATITUDE, coord[0]);
                         intent.putExtra(NavigationSelectorActivity.EXTRA_LONGITUDE, coord[1]);
                         intent.putExtra(LocationDisplayActivity.EXTRA_TIME, msg.getTime_());
@@ -460,17 +477,20 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
                         chatActivity.startActivity(intent);
 
                         break;
-                    }
-                    case "event": {
+                    case "event":
                         Map<String, String> data = gson.fromJson(msg.getData(), Map.class);
 
-                        Intent intent = new Intent(chatActivity.getBaseContext(), EventDetailsActivity.class);
+                        intent = new Intent(chatActivity.getBaseContext(), EventDetailsActivity.class);
 
                         intent.putExtra("eventId", data.get("eid"));
                         chatActivity.startActivity(intent);
 
                         break;
-                    }
+                    case "realtimelocation":
+                        intent = new Intent(chatActivity.getBaseContext(), RealTimeLocationDisplayActivity.class);
+                        intent.putExtra(RealTimeLocationDisplayActivity.EXTRA_CONVID, chatActivity.conversation.getConvId());
+                        chatActivity.startActivity(intent);
+                        break;
                 }
             };
         }

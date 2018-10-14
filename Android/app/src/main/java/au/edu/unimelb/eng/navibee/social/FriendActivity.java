@@ -34,6 +34,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.utils.FormatUtilityKt;
 import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
+import kotlinx.coroutines.experimental.Job;
 
 public class FriendActivity extends AppCompatActivity {
     // TODO magic string
@@ -90,6 +91,8 @@ public class FriendActivity extends AppCompatActivity {
                     }
                 });
             } else {
+                if (imageView.getTag() instanceof Job)
+                    ((Job) imageView.getTag()).cancel(null);
                 Resources r = textView.getResources();
                 textView.setText(((GroupConversation) conv).getName());
                 imageView.setImageDrawable(((GroupConversation) conv).getRoundIconDrawable(r));

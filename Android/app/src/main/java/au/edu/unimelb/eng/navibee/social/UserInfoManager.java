@@ -7,6 +7,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +38,7 @@ public class UserInfoManager {
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         db = FirebaseFirestore.getInstance();
     }
-    
+
     public void getUserInfo(String id, Callback<UserInfo> callback) {
         if (userInfoMap.containsKey(id)) {
             if (callback != null) callback.callback(userInfoMap.get(id));
@@ -66,7 +68,7 @@ public class UserInfoManager {
         });
     }
 
-    public void getUserInfo(ArrayList<String> ids, Callback<Map<String, UserInfo>> callback) {
+    public void getUserInfo(ArrayList<String> ids, Callback<@NotNull Map<String, @NotNull UserInfo>> callback) {
         Map<String, UserInfo> res = new HashMap<>();
         for (String id: new HashSet<>(ids)) {
             getUserInfo(id, info -> {

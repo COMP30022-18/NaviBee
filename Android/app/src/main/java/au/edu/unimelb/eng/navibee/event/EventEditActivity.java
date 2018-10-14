@@ -142,6 +142,12 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         setupFields();
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
+    }
+
     private void setupFields() {
         // init nameView
         nameView.setOnFocusChangeListener((v, hasFocus) -> {

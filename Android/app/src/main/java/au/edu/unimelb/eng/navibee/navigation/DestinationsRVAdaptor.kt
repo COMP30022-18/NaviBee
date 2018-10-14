@@ -109,9 +109,20 @@ data class DestinationRVEntry(val name: CharSequence,
                               val thumbnail: String? = null,
                               val wikiData: String? = null,
                               val googlePhotoReference: String? = null,
-                              val googlePlaceId: String? = null,
-                              val onClick: View.OnClickListener): DestinationRVItem()
+                              val googlePlaceId: String? = null): DestinationRVItem() {
+    lateinit var onClick: View.OnClickListener
+    fun onClick(oc: View.OnClickListener): DestinationRVEntry {
+        onClick = oc
+        return this
+    }
+
+}
 data class DestinationRVButton(val text: CharSequence,
-                               val icon: Int,
-                               val onClick: View.OnClickListener): DestinationRVItem()
+                               val icon: Int): DestinationRVItem() {
+    lateinit var onClick: View.OnClickListener
+    fun onClick(oc: View.OnClickListener): DestinationRVButton {
+        onClick = oc
+        return this
+    }
+}
 data class DestinationRVAttributions(val attributes: CharSequence): DestinationRVItem()

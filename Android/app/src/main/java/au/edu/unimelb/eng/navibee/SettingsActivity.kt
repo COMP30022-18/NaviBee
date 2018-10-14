@@ -4,6 +4,11 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.*
+import au.edu.unimelb.eng.navibee.social.ConversationManager
+import au.edu.unimelb.eng.navibee.social.UserInfoManager
+import au.edu.unimelb.eng.navibee.sos.FallDetection
+
+
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -21,10 +26,16 @@ class SettingsActivity : AppCompatActivity() {
     private fun setupActionBar() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
+
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
+    }
+
 }
 
 class SettingsFragment: PreferenceFragmentCompat(),
-        SharedPreferences.OnSharedPreferenceChangeListener {
+        SharedPreferences.OnSharedPreferenceChangeListener{
 
     private lateinit var sharedPref: SharedPreferences
 
@@ -32,6 +43,31 @@ class SettingsFragment: PreferenceFragmentCompat(),
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preference)
+
+        val contactPreference = findPreference("sos_emergency_contact")
+
+        setListPreferenceData(contactPreference as ListPreference)
+
+        contactPreference.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            setListPreferenceData(contactPreference)
+            false
+        }
+    }
+
+    private fun setListPreferenceData(contactPreference: ListPreference) {
+
+        val uidList = ConversationManager.getInstance().friendList
+        val nameList = mutableListOf<CharSequence>()
+        UserInfoManager.getInstance().getUserInfo(uidList) { stringUserInfoMap ->
+            for (uid in uidList) {
+                nameList.add(stringUserInfoMap[uid]!!.name)
+            }
+        }
+
+        contactPreference.setDefaultValue(" ")
+        contactPreference.entries = nameList.toTypedArray()
+        contactPreference.entryValues = uidList.toTypedArray()
+
     }
 
     override fun onResume() {
@@ -66,6 +102,15 @@ class SettingsFragment: PreferenceFragmentCompat(),
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         if (key !in ignoreSummary)
             updateSummary(preferenceScreen.findPreference(key))
+
+        // Checks fall detection countdown is enabled
+        if (key == "countdown_enabled") {
+            if (sharedPreferences?.getBoolean(key, true) == true)
+                FallDetection.getInstance().start()
+            else
+                FallDetection.getInstance().stop()
+        }
+
     }
 
     private fun updateSummary(pref: Preference) {
