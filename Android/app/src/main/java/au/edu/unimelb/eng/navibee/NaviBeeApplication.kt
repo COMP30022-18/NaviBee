@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import android.preference.PreferenceManager
 import au.edu.unimelb.eng.navibee.social.ConversationManager
 import au.edu.unimelb.eng.navibee.sos.FallDetection
 import com.google.firebase.Timestamp
@@ -41,7 +42,13 @@ class NaviBeeApplication : Application() {
             inited = true
             ConversationManager.init()
             setFCMToken()
-            FallDetection.getInstance().start()
+
+            val isEnabled = PreferenceManager.getDefaultSharedPreferences(applicationContext).getBoolean("countdown_enabled", true)
+
+            if (isEnabled) {
+                FallDetection.getInstance().start()
+            }
+
             // notification channel
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

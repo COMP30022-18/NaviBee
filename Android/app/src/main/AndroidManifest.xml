@@ -221,6 +221,8 @@
         </activity>
         <activity android:name=".social.LocationDisplayActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
+        <activity android:name=".social.RealTimeLocationDisplayActivity"
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
         <activity android:name=".social.GroupDetailActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar"
@@ -231,7 +233,7 @@
         </activity>
         <activity
             android:name=".sos.SosCountDownActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar"/>
     </application>
 
 </manifest>

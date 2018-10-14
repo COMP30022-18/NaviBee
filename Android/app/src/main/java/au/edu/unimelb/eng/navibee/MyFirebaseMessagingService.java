@@ -67,6 +67,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 case "event":
                     content = getString(R.string.notificaiton_event);
                     break;
+                case "realtimelocation":
+                    content = getString(R.string.notification_realtimelocation);
+                    break;
             }
 
             Intent intent = new Intent(this, LoginActivity.class);
