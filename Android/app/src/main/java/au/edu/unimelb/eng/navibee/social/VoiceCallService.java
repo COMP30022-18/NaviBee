@@ -1,9 +1,9 @@
 package au.edu.unimelb.eng.navibee.social;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.widget.Toast;
 
 import java.util.Date;
 import java.util.Timer;
@@ -21,7 +21,10 @@ public class VoiceCallService {
         return ourInstance;
     }
 
-    public final static String BROADCAST_VOICECALL_UPDATE = "broadcast.voicecall.update";
+    public static final int VOCIECALL_EXPIRE = 60 * 1000;
+    public static final String BROADCAST_VOICECALL_UPDATE = "broadcast.voicecall.update";
+
+
     private static final int CONNECTING_TIMEOUT = 5 * 1000;
     private static final int ANSWER_TIMEOUT = 20 * 1000;
     private static final int WAITING_TIMEOUT = 40 * 1000;
@@ -39,17 +42,20 @@ public class VoiceCallService {
 
 
     Handler handler = new Handler(Looper.getMainLooper());
-    private Timer timeoutTimer = new Timer();
-    private Timer answerTimer = new Timer();
+    private Timer timeoutTimer;
+    private Timer answerTimer;
 
     private VoiceCallService() {
 
     }
 
     public void setup(PrivateConversation conv, Conversation.Message msg, boolean isInitiator) {
+        // handle busy case
         if (status != Status.Idle) return;
-
         status = Status.Waiting;
+
+        timeoutTimer = new Timer();
+        answerTimer = new Timer();
 
         channelId = msg.getData();
         this.isInitiator = isInitiator;
@@ -67,8 +73,8 @@ public class VoiceCallService {
             }, ANSWER_TIMEOUT);
         }
 
-        micEnabled = true;
-        speakerEnabled = false;
+        isMicEnabled = true;
+        isSpeakerEnabled = false;
 
         startVoiceCallActivity();
     }
@@ -81,6 +87,7 @@ public class VoiceCallService {
     }
 
     private void connect() {
+        status = Status.Connecting;
 
         if (isInitiator) {
             timeoutTimer.schedule(new TimerTask() {
@@ -107,7 +114,7 @@ public class VoiceCallService {
             @Override
             public void onUserJoined(int uid, int elapsed) {
                 handler.post(() -> {
-                    if (status != Status.Calling) {
+                    if (status == Status.Connecting) {
                         // call started
                         status = Status.Calling;
                         timeoutTimer.cancel();
@@ -122,19 +129,11 @@ public class VoiceCallService {
         };
 
         VoiceCallEngine.getInstance().joinChannel(channelId, mEventHandler);
-
     }
 
     private void showDialogAndClose(String msg) {
         closeVoiceCall();
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(NaviBeeApplication.getInstance());
-        builder.setMessage(msg)
-                .setCancelable(false)
-                .setPositiveButton("OK", (dialog, id) -> {
-                });
-        AlertDialog alert = builder.create();
-        alert.show();
+        Toast.makeText(NaviBeeApplication.getInstance(), msg, Toast.LENGTH_LONG).show();
     }
 
     public void answerCall() {
@@ -163,6 +162,26 @@ public class VoiceCallService {
     private void broadcastUpdate() {
         Intent intent = new Intent(BROADCAST_VOICECALL_UPDATE);
         NaviBeeApplication.getInstance().sendBroadcast(intent);
+    }
+
+    public void toggleSpeaker() {
+        isSpeakerEnabled = !isSpeakerEnabled;
+
+        if(isSpeakerEnabled) {
+            VoiceCallEngine.getInstance().useSpeaker();
+        } else {
+            VoiceCallEngine.getInstance().useEarpiece();
+        }
+    }
+
+    public void toggleMute() {
+        isMicEnabled = !isMicEnabled;
+        if (isMicEnabled) {
+            VoiceCallEngine.getInstance().unmuteMic();
+        } else {
+            VoiceCallEngine.getInstance().muteMic();
+        }
+
     }
 
 
