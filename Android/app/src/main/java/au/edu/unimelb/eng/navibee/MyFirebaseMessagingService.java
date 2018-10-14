@@ -81,6 +81,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     break;
             }
 
+            int id = createID();
+
             Intent intent = new Intent(this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.putExtra("convID", data.get("convID"));
@@ -106,7 +108,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         .build();
 
                 PendingIntent replyPendingIntent =
-                        getMessageReplyIntent(data.get("convID"));
+                        getMessageReplyIntent(data.get("convID"), id);
 
                 // Create the reply action and add the remote input.
                 NotificationCompat.Action action =
@@ -132,10 +134,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                                         builder.setStyle(new NotificationCompat
                                                 .BigPictureStyle()
                                                 .bigPicture(bitmap));
-                                    sendNotifcation(builder.build(), data.get("convID"));
+                                    sendNotifcation(builder.build(), data.get("convID"), id);
                         });
                     } else {
-                        sendNotifcation(builder.build(), data.get("convID"));
+                        sendNotifcation(builder.build(), data.get("convID"), id);
                     }
                 }
             }.execute();
@@ -144,18 +146,17 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     }
 
-    private PendingIntent getMessageReplyIntent(String convId) {
-        Intent intent = NotificationBroadcastReceiver.getReplyMessageIntent(this, convId);
+    private PendingIntent getMessageReplyIntent(String convId, int notiId) {
+        Intent intent = NotificationBroadcastReceiver.getReplyMessageIntent(this, convId, notiId);
         return PendingIntent.getBroadcast(getApplicationContext(), 100, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    private void sendNotifcation(Notification notification, String convId) {
+    private void sendNotifcation(Notification notification, String convId, int id) {
         NotificationManagerCompat notificationManager =
                 NotificationManagerCompat.from(this);
 
         // TODO: save notification id
-        int id = createID();
         notificationManager.notify(id, notification);
 
         saveNotification(id, convId);

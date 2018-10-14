@@ -10,6 +10,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Date;
 
+import androidx.core.app.NotificationManagerCompat;
 import au.edu.unimelb.eng.navibee.social.Conversation;
 
 import static au.edu.unimelb.eng.navibee.MyFirebaseMessagingService.REPLY_ACTION;
@@ -18,6 +19,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
 
     // Key for the string that's delivered in the action's intent.
     private static final String KEY_CONV_ID = "key_conv_id";
+    private static final String KEY_NOTI_ID = "key_noti_id";
 
 
     @Override
@@ -27,8 +29,12 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
             // for this tutorial, we'll just show it in a toast;
             CharSequence message = MyFirebaseMessagingService.getReplyMessage(intent);
             String convId = intent.getStringExtra(KEY_CONV_ID);
-
+            int notiId = intent.getIntExtra(KEY_NOTI_ID, 0);
             sendMessageByConvId(convId, "text", message);
+
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(NaviBeeApplication.getInstance());
+
+            notificationManager.cancel(notiId);
         }
     }
 
@@ -46,10 +52,11 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
                 .add(message);
     }
 
-    public static Intent getReplyMessageIntent(Context context, String convId) {
+    public static Intent getReplyMessageIntent(Context context, String convId, int notiId) {
         Intent intent = new Intent(context, NotificationBroadcastReceiver.class);
         intent.setAction(REPLY_ACTION);
         intent.putExtra(KEY_CONV_ID, convId);
+        intent.putExtra(KEY_NOTI_ID, notiId);
         return intent;
     }
 }
