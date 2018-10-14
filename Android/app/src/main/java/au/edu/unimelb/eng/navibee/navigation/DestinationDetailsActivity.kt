@@ -10,6 +10,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
@@ -73,6 +75,8 @@ class DestinationDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     private var titleRowHeight = -1
     private var topObscureSize = 0
 
+    private var collapsed = false
+
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
 
     private val primaryColor: Int by lazy {
@@ -125,8 +129,14 @@ class DestinationDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         // Setup data for loading screen
+        navigation_destinations_details_toolbar
+                .setBackgroundColor(0x6fffffff)
+        navigation_destinations_details_toolbar_padding
+                .setBackgroundColor(0x6fffffff)
         supportActionBar?.title = resources.getString(R.string.prompt_loading)
         navigation_destinations_details_toolbar.setTitleTextColor(0)
+        supportActionBar?.subtitle = resources.getString(R.string.prompt_loading)
+        navigation_destinations_details_toolbar.setSubtitleTextColor(0)
         listItems.add(SimpleRVIndefiniteProgressBar())
 
         // Recycler View
@@ -162,6 +172,27 @@ class DestinationDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         viewModel.loadDetails(placeId)
         viewModel.loadImageList(placeId)
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_destination_go, menu)
+        return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        menu?.findItem(R.id.menu_action_go)?.isVisible = collapsed
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_action_go -> {
+                onClickGo(null)
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun subscribe() {
@@ -211,11 +242,31 @@ class DestinationDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                     navigation_destinations_details_toolbar
                             .setTitleTextColor(colorRGBA(0, 0, 0, offset))
                     navigation_destinations_details_toolbar
-                            .setBackgroundColor(colorA(primaryColor, offset))
+                            .setSubtitleTextColor(colorRGBA(0, 0, 0, offset * 0.75f))
+                    // navigation_destinations_details_toolbar
+                    //         .setBackgroundColor(colorA(primaryColor, offset * 0.75f + 0.25f))
+                    // navigation_destinations_details_toolbar_padding
+                    //         .setBackgroundColor(colorA(primaryColor, offset * 0.75f + 0.25f))
+
+                    navigation_destinations_details_toolbar
+                            .setBackgroundColor(
+                                    colorInterlace(primaryColor, 0x6fffffff, offset)
+                            )
                     navigation_destinations_details_toolbar_padding
-                            .setBackgroundColor(colorA(primaryColor, offset))
+                            .setBackgroundColor(
+                                    colorInterlace(primaryColor, 0x6fffffff, offset)
+                            )
+
                     navigation_destinations_details_fab_button.scaleX = 1 - offset
                     navigation_destinations_details_fab_button.scaleY = 1 - offset
+                }
+
+                if (offset > 0.8 && !collapsed) {
+                    collapsed = true
+                    invalidateOptionsMenu()
+                } else if (offset <= 0.8 && collapsed) {
+                    collapsed = false
+                    invalidateOptionsMenu()
                 }
             }
 
@@ -272,10 +323,25 @@ class DestinationDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun colorA(color: Int, alpha: Float) =
             colorRGBA(Color.red(color), Color.green(color), Color.blue(color), alpha)
 
+    private fun colorInterlace(color0: Int, color1: Int, offset: Float): Int {
+        return colorRGBA(
+                clampOffset(Color.red(color0), Color.red(color1), offset),
+                clampOffset(Color.green(color0), Color.green(color1), offset),
+                clampOffset(Color.blue(color0), Color.blue(color1), offset),
+                clampOffset(Color.alpha(color0), Color.alpha(color1), offset)
+        )
+    }
+
+    private fun clampOffset(val0: Int, val1: Int, offset: Float): Int {
+        return ((val0 - val1) * offset + val1).toInt()
+    }
+
+    private fun colorRGBA(red: Int, green: Int, blue: Int, alpha: Int) =
+            alpha shl 24 or (red shl 16) or (green shl 8) or blue
     private fun colorRGBA(red: Int, green: Int, blue: Int, alpha: Float) =
         (alpha * 255).toInt() shl 24 or (red shl 16) or (green shl 8) or blue
 
-    fun onClickGo(view: View) {
+    fun onClickGo(view: View?) {
         viewModel.placeDetails.value?.data?.get(0)?.run {
             startActivity<NavigationSelectorActivity>(
                 NavigationSelectorActivity.EXTRA_LATITUDE to latLng.latitude,
@@ -286,21 +352,27 @@ class DestinationDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun renderPlaceDetails(place: Place) {
-        supportActionBar?.title = place.name
 
         var attributions: SimpleRVAttributions? = null
 
         if (listItems.isNotEmpty() && listItems.last() is SimpleRVAttributions) {
             attributions = listItems.last() as SimpleRVAttributions
         }
-        
+
+        val placeTypes = place.placeTypes.joinToString(", ") { i ->
+            googlePlaceTypeIDToString(i, resources)
+        }
+
+        supportActionBar?.apply{
+            title = place.name
+            subtitle = placeTypes
+        }
+
         listItems.clear()
         listItems.add(
                 SimpleRVTextPrimarySecondaryStatic(
                         primary = place.name,
-                        secondary = place.placeTypes.joinToString(", ") { i ->
-                            googlePlaceTypeIDToString(i, resources)
-                        }
+                        secondary = placeTypes
                 )
         )
         if (place.address != null)

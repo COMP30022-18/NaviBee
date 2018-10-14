@@ -19,6 +19,13 @@
             android:key="navigation_search_region"
             android:summary="@string/pref_navigation_search_region_summary"
             android:title="@string/pref_navigation_search_region" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:title="@string/pref_navigation_show_street_view"
+            android:key="navigation_show_street_view"
+            android:icon="@drawable/ic_streetview_black80_24dp"
+            android:summaryOn="@string/pref_navigation_show_street_view_on"
+            android:summaryOff="@string/pref_navigation_show_street_view_off"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_section_title_sos">
@@ -29,7 +36,6 @@
             android:key="countdown_enabled"
             android:title="@string/pref_sos_enable_fall_detection"/>
         <EditTextPreference
-            android:defaultValue=" "
             android:inputType="phone"
             android:digits="0123456789"
             android:dialogTitle="@string/pref_sos_preferred_emergency_call"
@@ -41,6 +47,13 @@
             android:icon="@drawable/ic_people_black_24dp"
             android:key="sos_emergency_contact"
             android:title="@string/pref_sos_preferred_emergency_contact"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_section_title_developer_options">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:title="@string/pref_developer_options_navigation_emulation"
+            android:key="navigation_simulation"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

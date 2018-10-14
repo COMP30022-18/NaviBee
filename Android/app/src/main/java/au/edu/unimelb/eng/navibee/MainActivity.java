@@ -1,12 +1,9 @@
 package au.edu.unimelb.eng.navibee;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.Gravity;
@@ -21,16 +18,10 @@ import android.widget.TextView;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.button.MaterialButton;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.iid.FirebaseInstanceId;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,16 +30,13 @@ import au.edu.unimelb.eng.navibee.event.EventsActivity;
 import au.edu.unimelb.eng.navibee.navigation.DestinationsActivity;
 import au.edu.unimelb.eng.navibee.social.ConversationManager;
 import au.edu.unimelb.eng.navibee.social.FriendActivity;
-import au.edu.unimelb.eng.navibee.sos.FallDetection;
 import au.edu.unimelb.eng.navibee.sos.SosActivity;
 import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
 import timber.log.Timber;
 
 import static au.edu.unimelb.eng.navibee.utils.DisplayUtilitiesKt.updateDpi;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
-
-    private static boolean inited = false;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
@@ -62,8 +50,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Update app DPI for debug purpose.
         updateDpi(this);
         setContentView(R.layout.activity_main);
-
-        firestoreTimestamp();
 
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
@@ -80,31 +66,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         naviBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.gradient_landing_major_background));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             naviBtn.setClipToOutline(true);
-        }
-
-        if (!inited) {
-            inited = true;
-            ConversationManager.init();
-            setFCMToken();
-
-            Boolean isEnabled = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("countdown_enabled", true);
-
-            if (isEnabled) {
-                FallDetection.getInstance().start();
-            }
-            // notification channel
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                CharSequence name = "Default";
-                String description = "Default channel";
-                int importance = NotificationManager.IMPORTANCE_HIGH;
-                NotificationChannel channel = new NotificationChannel(MyFirebaseMessagingService.CHANNEL_ID, name, importance);
-                channel.setDescription(description);
-                // Register the channel with the system; you can't change the importance
-                // or other notification behaviors after this
-                NotificationManager notificationManager = getSystemService(NotificationManager.class);
-                notificationManager.createNotificationChannel(channel);
-            }
         }
 
         String convID = getIntent().getStringExtra("convID");
@@ -168,14 +129,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    // The behavior for java.util.Date objects stored in Firestore is going to chang
-    private void firestoreTimestamp() {
-        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setTimestampsInSnapshotsEnabled(true)
-                .build();
-        FirebaseFirestore.getInstance().setFirestoreSettings(settings);
-    }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -209,25 +162,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             (View v) -> logOut()
     };
 
-    private void setFCMToken() {
-        FirebaseInstanceId.getInstance().getInstanceId()
-                .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()) {
-                        return;
-                    }
-                    // Get Instance ID token
-                    String token = task.getResult().getToken();
-                    String uid = Objects.requireNonNull(FirebaseAuth.getInstance()
-                            .getCurrentUser()).getUid();
-
-                    Map<String, Object> docData = new HashMap<>();
-                    docData.put("uid", uid);
-                    docData.put("lastSeen", new Timestamp(new Date()));
-                    FirebaseFirestore db = FirebaseFirestore.getInstance();
-                    db.collection("fcmTokens").document(token).set(docData);
-
-                });
-    }
 
     private void logOut() {
         // sign out firebase

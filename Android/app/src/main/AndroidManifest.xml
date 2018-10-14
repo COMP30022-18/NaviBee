@@ -138,9 +138,13 @@
         </activity>
         <activity
             android:name=".navigation.NavigationActivity"
+            android:launchMode="singleTask"
+            android:taskAffinity="${applicationId}.navigationTask"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".navigation.TransitNavigationActivity"
+            android:launchMode="singleTask"
+            android:taskAffinity="${applicationId}.navigationTask"
             android:theme="@style/AppTheme.TranslucentActionBar" />
         <activity
             android:name=".navigation.NavigationSelectorActivity"
