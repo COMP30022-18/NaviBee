@@ -3,6 +3,7 @@ package au.edu.unimelb.eng.navibee.sos;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.social.ConversationManager;
 import au.edu.unimelb.eng.navibee.social.PrivateConversation;
@@ -70,9 +71,15 @@ public class SosCountDownActivity extends AppCompatActivity {
 
     private void triggerSOS() {
 
-        String phoneNumber = "123";
+//        String phoneNumber = "123";
+        String phoneNumber = PreferenceManager.getDefaultSharedPreferences(this).getString("sos_emergency_call", " ");
         String enmergecyContactUid = "bEQ9x53aA6TFttXxE6QBHsyIW4u2";
 
+        // check digit only
+        if (!android.text.TextUtils.isDigitsOnly(phoneNumber)) {
+            Toast.makeText(this, "Digits Only!", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // emergency message
         PrivateConversation conv = ConversationManager.getInstance().getPrivateConversation(enmergecyContactUid);

@@ -49,6 +49,8 @@ public class SosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sos);
 
+        checkPhoneCallPermission();
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         countDownTextView = findViewById(R.id.sos_countdown_number);
 
@@ -87,12 +89,19 @@ public class SosActivity extends AppCompatActivity {
 
     private void triggerSOS() {
 
-        String phoneNumber = "123";
-        String enmergecyContactUid = "bEQ9x53aA6TFttXxE6QBHsyIW4u2";
+        String phoneNumber = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+                            .getString("sos_emergency_call", " ");
+        String contactUid = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+                            .getString("sos_emergency_contact", " ");
 
+        // check digit only
+        if (!android.text.TextUtils.isDigitsOnly(phoneNumber)) {
+            Toast.makeText(this, "Digits Only!", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // emergency message
-        PrivateConversation conv = ConversationManager.getInstance().getPrivateConversation(enmergecyContactUid);
+        PrivateConversation conv = ConversationManager.getInstance().getPrivateConversation(contactUid);
         conv.sendMessage("text", "Emergency!");
 
         // location
@@ -123,6 +132,13 @@ public class SosActivity extends AppCompatActivity {
 
 
         finish();
+    }
+
+    // Check the phone call permission
+    public void checkPhoneCallPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, 1);
+        }
     }
 
 }

@@ -4,7 +4,11 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.*
+import au.edu.unimelb.eng.navibee.social.UserInfoManager
 import au.edu.unimelb.eng.navibee.sos.FallDetection
+import au.edu.unimelb.eng.navibee.social.ConversationManager
+
+
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -22,10 +26,11 @@ class SettingsActivity : AppCompatActivity() {
     private fun setupActionBar() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
+
 }
 
 class SettingsFragment: PreferenceFragmentCompat(),
-        SharedPreferences.OnSharedPreferenceChangeListener {
+        SharedPreferences.OnSharedPreferenceChangeListener{
 
     private lateinit var sharedPref: SharedPreferences
 
@@ -33,6 +38,31 @@ class SettingsFragment: PreferenceFragmentCompat(),
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preference)
+
+        val contactPreference = findPreference("sos_emergency_contact")
+
+        setListPreferenceData(contactPreference as ListPreference)
+
+        contactPreference.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            setListPreferenceData(contactPreference)
+            false
+        }
+    }
+
+    private fun setListPreferenceData(contactPreference: ListPreference) {
+
+        val uidList = ConversationManager.getInstance().friendList
+        val nameList = mutableListOf<CharSequence>()
+        UserInfoManager.getInstance().getUserInfo(uidList) { stringUserInfoMap ->
+            for (uid in uidList) {
+                nameList.add(stringUserInfoMap[uid]!!.name)
+            }
+        }
+
+        contactPreference.setDefaultValue(" ")
+        contactPreference.entries = nameList.toTypedArray()
+        contactPreference.entryValues = uidList.toTypedArray()
+
     }
 
     override fun onResume() {

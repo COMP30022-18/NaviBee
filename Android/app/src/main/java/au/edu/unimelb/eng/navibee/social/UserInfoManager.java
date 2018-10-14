@@ -6,6 +6,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,7 +64,7 @@ public class UserInfoManager {
         });
     }
 
-    public void getUserInfo(ArrayList<String> ids, Callback<Map<String, UserInfo>> callback) {
+    public void getUserInfo(ArrayList<String> ids, Callback<@NotNull Map<String, @NotNull UserInfo>> callback) {
         Map<String, UserInfo> res = new HashMap<>();
         for (String id: new HashSet<>(ids)) {
             getUserInfo(id, info -> {
