@@ -509,6 +509,12 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             valid = false;
         }
 
+        // check if date is after now
+        if(!isTimeAfterNow(dateMap)){
+            timeLayout.setError(getString(R.string.event_create_time_invalid));
+            valid = false;
+        }
+
         // check if location selected
         if(eventLocation == null){
             locationLayout.setError(getResources().getString(R.string.event_create_location_required));
@@ -520,6 +526,26 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             finishedEditEvent();
         }
     }
+
+    private boolean isTimeAfterNow(Map<String, Integer> dateMap){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, dateMap.get("year"));
+        calendar.set(Calendar.MONTH, dateMap.get("month"));
+        calendar.set(Calendar.DAY_OF_MONTH, dateMap.get("day"));
+        calendar.set(Calendar.HOUR_OF_DAY, dateMap.get("hour"));
+        calendar.set(Calendar.MINUTE, dateMap.get("minute"));
+        Date testTime = calendar.getTime();
+
+        Date currentTime = new Date();
+
+        if(testTime.compareTo(currentTime) >= 0) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
 
     private void selectPics(){
         PickImageDialog.build(new PickSetup().setSystemDialog(true)).show(EventEditActivity.this);
