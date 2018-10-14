@@ -323,7 +323,7 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="message_notification_channel">Messages</string>
     <string name="message_notification_channel_desc">Message notifications</string>
-    <string name="sos_act_text">Activated the SOS mode.</string>
+    <string name="sos_act_text">You have activated the SOS mode.</string>
     <string name="sos_pre_text">We\'ve detected that you might be in danger\.</string>
     <string name="sos_main_text">Your emergency contact will be notified in</string>
     <string name="sos_time_unit">seconds</string>

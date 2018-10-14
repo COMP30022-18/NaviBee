@@ -8,9 +8,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.app.progresviews.ProgressWheel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
@@ -25,7 +25,7 @@ import au.edu.unimelb.eng.navibee.social.PrivateConversation;
 public class SosActivity extends AppCompatActivity {
 
     private CountDownTimer countDownTimer;
-    private TextView countDownTextView;
+    private ProgressWheel countDownView;
     private FusedLocationProviderClient mFusedLocationClient;
 
     @Override
@@ -36,12 +36,15 @@ public class SosActivity extends AppCompatActivity {
         checkPhoneCallPermission();
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        countDownTextView = findViewById(R.id.sos_countdown_number);
+        countDownView = findViewById(R.id.sos_progress);
 
         countDownTimer = new CountDownTimer(10 * 1000, 1000) {
             @Override
             public void onTick(long l) {
-                countDownTextView.setText(Long.toString(l / 1000 + 1));
+                Long val = l / 1000 + 1;
+                int angle = (int) ((float) val / 10 * 360);
+                countDownView.setStepCountText(Long.toString(val));
+                countDownView.setPercentage(angle);
             }
 
             @Override

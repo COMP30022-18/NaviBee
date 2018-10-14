@@ -40,4 +40,5 @@
 
     <color name="checkedGreen">#43A047</color>
     <color name="sosRed">#D32F2F</color>
+    <color name="rimColor">#3fffffff</color>
 </resources>
