@@ -36,7 +36,6 @@
             android:key="countdown_enabled"
             android:title="@string/pref_sos_enable_fall_detection"/>
         <EditTextPreference
-            android:defaultValue=" "
             android:inputType="phone"
             android:digits="0123456789"
             android:dialogTitle="@string/pref_sos_preferred_emergency_call"

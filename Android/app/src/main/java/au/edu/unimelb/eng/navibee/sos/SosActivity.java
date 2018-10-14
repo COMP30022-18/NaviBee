@@ -4,14 +4,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import au.edu.unimelb.eng.navibee.R;
-import au.edu.unimelb.eng.navibee.social.ConversationManager;
-import au.edu.unimelb.eng.navibee.social.PrivateConversation;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -21,6 +13,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.social.ConversationManager;
+import au.edu.unimelb.eng.navibee.social.PrivateConversation;
 
 
 public class SosActivity extends AppCompatActivity {
@@ -76,43 +75,46 @@ public class SosActivity extends AppCompatActivity {
     private void triggerSOS() {
 
         String phoneNumber = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
-                .getString("sos_emergency_call", " ");
+                .getString("sos_emergency_call", "");
         String contactUid = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
-                .getString("sos_emergency_contact", " ");
+                .getString("sos_emergency_contact", "");
+
+        if (!contactUid.isEmpty()) {
+
+            // emergency message
+            PrivateConversation conv = ConversationManager.getInstance().getPrivateConversation(contactUid);
+            conv.sendMessage("text", "Emergency!");
+
+            // location
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Unable to get current location", Toast.LENGTH_LONG).show();
+                } else {
+                    mFusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
+                        if (location != null) {
+                            conv.sendLocation(location.getLatitude(), location.getLongitude());
+                        }
+                    });
+                }
+            }
+
+        }
 
         // check digit only
-        if (!android.text.TextUtils.isDigitsOnly(phoneNumber)) {
+        if (!phoneNumber.isEmpty() && !android.text.TextUtils.isDigitsOnly(phoneNumber)) {
             Toast.makeText(this, "Digits Only!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // emergency message
-        PrivateConversation conv = ConversationManager.getInstance().getPrivateConversation(contactUid);
-        conv.sendMessage("text", "Emergency!");
-
-        // location
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Unable to get current location", Toast.LENGTH_LONG).show();
-            } else {
-                mFusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
-                    if (location != null) {
-                        conv.sendLocation(location.getLatitude(), location.getLongitude());
-                    }
-                });
-            }
-        }
-
-        // emergency phone call
-        Intent callIntent = new Intent(Intent.ACTION_CALL);
-
-        callIntent.setData(Uri.parse("tel:" + phoneNumber));
-        callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "Unable to make phone call", Toast.LENGTH_LONG).show();
         } else {
-            startActivity(callIntent);
+            // emergency phone call
+            Intent callIntent = new Intent(Intent.ACTION_CALL);
+
+            callIntent.setData(Uri.parse("tel:" + phoneNumber));
+            callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Unable to make phone call", Toast.LENGTH_LONG).show();
+            } else {
+                startActivity(callIntent);
+            }
         }
 
         finish();
