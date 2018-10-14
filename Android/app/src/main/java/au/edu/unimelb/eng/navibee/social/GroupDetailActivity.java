@@ -107,6 +107,12 @@ public class GroupDetailActivity extends AppCompatActivity {
                 .create();
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
+    }
+
     private void inflateMembers() {
         LinearLayout nsv = findViewById(R.id.group_member_scroll_list);
         for (String uid: memberList) {

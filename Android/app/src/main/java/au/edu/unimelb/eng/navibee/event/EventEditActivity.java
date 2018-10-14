@@ -41,6 +41,7 @@ import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 
 import java.io.ByteArrayOutputStream;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -95,7 +96,8 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             int minute = c.get(Calendar.MINUTE);
 
             // Create a new instance of TimePickerDialog and return it
-            return new TimePickerDialog(getActivity(), (EventEditActivity)getActivity(), hour, minute,
+            return new TimePickerDialog(getActivity(),
+                    (EventEditActivity)getActivity(), hour, minute,
                     DateFormat.is24HourFormat(getActivity()));
         }
 
@@ -112,7 +114,11 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             int day = c.get(Calendar.DAY_OF_MONTH);
 
             // Create a new instance of DatePickerDialog and return it
-            return new DatePickerDialog(getActivity(), (EventEditActivity)getActivity(), year, month, day);
+            DatePickerDialog dialog =
+                    new DatePickerDialog(getActivity(),
+                            (EventEditActivity)getActivity(), year, month, day);
+            dialog.getDatePicker().setMinDate(System.currentTimeMillis());
+            return dialog;
         }
 
     }
@@ -140,6 +146,12 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         loadData();
 
         setupFields();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 
     private void setupFields() {
@@ -308,7 +320,15 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
         setEventDate(year, month, day);
-        showTimePickerDialog();
+
+        final Calendar c = Calendar.getInstance();
+        int tYear = c.get(Calendar.YEAR);
+        int tMonth = c.get(Calendar.MONTH);
+        int tDay = c.get(Calendar.DAY_OF_MONTH);
+
+        boolean isToday = year == tYear && month == tMonth && day == tDay;
+
+        showTimePickerDialog(isToday);
     }
 
     private void setEventDate(int year, int month, int day){
@@ -319,12 +339,12 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
     public void showDatePickerDialog(View v) {
         timeLayout.setError(null);
-        DialogFragment dateFragment = new DatePickerFragment();
+        DatePickerFragment dateFragment = new DatePickerFragment();
         dateFragment.show(getSupportFragmentManager(), "datePicker");
     }
 
-    public void showTimePickerDialog() {
-        DialogFragment timeFragment = new TimePickerFragment();
+    public void showTimePickerDialog(boolean isToday) {
+        TimePickerFragment timeFragment = new TimePickerFragment();
         timeFragment.show(getSupportFragmentManager(), "timePicker");
     }
 
@@ -503,6 +523,12 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             valid = false;
         }
 
+        // check if date is after now
+        if(!isTimeAfterNow(dateMap)){
+            timeLayout.setError(getString(R.string.event_create_time_invalid));
+            valid = false;
+        }
+
         // check if location selected
         if(eventLocation == null){
             locationLayout.setError(getResources().getString(R.string.event_create_location_required));
@@ -514,6 +540,26 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             finishedEditEvent();
         }
     }
+
+    private boolean isTimeAfterNow(Map<String, Integer> dateMap){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, dateMap.get("year"));
+        calendar.set(Calendar.MONTH, dateMap.get("month"));
+        calendar.set(Calendar.DAY_OF_MONTH, dateMap.get("day"));
+        calendar.set(Calendar.HOUR_OF_DAY, dateMap.get("hour"));
+        calendar.set(Calendar.MINUTE, dateMap.get("minute"));
+        Date testTime = calendar.getTime();
+
+        Date currentTime = new Date();
+
+        if(testTime.compareTo(currentTime) >= 0) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
 
     private void selectPics(){
         PickImageDialog.build(new PickSetup().setSystemDialog(true)).show(EventEditActivity.this);

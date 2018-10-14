@@ -7,6 +7,7 @@ import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.view.View;
@@ -26,6 +27,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
 import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
+
+import static au.edu.unimelb.eng.navibee.utils.DimensionsUtilitiesKt.getStatusBarHeight;
 
 public class LocationDisplayActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -135,9 +138,16 @@ public class LocationDisplayActivity extends AppCompatActivity implements OnMapR
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
         LatLng location = new LatLng(lat, lon);
-        if (!(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-            googleMap.setMyLocationEnabled(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) !=
+                    PackageManager.PERMISSION_GRANTED &&
+                    checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                            PackageManager.PERMISSION_GRANTED)) {
+                googleMap.setMyLocationEnabled(true);
+            }
         }
+        googleMap.setPadding(0, getStatusBarHeight(mapView), 0, 0);
+
         googleMap.getUiSettings().setMapToolbarEnabled(false);
 
         googleMap.addMarker(new MarkerOptions().position(location));
