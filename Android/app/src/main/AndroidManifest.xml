@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <uses-feature android:name="android.hardware.nfc" />
 
@@ -162,17 +163,14 @@
         </activity>
         <activity
             android:name=".social.ChatActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".social.FriendActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".social.FriendActivity" />
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".social.AddFriendQRActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar">
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
-                <category android:name="android.intent.category.DEFAULT"/>
+
+                <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="application/navibee" />
             </intent-filter>
         </activity>
@@ -204,6 +202,7 @@
         <activity
             android:name=".social.VoiceCallActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <activity android:name=".social.CreateGroupChatActivity"
             android:label="@string/friends_create_group"
             android:parentActivityName=".social.FriendActivity">
