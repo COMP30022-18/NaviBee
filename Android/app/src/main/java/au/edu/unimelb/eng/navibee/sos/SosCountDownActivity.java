@@ -22,11 +22,6 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import au.edu.unimelb.eng.navibee.R;
-import au.edu.unimelb.eng.navibee.social.ConversationManager;
-import au.edu.unimelb.eng.navibee.social.PrivateConversation;
 
 public class SosCountDownActivity extends AppCompatActivity {
 
@@ -58,6 +53,7 @@ public class SosCountDownActivity extends AppCompatActivity {
     }
 
     public void notifyOnClick(View view) {
+        countDownTimer.cancel();
         triggerSOS();
     }
 
@@ -77,9 +73,10 @@ public class SosCountDownActivity extends AppCompatActivity {
 
     private void triggerSOS() {
 
-//        String phoneNumber = "123";
-        String phoneNumber = PreferenceManager.getDefaultSharedPreferences(this).getString("sos_emergency_call", " ");
-        String enmergecyContactUid = "bEQ9x53aA6TFttXxE6QBHsyIW4u2";
+        String phoneNumber = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+                .getString("sos_emergency_call", " ");
+        String contactUid = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+                .getString("sos_emergency_contact", " ");
 
         // check digit only
         if (!android.text.TextUtils.isDigitsOnly(phoneNumber)) {
@@ -88,7 +85,7 @@ public class SosCountDownActivity extends AppCompatActivity {
         }
 
         // emergency message
-        PrivateConversation conv = ConversationManager.getInstance().getPrivateConversation(enmergecyContactUid);
+        PrivateConversation conv = ConversationManager.getInstance().getPrivateConversation(contactUid);
         conv.sendMessage("text", "Emergency!");
 
         // location
@@ -104,7 +101,6 @@ public class SosCountDownActivity extends AppCompatActivity {
             }
         }
 
-
         // emergency phone call
         Intent callIntent = new Intent(Intent.ACTION_CALL);
 
@@ -116,7 +112,6 @@ public class SosCountDownActivity extends AppCompatActivity {
         } else {
             startActivity(callIntent);
         }
-
 
         finish();
     }
