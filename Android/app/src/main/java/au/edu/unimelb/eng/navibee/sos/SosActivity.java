@@ -10,13 +10,13 @@ import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.Toast;
 
-import com.app.progresviews.ProgressWheel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import antonkozyriatskyi.circularprogressindicator.CircularProgressIndicator;
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.social.ConversationManager;
 import au.edu.unimelb.eng.navibee.social.PrivateConversation;
@@ -25,7 +25,7 @@ import au.edu.unimelb.eng.navibee.social.PrivateConversation;
 public class SosActivity extends AppCompatActivity {
 
     private CountDownTimer countDownTimer;
-    private ProgressWheel countDownView;
+    private CircularProgressIndicator countDownView;
     private FusedLocationProviderClient mFusedLocationClient;
 
     @Override
@@ -37,14 +37,15 @@ public class SosActivity extends AppCompatActivity {
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         countDownView = findViewById(R.id.sos_progress);
+        countDownView.setProgressTextAdapter(v -> String.valueOf((int) v / 1000 + 1));
 
         countDownTimer = new CountDownTimer(10 * 1000, 1000) {
             @Override
             public void onTick(long l) {
-                Long val = l / 1000 + 1;
-                int angle = (int) ((float) val / 10 * 360);
-                countDownView.setStepCountText(Long.toString(val));
-                countDownView.setPercentage(angle);
+//                Long val = l / 1000 + 1;
+//                int angle = (int) ((float) val / 10 * 360);
+//                countDownView.setStepCountText(Long.toString(val));
+                countDownView.setProgress(l, 10 * 1000);
             }
 
             @Override

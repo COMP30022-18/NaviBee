@@ -85,7 +85,7 @@
         app:srcCompat="@drawable/ic_close_white_24dp" />
 
 
-    <com.app.progresviews.ProgressWheel
+    <antonkozyriatskyi.circularprogressindicator.CircularProgressIndicator
         android:id="@+id/sos_progress"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -93,20 +93,18 @@
         android:layout_marginEnd="64dp"
         android:layout_marginTop="16dp"
         app:layout_constraintDimensionRatio="1:1"
-        app:barWidth="12dp"
-        app:countText="10"
-        app:countTextColor="@color/colorDarkTextPrimary"
-        app:countTextSize="64sp"
-        app:defTextColor="@color/colorDarkTextSecondary"
-        app:defTextSize="24sp"
-        app:definitionText="@string/sos_time_unit"
+        app:direction="clockwise"
+        app:drawDot="false"
+        app:progressStrokeWidth="12dp"
+        app:startAngle="270"
+        app:enableProgressAnimation="true"
+        app:textColor="@color/colorDarkTextPrimary"
+        app:textSize="64sp"
+        app:fillBackground="false"
         app:layout_constraintBottom_toTopOf="@+id/sos.countdown.notify_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sos.countdown.main_text"
-        app:marginBtwText="15dp"
-        app:percentage="360"
-        app:progressColor="@color/colorPrimary"
-        app:rimColor="@color/rimColor"/>
+        app:progressColor="@color/colorPrimary"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
