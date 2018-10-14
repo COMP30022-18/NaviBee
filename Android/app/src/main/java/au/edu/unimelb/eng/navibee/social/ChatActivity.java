@@ -239,6 +239,8 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK) {
                 PlacePicker.getLatLngBounds(data);
