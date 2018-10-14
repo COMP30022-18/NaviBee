@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.Gravity;
@@ -81,12 +82,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             naviBtn.setClipToOutline(true);
         }
 
-
         if (!inited) {
             inited = true;
             ConversationManager.init();
             setFCMToken();
-            FallDetection.getInstance().start();
+
+            Boolean isEnabled = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("countdown_enabled", true);
+
+            if (isEnabled) {
+                FallDetection.getInstance().start();
+            }
             // notification channel
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -107,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // notification clicked
             ConversationManager.getInstance().waitForOpenChatAvtivity(convID);
         }
+
     }
 
     private void setupWelcomeBanner() {
