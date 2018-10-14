@@ -230,6 +230,12 @@ public class EventDetailsActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
+    }
+
     private String getRelationship(EventsActivity.EventItem eventItem){
         String relationship;
         if (eventItem.getHolder().equals(uid)) {

@@ -174,6 +174,11 @@ class DestinationDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_destination_go, menu)
         return true

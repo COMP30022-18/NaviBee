@@ -159,6 +159,12 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
     }
 
     @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(convUpdateReceiver);

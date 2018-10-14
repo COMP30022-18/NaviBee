@@ -132,6 +132,11 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
         handleIntent(intent)
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
+    }
+
     override fun onNewIntent(intent: Intent?) {
         handleIntent(intent ?: return)
     }

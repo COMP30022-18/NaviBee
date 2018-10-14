@@ -4,9 +4,9 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.*
+import au.edu.unimelb.eng.navibee.social.ConversationManager
 import au.edu.unimelb.eng.navibee.social.UserInfoManager
 import au.edu.unimelb.eng.navibee.sos.FallDetection
-import au.edu.unimelb.eng.navibee.social.ConversationManager
 
 
 
@@ -25,6 +25,11 @@ class SettingsActivity : AppCompatActivity() {
      */
     private fun setupActionBar() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
     }
 
 }
