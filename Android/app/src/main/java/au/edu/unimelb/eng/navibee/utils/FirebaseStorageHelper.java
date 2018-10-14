@@ -5,12 +5,10 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.widget.ImageView;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -19,7 +17,6 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
@@ -27,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import au.edu.unimelb.eng.navibee.NaviBeeApplication;
 
@@ -211,8 +207,43 @@ public class FirebaseStorageHelper {
         }
     }
 
+    public static void loadImage(String filePath, boolean isThumb, PayloadCallback callback) {
+
+        if (isThumb) {
+            int where = filePath.lastIndexOf(".");
+            filePath = filePath.substring(0, where) + "-thumb" + filePath.substring(where);
+        }
+
+        // fs- is for firebase storage caches
+        String filename = "fs-"+ sha256(filePath);
+        File file = new File(NaviBeeApplication.getInstance().getCacheDir(), filename);
+
+        if (file.exists()) {
+            // cache exists
+            Bitmap b = loadImageFromCacheFile(file);
+            if (callback!=null) callback.callback(true, b);
+        } else {
+            // cache not exists
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReference();
+            storageRef = storageRef.child(filePath);
+            storageRef.getFile(file).addOnSuccessListener(taskSnapshot -> {
+                // Local temp file has been created
+                Bitmap b = loadImageFromCacheFile(file);
+                if (callback!=null) callback.callback(true, b);
+            }).addOnFailureListener(taskSnapshot -> {
+                if (callback!=null) callback.callback(false, null);
+            });
+
+        }
+    }
+
     public interface Callback {
         void callback(boolean isSuccess);
+    }
+
+    public interface PayloadCallback {
+        void callback(boolean isSuccess, Bitmap bitmap);
     }
 
     private static String sha256(String url) {
@@ -245,6 +276,17 @@ public class FirebaseStorageHelper {
             imageView.setImageBitmap(bitmap);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private static Bitmap loadImageFromCacheFile(File file) {
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            Bitmap bitmap = BitmapFactory.decodeStream(fis);
+            return bitmap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 

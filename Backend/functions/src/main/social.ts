@@ -27,11 +27,16 @@ export const newMessageNotification = functions.firestore
             priority: 'high',
         }
 
+        const chatName = convDoc.type == "group" ? convDoc.name : "";
+
         let data = {
             'convID': convID,
+            'convType': convDoc.type,
             'msgID': context.params.messageID,
             'type': doc.type,
-            'senderName': senderName
+            'senderName': senderName,
+            'senderAvatar': senderDoc.photoURL,
+            'chatName': chatName
         }
 
         if (doc.type == "text") {
@@ -40,6 +45,8 @@ export const newMessageNotification = functions.firestore
                 content = content.substring(0, 40) + "...";
             }
             data['content'] = content;
+        } else if (doc.type == "image") {
+            data['content'] = doc.data;
         }
 
         for (let key in convDoc.users) {
