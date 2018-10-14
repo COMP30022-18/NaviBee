@@ -329,6 +329,7 @@
     <string name="notification_voicecall">is calling you</string>
     <string name="notification_location">sent you a location</string>
     <string name="notificaiton_event">sent you an event</string>
+    <string name="event_create_time_invalid">You can not create an event in the past.</string>
 
 
 </resources>
