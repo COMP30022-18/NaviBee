@@ -2,6 +2,7 @@ package au.edu.unimelb.eng.navibee.event;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.EventLogTags;
 import android.view.View;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -15,6 +16,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,11 +35,9 @@ public class EventsActivity extends AppCompatActivity {
     public static class EventItem {
 
         private String holder;
-        private String eventId;
         private String name;
         private Timestamp time;
         private Map<String, Boolean> users;
-        private Boolean isTag = false;
         private ArrayList<String> images;
         private String placeName;
         private double longitude;
@@ -92,22 +92,6 @@ public class EventsActivity extends AppCompatActivity {
             return users;
         }
 
-        public Boolean isTag() {
-            return isTag;
-        }
-
-        public void setTag(Boolean isTag){
-            this.isTag = isTag;
-        }
-
-        public String getEventId(){
-            return eventId;
-        }
-
-        public void setEventId(String eventId){
-            this.eventId = eventId;
-        }
-
         public Timestamp getTime() { return time; }
 
         public ArrayList<String> getImages() {
@@ -124,6 +108,7 @@ public class EventsActivity extends AppCompatActivity {
 
     private String uid;
     private FirebaseFirestore db;
+    private Map<EventItem, String> eventIdMap;
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter viewAdapter;
@@ -142,6 +127,7 @@ public class EventsActivity extends AppCompatActivity {
 
         // loading
         events.add(new EventRVIndefiniteProgressBar());
+        eventIdMap = new HashMap<>();
 
         // set up recycler view
         recyclerView = (RecyclerView) findViewById(R.id.events_recycler_view);
@@ -173,7 +159,7 @@ public class EventsActivity extends AppCompatActivity {
 
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         EventItem eventItem = document.toObject(EventItem.class);
-                        eventItem.setEventId(document.getId());
+                        eventIdMap.put(eventItem, document.getId());
                         eventList.add(eventItem);
                     }
 
@@ -236,7 +222,7 @@ public class EventsActivity extends AppCompatActivity {
                     eventUrl,
                     view -> {
                         Intent intent = new Intent(EventsActivity.this, EventDetailsActivity.class);
-                        intent.putExtra("eventId", i.getEventId());
+                        intent.putExtra("eventId", eventIdMap.get(i));
                         startActivity(intent);
                     }
             ));
