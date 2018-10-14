@@ -349,8 +349,9 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
                             LatLng(pt.latitude(), pt.longitude())
                     )
                     if (panorama.location != null) {
-                        val bearing = intersection.bearings()
-                                ?.get(intersection?.`in`() ?: 0)?.toFloat() ?: 0f
+                        val bearing = (intersection.bearings()
+                                ?.get(intersection?.`out`() ?: 0) ?: 0).toFloat()
+
                         panorama.animateTo(
                                 StreetViewPanoramaCamera.Builder()
                                         .zoom(0f).tilt(0f).bearing(bearing).build(),
