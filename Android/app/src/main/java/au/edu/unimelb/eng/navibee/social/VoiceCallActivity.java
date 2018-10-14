@@ -205,13 +205,14 @@ public class VoiceCallActivity extends AppCompatActivity {
 
 
 
+        // case waiting for response
         if (voiceCallService.getStatus() == VoiceCallService.Status.Waiting) {
             textViewStatus.setVisibility(View.VISIBLE);
             textViewStatus.setText("Waiting");
             changingDot.setVisibility(View.VISIBLE);
 
 
-            if (isInitiator){
+            if (voiceCallService.getIsInitiator()){
                 buttonMic.setVisibility(View.VISIBLE);
                 buttonSpeaker.setVisibility(View.VISIBLE);
                 buttonAccept.setVisibility(View.INVISIBLE);
@@ -226,6 +227,7 @@ public class VoiceCallActivity extends AppCompatActivity {
                 buttonHangup.setVisibility(View.INVISIBLE);
             }
         }
+        // case accepted and connecting
         else if (voiceCallService.getStatus() == VoiceCallService.Status.Connecting){
             textViewStatus.setVisibility(View.VISIBLE);
             textViewStatus.setText("Connecting");
@@ -235,7 +237,9 @@ public class VoiceCallActivity extends AppCompatActivity {
             buttonAccept.setVisibility(View.INVISIBLE);
             buttonDecline.setVisibility(View.INVISIBLE);
             buttonHangup.setVisibility(View.VISIBLE);
-        } else {
+        }
+        // case calling
+        else {
             textViewStatus.setVisibility(View.INVISIBLE);
             changingDot.setVisibility(View.INVISIBLE);
             buttonMic.setVisibility(View.VISIBLE);
@@ -245,26 +249,43 @@ public class VoiceCallActivity extends AppCompatActivity {
             buttonHangup.setVisibility(View.VISIBLE);
         }
 
-
-        textViewTime.setVisibility(View.INVISIBLE);
-
-        if (isInitiator) {
-            buttonAccept.setVisibility(View.INVISIBLE);
-            buttonDecline.setVisibility(View.INVISIBLE);
-            connect();
-        } else {
-            buttonHangup.setVisibility(View.INVISIBLE);
-
-            answerTimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    runOnUiThread(() -> showDialogAndClose("Call Cancelled."));
-                }
-            }, ANSWER_TIMEOUT);
+        if (voiceCallService.getIsMicEnabled()){
+            buttonMic.setImageResource(R.drawable.ic_mic_black_24dp);
+            buttonMic.setBackgroundResource(R.drawable.voicecall_mic_background);
+        }
+        else{
+            buttonMic.setImageResource(R.drawable.ic_mic_off_white_24dp);
+            buttonMic.setBackgroundResource(R.drawable.voicecall_button_background_white_hollow);
+        }
+        if (voiceCallService.getIsSpeakerEnabled()){
+            buttonSpeaker.setImageResource(R.drawable.ic_speaker_black_24dp);
+            buttonSpeaker.setBackgroundResource(R.drawable.voicecall_mic_background);
+        }
+        else{
+            buttonSpeaker.setImageResource(R.drawable.ic_speaker_white_24dp);
+            buttonSpeaker.setBackgroundResource(R.drawable.voicecall_button_background_white_hollow);
         }
 
 
-        mEventHandler.onUserJoined(0,0);
+//        textViewTime.setVisibility(View.INVISIBLE);
+//
+//        if (isInitiator) {
+//            buttonAccept.setVisibility(View.INVISIBLE);
+//            buttonDecline.setVisibility(View.INVISIBLE);
+//            connect();
+//        } else {
+//            buttonHangup.setVisibility(View.INVISIBLE);
+//
+//            answerTimer.schedule(new TimerTask() {
+//                @Override
+//                public void run() {
+//                    runOnUiThread(() -> showDialogAndClose("Call Cancelled."));
+//                }
+//            }, ANSWER_TIMEOUT);
+//        }
+//
+//
+//        mEventHandler.onUserJoined(0,0);
     }
 
     @Override
