@@ -85,7 +85,7 @@
         app:srcCompat="@drawable/ic_close_white_24dp" />
 
 
-    <antonkozyriatskyi.circularprogressindicator.CircularProgressIndicator
+    <au.edu.unimelb.eng.navibee.utils.CircularProgressView
         android:id="@+id/sos_progress"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -93,18 +93,31 @@
         android:layout_marginEnd="64dp"
         android:layout_marginTop="16dp"
         app:layout_constraintDimensionRatio="1:1"
-        app:direction="clockwise"
-        app:drawDot="false"
-        app:progressStrokeWidth="12dp"
+        app:reverse="false"
+        app:progressBarThickness="12dp"
+        app:backgroundAlphaEnabled="true"
+        app:shadow="false"
         app:startAngle="270"
+        app:progressThumb="true"
         app:enableProgressAnimation="true"
-        app:textColor="@color/colorDarkTextPrimary"
-        app:textSize="64sp"
-        app:fillBackground="false"
         app:layout_constraintBottom_toTopOf="@+id/sos.countdown.notify_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sos.countdown.main_text"
-        app:progressColor="@color/colorPrimary"/>
+        app:progressBarColor="@color/colorPrimary"/>
+
+    <TextView
+        android:id="@+id/sos_progress_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-light"
+        android:textColor="@color/colorDarkTextPrimary"
+        android:textAlignment="center"
+        android:textSize="92sp"
+        app:layout_constraintBottom_toBottomOf="@+id/sos_progress"
+        app:layout_constraintEnd_toEndOf="@+id/sos_progress"
+        app:layout_constraintStart_toStartOf="@+id/sos_progress"
+        app:layout_constraintTop_toTopOf="@+id/sos_progress"
+        tools:text="10"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
