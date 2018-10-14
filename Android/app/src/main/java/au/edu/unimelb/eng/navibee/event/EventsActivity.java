@@ -35,7 +35,6 @@ public class EventsActivity extends AppCompatActivity {
         private String holder;
         private String eventId;
         private String name;
-        private String location;
         private Timestamp time;
         private Map<String, Boolean> users;
         private Boolean isTag = false;
@@ -47,10 +46,9 @@ public class EventsActivity extends AppCompatActivity {
 
         public EventItem(){}
 
-        public EventItem(String name, String holder, String location, Timestamp time, Map<String, Boolean> users, ArrayList<String> images, String placeName, double longitude, double latitude, Boolean isPrivate){
+        public EventItem(String name, String holder, Timestamp time, Map<String, Boolean> users, ArrayList<String> images, String placeName, double longitude, double latitude, Boolean isPrivate){
             this.holder = holder;
             this.name = name;
-            this.location = location;
             this.users = users;
             this.time = time;
             this.images = images;
@@ -60,10 +58,9 @@ public class EventsActivity extends AppCompatActivity {
             this.isPrivate = isPrivate;
         }
 
-        public EventItem(String name, String holder, String location, Date time, Map<String, Boolean> users, ArrayList<String> images, String placeName, double longitude, double latitude, Boolean isPrivate){
+        public EventItem(String name, String holder, Date time, Map<String, Boolean> users, ArrayList<String> images, String placeName, double longitude, double latitude, Boolean isPrivate){
             this.holder = holder;
             this.name = name;
-            this.location = location;
             this.users = users;
             this.time = new Timestamp(time);
             this.images = images;
@@ -89,10 +86,6 @@ public class EventsActivity extends AppCompatActivity {
 
         public String getName(){
             return name;
-        }
-
-        public String getLocation(){
-            return location;
         }
 
         public Map<String, Boolean> getUsers(){
@@ -239,7 +232,7 @@ public class EventsActivity extends AppCompatActivity {
             }
             events.add(new EventRVEntry(
                     i.getName(),
-                    i.getLocation(),
+                    i.getPlaceName(),
                     eventUrl,
                     view -> {
                         Intent intent = new Intent(EventsActivity.this, EventDetailsActivity.class);

@@ -21,6 +21,7 @@ import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.leinardi.android.speeddial.SpeedDialView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 import androidx.annotation.NonNull;
@@ -373,7 +374,8 @@ public class FriendActivity extends AppCompatActivity {
     }
 
     private void sortChatsList() {
-        chatsList.sort((p1, p2) -> p2.getTimeForSort().compareTo(p1.getTimeForSort()));
+        // chatsList.sort((p1, p2) -> p2.getTimeForSort().compareTo(p1.getTimeForSort()));
+        Collections.sort(chatsList, (p1, p2) -> p2.getTimeForSort().compareTo(p1.getTimeForSort()));
     }
 
 }

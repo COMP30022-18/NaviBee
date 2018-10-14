@@ -164,13 +164,12 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
                                 name = item.name ?: "",
                                 location = item.vicinity ?: "",
                                 googlePlaceId = item.placeId,
-                                googlePhotoReference = photoReference,
-                                onClick = View.OnClickListener { _ ->
-                                    startActivity<DestinationDetailsActivity>(
-                                            DestinationDetailsActivity.EXTRA_PLACE_ID to item.placeId
-                                    )
-                                }
-                        ))
+                                googlePhotoReference = photoReference
+                        ).onClick(View.OnClickListener { _ ->
+                            startActivity<DestinationDetailsActivity>(
+                                    DestinationDetailsActivity.EXTRA_PLACE_ID to item.placeId
+                            )
+                        }))
                     }
 
                     val attrHTML = resources.getString(R.string.search_result_attributions) +
