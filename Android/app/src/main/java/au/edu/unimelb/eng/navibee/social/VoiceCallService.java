@@ -1,6 +1,7 @@
 package au.edu.unimelb.eng.navibee.social;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.ImageView;
@@ -221,17 +222,17 @@ public class VoiceCallService {
     public void showFloatWindow() {
         if (FloatWindow.get() == null) {
             ImageView imageView = new ImageView(NaviBeeApplication.getInstance());
-            imageView.setImageResource(R.drawable.ic_call_black80_24dp);
+            imageView.setImageResource(R.drawable.ic_call_float_window);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                imageView.setElevation(1200);
+            }
             FloatWindow.with(NaviBeeApplication.getInstance())
                     .setView(imageView)
-                    .setWidth(100)
-                    .setHeight(100)
                     .setDesktopShow(true)
                     .build();
 
             imageView.setOnClickListener(view -> {
                 startVoiceCallActivity();
-                FloatWindow.get().hide();
             });
         }
 

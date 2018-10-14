@@ -17,6 +17,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.yhao.floatwindow.FloatWindow;
+
 import java.util.Date;
 import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
 
@@ -128,6 +130,11 @@ public class VoiceCallActivity extends AppCompatActivity {
 
         thread.start();
         updateUI();
+
+        if (FloatWindow.get()!=null) {
+            FloatWindow.get().hide();
+            FloatWindow.destroy();
+        }
 
     }
 
