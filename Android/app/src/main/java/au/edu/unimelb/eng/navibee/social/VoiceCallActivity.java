@@ -267,7 +267,8 @@ public class VoiceCallActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // ???
+        super.onBackPressed();
+        voiceCallService.showFloatWindow();
     }
 
     private void checkPermission() {

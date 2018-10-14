@@ -3,13 +3,17 @@ package au.edu.unimelb.eng.navibee.social;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.yhao.floatwindow.FloatWindow;
 
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import au.edu.unimelb.eng.navibee.NaviBeeApplication;
+import au.edu.unimelb.eng.navibee.R;
 
 public class VoiceCallService {
 
@@ -156,6 +160,11 @@ public class VoiceCallService {
         answerTimer.purge();
         VoiceCallEngine.getInstance().leaveChannel();
 
+        if (FloatWindow.get() != null) {
+            FloatWindow.get().hide();
+            FloatWindow.destroy();
+        }
+
         broadcastUpdate();
     }
 
@@ -207,6 +216,26 @@ public class VoiceCallService {
 
     public boolean getIsSpeakerEnabled() {
         return isSpeakerEnabled;
+    }
+
+    public void showFloatWindow() {
+        if (FloatWindow.get() == null) {
+            ImageView imageView = new ImageView(NaviBeeApplication.getInstance());
+            imageView.setImageResource(R.drawable.ic_call_black80_24dp);
+            FloatWindow.with(NaviBeeApplication.getInstance())
+                    .setView(imageView)
+                    .setWidth(100)
+                    .setHeight(100)
+                    .setDesktopShow(true)
+                    .build();
+
+            imageView.setOnClickListener(view -> {
+                startVoiceCallActivity();
+                FloatWindow.get().hide();
+            });
+        }
+
+        FloatWindow.get().show();
     }
 
 
