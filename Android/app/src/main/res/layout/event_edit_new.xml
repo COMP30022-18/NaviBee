@@ -142,7 +142,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Private Event"
+                        android:textColor="@color/colorLightTextPrimary"
+                        android:text="@string/event_private"
                         android:textSize="32sp" />
                     <Switch
                         android:id="@+id/eventPrivateSwitch"
@@ -185,7 +186,7 @@
             android:onClick="onPublishClicked"
             android:text="@string/event_create_create"
             android:layout_marginTop="@dimen/form_vertical_padding"
-            android:layout_marginBottom="@dimen/form_vertical_padding"
+            android:layout_marginBottom="@dimen/boundary_margin"
             android:layout_marginStart="@dimen/boundary_margin"
             android:layout_marginEnd="@dimen/boundary_margin"
             android:layout_gravity="center_horizontal"

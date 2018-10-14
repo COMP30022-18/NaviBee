@@ -2,34 +2,28 @@ package au.edu.unimelb.eng.navibee.event;
 
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.WindowInsets;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.synnapps.carouselview.CarouselView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,12 +31,14 @@ import java.util.Map;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
+import au.edu.unimelb.eng.navibee.social.FriendDetail;
 import au.edu.unimelb.eng.navibee.social.UserInfoManager;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVIndefiniteProgressBar;
@@ -51,6 +47,7 @@ import au.edu.unimelb.eng.navibee.utils.SimpleRVTextSecondaryPrimaryStatic;
 import au.edu.unimelb.eng.navibee.utils.SimpleRVUserChips;
 import au.edu.unimelb.eng.navibee.utils.SimpleRecyclerViewAdaptor;
 import au.edu.unimelb.eng.navibee.utils.SimpleRecyclerViewItem;
+import au.edu.unimelb.eng.navibee.utils.URLChipCacheLoader;
 
 public class EventDetailsActivity extends AppCompatActivity {
 
@@ -64,6 +61,8 @@ public class EventDetailsActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager viewManager;
     private ArrayList<SimpleRecyclerViewItem> listItems = new ArrayList<>();
 
+    private CoordinatorLayout coordinatorLayout;
+
     private CarouselView carouselView;
 
     private EventsActivity.EventItem eventItem;
@@ -76,15 +75,18 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if(relationship != null){
-            if (relationship.equals("holder")) {
-                //            menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Edit the Event");
-                menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Delete the Event");
-            } else if (relationship.equals("participant")) {
-                menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Quit the Event");
-            } else {
-                menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Join the Event");
-                //            menu.add(Menu.NONE, Menu.FIRST + 1, 1, "Follow the Event");
+        if (relationship != null){
+            switch (relationship) {
+                case "holder":
+
+                    menu.add(Menu.NONE, Menu.FIRST, 0, getString(R.string.event_delete));
+                    break;
+                case "participant":
+                    menu.add(Menu.NONE, Menu.FIRST, 0, getString(R.string.event_quit));
+                    break;
+                default:
+                    menu.add(Menu.NONE, Menu.FIRST, 0, getString(R.string.event_join));
+                    break;
             }
         }
         getMenuInflater().inflate(R.menu.menu_event_detial, menu);
@@ -100,18 +102,14 @@ public class EventDetailsActivity extends AppCompatActivity {
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         eid = getIntent().getStringExtra("eventId");
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.event_details_fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startNavigation();
-            }
-        });
+        MaterialButton fab = findViewById(R.id.event_details_fab);
+        fab.setOnClickListener(view -> startNavigation());
 
-        AppBarLayout appbar = (AppBarLayout) findViewById(R.id.event_details_appbar);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.event_details_toolbar);
-        View toolbarPadding = (View) findViewById(R.id.event_details_toolbar_padding);
-        TextView fabText = (TextView) findViewById(R.id.event_details_fab_text);
+        AppBarLayout appbar = findViewById(R.id.event_details_appbar);
+        Toolbar toolbar = findViewById(R.id.event_details_toolbar);
+        View toolbarPadding = findViewById(R.id.event_details_toolbar_padding);
+
+        coordinatorLayout = findViewById(R.id.event_details_coordinator);
 
         primaryColor = ContextCompat.getColor(this, R.color.colorPrimary);
 
@@ -125,15 +123,12 @@ public class EventDetailsActivity extends AppCompatActivity {
         // Set padding for status bar
         // Require API 20
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
-            toolbarPadding.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
-                @Override
-                public WindowInsets onApplyWindowInsets(View view, WindowInsets windowInsets) {
-                    ViewGroup.LayoutParams layoutParams = toolbarPadding.getLayoutParams();
-                    layoutParams.height = windowInsets.getSystemWindowInsetTop();
-                    toolbarPadding.setLayoutParams(layoutParams);
+            toolbarPadding.setOnApplyWindowInsetsListener((view, windowInsets) -> {
+                ViewGroup.LayoutParams layoutParams = toolbarPadding.getLayoutParams();
+                layoutParams.height = windowInsets.getSystemWindowInsetTop();
+                toolbarPadding.setLayoutParams(layoutParams);
 
-                    return windowInsets;
-                }
+                return windowInsets;
             });
         } else {
             ViewGroup.LayoutParams layoutParams = toolbarPadding.getLayoutParams();
@@ -157,7 +152,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         listItems.add(new SimpleRVIndefiniteProgressBar());
 
         // Recycler View
-        recyclerView = (RecyclerView) findViewById(R.id.event_details_recycler_view);
+        recyclerView = findViewById(R.id.event_details_recycler_view);
 
         viewManager = new LinearLayoutManager(this);
         viewAdapter = new SimpleRecyclerViewAdaptor(listItems);
@@ -205,52 +200,43 @@ public class EventDetailsActivity extends AppCompatActivity {
                     toolbar.setTitleTextColor(colorRGBA(0, 0, 0, v));
                     toolbar.setBackgroundColor(colorA(primaryColor, v));
                     toolbarPadding.setBackgroundColor(colorA(primaryColor, v));
-                    fabText.setScaleX(1 - v);
-                    fabText.setScaleY(1 - v);
+                    fab.setScaleX(1 - v);
+                    fab.setScaleY(1 - v);
                 }
             }
         });
 
-        recyclerView.getViewTreeObserver().addOnDrawListener(new ViewTreeObserver.OnDrawListener() {
-            @Override
-            public void onDraw() {
-                updateTitleRowHeight(listItems);
-            }
-        });
+        recyclerView.getViewTreeObserver().addOnDrawListener(() ->
+                updateTitleRowHeight(listItems));
 
         // Get event data
 
-        db.collection("events").document(eid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if(documentSnapshot.exists()){
-                    eventItem = documentSnapshot.toObject(EventsActivity.EventItem.class);
-                    if (eventItem.getImages().size() != 0) {
-                        carouselView.setPageCount(eventItem.getImages().size());
-                    }
-
-                    getEventInfo();
-
-                    // finish fetch event info
-                    relationship = getRelationship(eventItem);
-                    invalidateOptionsMenu();
+        db.collection("events").document(eid).get()
+                .addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()){
+                eventItem = documentSnapshot.toObject(EventsActivity.EventItem.class);
+                if (eventItem.getImages().size() != 0) {
+                    carouselView.setPageCount(eventItem.getImages().size());
                 }
-                else{
-                    popup_allert("Sorry, this event has been deleted by the organiser.");
-                }
+
+                getEventInfo();
+
+                // finish fetch event info
+                relationship = getRelationship(eventItem);
+                invalidateOptionsMenu();
+            } else {
+                popup_alert(getString(R.string.event_deleted));
             }
         });
     }
 
     private String getRelationship(EventsActivity.EventItem eventItem){
         String relationship;
-        if(eventItem.getHolder().equals(uid)) {
+        if (eventItem.getHolder().equals(uid)) {
             relationship = "holder";
-        }
-        else if(eventItem.getUsers().keySet().contains(uid)){
+        } else if (eventItem.getUsers().keySet().contains(uid)){
             relationship = "participant";
-        }
-        else {
+        } else {
             relationship = "passerby";
         }
         return relationship;
@@ -265,17 +251,18 @@ public class EventDetailsActivity extends AppCompatActivity {
             updateEventInfo();
 
             String holder = stringUserInfoMap.get(eventItem.getHolder()).getName();
-            ArrayList<String> participants = new ArrayList<>();
+            ArrayList<UserInfoManager.UserInfo> participants = new ArrayList<>();
 //            ArrayList<String> photos = new ArrayList<>();
 
             userMap = new HashMap<>();
 
             for (int i = 0; i < uidList.size(); i++) {
-                String userName = stringUserInfoMap.get(uidList.get(i)).getName();
-                participants.add(userName);
+                UserInfoManager.UserInfo usr = stringUserInfoMap.get(uidList.get(i));
+                usr.setUserID(uidList.get(i));
+                participants.add(usr);
 
                 // Store user id and name into map
-                userMap.put(uidList.get(i), userName);
+                userMap.put(uidList.get(i), stringUserInfoMap.get(uidList.get(i)).getName());
             }
 
             // Event organiser
@@ -288,12 +275,24 @@ public class EventDetailsActivity extends AppCompatActivity {
 
             ArrayList<Chip> chipList = new ArrayList<>();
 
-            for (String participant : participants) {
-                Chip chip = (Chip) getLayoutInflater().inflate(R.layout.chip_user_profile, null);
-                chip.setText(participant);
-                // TODO use profile picture instead
-                chip.setChipIconResource(R.drawable.ic_people_black_24dp);
+            String myUid =  FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+            for (UserInfoManager.UserInfo participant : participants) {
+                Chip chip = (Chip) getLayoutInflater().inflate(R.layout.chip_user_profile, null);
+                chip.setText(participant.getName());
+                chip.setChipIconResource(R.drawable.ic_people_black_24dp);
+                new URLChipCacheLoader(participant.getPhotoUrl(),
+                        chip, getResources()).execute();
+                if (!participant.getUid().equals(myUid)) {
+                    chip.setOnClickListener(v -> {
+                            Intent intent = new Intent(this, FriendDetail.class);
+                            intent.putExtra("FRIEND_ID", participant.getUid());
+                            startActivity(intent);
+                    });
+                } else {
+                    chip.setClickable(false);
+                    chip.setFocusable(false);
+                }
                 chipList.add(chip);
             }
 
@@ -322,7 +321,14 @@ public class EventDetailsActivity extends AppCompatActivity {
 
             listItems.add(new SimpleRVTextPrimarySecondaryStatic(
                     eventItem.getName(),
-                    new SimpleDateFormat(getResources().getString(R.string.date_format)).format(eventItem.getTime_())
+                    DateUtils.formatDateTime(
+                            this,
+                            eventItem.getTime_().getTime(),
+                            DateUtils.FORMAT_SHOW_TIME
+                             | DateUtils.FORMAT_SHOW_DATE
+                             | DateUtils.FORMAT_SHOW_WEEKDAY
+                             | DateUtils.FORMAT_ABBREV_ALL
+                    )
             ));
         }
 
@@ -364,129 +370,80 @@ public class EventDetailsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(relationship == null){
-            return true;
-        }
-        else if (relationship.equals("holder")) {
+            return super.onOptionsItemSelected(item);
+        } else if (relationship.equals("holder")) {
             switch (item.getItemId()) {
-//                case Menu.FIRST + 0:
-//                    Toast.makeText(this, "Edit is clicked", Toast.LENGTH_SHORT).show();
-//                    editEvent();
-//                    break;
-                case Menu.FIRST + 0:
-                    Toast.makeText(this, "Delete is clicked", Toast.LENGTH_SHORT).show();
-                    deleteEvent();
-                    break;
-                default:
-                    break;
+                case Menu.FIRST:deleteEvent();
+                    return true;
             }
         } else if (relationship.equals("participant")) {
             switch (item.getItemId()) {
-                case Menu.FIRST + 0:
-                    Toast.makeText(this, "Quit is clicked", Toast.LENGTH_SHORT).show();
-                    quitEvent();
-                    break;
-                default:
-                    break;
+                case Menu.FIRST:quitEvent();
+                    return true;
             }
         } else {
             switch (item.getItemId()) {
-                case Menu.FIRST + 0:
-                    Toast.makeText(this, "Join is clicked", Toast.LENGTH_SHORT).show();
-                    joinEvent();
-                    break;
-//                case Menu.FIRST + 1:
-//                    Toast.makeText(this, "Follow is clicked", Toast.LENGTH_SHORT).show();
-//                    break;
-                default:
-                    break;
+                case Menu.FIRST:joinEvent();
+                    return true;
             }
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     private void quitEvent() {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("Alert");
-        dialog.setMessage("Are you sure you want to QUIT this event?");
-        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                dialoginterface.cancel();
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("users." + uid, FieldValue.delete());
+        db.collection("events").document(eid).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    // TODO: Task completed successfully
+                    finish();
+                } else {
+                    Snackbar.make(coordinatorLayout,
+                            R.string.error_failed_to_connect_to_server,
+                            Snackbar.LENGTH_SHORT).show();
+                }
             }
         });
-        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                Map<String, Object> updates = new HashMap<>();
-                updates.put("users." + uid, FieldValue.delete());
-                db.collection("events").document(eid).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            // Task completed successfully
-                            finish();
-                        } else {
-                            // Task failed with an exception
-                        }
-                    }
-                });
-            }
-        });
-        dialog.show();
     }
 
     private void deleteEvent() {
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("Alert");
-        dialog.setMessage("Are you sure you want to DELETE this event?");
-        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                dialoginterface.cancel();
+        dialog.setMessage(getString(R.string.event_delete_confirmation, eventItem.getName()));
+        dialog.setNegativeButton(R.string.action_cancel, (dialoginterface, i) -> dialoginterface.cancel());
+        dialog.setPositiveButton(R.string.action_delete, (dialoginterface, i) -> db.collection("events").document(eid).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    // TODO: Task completed successfully
+                    finish();
+                } else {
+                    Snackbar.make(coordinatorLayout,
+                            R.string.error_failed_to_connect_to_server,
+                            Snackbar.LENGTH_SHORT).show();
+                }
             }
-        });
-        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                db.collection("events").document(eid).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            // Task completed successfully
-                            finish();
-                        } else {
-                            // Task failed with an exception
-                        }
-                    }
-                });
-            }
-        });
+        }));
         dialog.show();
     }
 
     private void joinEvent() {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("Alert");
-        dialog.setMessage("Are you sure you want to JOIN this event?");
-        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                dialoginterface.cancel();
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("users." + uid, true);
+        db.collection("events").document(eid).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    // TODO: Task completed successfully
+                    finish();
+                } else {
+                    Snackbar.make(coordinatorLayout,
+                            R.string.error_failed_to_connect_to_server,
+                            Snackbar.LENGTH_SHORT).show();
+                }
             }
         });
-        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                Map<String, Object> updates = new HashMap<>();
-                updates.put("users." + uid, true);
-                db.collection("events").document(eid).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            // Task completed successfully
-                            finish();
-                        } else {
-                            // Task failed with an exception
-                        }
-                    }
-                });
-            }
-        });
-        dialog.show();
     }
 
     private void startNavigation(){
@@ -499,18 +456,16 @@ public class EventDetailsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void popup_allert(String allertMessage){
+    private void popup_alert(String alertMessage){
         AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-        builder1.setMessage(allertMessage);
+        builder1.setMessage(alertMessage);
         builder1.setCancelable(true);
 
         builder1.setPositiveButton(
-                "OK",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                        finish();
-                    }
+                R.string.action_ok,
+                (dialog, id) -> {
+                    dialog.cancel();
+                    finish();
                 });
 
         AlertDialog alert11 = builder1.create();

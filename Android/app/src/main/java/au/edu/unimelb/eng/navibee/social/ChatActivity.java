@@ -1,16 +1,18 @@
 package au.edu.unimelb.eng.navibee.social;
 
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -19,6 +21,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.commit451.modalbottomsheetdialogfragment.ModalBottomSheetDialogFragment;
+import com.commit451.modalbottomsheetdialogfragment.Option;
+import com.commit451.modalbottomsheetdialogfragment.OptionRequest;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,12 +33,17 @@ import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import au.edu.unimelb.eng.navibee.BuildConfig;
@@ -42,9 +52,10 @@ import au.edu.unimelb.eng.navibee.event.EventDetailsActivity;
 import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
+import timber.log.Timber;
 
 
-public class ChatActivity extends AppCompatActivity implements IPickResult {
+public class ChatActivity extends AppCompatActivity implements IPickResult, ModalBottomSheetDialogFragment.Listener {
 
     private Conversation conversation;
     private boolean isPrivate;
@@ -53,15 +64,31 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
     private RecyclerView.Adapter chatAdapter;
     private LinearLayoutManager chatLayoutManager;
 
-    int PLACE_PICKER_REQUEST = 2;
+    protected HashMap<String, UserInfoManager.UserInfo> userInfos = new HashMap<>();
 
+    private static final int PLACE_PICKER_REQUEST = 2;
+
+    private static final int SEND_PHOTO = 1;
+    private static final int SEND_LOCATION = 2;
+    private static final int SEND_VOICE_CALL = 3;
 
     private int currentMsgCount = 0;
 
-    BroadcastReceiver br = new BroadcastReceiver() {
+    private ModalBottomSheetDialogFragment.Builder extraDialog;
+
+    BroadcastReceiver msgUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             loadNewMsg();
+        }
+    };
+
+    BroadcastReceiver convUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (ConversationManager.getInstance().getConversation(conversation.getConvId()) == null){
+                finish();
+            }
         }
     };
 
@@ -81,21 +108,98 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
         chatAdapter = new ChatAdapter(conversation.getCurrentMessageList(), chatRecyclerView, this);
         chatRecyclerView.setAdapter(chatAdapter);
 
+        setSupportActionBar(findViewById(R.id.activity_chat_toolbar));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        TextView toolbarTitle = findViewById(R.id.chat_toolbar_title);
+        TextView toolbarSubtitle = findViewById(R.id.chat_toolbar_subtitle);
+        ImageView toolbarIcon = findViewById(R.id.chat_toolbar_icon);
+
+        UserInfoManager.getInstance().getUserInfo(conversation.uid, userInfo -> {
+            userInfos.put(conversation.uid, userInfo);
+        });
+
+        if (conversation instanceof PrivateConversation) {
+            toolbarSubtitle.setText(R.string.chat_type_private);
+            UserInfoManager.getInstance().getUserInfo(((PrivateConversation) conversation).getTargetUid(), userInfo -> {
+                userInfos.put(((PrivateConversation) conversation).getTargetUid(), userInfo);
+                toolbarTitle.setText(userInfo.getName());
+                new URLImageViewCacheLoader(userInfo.getPhotoUrl(), toolbarIcon).roundImage(true).execute();
+            });
+        } else if (conversation instanceof GroupConversation) {
+            GroupConversation group = (GroupConversation) conversation;
+            toolbarTitle.setText(group.getName());
+            String subtitle = getResources().getQuantityString(R.plurals.chat_group_member_count,
+                    group.getMembers().size(), group.getMembers().size());
+            toolbarSubtitle.setText(subtitle);
+            toolbarIcon.setImageDrawable(group.getRoundIconDrawable(getResources()));
+        }
+
+        Resources r = getResources();
+
+        extraDialog = new ModalBottomSheetDialogFragment.Builder()
+                .header(r.getString(R.string.chat_send_multimedia), R.layout.modal_bottom_sheet_dialog_fragment_header)
+                .add(new OptionRequest(SEND_PHOTO, r.getString(R.string.message_type_photo), R.drawable.ic_photo_black80_24dp))
+                .add(new OptionRequest(SEND_LOCATION, r.getString(R.string.message_type_location), R.drawable.ic_place_black80_24dp ));
+
+        if (isPrivate) {
+            extraDialog = extraDialog
+                    .add(new OptionRequest(SEND_VOICE_CALL, r.getString(R.string.chat_voice_call), R.drawable.ic_call_black80_24dp));
+        }
+
         currentMsgCount = conversation.getMessageCount();
         conversation.markAllAsRead();
 
-        IntentFilter intFilt = new IntentFilter(Conversation.BROADCAST_NEW_MESSAGE);
-        registerReceiver(br, intFilt);
-
         scrollToBottom();
+
+        if (ConversationManager.getInstance().getConversation(convId) == null){
+            finish();
+        }
+
+        registerReceiver(convUpdateReceiver, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
+        registerReceiver(msgUpdateReceiver, new IntentFilter(Conversation.BROADCAST_NEW_MESSAGE));
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(br);
+        unregisterReceiver(convUpdateReceiver);
+        unregisterReceiver(msgUpdateReceiver);
     }
 
+    public void onClickProfileName(View view) {
+        if (isPrivate){
+            Intent intent = new Intent(this, FriendDetail.class);
+            intent.putExtra("CONV_ID", conversation.getConvId());
+            intent.putExtra("FRIEND_ID", ((PrivateConversation) conversation).getTargetUid());
+            startActivity(intent);
+        } else {
+            Intent intent = new Intent(this, GroupDetailActivity.class);
+            intent.putExtra("CONV_ID", conversation.getConvId());
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public void onModalOptionSelected(@Nullable String s, @NotNull Option option) {
+        switch (option.getId()) {
+            case SEND_PHOTO:
+                PickImageDialog.build(new PickSetup().setSystemDialog(true)).show(ChatActivity.this);
+                break;
+            case SEND_LOCATION:
+                try {
+                    PlacePicker.IntentBuilder builder1 = new PlacePicker.IntentBuilder();
+                    startActivityForResult(builder1.build(ChatActivity.this), PLACE_PICKER_REQUEST);
+                } catch (Exception e) {
+                    Timber.e(e, "send location error.");
+                }
+                break;
+            case SEND_VOICE_CALL:
+                String voiceCallChannelId = UUID.randomUUID().toString();
+                conversation.sendMessage("voicecall", voiceCallChannelId);
+                break;
+        }
+    }
+    
     private void loadNewMsg() {
         while (currentMsgCount < conversation.getMessageCount()) {
             ((ChatAdapter) chatAdapter).addMessage(conversation.getMessage(currentMsgCount));
@@ -117,7 +221,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
 
     public void onClickSend(View view) {
         EditText editText = findViewById(R.id.edit_text_message);
-        String text = editText.getText().toString();
+        String text = editText.getText().toString().trim();
         if (!text.equals("")) {
             conversation.sendMessage("text", text);
             editText.setText("");
@@ -125,32 +229,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
     }
 
     public void onClickExtra(View view) {
-        String[] items;
-
-        if (isPrivate) {
-            items = new String[]{"Picture", "Location", "Voice Call"};
-        } else {
-            items = new String[]{"Picture", "Location"};
-        }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Send");
-        builder.setItems(items, (dialog, which) -> {
-            if (which==0) {
-                PickImageDialog.build(new PickSetup().setSystemDialog(true)).show(ChatActivity.this);
-            } else if (which==1) {
-                try {
-                    PlacePicker.IntentBuilder builder1 = new PlacePicker.IntentBuilder();
-                    startActivityForResult(builder1.build(ChatActivity.this), PLACE_PICKER_REQUEST);
-                } catch (Exception e) {
-                    Log.d("Chat", "send location error:" + e);
-                }
-            } else if (which==2) {
-                String voiceCallChannelId = UUID.randomUUID().toString();
-                conversation.sendMessage("voicecall", voiceCallChannelId);
-            }
-        });
-        builder.show();
+        extraDialog.show(getSupportFragmentManager(), "extra");
     }
 
     @Override
@@ -159,11 +238,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
             if (resultCode == RESULT_OK) {
                 PlacePicker.getLatLngBounds(data);
                 Place place = PlacePicker.getPlace(this, data);
-                double[] coord = new double[2];
-                coord[0] = place.getLatLng().latitude;
-                coord[1] = place.getLatLng().longitude;
-                Gson gson = new Gson();
-                conversation.sendMessage("location", gson.toJson(coord));
+                conversation.sendLocation(place.getLatLng().latitude, place.getLatLng().longitude);
             }
         }
     }
@@ -175,7 +250,7 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
     }
 
 
-    public static class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHolder> implements View.OnClickListener {
+    public static class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHolder> {
 
         private Gson gson = new Gson();
 
@@ -292,9 +367,8 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
 
             f.addView(cv);
 
-            v.setOnClickListener(this);
-
             MessageViewHolder vh = new MessageViewHolder(v);
+
             vh.setContentView(cv);
 
             return vh;
@@ -309,11 +383,9 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
             Conversation.Message msg = mDataset.get(position);
             View content = holder.getContentView();
 
-//            ((TextView) holder.itemView.findViewById(R.id.message_text)).setVisibility(View.GONE);
-//            ((ImageView) holder.itemView.findViewById(R.id.message_image)).setVisibility(View.GONE);
 
+            content.setOnClickListener(genOnCLick(position));
             TextView textView = content.findViewById(R.id.message_text);
-            TextView descView = content.findViewById(R.id.message_description);
             ImageView imageView = content.findViewById(R.id.message_image);
             switch (msg.getType()) {
                 case "text": {
@@ -346,8 +418,15 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
             // set user name
             if (!msg.getSender().equals(uid) && !chatActivity.isPrivate) {
                 UserInfoManager.getInstance().getUserInfo(msg.getSender(),
-                        userInfo -> ((TextView) holder.itemView.findViewById(R.id.message_sender))
-                                .setText(userInfo.getName()));
+                        userInfo -> {
+                            ((TextView) holder.itemView.findViewById(R.id.message_sender))
+                                    .setText(userInfo.getName());
+                            new URLImageViewCacheLoader(
+                                    userInfo.getPhotoUrl(),
+                                    holder.itemView.findViewById(R.id.message_sender_avatar)
+                            ).roundImage(true).execute();
+                        });
+
             }
         }
 
@@ -357,41 +436,45 @@ public class ChatActivity extends AppCompatActivity implements IPickResult {
             return mDataset.size();
         }
 
-        @Override
-        public void onClick(final View view) {
-            int itemPosition = mRecyclerView.getChildLayoutPosition(view);
-            Conversation.Message msg = mDataset.get(itemPosition);
-            switch (msg.getType()) {
-                case "image": {
-                    Intent intent = new Intent(chatActivity.getBaseContext(), ChatImageViewActivity.class);
-                    intent.putExtra("IMG_FS_PATH", msg.getData());
-                    chatActivity.startActivity(intent);
-                    break;
+        private View.OnClickListener genOnCLick(int pos) {
+            return v -> {
+                Conversation.Message msg = mDataset.get(pos);
+                switch (msg.getType()) {
+                    case "image": {
+                        Intent intent = new Intent(chatActivity.getBaseContext(), ChatImageViewActivity.class);
+                        intent.putExtra("IMG_FS_PATH", msg.getData());
+                        chatActivity.startActivity(intent);
+                        break;
+                    }
+                    case "location": {
+                        double[] coord = gson.fromJson(msg.getData(), double[].class);
+
+                        Intent intent = new Intent(chatActivity.getBaseContext(), LocationDisplayActivity.class);
+                        intent.putExtra(NavigationSelectorActivity.EXTRA_LATITUDE, coord[0]);
+                        intent.putExtra(NavigationSelectorActivity.EXTRA_LONGITUDE, coord[1]);
+                        intent.putExtra(LocationDisplayActivity.EXTRA_TIME, msg.getTime_());
+                        if (chatActivity.userInfos.containsKey(msg.getSender())) {
+                            intent.putExtra(LocationDisplayActivity.EXTRA_SENDER, (Parcelable) chatActivity.userInfos.get(msg.getSender()));
+                        }
+
+                        chatActivity.startActivity(intent);
+
+                        break;
+                    }
+                    case "event": {
+                        Map<String, String> data = gson.fromJson(msg.getData(), Map.class);
+
+                        Intent intent = new Intent(chatActivity.getBaseContext(), EventDetailsActivity.class);
+
+                        intent.putExtra("eventId", data.get("eid"));
+                        chatActivity.startActivity(intent);
+
+                        break;
+                    }
                 }
-                case "location": {
-                    double[] coord = gson.fromJson(msg.getData(), double[].class);
-
-                    Intent intent = new Intent(chatActivity.getBaseContext(), LocationDisplayActivity.class);
-                    intent.putExtra(NavigationSelectorActivity.EXTRA_LATITUDE, coord[0]);
-                    intent.putExtra(NavigationSelectorActivity.EXTRA_LONGITUDE, coord[1]);
-
-                    chatActivity.startActivity(intent);
-
-                    break;
-                }
-                case "event": {
-                    Map<String, String> data = gson.fromJson(msg.getData(), Map.class);
-
-                    Intent intent = new Intent(chatActivity.getBaseContext(), EventDetailsActivity.class);
-
-                    intent.putExtra("eventId", data.get("eid"));
-                    chatActivity.startActivity(intent);
-
-                    break;
-                }
-            }
-
+            };
         }
+
 
     }
 }

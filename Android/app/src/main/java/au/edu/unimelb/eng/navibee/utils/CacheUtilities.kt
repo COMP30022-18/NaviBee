@@ -4,8 +4,10 @@ import android.content.res.Resources
 import android.graphics.BitmapFactory
 import android.view.View
 import android.widget.ImageView
+import androidx.appcompat.app.ActionBar
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import au.edu.unimelb.eng.navibee.NaviBeeApplication
+import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipDrawable
 import com.google.common.io.ByteStreams
 import kotlinx.coroutines.experimental.Job
@@ -158,7 +160,81 @@ class URLChipDrawableCacheLoader
                 chipDrawable.chipIcon = drawable
             }
         } catch (e: Exception) {
-            Timber.e(e, "Failed loading image to ImageView.")
+            Timber.e(e, "Failed loading image to chip.")
+        }
+    }
+}
+
+
+class URLChipCacheLoader
+@JvmOverloads constructor(private val url: String,
+                          private val chip: Chip,
+                          private val resources: Resources,
+                          prefix: String = "image-url"):
+        CachedLoader(prefix) {
+    override val defaultKey = url
+
+    override fun loadTask(file: File) {
+        try {
+            val input = java.net.URL(url).openStream()
+            val output = FileOutputStream(file)
+            ByteStreams.copy(input, output)
+            output.close()
+            postLoad(file)
+        } catch (e: Exception) {
+            Timber.e(e, "Failed loading image from URL.")
+        }
+    }
+
+    override fun postLoad(file: File) {
+        try {
+            val drawable = RoundedBitmapDrawableFactory
+                    .create(resources, FileInputStream(file))
+            drawable.setAntiAlias(true)
+            drawable.isCircular = true
+
+            launch(UI) {
+                chip.chipIcon = drawable
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Failed loading image to chip.")
+        }
+    }
+}
+
+
+class URLActionBarIconCacheLoader
+@JvmOverloads constructor(private val url: String,
+                          private val actionBar: ActionBar,
+                          private val resources: Resources,
+                          prefix: String = "image-url"):
+        CachedLoader(prefix) {
+    override val defaultKey = url
+
+    override fun loadTask(file: File) {
+        try {
+            val input = java.net.URL(url).openStream()
+            val output = FileOutputStream(file)
+            ByteStreams.copy(input, output)
+            output.close()
+            postLoad(file)
+        } catch (e: Exception) {
+            Timber.e(e, "Failed loading image from URL.")
+        }
+    }
+
+    override fun postLoad(file: File) {
+        try {
+            val drawable = RoundedBitmapDrawableFactory
+                    .create(resources, FileInputStream(file))
+            drawable.setAntiAlias(true)
+            drawable.isCircular = true
+
+            launch(UI) {
+                actionBar.setIcon(drawable)
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Failed loading image to action bar.")
         }
     }
 }

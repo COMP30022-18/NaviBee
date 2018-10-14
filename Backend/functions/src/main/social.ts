@@ -21,37 +21,30 @@ export const newMessageNotification = functions.firestore
         const senderDoc = (await db.collection('users').doc(sender).get()).data();
         const senderName = senderDoc.name;
 
-        // generate notification text
-        let content = "";
-        if (doc.type == "text") {
-            content = doc.data;
-            if (content.length>40) {
-                content = content.substring(0, 40) + "...";
-            }
-        } else if (doc.type == "image") {
-            content = "[Photo]"
-        } else if (doc.type == "voicecall") {
-            content = "[Voice Call]"
-        } else if (doc.type == "location") {
-            content = "[Location]"
-        } else if (doc.type == "event") {
-            content = "[Event]"
-        }
-
         // android payload
         // not declare type will case error (?)
         let android: messaging.AndroidConfig = {
             priority: 'high',
-            notification: {
-                sound: 'default',
-                title: senderName,
-                body: content
+        }
+
+        let data = {
+            'convID': convID,
+            'msgID': context.params.messageID,
+            'type': doc.type,
+            'senderName': senderName
+        }
+
+        if (doc.type == "text") {
+            let content = doc.data;
+            if (content.length > 40) {
+                content = content.substring(0, 40) + "...";
             }
+            data['content'] = content;
         }
 
         for (let key in convDoc.users) {
             // for all users of this conversation
-            if (key!=sender) {
+            if (key != sender) {
                 let receiver = key;
 
                 // find all tokens and send notification
@@ -61,7 +54,7 @@ export const newMessageNotification = functions.firestore
                 tokens.forEach( tokenDoc => {
                     let token = tokenDoc.id;
                     try {
-                        msg.send({token: token, android: android});
+                        msg.send({token: token, android: android, data: data});
                     } catch(Error) {
                         // token is invalid
                     }
@@ -75,19 +68,19 @@ export const addFriend = functions.https.onCall(
     async (data, context) => {
         const uid = context.auth.uid;
 
-        if (uid==null) {
-            return {code:-1, msg:"need login"};
+        if (uid == null) {
+            return {code: -1, msg: "need login"};
         }
 
         const targetUid = data.targetUid;
 
-        if (uid==targetUid) {
-            return {code:-1, msg:"can not add yourself as a friend"};
+        if (uid == targetUid) {
+            return {code: -1, msg: "can not add yourself as a friend"};
         }
 
         let doc = await db.collection('users').doc(targetUid).get();
         if (!doc.exists) {
-            return {code:-1, msg:"target user not exists"};
+            return {code: -1, msg: "target user not exists"};
         }
 
         let convDoc = await db.collection('conversations')
@@ -98,7 +91,7 @@ export const addFriend = functions.https.onCall(
                             .get();
 
         if (!convDoc.empty) {
-            return {code:-1, msg:"have been friends already"};
+            return {code: -1, msg: "have been friends already"};
         }
 
         // set up private conversations
@@ -122,8 +115,8 @@ export const createGroupChat = functions.https.onCall(
     async (data, context) => {
         const uid = context.auth.uid;
 
-        if (uid==null) {
-            return {code:-1, msg:"need login"};
+        if (uid == null) {
+            return {code: -1, msg: "need login"};
         }
 
         let conv = {};

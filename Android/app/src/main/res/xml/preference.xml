@@ -19,15 +19,35 @@
             android:key="navigation_search_region"
             android:summary="@string/pref_navigation_search_region_summary"
             android:title="@string/pref_navigation_search_region" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:title="@string/pref_navigation_show_street_view"
+            android:key="navigation_show_street_view"
+            android:icon="@drawable/ic_streetview_black80_24dp"
+            android:summaryOn="@string/pref_navigation_show_street_view_on"
+            android:summaryOff="@string/pref_navigation_show_street_view_off"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_section_title_sos">
         <EditTextPreference
+            android:inputType="phone"
+            android:digits="0123456789"
             android:dialogTitle="@string/pref_sos_preferred_emergency_call"
-            android:icon="@drawable/ic_people_black_24dp"
+            android:icon="@drawable/ic_call_black_24dp"
             android:key="sos_emergency_call"
-            android:summary="@string/pref_sos_preferred_emergency_call_titles"
             android:title="@string/pref_sos_preferred_emergency_call"/>
+        <!--<au.edu.unimelb.eng.navibee.FriendListPreference-->
+            <!--android:key="sos_emergency_contact"-->
+            <!--android:title="@string/pref_sos_preferred_emergency_contact"-->
+            <!--android:summary="@string/pref_sos_preferred_emergency_contact_titles"-->
+            <!--android:icon="@drawable/ic_people_black_24dp"/>-->
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_section_title_developer_options">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:title="@string/pref_developer_options_navigation_emulation"
+            android:key="navigation_simulation"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

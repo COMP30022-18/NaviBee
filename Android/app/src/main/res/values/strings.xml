@@ -1,12 +1,14 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name" tools:override="true">NaviBee</string>
+    <string name="app_name" translatable="false" tools:override="true">NaviBee</string>
     <string name="action_settings">Settings</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
     <string name="action_log_out">Log out</string>
     <string name="app_version_short">α</string>
     <string name="landing_navigation">Get somewhere</string>
     <string name="landing_events">Events</string>
     <string name="landing_social">Friends</string>
     <string name="landing_sos">SOS</string>
+    <string name="title_activity_sos">SOS Help</string>
     <string name="title_activity_event_detail">EventDetailActivity</string>
     <string name="navigation_search_hint">Where do you want to go?</string>
     <string name="search_button_text">Search</string>
@@ -23,6 +25,42 @@
     <string name="button_send_message">Send message</string>
     <string name="chat_type_message_here">Type your message…</string>
     <string name="chat_voice_call">Voice call</string>
+    <string name="chat_realtime_location">Realtime location</string>
+    <string name="chat_type_private">Private chat</string>
+    <string name="chat_type_group">Group chat</string>
+    <string name="chat_msg_type_event">Event invitation</string>
+    <string name="chat_send_multimedia">Send…</string>
+    <plurals name="chat_group_member_count">
+        <item quantity="one">%1$d member</item>
+        <item quantity="other">%1$d members</item>
+    </plurals>
+    <string name="message_type_photo">Photo</string>
+    <string name="message_type_location">Location</string>
+    <string name="friends_tab_chats">Chats</string>
+    <string name="friends_tab_friends">Friends</string>
+    <string name="message_type_voice_call">Voice call</string>
+    <string name="friends_create_group">Create group</string>
+    <string name="friends_add_friend">Add friend</string>
+    <string name="chat_group_name">Group name</string>
+    <string name="friend_added">%s is added as your friend.</string>
+    <string name="friend_since">Friend since %s</string>
+    <string name="chat_create_group_back_warning">Do you want to discard your changes?</string>
+    <string name="action_discard">Discard</string>
+    <string name="action_keep">Keep</string>
+    <string name="chat_delete_friend">Do you want to remove %s from friends?</string>
+    <string name="action_remove">Remove</string>
+    <string name="chat_group_created_at">Created %s</string>
+    <string name="chat_group_create_friend_required">At least one friend should be selected.</string>
+    <string name="chat_group_delete">Dismiss group</string>
+    <string name="user_profile_subtitle">A proud NaviBee user.</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_dismiss">Dismiss</string>
+    <string name="action_ok">OK</string>
+    <string name="chat_group_deleted">Sorry, this group is dismissed by the creator.</string>
+    <string name="chat_group_delete_confirm">Do you want to dismiss this group?</string>
+    <string name="profile_send_message">Send message</string>
+    <string name="profile_delete_friend">Delete friend</string>
+    <string name="profile_add_friend">Add friend</string>
     <string name="sos_btn">Call</string>
     <string name="sos_setting">SOS Setting</string>
     <string name="sos_setting_btn">Save</string>
@@ -166,15 +204,22 @@
     <string name="place_unknown">Place</string>
     <string name="place_details_address">Address</string>
     <string name="place_details_phone_number">Phone number</string>
+    <string name="action_delete">Delete</string>
     <string name="place_details_ratings">Ratings</string>
     <string name="place_details_website">Website</string>
     <string name="alert_dialog_title_select_method_of_travel">Select a method of travel…</string>
     <string name="title_activity_event_details">EventDetailsActivity</string>
-    <string name="date_format">EEE, MMM d, HH:mm</string>
+    <string name="events">Events</string>
+    <string name="event_delete_confirmation">Do you want to delete %s?</string>
     <string name="event_create_name">Event Name</string>
+    <string name="event_delete">Delete</string>
+    <string name="event_quit">Quit</string>
+    <string name="event_join">Join</string>
     <string name="event_create_name_required">Event name is required.</string>
     <string name="event_create_event">New event</string>
     <string name="event_create_create">Create event</string>
+    <string name="event_private">Private event</string>
+    <string name="event_deleted">Sorry, this event has been taken down by the organiser.</string>
     <string name="event_create_location">Location</string>
     <string name="event_create_location_required">Event location is required.</string>
     <string name="event_create_time">Time</string>
@@ -225,7 +270,6 @@
 
     <string name="error_failed_to_connect_to_server">Failed to connect to server. Please check your internet connection.</string>
 
-
     <string name="action_confirm">Confirm</string>
     <!-- Strings related to Settings -->
     <string name="pref_section_title_navigation">Navigation</string>
@@ -237,13 +281,13 @@
         <item>Drive</item>
         <item>Walk</item>
     </string-array>
-    <string-array name="pref_navigation_preferred_mean_of_transport_values">
+    <string-array name="pref_navigation_preferred_mean_of_transport_values" translatable="false">
         <item>always_ask</item>
         <item>transit</item>
         <item>drive</item>
         <item>walk</item>
     </string-array>
-    <string name="pref_navigation_preferred_mean_of_transport_default">always_ask</string>
+    <string name="pref_navigation_preferred_mean_of_transport_default" translatable="false">always_ask</string>
 
     <string name="pref_navigation_search_region">Country/region of search</string>
     <string name="pref_navigation_search_region_summary">Default region to search when location service is not available.</string>
@@ -252,19 +296,39 @@
         <item>New Zealand</item>
         <item>Fiji</item>
     </string-array>
-    <string-array name="pref_navigation_search_region_values">
+    <string-array name="pref_navigation_search_region_values" translatable="false">
         <item>au</item>
         <item>nz</item>
         <item>fj</item>
     </string-array>
-    <string name="pref_navigation_search_region_values_default">au</string>
+    <string name="pref_navigation_search_region_values_default" translatable="false">au</string>
+
+    <string name="pref_navigation_show_street_view">Show street view in driving/walking navigation</string>
+    <string name="pref_navigation_show_street_view_on">Will show street view overlay</string>
+    <string name="pref_navigation_show_street_view_off">Will not show street view overlay</string>
+
+    <string name="pref_section_title_developer_options">Developer options</string>
+    <string name="pref_developer_options_navigation_emulation">Enable navigation emulation</string>
 
     <string name="pref_section_title_sos">SOS</string>
-    <string name="pref_sos_preferred_emergency_call">Preferred emergency call</string>
-    <string name="pref_sos_preferred_emergency_call_titles">Required a phone number to contact.</string>
+    <string name="pref_sos_preferred_emergency_call">Preferred emergency call number</string>
+    <string name="pref_sos_preferred_emergency_call_titles">Required a phone number to call.</string>
+
+    <string name="pref_sos_preferred_emergency_contact">Preferred emergency contact</string>
+    <string name="pref_sos_preferred_emergency_contact_titles">Required a friend to get emergency help.</string>
 
     <string name="title_activity_event_pic_fullscreen">EventPicFullscreenActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="sos_pre_text">We\'ve detected that you might be in danger\.</string>
+    <string name="sos_main_text">Your emergency contact will be notified in</string>
+    <string name="sos_time_unit">seconds</string>
+    <string name="sos_notify_text">Notify Now</string>
+    <string name="notification_image">sent you a photo</string>
+    <string name="notification_voicecall">is calling you</string>
+    <string name="notification_location">sent you a location</string>
+    <string name="notificaiton_event">sent you an event</string>
+
 
 </resources>
