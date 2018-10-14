@@ -2,19 +2,29 @@ package au.edu.unimelb.eng.navibee.navigation
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
+import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
 import androidx.core.content.ContextCompat
 import au.edu.unimelb.eng.navibee.BuildConfig
 import au.edu.unimelb.eng.navibee.R
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.StreetViewPanorama
+import com.google.android.gms.maps.StreetViewPanoramaOptions
+import com.google.android.gms.maps.StreetViewPanoramaView
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.StreetViewPanoramaCamera
 import com.mapbox.api.directions.v5.DirectionsCriteria
 import com.mapbox.api.directions.v5.models.DirectionsResponse
 import com.mapbox.api.directions.v5.models.DirectionsRoute
@@ -50,7 +60,6 @@ import timber.log.Timber
 class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
         NavigationListener, OnNavigationReadyCallback {
 
-
     companion object {
         const val EXTRA_DEST_LAT = "destinationLatitude"
         const val EXTRA_DEST_LON = "destinationLongitude"
@@ -59,6 +68,11 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
         const val MEAN_WALKING = DirectionsCriteria.PROFILE_WALKING
         const val MEAN_CYCLING = DirectionsCriteria.PROFILE_CYCLING
 
+        private const val PANORAMA_ANIMATION_DURATION = 500L
+        private const val PANORAMA_DISPLAY_DURATION = 10000L
+
+        private const val STREETVIEW_BUNDLE_KEY = "StreetViewBundleKey"
+
         private val routeUtils = RouteUtils()
     }
 
@@ -66,9 +80,13 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    private var isMapReady = false
     private var route: DirectionsRoute? = null
-    private lateinit var notification: NaviBeeMapBoxNotification
+    private var notification: NaviBeeMapBoxNotification? = null
+
+    private lateinit var panorama: StreetViewPanorama
+    private var navigationPanorama: StreetViewPanoramaView? = null
+    private var panoramaExpanded = false
+    private val handler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,6 +111,7 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
             finish()
         }
 
+        navigationView.onCreate(savedInstanceState)
         navigationView.initialize(this)
     }
 
@@ -109,10 +128,41 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
         return Triple(destLat, destLon, mean)
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-//        navigationView.onStop()
-//        navigationView.onDestroy()
+    private fun onStreetViewPanoramaReady(p0: StreetViewPanorama?) {
+        panorama = p0 ?: return
+        panorama.isUserNavigationEnabled = false
+
+        // Street view image setup
+        val instructionLayout =
+                findViewById<ViewGroup>(R.id.navigation_navigation_navigation_view)
+                        .findViewById<ViewGroup>(R.id.instructionView)
+                        .findViewById<View>(R.id.instructionLayout)
+        val instructionHeight = instructionLayout.height
+
+
+        navigationPanorama?.layoutParams = ConstraintLayout
+                .LayoutParams(0, 0).apply {
+                    topMargin = instructionHeight
+                    height = dpToPx(200)
+                    width = MATCH_CONSTRAINT
+                    startToStart = PARENT_ID
+                    topToTop = PARENT_ID
+                    endToEnd = PARENT_ID
+                }
+
+        navigation_navigation_constraint.addView(navigationPanorama)
+
+        navigationPanorama?.apply {
+             scaleY = 0f
+             pivotY = 0f
+        }
+
+    }
+
+    private fun dpToPx(dp: Int): Int {
+        val density = applicationContext.resources
+                .displayMetrics.density
+        return Math.round(dp.toFloat() * density)
     }
 
     override fun finish() {
@@ -131,6 +181,7 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
     override fun onResume() {
         super.onResume()
         navigationView.onResume()
+        navigationPanorama ?.onResume()
     }
 
     override fun onLowMemory() {
@@ -140,7 +191,6 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
 
     override fun onBackPressed() {
         if (!navigationView.onBackPressed()) {
-            // super.onBackPressed()
             moveTaskToBack(true)
         }
     }
@@ -148,6 +198,15 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
     override fun onSaveInstanceState(outState: Bundle?) {
         navigationView.onSaveInstanceState(outState)
         super.onSaveInstanceState(outState)
+
+        var mStreetViewBundle = outState?.getBundle(STREETVIEW_BUNDLE_KEY)
+
+        if (mStreetViewBundle == null) {
+            mStreetViewBundle = Bundle()
+            outState?.putBundle(STREETVIEW_BUNDLE_KEY, mStreetViewBundle)
+        }
+
+        navigationPanorama?.onSaveInstanceState(mStreetViewBundle)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
@@ -158,6 +217,7 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
     override fun onPause() {
         super.onPause()
         navigationView.onPause()
+        navigationPanorama?.onPause()
     }
 
     override fun onStop() {
@@ -167,12 +227,15 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
 
     override fun onDestroy() {
         super.onDestroy()
-        notification.unregisterReceiver(this)
+        notification?.unregisterReceiver(this)
         navigationView.onDestroy()
+        navigationPanorama?.onDestroy()
     }
 
     @SuppressLint("MissingPermission")
     override fun onNavigationReady(isRunning: Boolean) {
+
+        val context = this
 
         // Get destination location
         val (destLat, destLon, mean) = getDestinationDetails()
@@ -202,6 +265,16 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
                                 }.show()
                                 return
                             }
+
+                            navigationPanorama = StreetViewPanoramaView(context,
+                                    StreetViewPanoramaOptions().position(LatLng(destLat, destLon))
+                                            .userNavigationEnabled(false))
+
+                            navigationPanorama?.onCreate(null)
+                            navigationPanorama?.getStreetViewPanoramaAsync {
+                                onStreetViewPanoramaReady(it)
+                            }
+
                             startNavigation(route!!)
                         }
 
@@ -254,10 +327,57 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
     }
 
     override fun onMilestoneEvent(routeProgress: RouteProgress?, instruction: String?, milestone: Milestone?) {
-        if (routeProgress != null && milestone != null
-                && routeUtils.isArrivalEvent(routeProgress, milestone)) {
-            finish()
+        if (routeProgress != null && milestone != null) {
+            if (routeUtils.isArrivalEvent(routeProgress, milestone)) {
+                finish()
+            } else {
+                val intersection = routeProgress
+                        .currentLegProgress()
+                        .currentStepProgress()
+                        .currentIntersection()
+                val pt = intersection.location()
+                panorama.setPosition(
+                    LatLng(pt.latitude(), pt.longitude())
+                )
+                if (panorama.location != null) {
+                    val bearing = intersection.bearings()
+                            ?.get(intersection?.`in`() ?: 0)?.toFloat() ?: 0f
+                    panorama.animateTo(
+                            StreetViewPanoramaCamera.Builder()
+                                    .zoom(0f).tilt(0f).bearing(bearing).build(),
+                            PANORAMA_ANIMATION_DURATION
+                    )
+                     showPanorama()
+                } else {
+                     hidePanorama()
+                }
+            }
         }
+    }
+
+    private fun showPanorama() {
+        handler.removeCallbacks(hidePanoramaRunnable)
+        if (!panoramaExpanded) {
+            panoramaExpanded = true
+            navigationPanorama
+                    ?.animate()
+                    ?.setDuration(PANORAMA_ANIMATION_DURATION)
+                    ?.scaleY(1.0f)
+        }
+        handler.postDelayed(hidePanoramaRunnable, PANORAMA_DISPLAY_DURATION)
+    }
+
+    private val hidePanoramaRunnable: Runnable = Runnable {
+        panoramaExpanded = false
+        navigationPanorama
+                ?.animate()
+                ?.setDuration(PANORAMA_ANIMATION_DURATION)
+                ?.scaleY(0f)
+    }
+
+    private fun hidePanorama() {
+        handler.removeCallbacks(hidePanoramaRunnable)
+        hidePanoramaRunnable.run()
     }
 
     private fun isNightModeEnabled(): Boolean {
