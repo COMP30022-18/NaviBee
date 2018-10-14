@@ -54,6 +54,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
 
+        if (!NaviBeeApplication.getInstance().getInited()) {
+            NaviBeeApplication.getInstance().init();
+        }
+
         findViewById(R.id.landing_sos_btn).setOnClickListener(this);
         findViewById(R.id.landing_social_btn).setOnClickListener(this);
 
