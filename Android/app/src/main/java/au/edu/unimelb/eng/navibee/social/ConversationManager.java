@@ -1,7 +1,5 @@
 package au.edu.unimelb.eng.navibee.social;
 
-import au.edu.unimelb.eng.navibee.NaviBeeApplication;
-
 import android.content.Intent;
 import android.util.Log;
 
@@ -228,6 +226,7 @@ public class ConversationManager {
         if (getConversation(convId) != null) {
             Intent intent = new Intent(NaviBeeApplication.getInstance(), ChatActivity.class);
             intent.putExtra("CONV_ID", convId);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             NaviBeeApplication.getInstance().startActivity(intent);
             return true;
         }
