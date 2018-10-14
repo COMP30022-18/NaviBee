@@ -1,12 +1,10 @@
 package au.edu.unimelb.eng.navibee.sos;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,22 +15,13 @@ import au.edu.unimelb.eng.navibee.social.PrivateConversation;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.preference.PreferenceManager;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.material.appbar.AppBarLayout;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import au.edu.unimelb.eng.navibee.R;
 
 public class SosActivity extends AppCompatActivity {
 
@@ -55,19 +44,6 @@ public class SosActivity extends AppCompatActivity {
             public void onTick(long l) {
                 countDownTextView.setText(Long.toString(l / 1000 + 1));
             }
-        
-        // Set padding for status bar
-        // Require API 20
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
-            toolbarPadding.setOnApplyWindowInsetsListener((view, windowInsets) -> {
-                ViewGroup.LayoutParams layoutParams = toolbarPadding.getLayoutParams();
-                layoutParams.height = windowInsets.getSystemWindowInsetTop();
-                toolbarPadding.setLayoutParams(layoutParams);
-
-                return windowInsets;
-            });
-        } else {
-            ViewGroup.LayoutParams layoutParams = toolbarPadding.getLayoutParams();
 
             @Override
             public void onFinish() {
@@ -79,6 +55,7 @@ public class SosActivity extends AppCompatActivity {
     }
 
     public void notifyOnClick(View view) {
+        countDownTimer.cancel();
         triggerSOS();
     }
 
@@ -99,9 +76,9 @@ public class SosActivity extends AppCompatActivity {
     private void triggerSOS() {
 
         String phoneNumber = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
-                            .getString("sos_emergency_call", " ");
+                .getString("sos_emergency_call", " ");
         String contactUid = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
-                            .getString("sos_emergency_contact", " ");
+                .getString("sos_emergency_contact", " ");
 
         // check digit only
         if (!android.text.TextUtils.isDigitsOnly(phoneNumber)) {
@@ -119,13 +96,12 @@ public class SosActivity extends AppCompatActivity {
                 Toast.makeText(this, "Unable to get current location", Toast.LENGTH_LONG).show();
             } else {
                 mFusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
-                    if (location!=null) {
+                    if (location != null) {
                         conv.sendLocation(location.getLatitude(), location.getLongitude());
                     }
                 });
             }
         }
-
 
         // emergency phone call
         Intent callIntent = new Intent(Intent.ACTION_CALL);
@@ -138,7 +114,6 @@ public class SosActivity extends AppCompatActivity {
         } else {
             startActivity(callIntent);
         }
-
 
         finish();
     }
