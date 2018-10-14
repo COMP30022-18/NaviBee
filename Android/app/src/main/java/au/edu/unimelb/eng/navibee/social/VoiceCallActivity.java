@@ -210,30 +210,20 @@ public class VoiceCallActivity extends AppCompatActivity {
             textViewStatus.setVisibility(View.VISIBLE);
             textViewStatus.setText("Waiting");
             changingDot.setVisibility(View.VISIBLE);
+            buttonMic.setVisibility(View.INVISIBLE);
+            buttonSpeaker.setVisibility(View.INVISIBLE);
 
-
-            if (voiceCallService.getIsInitiator()){
-                buttonMic.setVisibility(View.VISIBLE);
-                buttonSpeaker.setVisibility(View.VISIBLE);
-                buttonAccept.setVisibility(View.INVISIBLE);
-                buttonDecline.setVisibility(View.INVISIBLE);
-                buttonHangup.setVisibility(View.VISIBLE);
-            }
-            else{
-                buttonMic.setVisibility(View.INVISIBLE);
-                buttonSpeaker.setVisibility(View.INVISIBLE);
-                buttonAccept.setVisibility(View.VISIBLE);
-                buttonDecline.setVisibility(View.VISIBLE);
-                buttonHangup.setVisibility(View.INVISIBLE);
-            }
+            buttonAccept.setVisibility(View.VISIBLE);
+            buttonDecline.setVisibility(View.VISIBLE);
+            buttonHangup.setVisibility(View.INVISIBLE);
         }
         // case accepted and connecting
         else if (voiceCallService.getStatus() == VoiceCallService.Status.Connecting){
             textViewStatus.setVisibility(View.VISIBLE);
             textViewStatus.setText("Connecting");
             changingDot.setVisibility(View.VISIBLE);
-            buttonMic.setVisibility(View.VISIBLE);
-            buttonSpeaker.setVisibility(View.VISIBLE);
+            buttonMic.setVisibility(View.INVISIBLE);
+            buttonSpeaker.setVisibility(View.INVISIBLE);
             buttonAccept.setVisibility(View.INVISIBLE);
             buttonDecline.setVisibility(View.INVISIBLE);
             buttonHangup.setVisibility(View.VISIBLE);
@@ -247,25 +237,23 @@ public class VoiceCallActivity extends AppCompatActivity {
             buttonAccept.setVisibility(View.INVISIBLE);
             buttonDecline.setVisibility(View.INVISIBLE);
             buttonHangup.setVisibility(View.VISIBLE);
+            if (voiceCallService.getIsMicEnabled()){
+                buttonMic.setImageResource(R.drawable.ic_mic_black_24dp);
+                buttonMic.setBackgroundResource(R.drawable.voicecall_mic_background);
+            }
+            else{
+                buttonMic.setImageResource(R.drawable.ic_mic_off_white_24dp);
+                buttonMic.setBackgroundResource(R.drawable.voicecall_button_background_white_hollow);
+            }
+            if (voiceCallService.getIsSpeakerEnabled()){
+                buttonSpeaker.setImageResource(R.drawable.ic_speaker_black_24dp);
+                buttonSpeaker.setBackgroundResource(R.drawable.voicecall_mic_background);
+            }
+            else{
+                buttonSpeaker.setImageResource(R.drawable.ic_speaker_white_24dp);
+                buttonSpeaker.setBackgroundResource(R.drawable.voicecall_button_background_white_hollow);
+            }
         }
-
-        if (voiceCallService.getIsMicEnabled()){
-            buttonMic.setImageResource(R.drawable.ic_mic_black_24dp);
-            buttonMic.setBackgroundResource(R.drawable.voicecall_mic_background);
-        }
-        else{
-            buttonMic.setImageResource(R.drawable.ic_mic_off_white_24dp);
-            buttonMic.setBackgroundResource(R.drawable.voicecall_button_background_white_hollow);
-        }
-        if (voiceCallService.getIsSpeakerEnabled()){
-            buttonSpeaker.setImageResource(R.drawable.ic_speaker_black_24dp);
-            buttonSpeaker.setBackgroundResource(R.drawable.voicecall_mic_background);
-        }
-        else{
-            buttonSpeaker.setImageResource(R.drawable.ic_speaker_white_24dp);
-            buttonSpeaker.setBackgroundResource(R.drawable.voicecall_button_background_white_hollow);
-        }
-
 
 //        textViewTime.setVisibility(View.INVISIBLE);
 //
