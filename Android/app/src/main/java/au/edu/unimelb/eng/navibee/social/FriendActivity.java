@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import java.security.acl.Group;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -337,7 +338,8 @@ public class FriendActivity extends AppCompatActivity {
     }
 
     private void sortChatsList() {
-        chatsList.sort((p1, p2) -> p2.getTimeForSort().compareTo(p1.getTimeForSort()));
+        // chatsList.sort((p1, p2) -> p2.getTimeForSort().compareTo(p1.getTimeForSort()));
+        Collections.sort(chatsList, (p1, p2) -> p2.getTimeForSort().compareTo(p1.getTimeForSort()));
     }
 
     public void onClick(View view) {

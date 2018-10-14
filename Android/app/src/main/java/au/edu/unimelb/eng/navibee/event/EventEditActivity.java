@@ -416,8 +416,6 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
         String holder = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        String location = "Test Location";
-
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, dateMap.get("year"));
         calendar.set(Calendar.MONTH, dateMap.get("month"));
@@ -430,7 +428,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         users.put(holder, true);
 
 
-        EventsActivity.EventItem newEvent = new EventsActivity.EventItem(name, holder, location,
+        EventsActivity.EventItem newEvent = new EventsActivity.EventItem(name, holder,
                 eventDate, users, picsStoragePath, eventLocation.getName().toString(),
                 eventLocation.getLatLng().longitude, eventLocation.getLatLng().latitude, privateSwitch.isChecked());
 
