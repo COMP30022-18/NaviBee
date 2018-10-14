@@ -49,16 +49,17 @@
 
         <!--app:layout_constraintEnd_toStartOf="@+id/recycler_view_events_list_entry_preview"-->
 
-        <!--<ImageView-->
-            <!--android:id="@+id/recycler_view_events_list_entry_preview"-->
-            <!--android:layout_width="120dp"-->
-            <!--android:layout_height="0dp"-->
-            <!--android:scaleType="centerCrop"-->
-            <!--app:layout_constraintBottom_toBottomOf="parent"-->
-            <!--app:layout_constraintEnd_toEndOf="parent"-->
-            <!--app:layout_constraintTop_toTopOf="parent"-->
-            <!--app:srcCompat="@drawable/navibee_placeholder"-->
-            <!--tools:srcCompat="@tools:sample/backgrounds/scenic"/>-->
+        <ImageView
+            android:id="@+id/recycler_view_events_list_entry_preview"
+            android:layout_width="120dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/navibee_placeholder"
+            tools:srcCompat="@tools:sample/backgrounds/scenic"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

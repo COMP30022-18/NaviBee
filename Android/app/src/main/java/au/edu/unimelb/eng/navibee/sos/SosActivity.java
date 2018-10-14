@@ -2,7 +2,6 @@ package au.edu.unimelb.eng.navibee.sos;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -21,22 +20,19 @@ import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowInsets;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.appbar.AppBarLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
 
-import java.util.HashMap;
-import java.util.Map;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import au.edu.unimelb.eng.navibee.R;
 
 public class SosActivity extends AppCompatActivity {
 
@@ -59,6 +55,19 @@ public class SosActivity extends AppCompatActivity {
             public void onTick(long l) {
                 countDownTextView.setText(Long.toString(l / 1000 + 1));
             }
+        
+        // Set padding for status bar
+        // Require API 20
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            toolbarPadding.setOnApplyWindowInsetsListener((view, windowInsets) -> {
+                ViewGroup.LayoutParams layoutParams = toolbarPadding.getLayoutParams();
+                layoutParams.height = windowInsets.getSystemWindowInsetTop();
+                toolbarPadding.setLayoutParams(layoutParams);
+
+                return windowInsets;
+            });
+        } else {
+            ViewGroup.LayoutParams layoutParams = toolbarPadding.getLayoutParams();
 
             @Override
             public void onFinish() {

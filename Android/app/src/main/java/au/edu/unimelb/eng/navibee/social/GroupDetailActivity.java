@@ -2,35 +2,24 @@ package au.edu.unimelb.eng.navibee.social;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.Image;
 import android.os.Bundle;
-import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.security.acl.Group;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import au.edu.unimelb.eng.navibee.R;
-import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
-import jdenticon.Jdenticon;
+import au.edu.unimelb.eng.navibee.utils.FormatUtilityKt;
+import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
 
 public class GroupDetailActivity extends AppCompatActivity {
     private ConversationManager cm = ConversationManager.getInstance();
@@ -38,74 +27,17 @@ public class GroupDetailActivity extends AppCompatActivity {
     private ArrayList<String> memberList;
     private String convId;
 
+    AlertDialog chatDeletedDialog;
+    AlertDialog deleteChatDialog;
+
     private BroadcastReceiver convUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (ConversationManager.getInstance().getConversation(convId) == null){
-                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-                dialog.setTitle("Alert");
-                dialog.setMessage("Sorry, this group chat has been deleted by the creator.");
-                dialog.setPositiveButton("Ok", (dialoginterface, i) -> finish());
-
-                dialog.show();
+                chatDeletedDialog.show();
             }
         }
     };
-
-
-    public static class MemberAdapter extends BaseAdapter{
-        private Context context;
-        private ArrayList<String> members;
-
-        public MemberAdapter(Context context, ArrayList<String> members) {
-            this.context = context;
-            this.members = members;
-
-        }
-
-        public int getCount() {
-            return members.size();
-        }
-
-        public Object getItem(int position) {
-            return members.get(position);
-        }
-
-        public long getItemId(int position) {
-            return position;
-        }
-
-        // create a new ImageView for each item referenced by the Adapter
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view;
-            String member = members.get(position);
-            if (convertView == null){
-                LayoutInflater inflater = LayoutInflater.from(context);
-                view = inflater.inflate(R.layout.group_chat_member_item, parent, false);
-                TextView viewName = (TextView) view.findViewById(R.id.group_member_name);
-                ImageView viewIcon = (ImageView) view.findViewById(R.id.group_member_icon);
-                UserInfoManager.getInstance().getUserInfo(member, userInfo -> {
-                    viewName.setText(userInfo.getName());
-                    NetworkImageHelper.loadImage(viewIcon, userInfo.getPhotoUrl());
-                });
-            }
-            else{
-                view = convertView;
-            }
-            view.setId(position);
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (!member.equals(ConversationManager.getInstance().getUid())){
-                        Intent intent = new Intent(context, FriendDetail.class);
-                        intent.putExtra("FRIEND_ID", member);
-                        context.startActivity(intent);
-                    }
-                }
-            });
-            return view;
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,58 +48,100 @@ public class GroupDetailActivity extends AppCompatActivity {
         conv = (GroupConversation) cm.getConversation(convId);
         memberList = new ArrayList<>(conv.getMembers());
 
-        GridView gridview = (GridView) findViewById(R.id.activity_group_detail_members);
-        gridview.setAdapter(new MemberAdapter(this, memberList));
+        setSupportActionBar(findViewById(R.id.chat_groupDetail_toolbar));
+        String subtitleString = getResources().getQuantityString(
+                R.plurals.chat_group_member_count,
+                conv.getMembers().size(), conv.getMembers().size()
+        );
 
-        int memberCount = memberList.size();
+        ImageView avatar = findViewById(R.id.cat_avatar);
+        TextView title = findViewById(R.id.cat_title);
+        TextView subtitle = findViewById(R.id.cat_subtitle);
+        avatar.setImageDrawable(conv.getRoundIconDrawable(getResources()));
+        title.setText(conv.getName());
+        subtitle.setText(subtitleString);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        int numColomns = 4;
-        int totalHeight = (memberList.size() / numColomns);
-        if (memberCount % numColomns != 0) {
-            totalHeight++;
-        }
-        ViewGroup.LayoutParams params = gridview.getLayoutParams();
-        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 96*totalHeight + 12, getResources().getDisplayMetrics());
-        params.height = height;
-        gridview.setLayoutParams(params);
-        gridview.requestLayout();
+        String myUid = ConversationManager.getInstance().getUid();
+        UserInfoManager.getInstance().getUserInfo(myUid, userInfo -> {
+            TextView viewName = findViewById(R.id.groupDetail_selfName);
+            ImageView viewIcon = findViewById(R.id.groupDetail_selfAvatar);
+            View isAdmin = findViewById(R.id.groupDetail_selfIsAdmin);
 
-        TextView members = findViewById(R.id.activity_group_detail_members_text);
-        String memberText = "Members (" + Integer.toString(memberCount) + ")";
-        members.setText(memberText);
-
-
-        TextView creator = findViewById(R.id.activity_group_detail_creator);
-        UserInfoManager.getInstance().getUserInfo(conv.getCreator(), userInfo -> {
-            creator.setText(userInfo.getName());
+            viewName.setText(userInfo.getName());
+            new URLImageViewCacheLoader(userInfo.getPhotoUrl(), viewIcon)
+                    .roundImage(true).execute();
+            isAdmin.setVisibility(
+                    conv.getCreator().equals(cm.getUid()) ?
+                            View.VISIBLE : View.GONE
+            );
         });
+
+        TextView createDateLabel = findViewById(R.id.activity_group_detail_date_created_label);
         TextView createDate = findViewById(R.id.activity_group_detail_date_created);
-        Date date = conv.getCreateDate();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-        createDate.setText(dateFormat.format(date));
-        TextView groupName = findViewById(R.id.group_detail_name);
-        groupName.setText(conv.getName());
-        ImageView groupIcon = findViewById(R.id.group_detail_icon);
+        long date = conv.getCreateDate().getTime();
+        createDate.setText(FormatUtilityKt.chatDateMediumFormat(date));
+        createDateLabel.setText(
+                getString(
+                        R.string.chat_group_created_at,
+                        FormatUtilityKt.chatDatePreposition(date)
+                )
+        );
 
-        groupIcon.setImageBitmap(conv.getIconBitmap());
-
-        Button button = findViewById(R.id.activity_group_detail_deleteGroup_button);
-        if (!cm.getUid().equals(conv.getCreator())){
-            button.setVisibility(View.GONE);
-        }
-
-
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("Alert");
-        dialog.setMessage("Sorry, this group chat has been deleted by the creator.");
-        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                finish();
-            }
-        });
+        inflateMembers();
 
         registerReceiver(convUpdateReceiver, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
 
+        chatDeletedDialog = new AlertDialog.Builder(this)
+                .setMessage(R.string.chat_group_deleted)
+                .setPositiveButton(R.string.action_ok, (dialog, i) -> finish())
+                .create();
+
+        deleteChatDialog = new AlertDialog.Builder(this)
+                .setMessage(R.string.chat_group_delete_confirm)
+                .setNegativeButton(R.string.action_cancel, (dialog, i) -> dialog.cancel())
+                .setPositiveButton(R.string.action_dismiss, (dialog, i) -> {
+                    cm.deleteGroup(convId);
+                    finish();
+                })
+                .create();
+    }
+
+    private void inflateMembers() {
+        LinearLayout nsv = findViewById(R.id.group_member_scroll_list);
+        for (String uid: memberList) {
+            if (cm.getUid().equals(uid))
+                continue;
+            LayoutInflater inflater = getLayoutInflater();
+            View view = inflater.inflate(R.layout.group_chat_member_item, nsv, false);
+            TextView viewName = view.findViewById(R.id.group_member_name);
+            ImageView viewIcon = view.findViewById(R.id.group_member_icon);
+            View isAdmin = view.findViewById(R.id.group_member_is_admin);
+            UserInfoManager.getInstance().getUserInfo(uid, userInfo -> {
+                viewName.setText(userInfo.getName());
+                new URLImageViewCacheLoader(userInfo.getPhotoUrl(), viewIcon)
+                        .roundImage(true).execute();
+                isAdmin.setVisibility(
+                        conv.getCreator().equals(uid) ? View.VISIBLE : View.GONE
+                );
+            });
+            view.setOnClickListener(v -> {
+                if (!uid.equals(ConversationManager.getInstance().getUid())){
+                    Intent intent = new Intent(this, FriendDetail.class);
+                    intent.putExtra("FRIEND_ID", uid);
+                    startActivity(intent);
+                }
+            });
+            nsv.addView(view);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (!cm.getUid().equals(conv.getCreator()))
+            return super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.menu_chat_activity, menu);
+        return true;
     }
 
     @Override
@@ -176,25 +150,17 @@ public class GroupDetailActivity extends AppCompatActivity {
         unregisterReceiver(convUpdateReceiver);
     }
 
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.activity_group_detail_deleteGroup_button:
-                AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-                dialog.setTitle("Alert");
-                dialog.setMessage("Are you sure you want to delete this group?");
-                dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialoginterface, int i) {
-                        dialoginterface.cancel();
-                    }
-                });
-                dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialoginterface, int i) {
-                        cm.deleteGroup(convId);
-                        finish();
-                    }
-                });
-                dialog.show();
-                break;
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.chat_groupDetails_delete:
+                deleteChatDialog.show();
+                return true;
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }

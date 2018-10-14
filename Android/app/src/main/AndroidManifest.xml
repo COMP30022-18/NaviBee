@@ -56,6 +56,16 @@
                 android:resource="@xml/picker_provider_paths" />
         </provider>
 
+
+        <!-- Services -->
+        <service
+            android:name=".MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
+
         <!-- Activities -->
 
         <activity
@@ -71,9 +81,11 @@
             android:name=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
         <activity
-            android:name=".EventActivity"
+            android:name=".event.EventsActivity"
+            android:label="@string/events"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".event.EventSelectFriendsActivity" />
+        <activity android:name=".event.EventSelectFriendsActivity"
+            android:label="@string/event_create_choose_participants"/>
         <activity
             android:name=".sos.SosActivity"
             android:label="@string/title_activity_sos"
@@ -146,7 +158,12 @@
         </activity>
         <activity
             android:name=".social.ChatActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".social.FriendActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".social.FriendActivity" />
+        </activity>
         <activity android:name=".social.AddFriendQRActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar">
             <intent-filter>
@@ -159,39 +176,57 @@
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="android:screenOrientation" />
-        <activity android:name=".event.EventEditActivity" />
-        <activity
-            android:name=".SosSettingActivity"
-            android:label="@string/sos_setting" />
+        <activity android:name=".event.EventEditActivity"
+            android:label="@string/event_create_event"
+            android:parentActivityName=".event.EventsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".event.EventsActivity" />
+        </activity>
         <activity
             android:name=".event.EventDetailsActivity"
             android:parentActivityName=".event.EventsActivity"
-            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
-        <activity
-            android:name=".social.ChatImageViewActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity">
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".event.EventsActivity" />
         </activity>
+        <activity
+            android:name=".social.ChatImageViewActivity"
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
         <activity
             android:name=".event.EventPicFullscreenActivity">
         </activity>
         <activity
-            android:name=".event.EventsActivity"
-            android:label="@string/landing_events">
-        </activity>
-        <activity
             android:name=".social.VoiceCallActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".social.CreateGroupChatActivity" />
-        <activity android:name=".social.FriendDetail" />
-        <activity android:name=".social.GroupDetailActivity" />
-        <activity android:name=".social.LocationDisplayActivity" />
+        <activity android:name=".social.CreateGroupChatActivity"
+            android:label="@string/friends_create_group"
+            android:parentActivityName=".social.FriendActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".event.EventSelectFriendsActivity" />
+        </activity>
+        <activity android:name=".social.FriendDetail"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label=""
+            android:parentActivityName=".social.FriendActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".social.FriendActivity" />
+        </activity>
+        <activity android:name=".social.LocationDisplayActivity"
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
+        <activity android:name=".social.RealTimeLocationDisplayActivity"
+            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar" />
+        <activity android:name=".social.GroupDetailActivity"
+            android:label=""
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".social.ChatActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".social.ChatActivity" />
+        </activity>
         <activity
             android:name=".sos.SosCountDownActivity"
             android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar"/>

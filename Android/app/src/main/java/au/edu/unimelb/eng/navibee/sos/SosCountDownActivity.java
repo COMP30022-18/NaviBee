@@ -22,6 +22,12 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.social.ConversationManager;
+import au.edu.unimelb.eng.navibee.social.PrivateConversation;
+
 public class SosCountDownActivity extends AppCompatActivity {
 
     private CountDownTimer countDownTimer;
@@ -110,8 +116,8 @@ public class SosCountDownActivity extends AppCompatActivity {
         } else {
             startActivity(callIntent);
         }
-        
-        
+
+
         finish();
     }
 }

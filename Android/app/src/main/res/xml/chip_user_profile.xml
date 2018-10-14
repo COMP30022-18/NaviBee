@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<chip
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.MaterialComponents.Chip.Action"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:chipIconVisible="true"
+    app:chipIcon="@drawable/ic_settings_black_24dp"
+    app:iconEndPadding="4dp"
+    app:iconStartPadding="0dp"
+    app:chipIconSize="48dp"
+    android:textAppearance="@style/AppTheme.ChipTextStyle"
+    app:chipMinHeight="48dp"
+    app:chipCornerRadius="24dp"
+    app:chipStartPadding="0dp"
+    app:chipEndPadding="8dp">
+</chip>

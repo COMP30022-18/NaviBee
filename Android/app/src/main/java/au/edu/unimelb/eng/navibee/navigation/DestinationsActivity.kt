@@ -62,16 +62,13 @@ class DestinationsActivity : AppCompatActivity(){
         launch(UI){
             val oldList = destinations.toList()
             destinations.clear()
-            destinations.add(DestinationRVButton(resources.getString(R.string.action_navigation_say_a_place),
-                    R.drawable.ic_keyboard_voice_black_24dp,
+            destinations.add(DestinationRVButton(
+                    resources.getString(R.string.action_navigation_say_a_place),
+                    R.drawable.ic_keyboard_voice_black_24dp).onClick(
                     View.OnClickListener {
                         startVoiceSearch()
-                    })
-            )
-//            destinations.add(DestinationRVEntry("Transit navigation", "For debug use",
-//                    onClick = View.OnClickListener {
-//                        startActivity<TransitNavigationActivity>()
-//                    }))
+                    }
+            ))
             viewModel.searchHistory.value?.run {
                 if (isNotEmpty())
                     destinations.add(DestinationRVDivider(resources.getString(R.string.navigation_destinations_header_recent_destinations)))
@@ -79,13 +76,12 @@ class DestinationsActivity : AppCompatActivity(){
                     destinations.add(DestinationRVEntry(
                             name = i.name,
                             location = i.address,
-                            googlePlaceId = i.googlePlaceId,
-                            onClick = View.OnClickListener {
-                                startActivity<DestinationDetailsActivity>(
-                                        DestinationDetailsActivity.EXTRA_PLACE_ID to i.googlePlaceId
-                                )
-                            }
-                    ))
+                            googlePlaceId = i.googlePlaceId
+                    ).onClick(View.OnClickListener {
+                        startActivity<DestinationDetailsActivity>(
+                                DestinationDetailsActivity.EXTRA_PLACE_ID to i.googlePlaceId
+                        )
+                    }))
                 }
             }
 
@@ -96,13 +92,12 @@ class DestinationsActivity : AppCompatActivity(){
                     destinations.add(DestinationRVEntry(
                         name = i.name,
                         location = i.address,
-                        googlePlaceId = i.placeId,
-                        onClick = View.OnClickListener {
-                            startActivity<DestinationDetailsActivity>(
+                        googlePlaceId = i.placeId
+                    ).onClick(View.OnClickListener {
+                        startActivity<DestinationDetailsActivity>(
                                 DestinationDetailsActivity.EXTRA_PLACE_ID to i.placeId
-                            )
-                        }
-                    ))
+                        )
+                    }))
                 }
             }
 
@@ -137,7 +132,7 @@ class DestinationsActivity : AppCompatActivity(){
 
 }
 
-private class DestinationsRVDiffCallback(private val old: List<DestinationRVItem>,
+class DestinationsRVDiffCallback(private val old: List<DestinationRVItem>,
                                          private val new: List<DestinationRVItem>): DiffUtil.Callback() {
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int) =
             old[oldItemPosition] == new[newItemPosition]
@@ -151,7 +146,7 @@ private class DestinationsRVDiffCallback(private val old: List<DestinationRVItem
 }
 
 
-private class DestinationSuggestionModel(private val context: Application):
+class DestinationSuggestionModel(private val context: Application):
         AndroidViewModel(context), LifecycleObserver {
     val searchHistory = MutableLiveData<List<LocationSearchHistory>>()
     val popularDestinations = MutableLiveData<List<PopularDestination>>()
@@ -181,7 +176,7 @@ private class DestinationSuggestionModel(private val context: Application):
     }
 }
 
-private data class PopularDestination (
+data class PopularDestination (
     var name: String = "",
     var address: String = "",
     var order: Int = 0,

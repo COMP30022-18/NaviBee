@@ -1,6 +1,7 @@
 package au.edu.unimelb.eng.navibee.social;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import androidx.annotation.Nullable;
 
@@ -16,13 +17,18 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import androidx.core.app.NotificationManagerCompat;
+import au.edu.unimelb.eng.navibee.MyFirebaseMessagingService;
 import au.edu.unimelb.eng.navibee.NaviBeeApplication;
 import au.edu.unimelb.eng.navibee.utils.FirebaseStorageHelper;
 
@@ -39,6 +45,8 @@ public abstract class Conversation {
     private int unreadMsgCount = 0;
     private Date readTimestamp;
     private Date createTimestamp;
+
+    private ListenerRegistration mListener;
 
 
     public Conversation(String id, Date readTimestamp, Date createTimestamp) {
@@ -60,7 +68,7 @@ public abstract class Conversation {
     }
 
     private void listen() {
-        db.collection("conversations").document(conversationId)
+        mListener = db.collection("conversations").document(conversationId)
                 .collection("messages").orderBy("time")
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null) {
@@ -96,6 +104,10 @@ public abstract class Conversation {
                     intent = new Intent(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE);
                     NaviBeeApplication.getInstance().sendBroadcast(intent);
                 });
+    }
+
+    public void stopListening() {
+        mListener.remove();
     }
 
     protected abstract void newUnreadMsg(Message msg);
@@ -168,6 +180,18 @@ public abstract class Conversation {
 
         Intent intent = new Intent(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE);
         NaviBeeApplication.getInstance().sendBroadcast(intent);
+
+        // cancel notification
+        SharedPreferences prefs = NaviBeeApplication.getInstance().getSharedPreferences(MyFirebaseMessagingService.NOTIFICATION_PREFS_NAME, NaviBeeApplication.getInstance().MODE_PRIVATE);
+        Set<String> ids = prefs.getStringSet(conversationId, new HashSet<>());
+        prefs.edit().remove(conversationId).apply();
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(NaviBeeApplication.getInstance());
+
+        for (String idString: ids) {
+            int id = Integer.parseInt(idString);
+            notificationManager.cancel(id);
+        }
     }
 
 

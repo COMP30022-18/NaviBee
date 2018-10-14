@@ -1,7 +1,9 @@
 package au.edu.unimelb.eng.navibee.social;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 
 import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGParseException;
@@ -10,13 +12,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import au.edu.unimelb.eng.navibee.utils.HashUtilitiesKt;
 import jdenticon.Jdenticon;
 
 public class GroupConversation extends Conversation {
 
     private String name;
-    private String icon; // not using
     private Bitmap iconBitmap;
     private ArrayList<String> members =  new ArrayList<>();
     private String creator;
@@ -25,7 +28,6 @@ public class GroupConversation extends Conversation {
     public GroupConversation(String id, Date readTimestamp, Date createTimestamp, String name, String icon, Map<String, Boolean> users, String creator) {
         super(id, readTimestamp, createTimestamp);
         this.name = name;
-        this.icon = icon;
         for (String user:users.keySet()){
             members.add(user);
         }
@@ -49,6 +51,13 @@ public class GroupConversation extends Conversation {
 
     public Bitmap getIconBitmap() {
         return iconBitmap;
+    }
+
+    public Drawable getRoundIconDrawable(Resources r) {
+        RoundedBitmapDrawable d = RoundedBitmapDrawableFactory.create(r, iconBitmap);
+        d.setAntiAlias(true);
+        d.setCircular(true);
+        return d;
     }
 
     public ArrayList<String> getMembers(){ return this.members; }

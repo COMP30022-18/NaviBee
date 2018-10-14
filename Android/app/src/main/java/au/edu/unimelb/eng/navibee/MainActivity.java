@@ -1,5 +1,7 @@
 package au.edu.unimelb.eng.navibee;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -46,6 +48,8 @@ import static au.edu.unimelb.eng.navibee.utils.DisplayUtilitiesKt.updateDpi;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
+    private static boolean inited = false;
+
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private PopupAdapter mAdapter;
@@ -67,9 +71,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.landing_sos_btn).setOnClickListener(this);
         findViewById(R.id.landing_social_btn).setOnClickListener(this);
 
-        ConversationManager.init();
-        setFCMToken();
-
         setupWelcomeBanner();
 
         setupOverflowMenu();
@@ -81,10 +82,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             naviBtn.setClipToOutline(true);
         }
 
-        Boolean isEnabled = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("countdown_enabled", true);
+        if (!inited) {
+            inited = true;
+            ConversationManager.init();
+            setFCMToken();
 
-        if (isEnabled) {
-            FallDetection.getInstance().start();
+            Boolean isEnabled = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("countdown_enabled", true);
+
+            if (isEnabled) {
+                FallDetection.getInstance().start();
+            }
+            // notification channel
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                CharSequence name = "Default";
+                String description = "Default channel";
+                int importance = NotificationManager.IMPORTANCE_HIGH;
+                NotificationChannel channel = new NotificationChannel(MyFirebaseMessagingService.CHANNEL_ID, name, importance);
+                channel.setDescription(description);
+                // Register the channel with the system; you can't change the importance
+                // or other notification behaviors after this
+                NotificationManager notificationManager = getSystemService(NotificationManager.class);
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+
+        String convID = getIntent().getStringExtra("convID");
+        if (convID != null) {
+            // notification clicked
+            ConversationManager.getInstance().waitForOpenChatAvtivity(convID);
         }
 
     }
