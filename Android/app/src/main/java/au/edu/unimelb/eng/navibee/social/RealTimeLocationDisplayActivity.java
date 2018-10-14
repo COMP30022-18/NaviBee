@@ -3,7 +3,6 @@ package au.edu.unimelb.eng.navibee.social;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,7 +19,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -251,15 +249,11 @@ public class RealTimeLocationDisplayActivity extends AppCompatActivity implement
         googleMap.getUiSettings().setMapToolbarEnabled(false);
 
         LocationServices.getFusedLocationProviderClient(this).getLastLocation()
-        .addOnSuccessListener(new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                LatLng currentLatLng = new LatLng(location.getLatitude(),
-                        location.getLongitude());
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,
-                        10));
-            }
-
+        .addOnSuccessListener(location -> {
+            LatLng currentLatLng = new LatLng(location.getLatitude(),
+                    location.getLongitude());
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,
+                    10));
         });
 
         update(false);
