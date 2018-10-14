@@ -17,6 +17,8 @@ const val FIRST_TIME_SET_NEVER_ASK_MEAN_OF_TRANSPORT = "first_time_set_never_ask
 
 private const val MEAN_OF_TRANSPORT = "navigation_preferred_mean_of_transport"
 private const val LAST_MEAN_OF_TRANSPORT = "navigation_last_mean_of_transport"
+private const val SHOW_STREET_VIEW = "pref_navigation_show_street_view"
+private const val USE_SIMULATION = "navigation_simulation"
 const val MEAN_OF_TRANSPORT_ALWAYS_ASK = "always_ask"
 const val MEAN_OF_TRANSPORT_TRANSIT = "transit"
 const val MEAN_OF_TRANSPORT_DRIVE = "drive"
@@ -67,6 +69,14 @@ fun isFirstTimeSetNeverAskMeanOfTransport(context: Context): Boolean {
 
 fun getPreviousMeanOfTransport(context: Context): String? =
     getNavigationSharedPref(context).getString(LAST_MEAN_OF_TRANSPORT, null)
+
+fun shouldShowStreetView(context: Context): Boolean =
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(SHOW_STREET_VIEW, true)
+
+fun shouldUseSimulation(context: Context): Boolean =
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(USE_SIMULATION, false)
 
 fun setPreviousMeanOfTransport(context: Context, value: String) {
     getNavigationSharedPref(context).edit {

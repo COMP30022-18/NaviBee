@@ -88,6 +88,9 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
     private var panoramaExpanded = false
     private val handler = Handler()
 
+    private var showStreetView: Boolean = true
+    private var useSimulation: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -138,7 +141,6 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
                         .findViewById<ViewGroup>(R.id.instructionView)
                         .findViewById<View>(R.id.instructionLayout)
         val instructionHeight = instructionLayout.height
-
 
         navigationPanorama?.layoutParams = ConstraintLayout
                 .LayoutParams(0, 0).apply {
@@ -266,13 +268,15 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
                                 return
                             }
 
-                            navigationPanorama = StreetViewPanoramaView(context,
-                                    StreetViewPanoramaOptions().position(LatLng(destLat, destLon))
-                                            .userNavigationEnabled(false))
+                            if (showStreetView) {
+                                navigationPanorama = StreetViewPanoramaView(context,
+                                        StreetViewPanoramaOptions().position(LatLng(destLat, destLon))
+                                                .userNavigationEnabled(false))
 
-                            navigationPanorama?.onCreate(null)
-                            navigationPanorama?.getStreetViewPanoramaAsync {
-                                onStreetViewPanoramaReady(it)
+                                navigationPanorama?.onCreate(null)
+                                navigationPanorama?.getStreetViewPanoramaAsync {
+                                    onStreetViewPanoramaReady(it)
+                                }
                             }
 
                             startNavigation(route!!)
@@ -304,6 +308,9 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
 
     private fun startNavigation(route: DirectionsRoute) {
 
+        showStreetView = shouldShowStreetView(this)
+        useSimulation = shouldUseSimulation(this)
+
         notification = NaviBeeMapBoxNotification(
                 this,
                 navigationView
@@ -316,14 +323,15 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
                 .build()
 
         navigationView.startNavigation(
-                NavigationViewOptions.builder()
-                        .directionsRoute(route)
-                        .navigationListener(this)
-                        .navigationOptions(navigationOptions)
-                        .milestoneEventListener(this)
-                        .navigationListener(this)
-                        .build()
-                )
+                NavigationViewOptions.builder().let {
+                    it.directionsRoute(route)
+                    it.navigationListener(this)
+                    it.navigationOptions(navigationOptions)
+                    it.milestoneEventListener(this)
+                    it.navigationListener(this)
+                    it.shouldSimulateRoute(useSimulation)
+                    it.build()
+                })
     }
 
     override fun onMilestoneEvent(routeProgress: RouteProgress?, instruction: String?, milestone: Milestone?) {
@@ -331,25 +339,27 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
             if (routeUtils.isArrivalEvent(routeProgress, milestone)) {
                 finish()
             } else {
-                val intersection = routeProgress
-                        .currentLegProgress()
-                        .currentStepProgress()
-                        .currentIntersection()
-                val pt = intersection.location()
-                panorama.setPosition(
-                    LatLng(pt.latitude(), pt.longitude())
-                )
-                if (panorama.location != null) {
-                    val bearing = intersection.bearings()
-                            ?.get(intersection?.`in`() ?: 0)?.toFloat() ?: 0f
-                    panorama.animateTo(
-                            StreetViewPanoramaCamera.Builder()
-                                    .zoom(0f).tilt(0f).bearing(bearing).build(),
-                            PANORAMA_ANIMATION_DURATION
+                if (showStreetView) {
+                    val intersection = routeProgress
+                            .currentLegProgress()
+                            .currentStepProgress()
+                            .currentIntersection()
+                    val pt = intersection.location()
+                    panorama.setPosition(
+                            LatLng(pt.latitude(), pt.longitude())
                     )
-                     showPanorama()
-                } else {
-                     hidePanorama()
+                    if (panorama.location != null) {
+                        val bearing = intersection.bearings()
+                                ?.get(intersection?.`in`() ?: 0)?.toFloat() ?: 0f
+                        panorama.animateTo(
+                                StreetViewPanoramaCamera.Builder()
+                                        .zoom(0f).tilt(0f).bearing(bearing).build(),
+                                PANORAMA_ANIMATION_DURATION
+                        )
+                        showPanorama()
+                    } else {
+                        hidePanorama()
+                    }
                 }
             }
         }

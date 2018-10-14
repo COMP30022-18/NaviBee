@@ -303,6 +303,13 @@
     </string-array>
     <string name="pref_navigation_search_region_values_default" translatable="false">au</string>
 
+    <string name="pref_navigation_show_street_view">Show street view in driving/walking navigation</string>
+    <string name="pref_navigation_show_street_view_on">Will show street view overlay</string>
+    <string name="pref_navigation_show_street_view_off">Will not show street view overlay</string>
+
+    <string name="pref_section_title_developer_options">Developer options</string>
+    <string name="pref_developer_options_navigation_emulation">Enable navigation emulation</string>
+
     <string name="pref_section_title_sos">SOS</string>
     <string name="pref_sos_preferred_emergency_call">Preferred emergency call number</string>
     <string name="pref_sos_preferred_emergency_call_titles">Required a phone number to call.</string>
@@ -322,5 +329,6 @@
     <string name="notification_voicecall">is calling you</string>
     <string name="notification_location">sent you a location</string>
     <string name="notificaiton_event">sent you an event</string>
+
 
 </resources>

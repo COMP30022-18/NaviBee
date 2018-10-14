@@ -322,5 +322,10 @@
     <string name="notificaiton_event">发送了一个活动邀请</string>
     <string name="notification_realtimelocation">向你分享实时位置</string>
     <string name="chat_realtime_location_title">位置分享</string>
+    <string name="pref_navigation_show_street_view">在驾驶/步行导航中显示街景</string>
+    <string name="pref_navigation_show_street_view_on">"将显示街景叠加 "</string>
+    <string name="pref_navigation_show_street_view_off">不会显示街景叠加</string>
+    <string name="pref_section_title_developer_options">"开发者选项 "</string>
+    <string name="pref_developer_options_navigation_emulation">启用导航模拟</string>
 
 </resources>

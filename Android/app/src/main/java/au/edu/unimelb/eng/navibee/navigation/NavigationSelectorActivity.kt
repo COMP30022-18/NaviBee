@@ -33,7 +33,7 @@ import org.jetbrains.anko.startActivityForResult
  *      EXTRA_ORIGIN_NAME: CharSequence, name of origin, optional
  *      EXTRA_DESTINATION_NAME: CharSequence, name of destination, optional
  */
-    class NavigationSelectorActivity : AppCompatActivity() {
+class NavigationSelectorActivity : AppCompatActivity() {
 
     private var latitude = 0.0
     private var longitude = 0.0
@@ -71,6 +71,7 @@ import org.jetbrains.anko.startActivityForResult
                     CHECK_LOCATION_PERMISSION
             )
         }
+
     }
 
 
@@ -161,7 +162,6 @@ class MeanOfTransportBottomSheetDialogFragment: BottomSheetDialogFragment() {
 
         parent = activity as NavigationSelectorActivity
         appContext = context!!.applicationContext
-
 
         previousChoice = getPreviousMeanOfTransport(context!!)
 
