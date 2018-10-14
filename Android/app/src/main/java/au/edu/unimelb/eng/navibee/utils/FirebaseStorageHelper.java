@@ -176,6 +176,8 @@ public class FirebaseStorageHelper {
     }
 
     public static void loadImage(ImageView imageView, String filePath, boolean isThumb, Callback callback) {
+        final String tag = filePath;
+        imageView.setTag(tag);
 
         if (isThumb) {
             int where = filePath.lastIndexOf(".");
@@ -188,7 +190,7 @@ public class FirebaseStorageHelper {
 
         if (file.exists()) {
             // cache exists
-            loadImageFromCacheFile(imageView, file);
+            loadImageFromCacheFile(imageView, file, tag);
             if (callback!=null) callback.callback(true);
         } else {
             // cache not exists
@@ -198,7 +200,7 @@ public class FirebaseStorageHelper {
             storageRef = storageRef.child(filePath);
             storageRef.getFile(file).addOnSuccessListener(taskSnapshot -> {
                 // Local temp file has been created
-                loadImageFromCacheFile(imageView, file);
+                loadImageFromCacheFile(imageView, file, tag);
                 if (callback!=null) callback.callback(true);
             }).addOnFailureListener(taskSnapshot -> {
                 if (callback!=null) callback.callback(false);
@@ -269,7 +271,10 @@ public class FirebaseStorageHelper {
         return result;
     }
 
-    private static void loadImageFromCacheFile(ImageView imageView, File file) {
+    private static void loadImageFromCacheFile(ImageView imageView, File file, String tag) {
+        if (!(imageView.getTag() instanceof String)) return;
+        if (!imageView.getTag().equals(tag)) return;
+
         try {
             FileInputStream fis = new FileInputStream(file);
             Bitmap bitmap = BitmapFactory.decodeStream(fis);

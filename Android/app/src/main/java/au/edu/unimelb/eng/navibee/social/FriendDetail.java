@@ -134,7 +134,6 @@ public class FriendDetail extends AppCompatActivity {
     }
 
     public void onClickAddFriend(View view) {
-        loadButton(true);
         toggleButtons(false);
         ConversationManager.getInstance().addFriend(friendId)
                 .addOnFailureListener(result -> {
