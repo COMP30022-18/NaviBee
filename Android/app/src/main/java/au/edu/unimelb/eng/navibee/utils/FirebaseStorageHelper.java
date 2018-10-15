@@ -1,12 +1,15 @@
 package au.edu.unimelb.eng.navibee.utils;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Formatter;
@@ -32,7 +36,33 @@ public class FirebaseStorageHelper {
     private static final int IMAGE_SIZE = 1500;
     private static final int THUMB_IMAGE_SIZE = 500;
 
-    public static int getOrientation(Uri photoUri) {
+    // for file
+    private static int getFileOrientation(File imageFile){
+        int rotate = 0;
+        try {
+            ExifInterface exif = new ExifInterface(imageFile.getAbsolutePath());
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotate = 270;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotate = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotate = 90;
+                    break;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return rotate;
+    }
+
+    // for Content
+    public static int getContentOrientation(Uri photoUri) {
         /* it's on the external media. */
         Cursor cursor = NaviBeeApplication.getInstance().getContentResolver().query(photoUri,
                 new String[] { MediaStore.Images.ImageColumns.ORIENTATION }, null, null, null);
@@ -56,7 +86,12 @@ public class FirebaseStorageHelper {
         is.close();
 
         int rotatedWidth, rotatedHeight;
-        int orientation = getOrientation(photoUri);
+        int orientation;
+        if (photoUri.getScheme().equals("content")) {
+            orientation = getContentOrientation(photoUri);
+        } else {
+            orientation = getFileOrientation(new File(photoUri.getPath()));
+        }
 
         if (orientation == 90 || orientation == 270) {
             rotatedWidth = dbo.outHeight;

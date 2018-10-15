@@ -133,6 +133,7 @@ public abstract class Conversation {
                     }));
         } catch (Exception e) {
             Log.w(TAG, "sendPicture", e);
+            callback.callback(false, "");
         }
     }
 
