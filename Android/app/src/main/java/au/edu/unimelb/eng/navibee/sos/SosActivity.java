@@ -37,6 +37,14 @@ public class SosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sos);
 
+        // If activity is called by fall detection
+        String isEnabled = getIntent().getStringExtra("fall_detection");
+
+        if (isEnabled != null && isEnabled.equals("Enable")) {
+            TextView textView = findViewById(R.id.sos_countdown_pre_text);
+            textView.setText(R.string.sos_pre_text);
+        }
+
         checkPhoneCallPermission();
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
