@@ -59,7 +59,8 @@ public class FallDetection implements SensorEventListener {
                 state = State.Fall;
                 fallTimestamp = System.currentTimeMillis();
 
-                Intent intent = new Intent(NaviBeeApplication.getInstance(), SosCountDownActivity.class);
+                Intent intent = new Intent(NaviBeeApplication.getInstance(), SosActivity.class);
+                intent.putExtra("fall_detection", "Enable");
                 NaviBeeApplication.getInstance().startActivity(intent);
 
             } else if (System.currentTimeMillis() >= fallTimestamp + 2000) {

@@ -243,9 +243,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".social.ChatActivity" />
         </activity>
-        <activity
-            android:name=".sos.SosCountDownActivity"
-            android:theme="@style/AppTheme.NoActionBar.TransparentStatusBar"/>
     </application>
 
 </manifest>

@@ -37,6 +37,14 @@ public class SosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sos);
 
+        // If activity is called by fall detection
+        String isEnabled = getIntent().getStringExtra("fall_detection");
+
+        if (isEnabled != null && isEnabled.equals("Enable")) {
+            TextView textView = findViewById(R.id.sos_countdown_pre_text);
+            textView.setText(R.string.sos_pre_text);
+        }
+
         checkPhoneCallPermission();
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -93,16 +101,17 @@ public class SosActivity extends AppCompatActivity {
 
             // emergency message
             PrivateConversation conv = ConversationManager.getInstance().getPrivateConversation(contactUid);
-            conv.sendMessage("text", "Emergency!");
+            conv.sendMessage("text", getString(R.string.sos_emergency_message));
 
             // location
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Unable to get current location", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.sos_emergency_no_location), Toast.LENGTH_LONG).show();
                 } else {
                     mFusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
                         if (location != null) {
                             conv.sendLocation(location.getLatitude(), location.getLongitude());
+                            Toast.makeText(this, getString(R.string.sos_emergency_sent_location), Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -111,8 +120,8 @@ public class SosActivity extends AppCompatActivity {
         }
 
         // check digit only
-        if (!phoneNumber.isEmpty() && !android.text.TextUtils.isDigitsOnly(phoneNumber)) {
-            Toast.makeText(this, "Digits Only!", Toast.LENGTH_SHORT).show();
+        if ((!phoneNumber.isEmpty() && !android.text.TextUtils.isDigitsOnly(phoneNumber)) || phoneNumber.isEmpty()) {
+            Toast.makeText(this, getString(R.string.sos_emergency_phone), Toast.LENGTH_SHORT).show();
         } else {
             // emergency phone call
             Intent callIntent = new Intent(Intent.ACTION_CALL);
@@ -121,7 +130,7 @@ public class SosActivity extends AppCompatActivity {
             callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Unable to make phone call", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.sos_emergency_no_number), Toast.LENGTH_LONG).show();
             } else {
                 startActivity(callIntent);
             }
