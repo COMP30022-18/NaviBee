@@ -30,6 +30,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.material.chip.ChipDrawable;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -50,6 +51,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.DialogFragment;
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.social.ConversationManager;
@@ -67,7 +69,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     private final int MAX_NUM_OF_PHOTOS = 6;
 
     private HashMap<String, UserInfoManager.UserInfo> selectedUsers;
-    private Map<String, Integer> dateMap;
+    private HashMap<String, Integer> dateMap;
     private ArrayList<Bitmap> pics;
     private ArrayList<Uri> picsUri;
     private ArrayList<String> picsStoragePath = new ArrayList<>();
@@ -83,6 +85,8 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     private CircularProgressButton submit;
     private Place eventLocation;
     private Switch privateSwitch;
+
+    private CoordinatorLayout coord;
 
     private boolean isEnabled = true;
 
@@ -142,6 +146,8 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         locationLayout = findViewById(R.id.event_create_location_layout);
 
         submit = findViewById(R.id.eventPublish);
+
+        coord = findViewById(R.id.event_edit_coord);
 
         loadData();
 
@@ -380,18 +386,21 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             case PLACE_PICKER_REQUEST:
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(this, intent);
-//                String toastMsg = String.format("Place: %s", place.getName());
-//                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
-                String placeName = place.getName().toString();
-                if (placeName.matches("\\d+°((\\d+'([\\d.]+\")?)?)?[WS] \\d+°((\\d+'([\\d.]+\")?)?)?[NE]")) {
-                    // if place name is a coordinate
-                    placeName = place.getAddress().toString();
-                }
+                String placeName = getPlaceDisplayName(place);
                 locationField.setText(placeName);
                 eventLocation = place;
             }
             break;
         }
+    }
+
+    private String getPlaceDisplayName(Place place) {
+        String placeName = place.getName().toString();
+        if (placeName.matches("\\d+°((\\d+'([\\d.]+\")?)?)?[WS] \\d+°((\\d+'([\\d.]+\")?)?)?[NE]")) {
+            // if place name is a coordinate
+            placeName = place.getAddress().toString();
+        }
+        return placeName;
     }
 
     private void setChipGroupView(HashMap<String, UserInfoManager.UserInfo> selected){
@@ -447,9 +456,8 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         Map<String, Boolean> users = new HashMap<>();
         users.put(holder, true);
 
-
         EventsActivity.EventItem newEvent = new EventsActivity.EventItem(name, holder,
-                eventDate, users, picsStoragePath, eventLocation.getName().toString(),
+                eventDate, users, picsStoragePath, getPlaceDisplayName(eventLocation),
                 eventLocation.getLatLng().longitude, eventLocation.getLatLng().latitude, privateSwitch.isChecked());
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -473,7 +481,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
                         finish();
 
                     } else {
-                        // fail
+                        badInternetConnection();
                     }
                 });
 
@@ -493,19 +501,23 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
                             picsStoragePath.add(path);
                             finishedEditEvent();
                         } else {
-                            //fail
+                            badInternetConnection();
                         }
                     });
 
             } catch (Exception e) {
-                // fail
-
+                badInternetConnection();
             }
 
         } else {
             // complete
             uploadAll();
         }
+    }
+
+    private void badInternetConnection() {
+        Snackbar.make(coord, R.string.error_failed_to_connect_to_server, Snackbar.LENGTH_LONG).show();
+        progressingMode(false);
     }
 
     public void onPublishClicked(View v) {
@@ -541,8 +553,15 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
         }
     }
 
-    private boolean isTimeAfterNow(Map<String, Integer> dateMap){
+    private boolean isTimeAfterNow(HashMap<String, Integer> dateMap){
         Calendar calendar = Calendar.getInstance();
+        if (dateMap == null ||
+            dateMap.get("year") == null ||
+            dateMap.get("month") == null ||
+            dateMap.get("day") == null ||
+            dateMap.get("hour") == null ||
+            dateMap.get("minute") == null)
+            return false;
         calendar.set(Calendar.YEAR, dateMap.get("year"));
         calendar.set(Calendar.MONTH, dateMap.get("month"));
         calendar.set(Calendar.DAY_OF_MONTH, dateMap.get("day"));
@@ -552,12 +571,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
         Date currentTime = new Date();
 
-        if(testTime.compareTo(currentTime) >= 0) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return testTime.compareTo(currentTime) >= 0;
     }
 
 

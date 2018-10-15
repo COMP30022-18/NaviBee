@@ -6,13 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.os.PowerManager;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,9 +16,12 @@ import android.widget.TextView;
 import com.yhao.floatwindow.FloatWindow;
 
 import java.util.Date;
-import au.edu.unimelb.eng.navibee.utils.NetworkImageHelper;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import au.edu.unimelb.eng.navibee.R;
+import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
 
 public class VoiceCallActivity extends AppCompatActivity {
 
@@ -151,7 +150,8 @@ public class VoiceCallActivity extends AppCompatActivity {
         String targetUid = voiceCallService.getTargetUid();
         UserInfoManager.getInstance().getUserInfo(targetUid, userInfo -> {
             friendName.setText(userInfo.getName());
-            NetworkImageHelper.loadImage(friendIcon, userInfo.getHighResolutionPhotoUrl());
+            new URLImageViewCacheLoader(userInfo.getHighResolutionPhotoUrl(), friendIcon)
+                .roundImage(true).execute();
         });
 
         // case waiting for response

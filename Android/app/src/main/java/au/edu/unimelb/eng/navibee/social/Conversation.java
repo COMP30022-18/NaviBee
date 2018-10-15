@@ -120,7 +120,7 @@ public abstract class Conversation {
 
     }
 
-    public void sendPicture(Uri uri) {
+    public void sendPicture(Uri uri, FirebaseStorageHelper.UploadCallback callback) {
         try {
             FirebaseStorageHelper
                     .uploadImage(uri,null, "message", 70, false, ((isSuccess, path) -> {
@@ -129,6 +129,7 @@ public abstract class Conversation {
                         } else {
                             Toast.makeText(NaviBeeApplication.getInstance(), "Failed to send the photo.", Toast.LENGTH_LONG).show();
                         }
+                        callback.callback(isSuccess, path);
                     }));
         } catch (Exception e) {
             Log.w(TAG, "sendPicture", e);

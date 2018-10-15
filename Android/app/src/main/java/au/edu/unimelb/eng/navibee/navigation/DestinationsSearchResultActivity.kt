@@ -265,11 +265,13 @@ class DestinationsSearchResultActivity: AppCompatActivity(), OnMapReadyCallback 
 
         fusedLocationClient.lastLocation
                 .addOnSuccessListener { location : Location? ->
-                    Timber.d("Last known location: $location")
-                    lastKnownLocation = location
-                    if (googleMap != null) onMapReady(googleMap!!)
+                    if (location != null) {
+                        Timber.d("Last known location: $location")
+                        lastKnownLocation = location
+                        if (googleMap != null) onMapReady(googleMap!!)
 
-                    viewModel.searchForLocation(query, location)
+                        viewModel.searchForLocation(query, location)
+                    }
 
                 }
                 .addOnFailureListener {

@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
+import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -244,7 +245,16 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
         val destination = Point.fromLngLat(destLon, destLat)
 
         // Retrieve current location
-        fusedLocationClient.lastLocation.addOnSuccessListener { loc ->
+        fusedLocationClient.lastLocation.addOnSuccessListener { loc: Location? ->
+            if (loc == null) {
+                alert(R.string.location_not_found) {
+                    positiveButton(R.string.action_ok) {
+                        finish()
+                    }
+                }.show()
+                return@addOnSuccessListener
+            }
+
             val origin = Point.fromLngLat(loc.longitude, loc.latitude)
 
             // Request a route

@@ -82,23 +82,35 @@
         android:paddingRight="8dp"
         android:paddingTop="8dp">
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/btn_send_extra"
+        <com.github.jorgecastilloprz.FABProgressCircle
+            android:id="@+id/btn_send_extra_circle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginBottom="16dp"
-            android:onClick="onClickExtra"
-            android:focusable="true"
-            android:clickable="true"
-            app:backgroundTint="@color/white"
+            app:arcColor="@color/colorPrimary"
+            android:clipToPadding="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:tint="@color/colorLightTextSecondary"
-            app:rippleColor="@color/rippleOnLight"
-            app:fabCustomSize="48dp"
-            app:maxImageSize="36dp"
-            app:srcCompat="@drawable/ic_add_white_48dp"/>
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="8dp"
+            android:padding="4dp"
+            app:arcWidth="4dp"
+            app:finalIcon="@drawable/ic_check_black_24dp"
+            app:reusable="true"
+            >
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btn_send_extra"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onClickExtra"
+                android:focusable="true"
+                android:clickable="true"
+                app:backgroundTint="@color/white"
+                app:tint="@color/colorLightTextSecondary"
+                app:rippleColor="@color/rippleOnLight"
+                app:fabCustomSize="48dp"
+                app:maxImageSize="36dp"
+                app:srcCompat="@drawable/ic_add_white_48dp"/>
+        </com.github.jorgecastilloprz.FABProgressCircle>
 
         <LinearLayout
             android:layout_width="0dp"
@@ -110,7 +122,7 @@
             android:elevation="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/btn_send_extra"
+            app:layout_constraintStart_toEndOf="@+id/btn_send_extra_circle"
             >
 
             <EditText
@@ -135,8 +147,8 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_send_message"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="0dp"
                 android:layout_marginBottom="0dp"
