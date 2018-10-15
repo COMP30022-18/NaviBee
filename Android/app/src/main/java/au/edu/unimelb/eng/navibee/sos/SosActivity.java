@@ -101,12 +101,12 @@ public class SosActivity extends AppCompatActivity {
 
             // emergency message
             PrivateConversation conv = ConversationManager.getInstance().getPrivateConversation(contactUid);
-            conv.sendMessage("text", "Emergency!");
+            conv.sendMessage("text", getString(R.string.sos_emergency_message));
 
             // location
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Unable to get current location", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.sos_emergency_no_location), Toast.LENGTH_LONG).show();
                 } else {
                     mFusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
                         if (location != null) {
@@ -120,7 +120,7 @@ public class SosActivity extends AppCompatActivity {
 
         // check digit only
         if (!phoneNumber.isEmpty() && !android.text.TextUtils.isDigitsOnly(phoneNumber)) {
-            Toast.makeText(this, "Digits Only!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.sos_emergency_digits), Toast.LENGTH_SHORT).show();
         } else {
             // emergency phone call
             Intent callIntent = new Intent(Intent.ACTION_CALL);
@@ -129,7 +129,7 @@ public class SosActivity extends AppCompatActivity {
             callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Unable to make phone call", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.sos_emergency_no_number), Toast.LENGTH_LONG).show();
             } else {
                 startActivity(callIntent);
             }
