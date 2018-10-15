@@ -26,26 +26,28 @@
             style="@style/AppTheme.List.ItemTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toStartOf="@+id/recycler_view_events_list_entry_preview"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="@tools:sample/lorem[4]"/>
+            tools:text="@tools:sample/lorem[4]" />
 
         <TextView
             android:id="@+id/recycler_view_events_list_entry_subtitle"
             style="@style/AppTheme.List.CardItemSubtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="4dp"
-            tools:text="@tools:sample/lorem[10]"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/recycler_view_events_list_entry_preview"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/recycler_view_events_list_entry_title" />
+            app:layout_constraintTop_toBottomOf="@+id/recycler_view_events_list_entry_title"
+            tools:text="@tools:sample/lorem[10]" />
 
         <!--app:layout_constraintEnd_toStartOf="@+id/recycler_view_events_list_entry_preview"-->
 

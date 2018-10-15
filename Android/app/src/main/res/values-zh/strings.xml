@@ -327,5 +327,18 @@
     <string name="pref_navigation_show_street_view_off">不会显示街景叠加</string>
     <string name="pref_section_title_developer_options">"开发者选项 "</string>
     <string name="pref_developer_options_navigation_emulation">启用导航模拟</string>
+    <string name="location_not_found">抱歉，我们找不到您的位置。 请移动到GPS信号更好的地方。</string>
+    <string name="action_reply">回复</string>
+    <string name="pref_sos_enable_fall_detection">启用跌倒检测倒计时</string>
+    <string name="message_notification_channel">消息</string>
+    <string name="message_notification_channel_desc">消息通知</string>
+    <string name="sos_act_text">您已激活SOS模式。</string>
+    <string name="sos_emergency_message">紧急！</string>
+    <string name="sos_emergency_phone">电话号码无效！</string>
+    <string name="sos_emergency_empty_number">空电话号码，没有电话</string>
+    <string name="sos_emergency_no_location">无法获取当前位置</string>
+    <string name="sos_emergency_no_number">无法拨打电话</string>
+    <string name="sos_emergency_sent_location">发送位置！</string>
+    <string name="event_create_time_invalid">您不能在过去创建活动。</string>
 
 </resources>

@@ -8,6 +8,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import au.edu.unimelb.eng.navibee.NaviBeeApplication;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 public class FallDetection implements SensorEventListener {
     private static final FallDetection instance = new FallDetection();
     private static final double FALL_THRESHOLD = 1.8d;
@@ -61,6 +63,7 @@ public class FallDetection implements SensorEventListener {
 
                 Intent intent = new Intent(NaviBeeApplication.getInstance(), SosActivity.class);
                 intent.putExtra("fall_detection", true);
+                intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
                 NaviBeeApplication.getInstance().startActivity(intent);
 
             } else if (System.currentTimeMillis() >= fallTimestamp + 2000) {
