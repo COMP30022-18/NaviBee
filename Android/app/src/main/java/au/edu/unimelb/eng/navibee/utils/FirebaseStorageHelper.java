@@ -191,7 +191,7 @@ public class FirebaseStorageHelper {
         if (file.exists()) {
             // cache exists
             loadImageFromCacheFile(imageView, file, tag);
-            if (callback!=null) callback.callback(true);
+            if (callback != null) callback.callback(true);
         } else {
             // cache not exists
 
@@ -201,9 +201,9 @@ public class FirebaseStorageHelper {
             storageRef.getFile(file).addOnSuccessListener(taskSnapshot -> {
                 // Local temp file has been created
                 loadImageFromCacheFile(imageView, file, tag);
-                if (callback!=null) callback.callback(true);
+                if (callback != null) callback.callback(true);
             }).addOnFailureListener(taskSnapshot -> {
-                if (callback!=null) callback.callback(false);
+                if (callback != null) callback.callback(false);
             });
 
         }
@@ -223,7 +223,7 @@ public class FirebaseStorageHelper {
         if (file.exists()) {
             // cache exists
             Bitmap b = loadImageFromCacheFile(file);
-            if (callback!=null) callback.callback(true, b);
+            if (callback != null) callback.callback(true, b);
         } else {
             // cache not exists
             FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -232,9 +232,9 @@ public class FirebaseStorageHelper {
             storageRef.getFile(file).addOnSuccessListener(taskSnapshot -> {
                 // Local temp file has been created
                 Bitmap b = loadImageFromCacheFile(file);
-                if (callback!=null) callback.callback(true, b);
+                if (callback != null) callback.callback(true, b);
             }).addOnFailureListener(taskSnapshot -> {
-                if (callback!=null) callback.callback(false, null);
+                if (callback != null) callback.callback(false, null);
             });
 
         }
@@ -253,7 +253,7 @@ public class FirebaseStorageHelper {
 
         if (file.exists()) {
             // cache exists
-            if (callback!=null) callback.callback(true, file);
+            if (callback != null) callback.callback(true, file);
         } else {
             // cache not exists
             FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -261,9 +261,9 @@ public class FirebaseStorageHelper {
             storageRef = storageRef.child(filePath);
             storageRef.getFile(file).addOnSuccessListener(taskSnapshot -> {
                 // Local temp file has been created
-                if (callback!=null) callback.callback(true, file);
+                if (callback != null) callback.callback(true, file);
             }).addOnFailureListener(taskSnapshot -> {
-                if (callback!=null) callback.callback(false, null);
+                if (callback != null) callback.callback(false, null);
             });
 
         }

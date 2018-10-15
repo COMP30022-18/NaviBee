@@ -208,7 +208,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationManagerCompat notificationManager =
                 NotificationManagerCompat.from(this);
 
-        // TODO: save notification id
         notificationManager.notify(id, notification);
 
         saveNotification(id, convId);
@@ -225,9 +224,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
 
     private int createID(String convId){
-//        Date now = new Date();
-//        int id = Integer.parseInt(new SimpleDateFormat("ddHHmmss",  Locale.US).format(now));
-//        return id;
         return convId.hashCode();
     }
 

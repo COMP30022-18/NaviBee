@@ -25,8 +25,6 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (REPLY_ACTION.equals(intent.getAction())) {
-            // do whatever you want with the message. Send to the server or add to the db.
-            // for this tutorial, we'll just show it in a toast;
             CharSequence message = MyFirebaseMessagingService.getReplyMessage(intent);
             String convId = intent.getStringExtra(KEY_CONV_ID);
             int notiId = intent.getIntExtra(KEY_NOTI_ID, 0);
