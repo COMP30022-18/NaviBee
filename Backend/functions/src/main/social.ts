@@ -113,7 +113,7 @@ export const addFriend = functions.https.onCall(
         conv['readTimestamps'][uid] = new Date();
         conv['readTimestamps'][targetUid] = new Date();
         conv['createTimestamp'] = new Date();
-        db.collection('conversations').add(conv);
+        await db.collection('conversations').add(conv);
 
         return {code: 0};
     });
@@ -142,6 +142,6 @@ export const createGroupChat = functions.https.onCall(
             conv['users'][entry] = true;
             conv['readTimestamps'][entry] = new Date();
         }
-        db.collection('conversations').add(conv);
+        await db.collection('conversations').add(conv);
         return {code: 0};
     });

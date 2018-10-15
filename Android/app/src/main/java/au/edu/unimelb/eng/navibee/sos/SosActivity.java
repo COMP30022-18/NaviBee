@@ -97,10 +97,11 @@ public class SosActivity extends AppCompatActivity {
         String contactUid = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
                 .getString("sos_emergency_contact", "");
 
-        if (!contactUid.isEmpty()) {
+        PrivateConversation conv = ConversationManager.getInstance().getPrivateConversation(contactUid);
+        if (conv != null) {
 
             // emergency message
-            PrivateConversation conv = ConversationManager.getInstance().getPrivateConversation(contactUid);
+
             conv.sendMessage("text", getString(R.string.sos_emergency_message));
 
             // location

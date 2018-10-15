@@ -100,6 +100,7 @@ public class RealTimeLocationDisplayActivity extends AppCompatActivity implement
         conv = (PrivateConversation) ConversationManager.getInstance().getConversation(getIntent().getStringExtra(EXTRA_CONVID));
         UserInfoManager.getInstance().getUserInfo(conv.getTargetUid(),(userInfo -> {
             userName = userInfo.getName();
+            if (marker!=null) marker.setIcon(BitmapDescriptorFactory.fromBitmap(new IconGenerator(this).makeIcon(userName)));
             title.setText(userName);
             new URLImageViewCacheLoader(userInfo.getPhotoUrl(), icon).roundImage(true).execute();
             update(false);
@@ -145,11 +146,12 @@ public class RealTimeLocationDisplayActivity extends AppCompatActivity implement
                     marker = googleMap.addMarker(new MarkerOptions().position(location));
                     googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
                     googleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM_LEVEL));
+                    marker.setIcon(BitmapDescriptorFactory.fromBitmap(new IconGenerator(this).makeIcon(userName)));
                 } else {
                     marker.setPosition(location);
                 }
 
-                marker.setIcon(BitmapDescriptorFactory.fromBitmap(new IconGenerator(this).makeIcon(userName)));
+
             }
         }
 
