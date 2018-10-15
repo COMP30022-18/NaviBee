@@ -396,7 +396,7 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
 
     private String getPlaceDisplayName(Place place) {
         String placeName = place.getName().toString();
-        if (placeName.matches("\\d+°((\\d+'([\\d.]+\")?)?)?[WS] \\d+°((\\d+'([\\d.]+\")?)?)?[NE]")) {
+        if (placeName.matches("\\d+°((\\d+'([\\d.]+\")?)?)?[NS] \\d+°((\\d+'([\\d.]+\")?)?)?[WE]")) {
             // if place name is a coordinate
             placeName = place.getAddress().toString();
         }
