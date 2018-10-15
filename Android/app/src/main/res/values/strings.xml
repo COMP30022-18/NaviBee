@@ -242,6 +242,7 @@
     <string name="dialog_method_of_travel_transit">Public transport</string>
     <string name="action_just_once">Just once</string>
     <string name="action_always">Always</string>
+    <string name="action_reply">Reply</string>
     <string name="title_activity_settings">Settings</string>
     <string name="prompt_first_time_always_preferred_mean_of_transport">You can change your preferred mean of transport afterwards in the settings.</string>
     <string name="action_navigation_say_a_place">Say a place</string>
@@ -323,7 +324,7 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="message_notification_channel">Messages</string>
     <string name="message_notification_channel_desc">Message notifications</string>
-    <string name="sos_act_text">Activated the SOS mode.</string>
+    <string name="sos_act_text">You have activated the SOS mode.</string>
     <string name="sos_pre_text">We\'ve detected that you might be in danger\.</string>
     <string name="sos_main_text">Your emergency contact will be notified in</string>
     <string name="sos_time_unit">seconds</string>

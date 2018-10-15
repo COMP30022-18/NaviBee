@@ -1,6 +1,7 @@
 package au.edu.unimelb.eng.navibee.sos;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -8,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,12 +22,14 @@ import androidx.core.content.ContextCompat;
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.social.ConversationManager;
 import au.edu.unimelb.eng.navibee.social.PrivateConversation;
+import au.edu.unimelb.eng.navibee.utils.CircularProgressView;
 
 
 public class SosActivity extends AppCompatActivity {
 
     private CountDownTimer countDownTimer;
-    private TextView countDownTextView;
+    private CircularProgressView countDownView;
+    private TextView countDownText;
     private FusedLocationProviderClient mFusedLocationClient;
 
     @Override
@@ -36,12 +40,18 @@ public class SosActivity extends AppCompatActivity {
         checkPhoneCallPermission();
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        countDownTextView = findViewById(R.id.sos_countdown_number);
+        countDownView = findViewById(R.id.sos_progress);
+        countDownText = findViewById(R.id.sos_progress_text);
+        countDownView.setMax(10 * 1000);
+        countDownView.setProgress(10 * 1000);
+        countDownView.setAnimationInterpolator(new LinearInterpolator());
 
         countDownTimer = new CountDownTimer(10 * 1000, 1000) {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onTick(long l) {
-                countDownTextView.setText(Long.toString(l / 1000 + 1));
+                countDownText.setText(Long.toString(l / 1000 + 1));
+                countDownView.setProgress(l, true, 1000);
             }
 
             @Override

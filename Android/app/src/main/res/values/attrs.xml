@@ -8,4 +8,18 @@
         <attr name="metaButtonBarStyle" format="reference" />
         <attr name="metaButtonBarButtonStyle" format="reference" />
     </declare-styleable>
+
+
+    <declare-styleable name="CircularProgressView">
+        <attr name="max" format="integer"/>
+        <attr name="shadow" format="boolean"/>
+        <attr name="progressThumb" format="boolean"/>
+        <attr name="startingAngle" format="integer"/>
+        <attr name="progressValue" format="integer"/>
+        <attr name="progressBarThickness" format="dimension"/>
+        <attr name="progressBarColor" format="color"/>
+        <attr name="backgroundColor" format="color"/>
+        <attr name="backgroundAlphaEnabled" format="boolean"/>
+        <attr name="reverse" format="boolean"/>
+    </declare-styleable>
 </resources>

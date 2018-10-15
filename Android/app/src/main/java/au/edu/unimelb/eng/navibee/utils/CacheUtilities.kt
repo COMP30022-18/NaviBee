@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.ActionBar
+import androidx.core.graphics.drawable.RoundedBitmapDrawable
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import au.edu.unimelb.eng.navibee.NaviBeeApplication
 import com.google.android.material.chip.Chip
@@ -163,6 +164,59 @@ class URLChipDrawableCacheLoader
             Timber.e(e, "Failed loading image to chip.")
         }
     }
+}
+
+
+abstract class URLCallbackCacheLoader
+@JvmOverloads constructor(private val url: String,
+                          private val prefix: String = "image-url"):
+        CachedLoader(prefix) {
+    override val defaultKey = url
+
+    override fun loadTask(file: File) {
+        try {
+            val input = java.net.URL(url).openStream()
+            val output = FileOutputStream(file)
+            ByteStreams.copy(input, output)
+            output.close()
+            postLoad(file)
+        } catch (e: Exception) {
+            Timber.e(e, "Failed loading image from URL.")
+        }
+    }
+
+    fun getRoundDrawable(file: File, resources: Resources): RoundedBitmapDrawable {
+        val drawable = RoundedBitmapDrawableFactory
+                .create(resources, FileInputStream(file))
+        drawable.setAntiAlias(true)
+        drawable.isCircular = true
+        return drawable
+    }
+
+    fun getRoundBitmap(file: File, resources: Resources) =
+            getRoundDrawable(file, resources).bitmap
+
+    fun getBitmap(file: File) =
+            BitmapFactory.decodeStream(FileInputStream(file))
+
+    @JvmOverloads
+    fun getFileAndExecute(key: String? = null): File {
+        val k = key ?: defaultKey
+        val file = File(
+                NaviBeeApplication.instance.cacheDir,
+                "$prefix-${sha256String(k)}"
+        )
+        job = launch {
+            if (file.exists()) {
+                postLoad(file)
+            } else {
+                loadTask(file)
+            }
+        }
+        return file
+    }
+
+    abstract override fun postLoad(file: File)
 }
 
 

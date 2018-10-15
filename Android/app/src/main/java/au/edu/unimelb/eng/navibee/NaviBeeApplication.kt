@@ -21,7 +21,8 @@ import java.util.*
 class NaviBeeApplication : Application() {
 
 
-    private var inited = false
+    public var inited = false
+        private set
 
     companion object {
         @JvmStatic lateinit var instance: NaviBeeApplication
@@ -35,8 +36,11 @@ class NaviBeeApplication : Application() {
         ApplicationStarter.initialize(this, true) // with prefetch on background thread
         instance = this
 
+        init()
+    }
 
-        if (!inited) {
+    public fun init() {
+        if (FirebaseAuth.getInstance().currentUser != null && !inited) {
             firestoreTimestamp()
 
             inited = true
@@ -64,7 +68,6 @@ class NaviBeeApplication : Application() {
             }
 
         }
-
     }
 
 

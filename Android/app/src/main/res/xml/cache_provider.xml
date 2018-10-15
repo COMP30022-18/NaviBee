@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <files-path name="image_picked" path="picked/"/>
+    <external-path name="*" path="Pictures/"/>
+    <cache-path name="images" path="/"/>
+</paths>
