@@ -258,6 +258,9 @@ public abstract class Conversation {
                 case "event":
                     text = "[Event]";
                     break;
+                case "realtimelocation":
+                    text = "[Location Sharing]";
+                    break;
             }
 
             return text.substring(0, Math.min(text.length(), 50));
