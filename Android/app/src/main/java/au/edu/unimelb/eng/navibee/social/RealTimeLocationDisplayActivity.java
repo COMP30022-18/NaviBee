@@ -250,6 +250,7 @@ public class RealTimeLocationDisplayActivity extends AppCompatActivity implement
 
         LocationServices.getFusedLocationProviderClient(this).getLastLocation()
         .addOnSuccessListener(location -> {
+            if (location == null) return;
             LatLng currentLatLng = new LatLng(location.getLatitude(),
                     location.getLongitude());
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,

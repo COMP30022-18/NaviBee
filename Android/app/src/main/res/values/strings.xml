@@ -240,6 +240,7 @@
     <string name="dialog_method_of_travel_driving">Driving</string>
     <string name="dialog_method_of_travel_walking">Walking</string>
     <string name="dialog_method_of_travel_transit">Public transport</string>
+    <string name="location_not_found">Sorry, we couldn\'t find your location. Please move to a place with better GPS signal.</string>
     <string name="action_just_once">Just once</string>
     <string name="action_always">Always</string>
     <string name="action_reply">Reply</string>

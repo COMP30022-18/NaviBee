@@ -106,6 +106,7 @@ dependencies {
     implementation 'com.sloydev:collapsingavatartoolbar:1.0.0'
     implementation 'com.github.yhaolpz:FloatWindow:1.0.9'
     implementation 'com.github.antonKozyriatskyi:CircularProgressIndicator:1.2.2'
+    implementation 'com.github.jorgecastilloprz:fabprogresscircle:1.01@aar'
 
     kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.6.0'
 

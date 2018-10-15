@@ -22,8 +22,10 @@ import android.widget.Toast;
 import com.commit451.modalbottomsheetdialogfragment.ModalBottomSheetDialogFragment;
 import com.commit451.modalbottomsheetdialogfragment.Option;
 import com.commit451.modalbottomsheetdialogfragment.OptionRequest;
+import com.github.jorgecastilloprz.FABProgressCircle;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.vansuita.pickimage.bean.PickResult;
@@ -74,6 +76,9 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
 
     private ModalBottomSheetDialogFragment.Builder extraDialog;
 
+    private FABProgressCircle extraProgressCircle;
+    private FloatingActionButton extraButton;
+
     BroadcastReceiver msgUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -105,6 +110,9 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
         chatRecyclerView.setLayoutManager(chatLayoutManager);
         chatAdapter = new ChatAdapter(conversation.getCurrentMessageList(), chatRecyclerView, this);
         chatRecyclerView.setAdapter(chatAdapter);
+
+        extraButton = findViewById(R.id.btn_send_extra);
+        extraProgressCircle = findViewById(R.id.btn_send_extra_circle);
 
         setSupportActionBar(findViewById(R.id.activity_chat_toolbar));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -226,7 +234,15 @@ public class ChatActivity extends AppCompatActivity implements IPickResult, Moda
     @Override
     public void onPickResult(PickResult r) {
         if (r.getError() == null) {
-            conversation.sendPicture(r.getUri());
+            extraProgressCircle.show();
+            extraButton.setEnabled(false);
+            conversation.sendPicture(r.getUri(), ((isSuccess, path) -> {
+                if (isSuccess)
+                    extraProgressCircle.beginFinalAnimation();
+                else
+                    extraProgressCircle.hide();
+                extraButton.setEnabled(true);
+            }));
         } else {
             //Handle possible errors
             Toast.makeText(this, r.getError().getMessage(), Toast.LENGTH_LONG).show();
