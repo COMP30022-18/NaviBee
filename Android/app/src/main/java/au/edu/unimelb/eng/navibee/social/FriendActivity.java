@@ -324,13 +324,6 @@ public class FriendActivity extends AppCompatActivity {
         );
 
         fab.setOnActionSelectedListener(fabListener);
-
-        loadChatsList();
-        loadContactList();
-
-        registerReceiver(convUpdateReceiver, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
-
-        registerReceiver(msgUpdateReceiver, new IntentFilter(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE));
     }
 
     SpeedDialView.OnActionSelectedListener fabListener = speedDialActionItem -> {
@@ -347,8 +340,17 @@ public class FriendActivity extends AppCompatActivity {
     };
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(convUpdateReceiver, new IntentFilter(ConversationManager.BROADCAST_CONVERSATION_UPDATED));
+        registerReceiver(msgUpdateReceiver, new IntentFilter(ConversationManager.BROADCAST_MESSAGE_READ_CHANGE));
+        loadContactList();
+        loadChatsList();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
         unregisterReceiver(convUpdateReceiver);
         unregisterReceiver(msgUpdateReceiver);
     }
