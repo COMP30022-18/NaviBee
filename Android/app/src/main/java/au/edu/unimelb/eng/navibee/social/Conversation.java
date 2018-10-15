@@ -2,24 +2,16 @@ package au.edu.unimelb.eng.navibee.social;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import androidx.annotation.Nullable;
-
 import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -191,6 +183,7 @@ public abstract class Conversation {
         for (String idString: ids) {
             int id = Integer.parseInt(idString);
             notificationManager.cancel(id);
+            MyFirebaseMessagingService.messages.delete(id);
         }
     }
 

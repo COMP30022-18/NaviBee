@@ -169,7 +169,7 @@ class URLChipDrawableCacheLoader
 
 abstract class URLCallbackCacheLoader
 @JvmOverloads constructor(private val url: String,
-                          prefix: String = "image-url"):
+                          private val prefix: String = "image-url"):
         CachedLoader(prefix) {
     override val defaultKey = url
 
@@ -198,6 +198,23 @@ abstract class URLCallbackCacheLoader
 
     fun getBitmap(file: File) =
             BitmapFactory.decodeStream(FileInputStream(file))
+
+    @JvmOverloads
+    fun getFileAndExecute(key: String? = null): File {
+        val k = key ?: defaultKey
+        val file = File(
+                NaviBeeApplication.instance.cacheDir,
+                "$prefix-${sha256String(k)}"
+        )
+        job = launch {
+            if (file.exists()) {
+                postLoad(file)
+            } else {
+                loadTask(file)
+            }
+        }
+        return file
+    }
 
     abstract override fun postLoad(file: File)
 }

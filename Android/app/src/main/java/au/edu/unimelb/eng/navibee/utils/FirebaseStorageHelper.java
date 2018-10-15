@@ -240,12 +240,72 @@ public class FirebaseStorageHelper {
         }
     }
 
+    public static void loadImage(String filePath, boolean isThumb, FileCallback callback) {
+
+        if (isThumb) {
+            int where = filePath.lastIndexOf(".");
+            filePath = filePath.substring(0, where) + "-thumb" + filePath.substring(where);
+        }
+
+        // fs- is for firebase storage caches
+        String filename = "fs-"+ sha256(filePath);
+        File file = new File(NaviBeeApplication.getInstance().getCacheDir(), filename);
+
+        if (file.exists()) {
+            // cache exists
+            if (callback!=null) callback.callback(true, file);
+        } else {
+            // cache not exists
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReference();
+            storageRef = storageRef.child(filePath);
+            storageRef.getFile(file).addOnSuccessListener(taskSnapshot -> {
+                // Local temp file has been created
+                if (callback!=null) callback.callback(true, file);
+            }).addOnFailureListener(taskSnapshot -> {
+                if (callback!=null) callback.callback(false, null);
+            });
+
+        }
+    }
+
+    public static File loadImageWithFile(String filePath, boolean isThumb) {
+
+        if (isThumb) {
+            int where = filePath.lastIndexOf(".");
+            filePath = filePath.substring(0, where) + "-thumb" + filePath.substring(where);
+        }
+
+        // fs- is for firebase storage caches
+        String filename = "fs-"+ sha256(filePath);
+        File file = new File(NaviBeeApplication.getInstance().getCacheDir(), filename);
+
+        if (file.exists()) {
+            return file;
+        } else {
+            // cache not exists
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReference();
+            storageRef = storageRef.child(filePath);
+            storageRef.getFile(file).addOnSuccessListener(taskSnapshot -> {
+                // Local temp file has been created
+                Bitmap b = loadImageFromCacheFile(file);
+            }).addOnFailureListener(taskSnapshot -> {
+            });
+            return file;
+        }
+    }
+
     public interface Callback {
         void callback(boolean isSuccess);
     }
 
     public interface PayloadCallback {
         void callback(boolean isSuccess, Bitmap bitmap);
+    }
+
+    public interface FileCallback {
+        void callback(boolean isSuccess, File file);
     }
 
     private static String sha256(String url) {

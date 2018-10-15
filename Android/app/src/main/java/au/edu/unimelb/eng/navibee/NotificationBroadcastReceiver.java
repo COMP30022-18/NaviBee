@@ -33,8 +33,8 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
             sendMessageByConvId(convId, "text", message);
 
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(NaviBeeApplication.getInstance());
-
             notificationManager.cancel(notiId);
+            MyFirebaseMessagingService.messages.remove(notiId);
         }
     }
 
