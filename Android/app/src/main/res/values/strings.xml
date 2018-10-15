@@ -23,7 +23,7 @@
     <string name="button_got_it">Got it</string>
     <string name="button_join">Join</string>
     <string name="button_send_message">Send message</string>
-    <string name="chat_type_message_here">Type your message…</string>
+    <string name="chat_type_message_here">Type here…</string>
     <string name="chat_voice_call">Voice call</string>
     <string name="chat_realtime_location">Realtime location</string>
     <string name="chat_type_private">Private chat</string>
