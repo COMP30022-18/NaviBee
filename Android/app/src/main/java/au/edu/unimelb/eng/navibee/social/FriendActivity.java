@@ -194,7 +194,6 @@ public class FriendActivity extends AppCompatActivity {
     private ArrayList<ContactItem> chatsList = new ArrayList<>();
 
     private FriendAdapter recyclerChatsAdapter;
-    private Button createGroupChatButton;
     private RecyclerView recyclerChatsList;
     private RecyclerView.LayoutManager recyclerChatsManager;
     private BottomNavigationView navigation;
