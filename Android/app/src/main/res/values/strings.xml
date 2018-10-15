@@ -330,6 +330,12 @@
     <string name="sos_main_text">Your emergency contact will be notified in</string>
     <string name="sos_time_unit">seconds</string>
     <string name="sos_notify_text">Notify Now</string>
+    <string name="sos_emergency_message">Emergency!</string>
+    <string name="sos_emergency_phone">Phone number is not valid!</string>
+    <string name="sos_emergency_empty_number">Empty phone number, no call</string>
+    <string name="sos_emergency_no_location">Unable to get current location</string>
+    <string name="sos_emergency_no_number">Unable to make phone call</string>
+    <string name="sos_emergency_sent_location">Sent location!</string>
     <string name="notification_image">sent you a photo</string>
     <string name="notification_voicecall">is calling you</string>
     <string name="notification_location">sent you a location</string>
@@ -337,6 +343,5 @@
     <string name="event_create_time_invalid">You can not create an event in the past.</string>
     <string name="notification_realtimelocation">wants to share location with you</string>
     <string name="chat_realtime_location_title">Location sharing</string>
-
 
 </resources>

@@ -42,7 +42,9 @@ public class FirebaseStorageHelper {
         }
 
         cursor.moveToFirst();
-        return cursor.getInt(0);
+        int i = cursor.getInt(0);
+        cursor.close();
+        return i;
     }
 
     private static byte[] scaleImage(Uri photoUri, int imageSize, int compressQuality) throws IOException {

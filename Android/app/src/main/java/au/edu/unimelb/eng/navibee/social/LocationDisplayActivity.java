@@ -1,6 +1,8 @@
 package au.edu.unimelb.eng.navibee.social;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
 
@@ -27,6 +29,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import au.edu.unimelb.eng.navibee.R;
 import au.edu.unimelb.eng.navibee.navigation.NavigationSelectorActivity;
 import au.edu.unimelb.eng.navibee.utils.URLImageViewCacheLoader;
+import kotlin.reflect.jvm.internal.impl.load.java.Constant;
 
 import static au.edu.unimelb.eng.navibee.utils.DimensionsUtilitiesKt.getStatusBarHeight;
 
@@ -60,8 +63,9 @@ public class LocationDisplayActivity extends AppCompatActivity implements OnMapR
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
 
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_FINE_LOCATION);
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_FINE_LOCATION);
         }
 
         TextView title = findViewById(R.id.chat_locationDisplay_title);
