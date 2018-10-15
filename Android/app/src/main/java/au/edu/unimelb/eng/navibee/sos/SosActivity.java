@@ -111,6 +111,7 @@ public class SosActivity extends AppCompatActivity {
                     mFusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
                         if (location != null) {
                             conv.sendLocation(location.getLatitude(), location.getLongitude());
+                            Toast.makeText(this, getString(R.string.sos_emergency_sent_location), Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -119,8 +120,8 @@ public class SosActivity extends AppCompatActivity {
         }
 
         // check digit only
-        if (!phoneNumber.isEmpty() && !android.text.TextUtils.isDigitsOnly(phoneNumber)) {
-            Toast.makeText(this, getString(R.string.sos_emergency_digits), Toast.LENGTH_SHORT).show();
+        if ((!phoneNumber.isEmpty() && !android.text.TextUtils.isDigitsOnly(phoneNumber)) || phoneNumber.isEmpty()) {
+            Toast.makeText(this, getString(R.string.sos_emergency_phone), Toast.LENGTH_SHORT).show();
         } else {
             // emergency phone call
             Intent callIntent = new Intent(Intent.ACTION_CALL);
