@@ -377,7 +377,7 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
     }
 
     private fun showPanorama() {
-        handler.removeCallbacks(hidePanoramaRunnable)
+        // handler.removeCallbacks(hidePanoramaRunnable)
         if (!panoramaExpanded) {
             panoramaExpanded = true
             navigationPanorama
@@ -385,7 +385,7 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
                     ?.setDuration(PANORAMA_ANIMATION_DURATION)
                     ?.scaleY(1.0f)
         }
-        handler.postDelayed(hidePanoramaRunnable, PANORAMA_DISPLAY_DURATION)
+        // handler.postDelayed(hidePanoramaRunnable, PANORAMA_DISPLAY_DURATION)
     }
 
     private val hidePanoramaRunnable: Runnable = Runnable {
@@ -397,7 +397,7 @@ class NavigationActivity : AppCompatActivity(), MilestoneEventListener,
     }
 
     private fun hidePanorama() {
-        handler.removeCallbacks(hidePanoramaRunnable)
+        // handler.removeCallbacks(hidePanoramaRunnable)
         hidePanoramaRunnable.run()
     }
 
