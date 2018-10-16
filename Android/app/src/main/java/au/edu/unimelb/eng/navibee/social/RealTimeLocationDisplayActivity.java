@@ -258,6 +258,9 @@ public class RealTimeLocationDisplayActivity extends AppCompatActivity implement
                     location.getLongitude());
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,
                     10));
+
+            myLocation = currentLatLng;
+            update(true);
         });
 
         update(false);
