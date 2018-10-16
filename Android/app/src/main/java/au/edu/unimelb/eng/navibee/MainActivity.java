@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Update app DPI for debug purpose.
+        NaviBeeApplication.getInstance().init();
         updateDpi(this);
         setContentView(R.layout.activity_main);
 
@@ -169,6 +170,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void logOut() {
         // sign out firebase
+        NaviBeeApplication.getInstance().uninit();
+
         FirebaseAuth.getInstance().signOut();
 
         // sign out google login

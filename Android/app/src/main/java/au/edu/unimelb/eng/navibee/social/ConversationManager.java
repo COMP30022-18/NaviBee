@@ -8,6 +8,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
@@ -24,6 +25,9 @@ public class ConversationManager {
 
 
     private static ConversationManager instance = null;
+
+    private static ListenerRegistration mListener1;
+    private static ListenerRegistration mListener2;
 
     public static ConversationManager getInstance() {
         return instance;
@@ -59,7 +63,7 @@ public class ConversationManager {
 
     private void listenPrivateConv() {
         // private conversation (friend list)
-        db.collection("conversations")
+        mListener1 = db.collection("conversations")
                 .whereEqualTo("isDeleted", false)
                 .whereEqualTo("users."+uid, true)
                 .whereEqualTo("type", "private")
@@ -118,7 +122,7 @@ public class ConversationManager {
 
     private void listenGroupConv() {
         // private conversation (friend list)
-        db.collection("conversations")
+        mListener2 = db.collection("conversations")
                 .whereEqualTo("users."+uid, true)
                 .whereEqualTo("isDeleted", false)
                 .whereEqualTo("type", "group")
@@ -170,6 +174,14 @@ public class ConversationManager {
             }
         }
         return "";
+    }
+
+    public void stopListening() {
+        mListener1.remove();
+        mListener2.remove();
+        for (Conversation conv :convIdMap.values()) {
+            conv.stopListening();
+        }
     }
 
     public Conversation getConversation(String convId) {

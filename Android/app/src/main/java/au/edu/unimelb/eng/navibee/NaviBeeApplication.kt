@@ -70,6 +70,12 @@ class NaviBeeApplication : Application() {
         }
     }
 
+    public fun uninit() {
+        ConversationManager.getInstance().stopListening();
+        inited = false;
+        FallDetection.getInstance().stop();
+    }
+
 
     private fun setFCMToken() {
         FirebaseInstanceId.getInstance().instanceId

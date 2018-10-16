@@ -43,7 +43,7 @@ public class RealTimeLocationDisplayActivity extends AppCompatActivity implement
 
     private static final float DEFAULT_ZOOM_LEVEL = 15.0f;
     private static final int PERMISSIONS_REQUEST_FINE_LOCATION = 1;
-    private static final int UPDATE_INTERVAL = 4 * 1000;
+    private static final int UPDATE_INTERVAL = 8 * 1000;
     private static final long EXPIRE_TIME = 2 * 60 * 1000;
 
     private PrivateConversation conv;
