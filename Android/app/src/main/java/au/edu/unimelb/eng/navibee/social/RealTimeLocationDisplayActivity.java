@@ -124,6 +124,7 @@ public class RealTimeLocationDisplayActivity extends AppCompatActivity implement
                     } else {
                         if (marker != null) {
                             marker.remove();
+                            marker = null;
                             location = null;
                         }
                     }
