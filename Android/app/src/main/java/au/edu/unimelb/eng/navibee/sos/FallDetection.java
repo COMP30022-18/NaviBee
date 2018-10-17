@@ -12,7 +12,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public class FallDetection implements SensorEventListener {
     private static final FallDetection instance = new FallDetection();
-    private static final double FALL_THRESHOLD = 0.5d;
+    private static final double FALL_THRESHOLD = 1.8d;
 
     public static FallDetection getInstance() {
         return instance;
