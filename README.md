@@ -3,12 +3,24 @@
 ![GitHub repo size in bytes](https://img.shields.io/github/repo-size/COMP30022-18/NaviBee.svg)
 
 [description]
+NaviBee is a Location-based Android smartphone app project designed for elderly people.
+
+The app is special designed for helping elderly people to reach their destination by providing sufficient help and easily understanding UI.
+One-to-one and One-to-many communication using rich media(text, image, voice call, location and real-time location) is also provided for elderly people as extra help.
+The function of Events and SOS are provided to users for social activities and emergency situation.  
+
 
 ### Screenshot
 [screenshot]
 
 ### Key features
 [key features]
+1. Navigation
+2. Text/Voice/Image Communication
+3. Real-time Location share
+4. Group Events share
+5. Emergency Detection
+
 
 ## Technical details
 
