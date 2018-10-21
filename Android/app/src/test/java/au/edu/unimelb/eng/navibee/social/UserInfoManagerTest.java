@@ -32,7 +32,7 @@ public class UserInfoManagerTest {
     private FirebaseUser mFirebaseUser;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
 
         // create static mock
         mFirebaseAuth = mock(FirebaseAuth.class);
@@ -82,6 +82,6 @@ public class UserInfoManagerTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
     }
 }
