@@ -1,6 +1,7 @@
 # NaviBee
 [![Github](https://img.shields.io/github/license/COMP30022-18/NaviBee.svg)](https://github.com/COMP30022-18/NaviBee/blob/master/LICENSE)
 ![GitHub repo size in bytes](https://img.shields.io/github/repo-size/COMP30022-18/NaviBee.svg)
+[![Contributors](https://img.shields.io/github/contributors/COMP30022-18/NaviBee.svg)](https://github.com/COMP30022-18/NaviBee/graphs/contributors)
 
 NaviBee is a Location-based Android smartphone app designed for elderly people, which is the group project of Unimelb COMP30022 IT Project Course.
 
@@ -41,13 +42,13 @@ The function of Events and SOS are provided to users for social activities and e
 ```js
 /
 ├── Android/    
-|   |           // Android project root
+│   │           // Android project root
 │   ├── app/src/main/java/au/edu/unimelb/eng/navibee/
 │   │           // Main code
 │   └── app/src/test/java/au/edu/unimelb/eng/navibee/
 │               // Unit test
 ├── Backend/
-|               // Code for Firebase Cloud Function
+│               // Code for Firebase Cloud Function
 └── Tool/
                 // Code for migrating db during development
 ```
