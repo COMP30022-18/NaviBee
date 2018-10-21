@@ -1,7 +1,6 @@
 package au.edu.unimelb.eng.navibee.social;
 
 import android.content.Context;
-import android.speech.tts.Voice;
 
 import org.junit.After;
 import org.junit.Before;
@@ -55,11 +54,9 @@ public class VoiceCallEngineTest {
         mRtcEngine = mock(RtcEngine.class);
         when(mRtcEngine.muteLocalAudioStream(any(boolean.class))).thenReturn(0);
         when(mRtcEngine.setEnableSpeakerphone(any(boolean.class))).thenReturn(0);
-        when(mRtcEngine.joinChannel(eq(null), anyString(), eq(""), eq(0))).thenReturn(0);
+        when(mRtcEngine.joinChannel(eq(null), anyString(), eq(""),eq(0))).thenReturn(0);
 
         PowerMockito.mockStatic(RtcEngine.class);
-
-        assertEquals(VoiceCallEngine.getInstance().getmRtcEngine(), mRtcEngine);
 
         when(RtcEngine.create(eq(mContext), anyString(), any(IRtcEngineEventHandler.class))).thenReturn(mRtcEngine);
 
@@ -68,38 +65,38 @@ public class VoiceCallEngineTest {
     @Test
     public void testGetInstance() {
         assertNotNull(VoiceCallEngine.getInstance());
-        assertEquals(VoiceCallEngine.getInstance().getmRtcEngine(), mRtcEngine);
+        assertNotNull(VoiceCallEngine.getInstance().getmRtcEngine());
     }
 
     @Test
     public void testJoinChannel() {
         String cid = "channel id";
-        VoiceCallEngine.getInstance().joinChannel(cid, any(VoiceCallEngine.EventHandler.class));
-        verify(mRtcEngine, times(1)).joinChannel(null, cid, "", 0);
+        VoiceCallEngine.getInstance().joinChannel(cid, mock(VoiceCallEngine.EventHandler.class));
+        verify(VoiceCallEngine.getInstance().getmRtcEngine(), times(1)).joinChannel(null, cid,"",0);
     }
 
     @Test
     public void testMuteMic() {
         VoiceCallEngine.getInstance().muteMic();
-        verify(mRtcEngine, times(1)).muteLocalAudioStream(true);
+        verify(VoiceCallEngine.getInstance().getmRtcEngine(), times(1)).muteLocalAudioStream(true);
     }
 
     @Test
     public void testUnmuteMic() {
         VoiceCallEngine.getInstance().unmuteMic();
-        verify(mRtcEngine, times(1)).muteLocalAudioStream(false);
+        verify(VoiceCallEngine.getInstance().getmRtcEngine(), times(1)).muteLocalAudioStream(false);
     }
 
     @Test
     public void testUseSpeaker() {
         VoiceCallEngine.getInstance().useSpeaker();
-        verify(mRtcEngine, times(1)).setEnableSpeakerphone(true);
+        verify(VoiceCallEngine.getInstance().getmRtcEngine(), times(1)).setEnableSpeakerphone(true);
     }
 
     @Test
     public void testEarpiece() {
         VoiceCallEngine.getInstance().useEarpiece();
-        verify(mRtcEngine, times(1)).setEnableSpeakerphone(false);
+        verify(VoiceCallEngine.getInstance().getmRtcEngine(), times(1)).setEnableSpeakerphone(false);
     }
 
     @After
