@@ -2,7 +2,6 @@
 [![Github](https://img.shields.io/github/license/COMP30022-18/NaviBee.svg)](https://github.com/COMP30022-18/NaviBee/blob/master/LICENSE)
 ![GitHub repo size in bytes](https://img.shields.io/github/repo-size/COMP30022-18/NaviBee.svg)
 
-[description]
 NaviBee is a Location-based Android smartphone app project designed for elderly people.
 
 The app is special designed for helping elderly people to reach their destination by providing sufficient help and easily understanding UI.
@@ -29,7 +28,6 @@ The function of Events and SOS are provided to users for social activities and e
 </table>
 
 ### Key features
-[key features]
 1. Navigation
 2. Text/Voice/Image Communication
 3. Real-time Location share
@@ -42,7 +40,8 @@ The function of Events and SOS are provided to users for social activities and e
 ### Folder Structure
 ```js
 /
-├── Android/    // Android project root
+├── Android/    
+|   |           // Android project root
 │   ├── app/src/main/java/au/edu/unimelb/eng/navibee/
 │   │           // Main code
 │   └── app/src/test/java/au/edu/unimelb/eng/navibee/
