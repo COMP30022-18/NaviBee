@@ -42,6 +42,10 @@ public class VoiceCallEngine {
         }
     };
 
+    public RtcEngine getmRtcEngine() {
+        return this.mRtcEngine;
+    }
+
     private VoiceCallEngine() {
         try {
             mRtcEngine = RtcEngine.create(NaviBeeApplication.getInstance().getBaseContext(), NaviBeeApplication.getInstance().getString(R.string.agora_app_id), mRtcEventHandler);

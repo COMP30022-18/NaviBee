@@ -51,7 +51,7 @@ public class EventsActivityTest {
         images.add("image2");
         assertNotNull(images);
 
-        EventsActivity.EventItem eventItem = new EventsActivity.EventItem(name, holder, time_, users, images, placeName, longitude, latitude, isPrivate);
+        EventsActivity.EventItem eventItem = new EventsActivity.EventItem(name, holder, time, users, images, placeName, longitude, latitude, isPrivate);
         EventsActivity.EventItem eventItem_ = new EventsActivity.EventItem(name, holder, time_, users, images, placeName, longitude, latitude, isPrivate);
 
         // check values
