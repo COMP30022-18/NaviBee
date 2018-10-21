@@ -24,8 +24,6 @@ import static org.mockito.Mockito.when;
 @PrepareForTest({FirebaseAuth.class, FirebaseFirestore.class})
 public class UserInfoManagerTest {
 
-    private UserInfoManager userInfoManager;
-
     @Mock
     private FirebaseAuth mFirebaseAuth;
     @Mock
