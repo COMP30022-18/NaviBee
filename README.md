@@ -3,7 +3,7 @@
 ![GitHub repo size in bytes](https://img.shields.io/github/repo-size/COMP30022-18/NaviBee.svg)
 [![Contributors](https://img.shields.io/github/contributors/COMP30022-18/NaviBee.svg)](https://github.com/COMP30022-18/NaviBee/graphs/contributors)
 
-NaviBee is a Location-based Android smartphone app designed for elderly people, which is the group project of Unimelb COMP30022 IT Project Course.
+NaviBee is a Location-based Android smartphone app designed for elderly people, which is the group project of Unimelb COMP30022 IT Project.
 
 The app is specifically designed for helping elderly people reach their destinations through sufficient location-based functionalities with concise UI.
 One-to-one and One-to-many communications using rich media(text, image, voice call, location and real-time location) are also available for elderly people as extra help.
