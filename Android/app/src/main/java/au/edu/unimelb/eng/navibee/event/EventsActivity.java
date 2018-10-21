@@ -2,7 +2,6 @@ package au.edu.unimelb.eng.navibee.event;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.EventLogTags;
 import android.view.View;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -130,14 +129,13 @@ public class EventsActivity extends AppCompatActivity {
         eventIdMap = new HashMap<>();
 
         // set up recycler view
-        recyclerView = (RecyclerView) findViewById(R.id.events_recycler_view);
+        recyclerView = (RecyclerView)findViewById(R.id.events_recycler_view);
         viewManager = new LinearLayoutManager(this);
         viewAdapter = new EventsRVAdaptor(events);
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(viewManager);
         recyclerView.setAdapter(viewAdapter);
-//        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
 
         loadEvents();
 
@@ -152,22 +150,19 @@ public class EventsActivity extends AppCompatActivity {
     private void loadEvents() {
         eventList = new ArrayList<>();
 
-        db.collection("events").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
+        db.collection("events").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
 
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        EventItem eventItem = document.toObject(EventItem.class);
-                        eventIdMap.put(eventItem, document.getId());
-                        eventList.add(eventItem);
-                    }
-
-                } else {
-                    // fail to pull data
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    EventItem eventItem = document.toObject(EventItem.class);
+                    eventIdMap.put(eventItem, document.getId());
+                    eventList.add(eventItem);
                 }
-                updateRecyclerVIew();
+
+            } else {
+                // fail to pull data
             }
+            updateRecyclerVIew();
         });
     }
 
