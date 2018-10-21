@@ -2,10 +2,10 @@
 [![Github](https://img.shields.io/github/license/COMP30022-18/NaviBee.svg)](https://github.com/COMP30022-18/NaviBee/blob/master/LICENSE)
 ![GitHub repo size in bytes](https://img.shields.io/github/repo-size/COMP30022-18/NaviBee.svg)
 
-NaviBee is a Location-based Android smartphone app project designed for elderly people.
+NaviBee is a Location-based Android smartphone app designed for elderly people, which is the group project of Unimelb COMP30022 IT Project Course.
 
-The app is special designed for helping elderly people to reach their destination by providing sufficient help and easily understanding UI.
-One-to-one and One-to-many communication using rich media(text, image, voice call, location and real-time location) is also provided for elderly people as extra help.
+The app is specifically designed for helping elderly people reach their destinations through sufficient location-based functionalities with concise UI.
+One-to-one and One-to-many communications using rich media(text, image, voice call, location and real-time location) are also available for elderly people as extra help.
 The function of Events and SOS are provided to users for social activities and emergency situation.  
 
 
@@ -28,10 +28,10 @@ The function of Events and SOS are provided to users for social activities and e
 </table>
 
 ### Key features
-1. Navigation
-2. Text/Voice/Image Communication
+1. Location-based service
+2. Communication with rich media(Text/Voice/Image)
 3. Real-time Location share
-4. Group Events share
+4. Creating and joining Events 
 5. Emergency Detection
 
 
@@ -53,7 +53,7 @@ The function of Events and SOS are provided to users for social activities and e
 ```
 
 ### Setup
-NaviBee uses multiple online services and please follow the instruction below in order to build your own version.
+NaviBee uses multiple online services. Please follow the instruction below in order to build your own version.
 
 #### Firebase
 1. Register [here](https://firebase.google.com/) and create a new project.
