@@ -41,13 +41,13 @@ The function of Events and SOS are provided to users for social activities and e
 ```js
 /
 ├── Android/    
-|   |           // Android project root
+│   │           // Android project root
 │   ├── app/src/main/java/au/edu/unimelb/eng/navibee/
 │   │           // Main code
 │   └── app/src/test/java/au/edu/unimelb/eng/navibee/
 │               // Unit test
 ├── Backend/
-|               // Code for Firebase Cloud Function
+│               // Code for Firebase Cloud Function
 └── Tool/
                 // Code for migrating db during development
 ```
