@@ -10,7 +10,7 @@ One-to-one and one-to-many communications using rich media(text, image, voice ca
 The function of Events and SOS are provided to users for social activities and emergency situation.  
 
 
-### Screenshot
+### Screenshots
 <table border="0">
  <tr>
     <td><img src=".github/1.jpg"!></td>
