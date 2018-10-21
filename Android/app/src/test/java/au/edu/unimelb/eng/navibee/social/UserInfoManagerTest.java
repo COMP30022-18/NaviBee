@@ -24,8 +24,6 @@ import static org.mockito.Mockito.when;
 @PrepareForTest({FirebaseAuth.class, FirebaseFirestore.class})
 public class UserInfoManagerTest {
 
-    private UserInfoManager userInfoManager;
-
     @Mock
     private FirebaseAuth mFirebaseAuth;
     @Mock
@@ -34,7 +32,7 @@ public class UserInfoManagerTest {
     private FirebaseUser mFirebaseUser;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
 
         // create static mock
         mFirebaseAuth = mock(FirebaseAuth.class);
@@ -84,6 +82,6 @@ public class UserInfoManagerTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
     }
 }
