@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import au.edu.unimelb.eng.navibee.event.EventsActivity;
+
 import static org.junit.Assert.*;
 
 public class EventsActivityTest {
