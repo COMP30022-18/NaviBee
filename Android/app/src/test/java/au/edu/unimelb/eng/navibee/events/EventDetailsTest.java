@@ -1,4 +1,4 @@
-package au.edu.unimelb.eng.navibee;
+package au.edu.unimelb.eng.navibee.events;
 
 import com.google.firebase.Timestamp;
 
@@ -13,10 +13,10 @@ import java.util.Map;
 
 import au.edu.unimelb.eng.navibee.event.EventsActivity;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class EventsActivityTest {
-
+public class EventDetailsTest {
     @Before
     public void setUp() throws Exception {
     }
@@ -24,9 +24,16 @@ public class EventsActivityTest {
     @Test
     public void testEventItem() {
 
+        final double unitTestDelta = 0.001;
+
         String name = "name";
         String holder = "holder";
-        String location = "location";
+        String placeName = "placeName";
+
+        double longitude = 0.0;
+        double latitude = 0.0;
+
+        Boolean isPrivate = false;
 
         Map<String, Boolean> users = new HashMap<>();
         users.put("user1", true);
@@ -41,40 +48,36 @@ public class EventsActivityTest {
         images.add("image2");
         assertNotNull(images);
 
-        EventsActivity.EventItem eventItem = new EventsActivity.EventItem(name, holder, location, time, users, images);
-        EventsActivity.EventItem eventItem_ = new EventsActivity.EventItem(name, holder, location, time_, users, images);
+        EventsActivity.EventItem eventItem = new EventsActivity.EventItem(name, holder, time_, users, images, placeName, longitude, latitude, isPrivate);
+        EventsActivity.EventItem eventItem_ = new EventsActivity.EventItem(name, holder, time_, users, images, placeName, longitude, latitude, isPrivate);
 
         // check values
         assertEquals(name, eventItem.getName());
         assertEquals(holder, eventItem.getHolder());
-        assertEquals(location, eventItem.getLocation());
+        assertEquals(isPrivate, eventItem.getIsPrivate());
         assertEquals(users, eventItem.getUsers());
         assertEquals(time, eventItem.getTime());
         assertEquals(time_, eventItem.getTime_());
         assertEquals(images, eventItem.getImages());
+        assertEquals(longitude, eventItem.getLongitude(), unitTestDelta);
+        assertEquals(latitude, eventItem.getLatitude(), unitTestDelta);
+        assertEquals(placeName, eventItem.getPlaceName());
 
         assertEquals(name, eventItem_.getName());
         assertEquals(holder, eventItem_.getHolder());
-        assertEquals(location, eventItem_.getLocation());
+        assertEquals(isPrivate, eventItem_.getIsPrivate());
         assertEquals(users, eventItem_.getUsers());
         assertEquals(time, eventItem_.getTime());
         assertEquals(time_, eventItem_.getTime_());
         assertEquals(images, eventItem_.getImages());
+        assertEquals(longitude, eventItem_.getLongitude(), unitTestDelta);
+        assertEquals(latitude, eventItem_.getLatitude(), unitTestDelta);
+        assertEquals(placeName, eventItem_.getPlaceName());
 
-        assertTrue(!eventItem.isTag());
-        eventItem.setTag(true);
-        assertTrue(eventItem.isTag());
-
-        assertNull(eventItem.getEventId());
-        String eventId = "event id";
-        eventItem.setEventId(eventId);
-        assertNotNull(eventItem.getEventId());
-        assertEquals(eventId, eventItem.getEventId());
 
     }
 
     @After
     public void tearDown() throws Exception {
     }
-
 }
