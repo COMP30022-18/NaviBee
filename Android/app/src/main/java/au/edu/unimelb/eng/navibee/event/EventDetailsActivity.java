@@ -62,12 +62,8 @@ public class EventDetailsActivity extends AppCompatActivity {
     private ArrayList<SimpleRecyclerViewItem> listItems = new ArrayList<>();
 
     private CoordinatorLayout coordinatorLayout;
-
     private CarouselView carouselView;
-
     private EventsActivity.EventItem eventItem;
-//    private Map<String, HashMap<String, String>> result;
-
     private Map<String, String> userMap;
 
     private int titleRowHeight = -1;
@@ -258,7 +254,6 @@ public class EventDetailsActivity extends AppCompatActivity {
 
             String holder = stringUserInfoMap.get(eventItem.getHolder()).getName();
             ArrayList<UserInfoManager.UserInfo> participants = new ArrayList<>();
-//            ArrayList<String> photos = new ArrayList<>();
 
             userMap = new HashMap<>();
 
@@ -457,7 +452,6 @@ public class EventDetailsActivity extends AppCompatActivity {
         Intent intent = new Intent(getBaseContext(), NavigationSelectorActivity.class);
         intent.putExtra(NavigationSelectorActivity.EXTRA_LATITUDE, eventItem.getLatitude());
         intent.putExtra(NavigationSelectorActivity.EXTRA_LONGITUDE, eventItem.getLongitude());
-//        intent.putExtra(NavigationSelectorActivity.EXTRA_DESTINATION_NAME, eventItem.getPlaceName());
 
         startActivity(intent);
     }

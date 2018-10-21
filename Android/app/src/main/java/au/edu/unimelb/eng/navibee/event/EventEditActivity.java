@@ -42,7 +42,6 @@ import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 
 import java.io.ByteArrayOutputStream;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -266,8 +265,6 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
             if (convertView == null) {
                 // if it's not recycled, initialize some attributes
                 imageView = new SquareImageView(mContext);
-//                int width = Resources.getSystem().getDisplayMetrics().widthPixels;
-//                imageView.setLayoutParams(new GridView.LayoutParams(10*width/30, 10*width/30));
                 imageView.setLayoutParams(new ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT));
@@ -404,7 +401,6 @@ public class EventEditActivity extends AppCompatActivity implements TimePickerDi
     }
 
     private void setChipGroupView(HashMap<String, UserInfoManager.UserInfo> selected){
-        //ArrayList<Chip> chipList = new ArrayList<>();
 
         StringBuilder sb = new StringBuilder();
         ArrayList<String> uids = new ArrayList<>(selected.keySet());

@@ -36,7 +36,7 @@ public class EventPicFullscreenActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, Menu.FIRST + 0, 0, "Delete This");
+        menu.add(Menu.NONE, Menu.FIRST + 0, 0, R.string.eventPicFullscreen_delete_this);
         getMenuInflater().inflate(R.menu.menu_event_pic_fullscreen, menu);
         return true;
     }
@@ -45,7 +45,7 @@ public class EventPicFullscreenActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case Menu.FIRST + 0:
-                Toast.makeText(this, "Edit is clicked", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.eventPicFullscreen_edit_clicked, Toast.LENGTH_SHORT).show();
                 deletePic();
                 break;
             default:
@@ -56,21 +56,15 @@ public class EventPicFullscreenActivity extends AppCompatActivity {
 
     private void deletePic(){
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("Alert");
-        dialog.setMessage("Are you sure you want to DELETE this photo?");
-        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                dialoginterface.cancel();
-            }
-        });
-        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialoginterface, int i) {
-                Intent intent = new Intent(EventPicFullscreenActivity.this, EventEditActivity.class);
-                intent.putExtra("position", position);
-                intent.putExtra("isDeleted", true);
-                setResult(RESULT_OK, intent);
-                finish();
-            }
+        dialog.setTitle(getString(R.string.eventPicFullscreen_alert));
+        dialog.setMessage(getString(R.string.eventFullScreen_delete_question));
+        dialog.setNegativeButton("Cancel", (dialoginterface, i) -> dialoginterface.cancel());
+        dialog.setPositiveButton("Ok", (dialoginterface, i) -> {
+            Intent intent = new Intent(EventPicFullscreenActivity.this, EventEditActivity.class);
+            intent.putExtra("position", position);
+            intent.putExtra("isDeleted", true);
+            setResult(RESULT_OK, intent);
+            finish();
         });
         dialog.show();
     }
