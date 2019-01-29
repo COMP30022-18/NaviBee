@@ -89,7 +89,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/all-contri
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore -->
-| [<img src="https://avatars2.githubusercontent.com/u/553831?v=4" width="100px;" alt="Eana Hufwe"/><br /><sub><b>Eana Hufwe</b></sub>](https://1a23.com)<br />[💻](https://github.com/COMP30022-18/NaviBee/commits?author=blueset "Code") | [<img src="https://avatars1.githubusercontent.com/u/8278409?v=4" width="100px;" alt="Zijun Chen"/><br /><sub><b>Zijun Chen</b></sub>](https://github.com/CaviarChen)<br />[💻](https://github.com/COMP30022-18/NaviBee/commits?author=CaviarChen "Code") |
+| [<img src="https://avatars2.githubusercontent.com/u/553831?v=4" width="100px;" alt="Eana Hufwe"/><br /><sub><b>Eana Hufwe</b></sub>](https://1a23.com)<br />[💻](https://github.com/COMP30022-18/NaviBee/commits?author=blueset "Code") | [<img src="https://avatars1.githubusercontent.com/u/8278409?v=4" width="100px;" alt="Zijun Chen"/><br /><sub><b>Zijun Chen</b></sub>](https://github.com/CaviarChen)<br />[💻](https://github.com/COMP30022-18/NaviBee/commits?author=CaviarChen "Code") | [<img src="https://avatars2.githubusercontent.com/u/21303543?v=4" width="100px;" alt="Wenqing Xue"/><br /><sub><b>Wenqing Xue</b></sub>](http://marsx.vip)<br />[💻](https://github.com/COMP30022-18/NaviBee/commits?author=MarsXue "Code") |
 | :---: | :---: |
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
