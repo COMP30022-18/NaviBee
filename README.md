@@ -1,5 +1,5 @@
 # NaviBee
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors)
 [![Github](https://img.shields.io/github/license/COMP30022-18/NaviBee.svg)](https://github.com/COMP30022-18/NaviBee/blob/master/LICENSE)
 ![GitHub repo size in bytes](https://img.shields.io/github/repo-size/COMP30022-18/NaviBee.svg)
 [![Contributors](https://img.shields.io/github/contributors/COMP30022-18/NaviBee.svg)](https://github.com/COMP30022-18/NaviBee/graphs/contributors)
@@ -89,8 +89,8 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/all-contri
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore -->
-| [<img src="https://avatars2.githubusercontent.com/u/553831?v=4" width="100px;" alt="Eana Hufwe"/><br /><sub><b>Eana Hufwe</b></sub>](https://1a23.com)<br />[💻](https://github.com/COMP30022-18/NaviBee/commits?author=blueset "Code") |
-| :---: |
+| [<img src="https://avatars2.githubusercontent.com/u/553831?v=4" width="100px;" alt="Eana Hufwe"/><br /><sub><b>Eana Hufwe</b></sub>](https://1a23.com)<br />[💻](https://github.com/COMP30022-18/NaviBee/commits?author=blueset "Code") | [<img src="https://avatars0.githubusercontent.com/u/39451885?v=4" width="100px;" alt="cmjhaha886"/><br /><sub><b>cmjhaha886</b></sub>](https://github.com/cmjhaha886)<br />[💻](https://github.com/COMP30022-18/NaviBee/commits?author=cmjhaha886 "Code") |
+| :---: | :---: |
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
