@@ -1,4 +1,5 @@
 # NaviBee
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors)
 [![Github](https://img.shields.io/github/license/COMP30022-18/NaviBee.svg)](https://github.com/COMP30022-18/NaviBee/blob/master/LICENSE)
 ![GitHub repo size in bytes](https://img.shields.io/github/repo-size/COMP30022-18/NaviBee.svg)
 [![Contributors](https://img.shields.io/github/contributors/COMP30022-18/NaviBee.svg)](https://github.com/COMP30022-18/NaviBee/graphs/contributors)
@@ -81,3 +82,15 @@ NaviBee uses multiple online services. Please follow the instruction below in or
     hereAppCode=Oz44KS6KaL44Gb44Gq44GM
     hereLicenseKey=44KJ5raI44GI44Gm44KG44GP5YWJ5peF44Gu57WC44KP44KK44Gu5aSi44Gr6KaL44Gf5a2Y5Zyo44Gr5YOV44Gv44Gq44KM44G+44GZ44KI44GG44Gr44Gq44KM44G+44GZ44KI44GG44Gr44Kq44Ov44Op44OK44Kk44Km44K/44Oy44Km44K/44Kq44Km44Oc44Kv44Ks44Kq44Ov44OD44OG44K344Oe44Km44Oe44Ko44OL57a044Gj44Gm6YCj44Gt44Gm56eB44GM44GC44Gf44GX44GM44Gd44Gu5oCd5oOz44KS5Y+r44G244GL44KJ5o+P44GE44Gm55CG5oOz44KS44Gd44Gu5oCd44GE44Gv6Kqw44Gr44KC6Kem44KM44GV44Gb44Gq44GE6IG044GT44GI44KL44GT44Gu5aOw44GC44Gf44GX44GM44Gd44Gu6Kq56KyX44KS5o6744GN44GR44GZ44GL44KJ44KP44GL44Gj44Gm44KL5pys5b2T44Gv5ZCb44GM6Kqw44KI44KK5YSq44GX44GE44Gj44Gm44GT44Go44KS5LqM5Lq644Gv44Gp44KT44Gq44Gr44Gf44GP44GV44KT44Gu6KiA6JGJ44KS5oCd44GE44Gk44GE44Gf44GT44Go44Gg44KN44GG44G=
     ```
+
+## Contributors
+
+Thanks goes to these wonderful people ([emoji key](https://github.com/all-contributors/all-contributors#emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore -->
+| [<img src="https://avatars2.githubusercontent.com/u/553831?v=4" width="100px;" alt="Eana Hufwe"/><br /><sub><b>Eana Hufwe</b></sub>](https://1a23.com)<br />[💻](https://github.com/COMP30022-18/NaviBee/commits?author=blueset "Code") |
+| :---: |
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
