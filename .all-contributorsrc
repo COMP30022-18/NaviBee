@@ -1,0 +1,23 @@
+{
+  "projectName": "NaviBee",
+  "projectOwner": "COMP30022-18",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "blueset",
+      "name": "Eana Hufwe",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/553831?v=4",
+      "profile": "https://1a23.com",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}
