@@ -1,5 +1,5 @@
 # NaviBee
-[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors)
+[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg)](#contributors)
 [![Github](https://img.shields.io/github/license/COMP30022-18/NaviBee.svg)](https://github.com/COMP30022-18/NaviBee/blob/master/LICENSE)
 ![GitHub repo size in bytes](https://img.shields.io/github/repo-size/COMP30022-18/NaviBee.svg)
 [![Contributors](https://img.shields.io/github/contributors/COMP30022-18/NaviBee.svg)](https://github.com/COMP30022-18/NaviBee/graphs/contributors)
